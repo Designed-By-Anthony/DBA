@@ -1,83 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { and, eq, gt } from "drizzle-orm";
+import { getDb, portalSessions, portalTokens } from "@dba/database";
+import crypto from "crypto";
+import { hashPortalToken } from "@/lib/portal-auth";
 
 /**
- * Magic Link Token Verification
- * 
- * POST /api/portal/verify
- * Body: { token: string }
- * 
- * Validates the token, marks it as used, and sets a session cookie.
+ * Magic Link Token Verification.
+ * Validates a token in SQL, marks it used, and creates a scoped portal session.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { token } = await request.json();
+    const { token } = (await request.json()) as { token?: string };
 
     if (!token) {
-      return NextResponse.json({ error: 'Token required' }, { status: 400 });
+      return NextResponse.json({ error: "Token required" }, { status: 400 });
     }
 
-    // Find the token in Firestore
-    let tokenQuery;
-    try {
-      tokenQuery = await db
-        .collection('portal_tokens')
-        .where('token', '==', token)
-        .where('used', '==', false)
-        .limit(1)
-        .get();
-    } catch {
-      return NextResponse.json({ error: 'Token validation failed' }, { status: 500 });
+    const database = getDb();
+    if (!database) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     }
 
-    if (!tokenQuery || tokenQuery.empty) {
-      return NextResponse.json({ error: 'Invalid or already-used token' }, { status: 401 });
+    const nowIso = new Date().toISOString();
+    const tokenHash = hashPortalToken(token);
+
+    const tokenRows = await database
+      .select()
+      .from(portalTokens)
+      .where(
+        and(
+          eq(portalTokens.tokenHash, tokenHash),
+          eq(portalTokens.used, false),
+          gt(portalTokens.expiresAt, nowIso),
+        ),
+      )
+      .limit(1);
+
+    const tokenRow = tokenRows[0];
+    if (!tokenRow) {
+      return NextResponse.json({ error: "Invalid or already-used token" }, { status: 401 });
     }
 
-    const tokenDoc = tokenQuery.docs[0];
-    const tokenData = tokenDoc.data();
+    await database
+      .update(portalTokens)
+      .set({
+        used: true,
+        usedAt: nowIso,
+      })
+      .where(eq(portalTokens.id, tokenRow.id));
 
-    // Check expiration
-    if (new Date(tokenData.expiresAt) < new Date()) {
-      return NextResponse.json({ error: 'This link has expired. Please request a new one.' }, { status: 401 });
-    }
+    const sessionToken = crypto.randomBytes(32).toString("hex");
+    const sessionTokenHash = hashPortalToken(sessionToken);
+    const sessionExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // Mark token as used
-    await db.collection('portal_tokens').doc(tokenDoc.id).update({ used: true });
-
-    // Generate a session token
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    const sessionExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    // Store session in Firestore (agencyId scopes portal data to the correct org)
-    await db.collection('portal_sessions').add({
-      sessionToken,
-      prospectId: tokenData.prospectId,
-      agencyId: tokenData.agencyId || '',
-      email: tokenData.email,
+    await database.insert(portalSessions).values({
+      tenantId: tokenRow.tenantId,
+      prospectId: tokenRow.prospectId,
+      prospectEmail: tokenRow.prospectEmail,
+      prospectName: tokenRow.prospectName,
+      sessionTokenHash,
       expiresAt: sessionExpiry.toISOString(),
-      createdAt: new Date().toISOString(),
+      createdAt: nowIso,
     });
 
-    // Set session cookie
     const response = NextResponse.json({
       success: true,
-      prospectId: tokenData.prospectId,
+      prospectId: tokenRow.prospectId,
     });
 
-    response.cookies.set('portal_session', sessionToken, {
+    response.cookies.set("portal_session", sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       expires: sessionExpiry,
-      path: '/',
+      path: "/",
     });
 
     return response;
   } catch (error: unknown) {
-    console.error('Token verification error:', error);
-    const msg = error instanceof Error ? error.message : 'Internal error';
+    console.error("Token verification error:", error);
+    const msg = error instanceof Error ? error.message : "Internal error";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { getTenantByOrgId } from "@/lib/tenant-db";
+import { getVerticalConfig } from "@/lib/vertical-config";
 import KitchenDisplay from "./KitchenDisplay";
 import JobEstimator from "./JobEstimator";
 
@@ -13,17 +13,16 @@ export default async function VerticalExperience({ children }: { children: React
     return <>{children}</>;
   }
 
-  const tenant = await getTenantByOrgId(orgId);
-  const vertical = tenant?.vertical;
+  const vertical = await getVerticalConfig(orgId);
 
   return (
     <>
-      {vertical === "restaurant" ? (
+      {vertical.id === "food" ? (
         <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
           <KitchenDisplay />
         </div>
       ) : null}
-      {vertical === "roofer" ? (
+      {vertical.id === "contractor" ? (
         <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
           <JobEstimator />
         </div>

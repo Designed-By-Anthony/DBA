@@ -32,10 +32,10 @@ export default function PortalLoginPage() {
   const [error, setError] = useState("");
   const [branding, setBranding] = useState<PortalBranding>(DEFAULT_BRANDING);
   const searchParams = useSearchParams();
+  const orgId = searchParams.get("org");
 
   // Load org branding if ?org= param exists
   useEffect(() => {
-    const orgId = searchParams.get("org");
     if (!orgId) return;
 
     async function loadBranding() {
@@ -54,7 +54,7 @@ export default function PortalLoginPage() {
       }
     }
     loadBranding();
-  }, [searchParams]);
+  }, [orgId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +67,7 @@ export default function PortalLoginPage() {
       const res = await fetch("/api/portal/magic-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), orgId }),
       });
 
       if (res.ok) {
@@ -128,7 +128,7 @@ export default function PortalLoginPage() {
         />
 
         <div className="text-center mb-6">
-          {!searchParams.get("org") ? (
+          {!orgId ? (
             <div className="mx-auto mb-4 flex justify-center">
               <Image
                 src={BRAND_ASSETS.mark}

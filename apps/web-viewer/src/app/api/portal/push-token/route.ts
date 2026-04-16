@@ -1,74 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import { NextRequest, NextResponse } from "next/server";
+import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 
 /**
  * POST /api/portal/push-token
- * Saves the client's FCM push token to their Firestore record.
- * Called by NotificationOptIn after the browser grants permission.
+ * Placeholder endpoint: push token persistence is disabled until SQL notification table lands.
  */
 export async function POST(request: NextRequest) {
-  const sessionToken = request.cookies.get('portal_session')?.value;
-  if (!sessionToken) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  const session = await getPortalSessionFromRequest(request);
+  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    const { token } = await request.json();
-    if (!token || typeof token !== 'string') {
-      return NextResponse.json({ error: 'Token is required' }, { status: 400 });
+    const { token } = (await request.json()) as { token?: string };
+    if (!token || typeof token !== "string") {
+      return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
 
-    // Find session
-    const sessionQuery = await db
-      .collection('portal_sessions')
-      .where('sessionToken', '==', sessionToken)
-      .limit(1)
-      .get();
-
-    if (sessionQuery.empty) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
-
-    const session = sessionQuery.docs[0].data();
-    const prospectId = session.prospectId as string;
-
-    // Save FCM token to prospect record
-    await db.collection('prospects').doc(prospectId).update({
-      fcmToken: token,
-      notifyByPush: true,
-      pushTokenUpdatedAt: new Date().toISOString(),
-    });
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, persisted: false });
   } catch (err) {
-    console.error('Push token save error:', err);
-    return NextResponse.json({ error: 'Failed to save token' }, { status: 500 });
+    console.error("Push token save error:", err);
+    return NextResponse.json({ error: "Failed to process token" }, { status: 500 });
   }
 }
 
 /**
  * DELETE /api/portal/push-token
- * Removes the FCM token (client opts out of push notifications)
+ * No-op while push token SQL storage is pending.
  */
 export async function DELETE(request: NextRequest) {
-  const sessionToken = request.cookies.get('portal_session')?.value;
-  if (!sessionToken) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  const session = await getPortalSessionFromRequest(request);
+  if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  try {
-    const sessionQuery = await db
-      .collection('portal_sessions')
-      .where('sessionToken', '==', sessionToken)
-      .limit(1)
-      .get();
-
-    if (sessionQuery.empty) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
-
-    const { prospectId } = sessionQuery.docs[0].data();
-
-    await db.collection('prospects').doc(prospectId as string).update({
-      fcmToken: null,
-      notifyByPush: false,
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error('Push token remove error:', err);
-    return NextResponse.json({ error: 'Failed to remove token' }, { status: 500 });
-  }
+  return NextResponse.json({ success: true, persisted: false });
 }

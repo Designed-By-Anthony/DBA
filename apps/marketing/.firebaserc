@@ -1,8 +1,0 @@
-{
-  "projects": {
-    "default": "dba-website-prod",
-    "prod": "dba-website-prod"
-  },
-  "targets": {},
-  "etags": {}
-}

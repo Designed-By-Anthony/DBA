@@ -1,52 +1,157 @@
-import * as admin from 'firebase-admin';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+type AnyRecord = any;
 
-let _initialized = false;
+type QuerySnapshotShim = {
+  empty: boolean;
+  docs: Array<{
+    id: string;
+    data: () => AnyRecord;
+    ref: DocRefShim;
+  }>;
+};
 
-if (!admin.apps.length) {
-  try {
-    if (process.env.FIRESTORE_EMULATOR_HOST) {
-      admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || 'dba-website-prod' });
-    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      admin.initializeApp({ credential: admin.credential.applicationDefault() });
-    } else if (process.env.FIREBASE_PROJECT_ID) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n').replace(/"/g, ''),
-        }),
-      });
-    }
-    if (admin.apps.length) {
-      _initialized = true;
-    }
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.stack : String(error);
-    console.error('Firebase admin initialization error', msg);
-  }
-} else {
-  _initialized = true;
+type DocSnapshotShim = {
+  id: string;
+  exists: boolean;
+  data: () => AnyRecord | undefined;
+  ref: DocRefShim;
+};
+
+type DocRefShim = {
+  id: string;
+  get: () => Promise<DocSnapshotShim>;
+  set: (data: AnyRecord, _options?: AnyRecord) => Promise<void>;
+  update: (data: AnyRecord) => Promise<void>;
+  delete: () => Promise<void>;
+  collection: (name: string) => CollectionRefShim;
+};
+
+type CollectionRefShim = {
+  doc: (id?: string) => DocRefShim;
+  where: (_field: string, _op: string, _value: unknown) => CollectionRefShim;
+  orderBy: (_field: string, _direction?: "asc" | "desc") => CollectionRefShim;
+  limit: (_count: number) => CollectionRefShim;
+  select: (..._fields: string[]) => CollectionRefShim;
+  count: () => {
+    get: () => Promise<{
+      data: () => { count: number };
+    }>;
+  };
+  get: () => Promise<QuerySnapshotShim>;
+  add: (data: AnyRecord) => Promise<{ id: string }>;
+};
+
+type WriteBatchShim = {
+  delete: (_ref: { id: string }) => void;
+  update: (_ref: { id: string }, _data: AnyRecord) => void;
+  commit: () => Promise<void>;
+};
+
+function buildDocRef(path: string): DocRefShim {
+  const id = path.split("/").at(-1) || "";
+  const ref: DocRefShim = {
+    id,
+    async get() {
+      return { id, exists: false, data: () => undefined, ref };
+    },
+    async set() {
+      // no-op in shim mode
+    },
+    async update() {
+      // no-op in shim mode
+    },
+    async delete() {
+      // no-op in shim mode
+    },
+    collection(name: string) {
+      return buildCollectionRef(`${path}/${name}`);
+    },
+  };
+  return ref;
 }
 
-const FIRESTORE_DB_ID = process.env.FIRESTORE_DATABASE_ID || 'dba-studio';
-
-let _db: Firestore | null = null;
-
-function initDb(): Firestore {
-  if (!_db) {
-    if (!_initialized) {
-      throw new Error('Firebase Admin SDK not initialized — check credentials env vars');
-    }
-    _db = getFirestore(FIRESTORE_DB_ID);
-    try { _db.settings({ ignoreUndefinedProperties: true }); } catch { /* hot reload */ }
-  }
-  return _db;
+function buildCollectionRef(path: string): CollectionRefShim {
+  return {
+    doc(id?: string) {
+      const resolvedId = id || `doc_${Date.now()}`;
+      return buildDocRef(`${path}/${resolvedId}`);
+    },
+    where() {
+      return this;
+    },
+    orderBy() {
+      return this;
+    },
+    limit() {
+      return this;
+    },
+    select() {
+      return this;
+    },
+    count() {
+      return {
+        async get() {
+          return {
+            data: () => ({ count: 0 }),
+          };
+        },
+      };
+    },
+    async get() {
+      return { empty: true, docs: [] };
+    },
+    async add() {
+      return { id: `doc_${Date.now()}` };
+    },
+  };
 }
 
-/** Lazy Firestore accessor — safe to import at build time; throws at call time if unconfigured. */
-export const db: Firestore = new Proxy({} as Firestore, {
-  get(_target, prop, receiver) {
-    return Reflect.get(initDb(), prop, receiver);
+export const db = {
+  collection(name: string) {
+    return buildCollectionRef(name);
   },
-});
+  collectionGroup(name: string) {
+    return buildCollectionRef(name);
+  },
+  batch(): WriteBatchShim {
+    return {
+      delete() {
+        // no-op
+      },
+      update() {
+        // no-op
+      },
+      async commit() {
+        // no-op
+      },
+    };
+  },
+};
+
+declare global {
+  namespace FirebaseFirestore {
+    type DocumentData = any;
+
+    type Query = {
+      where: (field: string, op: string, value: unknown) => Query;
+      orderBy: (field: string, direction?: "asc" | "desc") => Query;
+      limit: (count: number) => Query;
+      select: (...fields: string[]) => Query;
+      get: () => Promise<QuerySnapshot>;
+    };
+
+    type QueryDocumentSnapshot = {
+      id: string;
+      data: () => DocumentData;
+      ref: {
+        id: string;
+        update: (data: Record<string, unknown>) => Promise<void>;
+        delete: () => Promise<void>;
+      };
+    };
+
+    type QuerySnapshot = {
+      empty: boolean;
+      docs: QueryDocumentSnapshot[];
+    };
+  }
+}

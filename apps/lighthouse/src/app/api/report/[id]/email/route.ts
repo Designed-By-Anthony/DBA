@@ -22,7 +22,10 @@ class ApiError extends Error {
   }
 }
 
-async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
+type DocRef = ReturnType<ReturnType<typeof db.collection>["doc"]>;
+type TimestampLike = ReturnType<typeof Timestamp.now>;
+
+async function reserveEmailSend(ref: DocRef) {
   return db.runTransaction(async (transaction) => {
     const snap = await transaction.get(ref);
 
@@ -31,7 +34,7 @@ async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
     }
 
     const data = snap.data()!;
-    const sentCount = data.emailSentCount || 0;
+    const sentCount = Number(data.emailSentCount ?? 0);
     if (sentCount >= MAX_SENDS_PER_REPORT) {
       throw new ApiError(
         429,
@@ -39,7 +42,7 @@ async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
       );
     }
 
-    const lastSentAt: Timestamp | null = data.emailLastSentAt || null;
+    const lastSentAt: TimestampLike | null = (data.emailLastSentAt as TimestampLike | null) || null;
     if (lastSentAt) {
       const elapsed = Date.now() - lastSentAt.toMillis();
       if (elapsed < MIN_INTERVAL_MS) {
@@ -52,7 +55,7 @@ async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
       }
     }
 
-    const lockUntil: Timestamp | null = data.emailSendLockUntil || null;
+    const lockUntil: TimestampLike | null = (data.emailSendLockUntil as TimestampLike | null) || null;
     if (lockUntil && lockUntil.toMillis() > Date.now()) {
       const waitSec = Math.ceil((lockUntil.toMillis() - Date.now()) / 1000);
       throw new ApiError(
@@ -62,13 +65,13 @@ async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
       );
     }
 
-    const lead = data.lead || {};
-    const recipient = normalizeEmail(lead.email);
+    const lead = (data.lead as Record<string, unknown> | undefined) ?? {};
+    const recipient = normalizeEmail(typeof lead.email === "string" ? lead.email : "");
     if (!recipient) {
       throw new ApiError(400, 'No valid email address is on file for this report.');
     }
 
-    const scores = data.scores || {};
+    const scores = (data.scores as Record<string, unknown> | undefined) ?? {};
     transaction.update(ref, {
       emailSendLockUntil: Timestamp.fromMillis(Date.now() + SEND_LOCK_WINDOW_MS),
     });
@@ -77,11 +80,11 @@ async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
       recipient,
       firstName: lead.name ? String(lead.name).split(' ')[0] : '',
       url: String(lead.url || ''),
-      trustScore: scores.trustScore || 0,
-      performance: scores.performance || 0,
-      accessibility: scores.accessibility || 0,
-      bestPractices: scores.bestPractices || 0,
-      seo: scores.seo || 0,
+      trustScore: Number(scores.trustScore ?? 0),
+      performance: Number(scores.performance ?? 0),
+      accessibility: Number(scores.accessibility ?? 0),
+      bestPractices: Number(scores.bestPractices ?? 0),
+      seo: Number(scores.seo ?? 0),
     };
   });
 }

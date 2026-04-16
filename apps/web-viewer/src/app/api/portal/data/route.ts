@@ -1,88 +1,46 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import { NextRequest, NextResponse } from "next/server";
+import { and, desc, eq } from "drizzle-orm";
+import { getDb, tickets } from "@dba/database";
+import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 
 /**
- * Portal Data API
- * 
- * GET /api/portal/data
- * 
- * Returns the authenticated client's project data:
- * - Prospect info (status, onboarding, links)
- * - Milestones
- * - Support tickets
- * 
- * Auth: Reads the portal_session cookie set during magic link verification
+ * Portal Data API.
+ * Reads authenticated portal session and returns scoped ticket + milestone data.
  */
 export async function GET(request: NextRequest) {
   try {
-    const sessionToken = request.cookies.get('portal_session')?.value;
-
-    if (!sessionToken) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const session = await getPortalSessionFromRequest(request);
+    if (!session) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Validate session
-    let sessionQuery;
-    try {
-      sessionQuery = await db
-        .collection('portal_sessions')
-        .where('sessionToken', '==', sessionToken)
-        .limit(1)
-        .get();
-    } catch {
-      return NextResponse.json({ error: 'Session validation failed' }, { status: 500 });
+    const database = getDb();
+    if (!database) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     }
 
-    if (!sessionQuery || sessionQuery.empty) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
-    }
+    const ticketRows = await database
+      .select()
+      .from(tickets)
+      .where(
+        and(
+          eq(tickets.tenantId, session.tenantId),
+          eq(tickets.prospectId, session.prospectId),
+        ),
+      )
+      .orderBy(desc(tickets.createdAt))
+      .limit(10);
 
-    const session = sessionQuery.docs[0].data();
-
-    // Check expiration
-    if (new Date(session.expiresAt) < new Date()) {
-      return NextResponse.json({ error: 'Session expired' }, { status: 401 });
-    }
-
-    const prospectId = session.prospectId;
-
-    // Fetch prospect data
-    const prospectDoc = await db.collection('prospects').doc(prospectId).get();
-    if (!prospectDoc.exists) {
-      return NextResponse.json({ error: 'Account not found' }, { status: 404 });
-    }
-
-    const prospect = prospectDoc.data()!;
-
-    // Fetch support tickets
-    let tickets: Array<{ id: string; subject: string; status: string; createdAt: string }> = [];
-    try {
-      const ticketQuery = await db
-        .collection('tickets')
-        .where('prospectId', '==', prospectId)
-        .orderBy('createdAt', 'desc')
-        .limit(10)
-        .get();
-      tickets = ticketQuery.docs.map((d) => ({
-        id: d.id,
-        subject: d.data().subject,
-        status: d.data().status,
-        createdAt: d.data().createdAt,
-      }));
-    } catch {
-      // Tickets collection might not exist yet
-    }
-
-    // Build milestones based on prospect status
-    const stages = ['lead', 'contacted', 'proposal', 'dev', 'launched'];
+    const latestStatus = ticketRows[0]?.status || "lead";
+    const stages = ["lead", "contacted", "proposal", "dev", "launched"];
     const stageLabels: Record<string, string> = {
-      lead: 'Initial Inquiry',
-      contacted: 'Discovery Call',
-      proposal: 'Proposal & Contract',
-      dev: 'Building Your Website',
-      launched: 'Website Live!',
+      lead: "Initial Inquiry",
+      contacted: "Discovery Call",
+      proposal: "Proposal & Contract",
+      dev: "Building Your Website",
+      launched: "Website Live!",
     };
-    const currentIdx = stages.indexOf(prospect.status || 'lead');
+    const currentIdx = stages.indexOf(latestStatus);
     const milestones = stages.map((stage, i) => ({
       label: stageLabels[stage] || stage,
       completed: i < currentIdx,
@@ -91,26 +49,29 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       prospect: {
-        name: prospect.name || '',
-        company: prospect.company || '',
-        status: prospect.status || 'lead',
-        onboarding: prospect.onboarding || null,
-        driveFolderUrl: prospect.driveFolderUrl || null,
-        contractDocUrl: prospect.contractDocUrl || null,
-        pricingTier: prospect.pricingTier || null,
-        // Client-visible update fields
-        projectNotes: prospect.projectNotes || null,
-        contractSigned: prospect.contractSigned || false,
-        contractStatus: prospect.contractStatus || 'draft',
-        stagingUrl: prospect.stagingUrl || null,
+        name: session.prospectName,
+        company: "",
+        status: latestStatus,
+        onboarding: null,
+        driveFolderUrl: null,
+        contractDocUrl: null,
+        pricingTier: null,
+        projectNotes: null,
+        contractSigned: false,
+        contractStatus: "draft",
+        stagingUrl: null,
       },
       milestones,
-      tickets,
+      tickets: ticketRows.map((row) => ({
+        id: row.id,
+        subject: row.subject,
+        status: row.status,
+        createdAt: row.createdAt,
+      })),
     });
-
   } catch (error: unknown) {
-    console.error('Portal data error:', error);
-    const msg = error instanceof Error ? error.message : 'Internal error';
+    console.error("Portal data error:", error);
+    const msg = error instanceof Error ? error.message : "Internal error";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

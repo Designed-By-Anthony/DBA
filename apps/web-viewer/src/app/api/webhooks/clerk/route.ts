@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     if (evt.type === "organization.deleted") {
       const id = evt.data.id;
       if (id) {
-        await db.delete(tenants).where(eq(tenants.id, id));
+        await db.delete(tenants).where(eq(tenants.clerkOrgId, id));
       }
       return NextResponse.json({ ok: true });
     }
@@ -47,16 +47,16 @@ export async function POST(request: NextRequest) {
       await db
         .insert(tenants)
         .values({
-          id: data.id,
+          clerkOrgId: data.id,
           name: data.name,
-          vertical,
+          verticalType: vertical,
           crmConfig,
         })
         .onConflictDoUpdate({
-          target: tenants.id,
+          target: tenants.clerkOrgId,
           set: {
             name: data.name,
-            vertical,
+            verticalType: vertical,
             crmConfig,
           },
         });

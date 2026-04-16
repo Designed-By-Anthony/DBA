@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AuditResults, AuditData } from "./AuditResults";
 
 const LOADING_MESSAGES = [
@@ -24,6 +24,53 @@ export function AuditForm() {
   const [reportId, setReportId] = useState<string | null>(null);
   
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  const turnstileTokenRef = useRef<string>("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const anyWindow = window as Window & {
+      turnstile?: {
+        render: (container: string | HTMLElement, options: Record<string, unknown>) => string;
+      };
+      __lighthouseTurnstileOnSuccess?: (token: string) => void;
+      __lighthouseTurnstileOnExpired?: () => void;
+      __lighthouseTurnstileOnError?: () => void;
+    };
+
+    anyWindow.__lighthouseTurnstileOnSuccess = (token: string) => {
+      turnstileTokenRef.current = token;
+    };
+    anyWindow.__lighthouseTurnstileOnExpired = () => {
+      turnstileTokenRef.current = "";
+    };
+    anyWindow.__lighthouseTurnstileOnError = () => {
+      turnstileTokenRef.current = "";
+    };
+
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey) return;
+
+    const mount = () => {
+      const host = document.getElementById("lighthouse-turnstile");
+      if (!host || !anyWindow.turnstile || host.childElementCount > 0) return;
+      anyWindow.turnstile.render(host, {
+        sitekey: siteKey,
+        theme: "dark",
+        callback: "__lighthouseTurnstileOnSuccess",
+        "expired-callback": "__lighthouseTurnstileOnExpired",
+        "error-callback": "__lighthouseTurnstileOnError",
+      });
+    };
+
+    mount();
+    const interval = window.setInterval(mount, 250);
+    return () => {
+      window.clearInterval(interval);
+      anyWindow.__lighthouseTurnstileOnSuccess = undefined;
+      anyWindow.__lighthouseTurnstileOnExpired = undefined;
+      anyWindow.__lighthouseTurnstileOnError = undefined;
+    };
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -50,12 +97,19 @@ export function AuditForm() {
     setErrorMsg("");
 
     try {
+      const turnstileToken = turnstileTokenRef.current;
+      if (!turnstileToken) {
+        setErrorMsg("Please complete the security check.");
+        setStatus("error");
+        return;
+      }
+
       const res = await fetch("/api/audit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url: finalUrl, email, name, company, location }),
+        body: JSON.stringify({ url: finalUrl, email, name, company, location, turnstileToken }),
       });
 
       let data: { error?: string; results?: AuditData | null; reportId?: string } | null = null;
@@ -187,6 +241,10 @@ export function AuditForm() {
             {errorMsg}
           </div>
         )}
+
+        {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+          <div id="lighthouse-turnstile" className="min-h-[65px]" />
+        ) : null}
 
         <button
           type="submit"

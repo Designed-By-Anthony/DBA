@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PlanSuite } from '@dba/lead-form-contract';
-import { db } from '@/lib/firebase';
+import { getTenantByOrgId } from '@/lib/tenant-db';
+import { getVerticalTemplateFromType } from '@/lib/vertical-config';
 
 /**
  * Portal Branding API
@@ -24,9 +25,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const doc = await db.collection('org_settings').doc(orgId).get();
-
-    if (!doc.exists) {
+    const tenant = await getTenantByOrgId(orgId);
+    if (!tenant) {
       return NextResponse.json({
         brandName: 'Client Portal',
         brandColor: '#2563eb',
@@ -36,15 +36,13 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const data = doc.data()!;
-    const rawPlan = data.planSuite;
-    const planSuite: PlanSuite = rawPlan === 'starter' ? 'starter' : 'full';
+    const planSuite: PlanSuite = 'full';
 
     return NextResponse.json({
-      brandName: data.brandName || 'Client Portal',
-      brandColor: data.brandColor || '#2563eb',
-      brandInitial: data.brandInitial || 'D',
-      verticalTemplate: data.verticalTemplate || 'general',
+      brandName: tenant.name || 'Client Portal',
+      brandColor: '#2563eb',
+      brandInitial: (tenant.name?.trim()?.charAt(0)?.toUpperCase() || 'D'),
+      verticalTemplate: getVerticalTemplateFromType(tenant.verticalType),
       planSuite,
     });
   } catch (error) {

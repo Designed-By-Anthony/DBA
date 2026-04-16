@@ -2,7 +2,6 @@
  * Single-recipient transactional / automation emails (sequences, automations).
  * Mirrors the core pipeline in sendEmail but callable from cron and automations.
  */
-import type { DocumentData } from "firebase-admin/firestore";
 import { db } from "@/lib/firebase";
 import { Resend } from "resend";
 import {
@@ -100,7 +99,7 @@ export async function sendProspectEmailFromTemplate(params: {
       createdAt: new Date().toISOString(),
     };
 
-    await emailRef.set(emailRecord as DocumentData);
+    await emailRef.set(emailRecord as Record<string, unknown>);
 
     await db.collection("prospects").doc(params.prospectId).update({
       lastContactedAt: new Date().toISOString(),

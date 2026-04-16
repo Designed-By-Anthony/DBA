@@ -1,6 +1,5 @@
 import { db } from "@/lib/firebase";
 import type { AutomationAction, AutomationTrigger } from "./types";
-import { FieldValue } from "firebase-admin/firestore";
 import { sendProspectEmailFromTemplate } from "@/lib/prospect-email";
 
 /**
@@ -46,8 +45,13 @@ async function executeRuleAction(
     switch (action.type) {
       case 'add_tag': {
         const tag = String(action.payload.tag);
+        const snapshot = await prospectRef.get();
+        const snapshotData = snapshot.data();
+        const currentTags = Array.isArray(snapshotData?.tags)
+          ? (snapshotData.tags as string[])
+          : [];
         await prospectRef.update({
-          tags: FieldValue.arrayUnion(tag)
+          tags: Array.from(new Set([...currentTags, tag])),
         });
         await logAutomationActivity(agencyId, prospectId, ruleName, `Added tag: ${tag}`);
         break;

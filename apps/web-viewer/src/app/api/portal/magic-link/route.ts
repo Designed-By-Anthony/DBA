@@ -1,88 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { Resend } from 'resend';
-import { complianceConfig } from '@/lib/theme.config';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { and, eq } from "drizzle-orm";
+import { getDb, leads, portalTokens } from "@dba/database";
+import { Resend } from "resend";
+import { complianceConfig } from "@/lib/theme.config";
+import crypto from "crypto";
+import { hashPortalToken } from "@/lib/portal-auth";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
- * Magic Link Authentication for Client Portal
- * 
- * POST /api/portal/magic-link
- * Body: { email: string }
- * 
- * Generates a time-limited token, stores it in Firestore,
- * and sends a branded login link to the client.
+ * Magic Link Authentication for Client Portal.
+ * Uses SQL projection tables (leads + portal_tokens) with tenant scoping.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, orgId } = (await request.json()) as { email?: string; orgId?: string };
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!email || !orgId) {
+      // Keep response generic to avoid exposing tenant membership.
+      return NextResponse.json({ success: true });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const database = getDb();
+    if (!database) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
 
-    // Check if this email is associated with a prospect
-    let prospectQuery;
-    try {
-      prospectQuery = await db
-        .collection('prospects')
-        .where('email', '==', normalizedEmail)
+    // Anti-enumeration: same response even if no matching lead.
+    const lead = (
+      await database
+        .select()
+        .from(leads)
+        // magic-link lookup must be tenant-scoped to avoid cross-org disclosure
+        .where(and(eq(leads.tenantId, orgId), eq(leads.emailNormalized, normalizedEmail)))
         .limit(1)
-        .get();
-        console.log("PROSPECT QUERY RESULT EMPTY?:", prospectQuery.empty);
-    } catch (err) {
-      console.log("PROSPECT QUERY ERROR:", err);
-      prospectQuery = null;
+    )[0];
+
+    if (!lead) {
+      return NextResponse.json({ success: true });
     }
 
-    if (!prospectQuery || prospectQuery.empty) {
-      console.log("NO PROSPECT FOUND FOR:", normalizedEmail);
-      // Don't reveal if the email exists — just show the success page
-      // This prevents email enumeration
-      return NextResponse.json({ success: true, debug: 'NO PROSPECT FOUND' });
-    }
+    const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = hashPortalToken(token);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
-    const prospectId = prospectQuery.docs[0].id;
-    const prospectData = prospectQuery.docs[0].data();
-    const prospectName = prospectData.name || 'there';
-    const agencyId = prospectData.agencyId || '';
-
-    // Generate a secure token
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-    // Store the token in Firestore (scoped to the org)
-    await db.collection('portal_tokens').add({
-      token,
-      prospectId,
-      agencyId,
-      email: normalizedEmail,
-      expiresAt: expiresAt.toISOString(),
+    await database.insert(portalTokens).values({
+      tenantId: lead.tenantId,
+      prospectId: lead.prospectId,
+      prospectEmail: lead.email,
+      prospectName: lead.name,
+      tokenHash,
+      expiresAt,
       used: false,
       createdAt: new Date().toISOString(),
     });
 
-    // Build the magic link URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "[REDACTED]";
     const magicLink = `${baseUrl}/portal/verify?token=${token}`;
 
-    // Send the magic link email
-    if (process.env.NEXT_PUBLIC_IS_TEST !== 'true' && resend) {
+    if (process.env.NEXT_PUBLIC_IS_TEST !== "true" && resend) {
       await resend.emails.send({
         from: `Designed by Anthony <${complianceConfig.fromEmail}>`,
         to: [normalizedEmail],
-        subject: 'Your Portal Login Link',
+        subject: "Your Portal Login Link",
         html: `
           <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 24px;">
             <div style="background: #0a0a0f; border-radius: 16px; padding: 40px; text-align: center;">
               <div style="width: 56px; height: 56px; background: #2563eb; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin-bottom: 24px;">
                 D
               </div>
-              <h1 style="color: #ffffff; margin: 0 0 8px; font-size: 24px;">Welcome Back, ${prospectName.split(' ')[0]}</h1>
+              <h1 style="color: #ffffff; margin: 0 0 8px; font-size: 24px;">Welcome Back, ${(lead.name || "there").split(" ")[0]}</h1>
               <p style="color: #888; margin: 0 0 32px; font-size: 14px;">
                 Click the button below to access your Client Portal.
               </p>
@@ -102,14 +90,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    if (process.env.NEXT_PUBLIC_IS_TEST === 'true' || request.headers.get('x-e2e-testing') === 'true') {
+    if (process.env.NEXT_PUBLIC_IS_TEST === "true" || request.headers.get("x-e2e-testing") === "true") {
       return NextResponse.json({ success: true, testModeLink: magicLink });
     }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    console.error('Magic link error:', error);
-    const msg = error instanceof Error ? error.message : 'Internal error';
+    console.error("Magic link error:", error);
+    const msg = error instanceof Error ? error.message : "Internal error";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 import type { VerticalId } from "@dba/database";
 
-const VERTICALS: VerticalId[] = ["restaurant", "roofer", "florist", "agency"];
+const VERTICALS: VerticalId[] = ["restaurant", "service_pro", "florist", "agency"];
 
 function isVertical(v: string): v is VerticalId {
   return (VERTICALS as string[]).includes(v);
@@ -11,6 +11,7 @@ export function parseVerticalFromPublicMetadata(meta: unknown): VerticalId {
   if (!meta || typeof meta !== "object") return "agency";
   const raw = (meta as Record<string, unknown>).vertical;
   const v = typeof raw === "string" ? raw.toLowerCase().trim() : "";
+  if (v === "roofer" || v === "contractor") return "service_pro";
   if (v && isVertical(v)) return v;
   return "agency";
 }
