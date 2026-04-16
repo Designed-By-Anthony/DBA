@@ -14,7 +14,8 @@
         "SENTRY_PROJECT",
         "NEXT_PUBLIC_SENTRY_DSN",
         "GOOGLE_PAGESPEED_API_KEY",
-        "GEMINI_API_KEY"
+        "GEMINI_API_KEY",
+        "RESEND_API_KEY"
       ]
     },
     "lint": {
