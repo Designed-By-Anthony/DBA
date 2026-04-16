@@ -12,6 +12,19 @@
   "devDependencies": {
     "turbo": "^2.5.4"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "@firebase/util",
+      "@sentry/cli",
+      "@swc/core",
+      "esbuild",
+      "protobufjs",
+      "re2",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "scripts": {
     "build:turbo": "turbo run build --filter=./apps/web-viewer",
     "dev:web": "pnpm --filter agency-os dev",
