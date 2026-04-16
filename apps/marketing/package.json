@@ -43,6 +43,7 @@
     "@spotlightjs/astro": "^3.2.6",
     "@vercel/analytics": "^2.0.1",
     "astro": "^6.1.0",
+    "sharp": "^0.34.5",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
