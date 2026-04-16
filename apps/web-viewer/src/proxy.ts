@@ -1,11 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { isAdminAuthDevBypassEnabled } from '@/lib/admin-dev-auth'
 
 const isAdminRoute = createRouteMatcher(['/admin(.*)'])
 
-/** Align with `admin/layout.tsx`: admin is only Clerk-gated in production. */
+/** Align with `admin/layout.tsx`: Clerk-gate /admin whenever dev bypass is off. */
 function shouldProtectAdmin() {
-  return process.env.NODE_ENV === 'production'
+  return !isAdminAuthDevBypassEnabled()
 }
 
 export default clerkMiddleware(async (auth, req) => {
@@ -73,8 +74,8 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next()
   }
 
-  // ── Non-subdomain routes: Clerk gate for /admin in production only ──
-  // (localhost / Playwright use NODE_ENV development|test — same bypass as admin/layout.tsx)
+  // ── Non-subdomain routes: Clerk gate for /admin when dev bypass is off ──
+  // (see admin-dev-auth.ts — Playwright sets ALLOW_ADMIN_AUTH_BYPASS=1 with NODE_ENV=test)
   if (isAdminRoute(req) && shouldProtectAdmin()) {
     await auth.protect()
   }

@@ -3,6 +3,10 @@
 import type Stripe from "stripe";
 import { db } from "@/lib/firebase";
 import { stripe } from "@/lib/stripe";
+import {
+  resolveVerticalTypeForStripe,
+  STRIPE_META_VERTICAL_TYPE,
+} from "@/lib/stripe-metadata";
 import type { Quote } from "@/lib/types";
 
 type CheckoutSessionCreateParams = NonNullable<
@@ -55,6 +59,8 @@ export async function acceptQuoteAndCheckoutAction(params: {
       };
     });
 
+    const vertical_type = await resolveVerticalTypeForStripe(quote.agencyId);
+
     // 5. Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -67,7 +73,8 @@ export async function acceptQuoteAndCheckoutAction(params: {
         prospectId: params.prospectId,
         quoteId: params.quoteId,
         packageId: params.packageId,
-        agencyId: quote.agencyId
+        agencyId: quote.agencyId,
+        [STRIPE_META_VERTICAL_TYPE]: vertical_type,
       }
     });
 

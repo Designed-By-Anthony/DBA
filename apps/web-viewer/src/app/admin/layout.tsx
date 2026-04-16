@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { isAdminAuthDevBypassEnabled } from "@/lib/admin-dev-auth";
 import AdminLogin from "./AdminLogin";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { CommandPalette } from "@/components/ui/CommandPalette";
@@ -10,10 +11,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // DEV/TEST BYPASS: Skip auth on localhost in development/test mode
-  const isDev = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
-
-  if (!isDev) {
+  if (!isAdminAuthDevBypassEnabled()) {
     const { userId, orgId } = await auth();
 
     if (!userId) {

@@ -1,8 +1,11 @@
+import "./src/env";
+
 import { withSentryConfig } from "@sentry/nextjs";
 import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   /** Native `pg` driver — avoid bundling issues in the server graph. */
   serverExternalPackages: ['pg'],
   experimental: {

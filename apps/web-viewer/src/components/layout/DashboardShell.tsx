@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import QuickAddLead from "@/components/ui/QuickAddLead";
@@ -13,13 +13,17 @@ export default function DashboardShell({
   children: React.ReactNode;
   title?: string;
 }) {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("sidebar-collapsed") === "true";
-    }
-    return false;
-  });
+  // Keep the initial SSR/first-client render stable; load localStorage after mount.
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem("sidebar-collapsed") === "true");
+    } catch {
+      // ignore (storage disabled)
+    }
+  }, []);
 
   const handleToggle = () => {
     setCollapsed((prev) => {

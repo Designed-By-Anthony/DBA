@@ -1,4 +1,4 @@
-import { getDb, tenants } from "@dba/database";
+import { getDb, tenants, withTenantClerkOrg } from "@dba/database";
 import type { TenantRow } from "@dba/database";
 import { eq } from "drizzle-orm";
 
@@ -7,6 +7,12 @@ export async function getTenantByOrgId(orgId: string): Promise<TenantRow | null>
   const db = getDb();
   if (!db) return null;
 
-  const rows = await db.select().from(tenants).where(eq(tenants.id, orgId)).limit(1);
-  return rows[0] ?? null;
+  return withTenantClerkOrg(db, orgId, async (tx) => {
+    const rows = await tx
+      .select()
+      .from(tenants)
+      .where(eq(tenants.clerkOrgId, orgId))
+      .limit(1);
+    return rows[0] ?? null;
+  });
 }

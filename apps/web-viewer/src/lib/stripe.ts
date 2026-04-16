@@ -1,4 +1,8 @@
 import Stripe from 'stripe';
+import {
+  resolveVerticalTypeForStripe,
+  STRIPE_META_VERTICAL_TYPE,
+} from '@/lib/stripe-metadata';
 
 let _stripe: Stripe | null = null;
 
@@ -32,7 +36,10 @@ export async function createPaymentLink(params: {
   amount: number; // in dollars
   type: 'down_payment' | 'completion';
   description: string;
+  /** Clerk org id — used for `vertical_type` metadata (Cloud SQL tenant). */
+  organizationId: string;
 }) {
+  const vertical_type = await resolveVerticalTypeForStripe(params.organizationId);
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     customer_email: params.prospectEmail,
@@ -52,6 +59,7 @@ export async function createPaymentLink(params: {
     metadata: {
       prospectId: params.prospectId,
       type: params.type,
+      [STRIPE_META_VERTICAL_TYPE]: vertical_type,
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-cancelled`,
@@ -68,6 +76,7 @@ export async function createSubscription(params: {
   prospectEmail: string;
   prospectName: string;
   stripePriceId: string;
+  organizationId: string;
 }) {
   // First, find or create the Stripe customer
   const customers = await stripe.customers.list({ email: params.prospectEmail, limit: 1 });
@@ -84,6 +93,7 @@ export async function createSubscription(params: {
     customerId = customer.id;
   }
 
+  const vertical_type = await resolveVerticalTypeForStripe(params.organizationId);
   // Create checkout session for the subscription
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -97,6 +107,7 @@ export async function createSubscription(params: {
     metadata: {
       prospectId: params.prospectId,
       type: 'retainer',
+      [STRIPE_META_VERTICAL_TYPE]: vertical_type,
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-cancelled`,

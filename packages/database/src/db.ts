@@ -11,6 +11,8 @@ let _pool: pg.Pool | null = null;
 
 /**
  * Returns a Drizzle instance when `DATABASE_URL` is set; otherwise `null` (Firestore-only mode).
+ * Production apps should validate `DATABASE_URL` at build time (e.g. agency-os `src/env.ts` + t3-env).
+ * Tenant rows are keyed by `clerk_org_id`; engine skin reads `config` + `vertical` in Postgres.
  */
 export function getDb(): Database | null {
   const url = process.env.DATABASE_URL?.trim();

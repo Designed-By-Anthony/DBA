@@ -11,6 +11,11 @@ import * as Sentry from "@sentry/nextjs";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    if (process.env.VERCEL === "1" && process.env.NODE_ENV !== "production") {
+      console.warn(
+        "[agency-os] VERCEL=1 but NODE_ENV is not production — confirm this deployment is intentional.",
+      );
+    }
     // Server-side: import the server Sentry config
     await import("./sentry.server.config");
   }

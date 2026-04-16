@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useOrganization } from "@clerk/nextjs";
 import type { PlanSuite } from "@dba/lead-form-contract";
 import { getVerticalConfig, type VerticalConfig, type VerticalId } from "./verticals";
+import { tenantDbVerticalToUiTemplate } from "./tenant-vertical-bridge";
 
 type VerticalContextType = {
   vertical: VerticalConfig;
@@ -44,13 +45,32 @@ export function VerticalProvider({ children }: { children: React.ReactNode }) {
 
     async function load() {
       try {
-        const res = await fetch(`/api/portal/branding?org=${orgId}`);
-        if (res.ok && !cancelled) {
-          const data = await res.json();
-          const templateId = (data.verticalTemplate || "general") as VerticalId;
-          setVertical(getVerticalConfig(templateId));
+        const [brandingRes, sqlRes] = await Promise.all([
+          fetch(`/api/portal/branding?org=${orgId}`),
+          fetch("/api/admin/tenant-vertical", { credentials: "include" }),
+        ]);
+
+        let templateId: VerticalId = "general";
+        let planSuite: PlanSuite = "full";
+
+        if (brandingRes.ok) {
+          const data = await brandingRes.json();
+          templateId = (data.verticalTemplate || "general") as VerticalId;
           const ps = data.planSuite;
-          setPlanSuite(ps === "starter" ? "starter" : "full");
+          planSuite = ps === "starter" ? "starter" : "full";
+        }
+
+        // Prefer Cloud SQL `tenants.vertical` (Clerk webhook) over Firestore branding when present.
+        if (sqlRes.ok) {
+          const sql = (await sqlRes.json()) as { vertical?: string | null };
+          if (sql.vertical) {
+            templateId = tenantDbVerticalToUiTemplate(sql.vertical);
+          }
+        }
+
+        if (!cancelled) {
+          setVertical(getVerticalConfig(templateId));
+          setPlanSuite(planSuite);
         }
       } catch {
         // Fall back to general

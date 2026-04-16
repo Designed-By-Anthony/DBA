@@ -18,7 +18,7 @@ const AGENCY_OS_VIEWER_ORIGIN = 'https://viewer.designedbyanthony.com';
 
 /** GTM + GA + Clarity + Crazy Egg + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC =
-  "'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://www.clarity.ms https://*.clarity.ms https://*.crazyegg.com https://challenges.cloudflare.com";
+  "'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://www.clarity.ms https://*.clarity.ms https://*.crazyegg.com https://static.cloudflareinsights.com https://challenges.cloudflare.com";
 
 /**
  * Enforcing script-src: same tag surface + data:/unsafe-eval for Astro client bundles and GTM-injected scripts.
@@ -35,6 +35,7 @@ const SCRIPT_SRC_ENFORCING = [
   'https://www.clarity.ms',
   'https://*.clarity.ms',
   'https://*.crazyegg.com',
+  'https://static.cloudflareinsights.com',
   'https://challenges.cloudflare.com',
 ].join(' ');
 

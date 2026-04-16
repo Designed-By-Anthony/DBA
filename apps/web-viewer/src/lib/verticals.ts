@@ -10,7 +10,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, Building2, Users, GitBranch, Mail, MailOpen,
   Ticket, CreditCard, Zap, Inbox, Settings,
-  Hammer, ShoppingBag, Scissors, Dumbbell, Home, Camera, Store, ClipboardList,
+  Hammer, ShoppingBag, Scissors, Dumbbell, Home, Camera, Store, ClipboardList, Globe,
   CalendarDays, FileText, Package, Heart, Briefcase, ListOrdered, BarChart3,
 } from "lucide-react";
 
@@ -79,6 +79,7 @@ function buildSidebar(overrides: Partial<Record<string, { label: string; icon: L
     { label: "Automations", href: "/admin/automations", icon: Zap },
     { label: "Inbox", href: "/admin/inbox", icon: Inbox },
     { label: "Calendar", href: "/admin/calendar", icon: ShoppingBag }, // Re-using an icon temporarily
+    { label: "Domains", href: "/admin/domains", icon: Globe },
     { label: "Business Rules", href: "/admin/settings/business", icon: Settings },
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ];

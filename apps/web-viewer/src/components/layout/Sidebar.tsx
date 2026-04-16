@@ -23,9 +23,10 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const stripAdmin = useAdminPrefix();
-  const { organization } = useOrganization();
+  const { organization, isLoaded: isOrgLoaded } = useOrganization();
   const { vertical, planSuite } = useVertical();
-  const orgName = organization?.name || "Designed by Anthony";
+  // Stable SSR placeholder to avoid hydration mismatch while Clerk loads.
+  const orgName = isOrgLoaded ? organization?.name || "Designed by Anthony" : "Designed by Anthony";
   const navItems = filterSidebarForPlanSuite(vertical.sidebarItems, planSuite);
 
   const isActive = (href: string) => {

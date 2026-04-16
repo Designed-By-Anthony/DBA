@@ -53,15 +53,22 @@ export default function TopBar({
   onMenuClick: () => void;
   title?: string;
 }) {
+  // Avoid hydration mismatches: Clerk + time-based UI should not SSR with unstable output.
+  const [mounted, setMounted] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [hasUnread, setHasUnread] = useState(false);
-  const { user } = useUser();
-  const { organization } = useOrganization();
+  const { user, isLoaded: isUserLoaded } = useUser();
+  const { organization, isLoaded: isOrgLoaded } = useOrganization();
+  const isClerkLoaded = isUserLoaded && isOrgLoaded;
   const firstName = user?.firstName || "there";
   const orgName = organization?.name;
   const router = useRouter();
   const stripAdmin = useAdminPrefix();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load real activity data for notifications
   useEffect(() => {
@@ -115,7 +122,15 @@ export default function TopBar({
           {title || "Dashboard"}
         </h2>
         <p className="text-[11px] text-text-muted leading-tight hidden sm:block">
-          {getGreeting()}, {firstName}{orgName ? ` · ${orgName}` : ""}
+          {mounted && isClerkLoaded ? (
+            <>
+              {getGreeting()}, {firstName}
+              {orgName ? ` · ${orgName}` : ""}
+            </>
+          ) : (
+            // Stable SSR placeholder to prevent hydration mismatch.
+            <>Welcome</>
+          )}
         </p>
       </div>
 
@@ -189,13 +204,21 @@ export default function TopBar({
         </span>
 
         {/* Clerk User Button — handles profile, org switching, sign out */}
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: "w-8 h-8 ring-2 ring-[rgb(59_130_246/0.35)] ring-offset-2 ring-offset-[var(--color-surface-0)]",
-            },
-          }}
-        />
+        {mounted && isClerkLoaded ? (
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox:
+                  "w-8 h-8 ring-2 ring-[rgb(59_130_246/0.35)] ring-offset-2 ring-offset-[var(--color-surface-0)]",
+              },
+            }}
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="w-8 h-8 rounded-full bg-surface-3 ring-2 ring-[rgb(59_130_246/0.20)] ring-offset-2 ring-offset-[var(--color-surface-0)]"
+          />
+        )}
       </div>
     </header>
   );

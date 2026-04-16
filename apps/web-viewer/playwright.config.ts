@@ -12,8 +12,10 @@ dotenv.config({ path: '.env.test', override: true });
  * If Firestore port (see firebase.json) is already in use, `npm test` fails to start — stop the other emulator or use `npm run test:pw` with Firestore already running on that port.
  * Alternative: `npm run test:pw` (Next only) with Firestore emulator already running (port in firebase.json / .env.test).
  *
- * Or set SKIP_WEBSERVER=1 and run emulator + `npm run dev -- -p 3001` yourself.
+ * Or set SKIP_WEBSERVER=1 and run emulator + `npm run dev -- -p 3001` yourself (set ALLOW_ADMIN_AUTH_BYPASS=1 in that shell if you need /admin without Clerk).
  * If the emulator cannot bind its port, use E2E_NO_FIRESTORE_EMULATOR=1 and run `firebase emulators:start --only firestore` separately (same port as firebase.json / .env.test).
+ *
+ * `reuseExistingServer` (local only): if Playwright attaches to the wrong process on :3001, stop stray emulators or other dev servers so the URL probe targets this app.
  */
 const webServerCommand =
   process.env.E2E_NO_FIRESTORE_EMULATOR === '1'
@@ -72,6 +74,10 @@ export default defineConfig({
           env: {
             ...process.env,
             NODE_ENV: 'test',
+            // Must match admin-dev-auth.ts — test NODE_ENV alone no longer bypasses Clerk.
+            ALLOW_ADMIN_AUTH_BYPASS: '1',
+            // .env.test has no Cloud SQL / Clerk secrets; allow dev server to boot for Firestore-only E2E.
+            SKIP_ENV_VALIDATION: '1',
           },
         },
       }),

@@ -3,6 +3,10 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { verifyAuth } from "@/app/admin/actions";
 import { getStripeClient } from "@/lib/stripe";
+import {
+  resolveVerticalTypeForStripe,
+  STRIPE_META_VERTICAL_TYPE,
+} from "@/lib/stripe-metadata";
 
 /**
  * Agency Pro subscription checkout. Set STRIPE_AGENCY_PRO_PRICE_ID in production;
@@ -12,13 +16,14 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
   url: string | null;
   error?: string;
 }> {
-  await verifyAuth();
+  const { user: sess } = await verifyAuth();
   const user = await currentUser();
   const email = user?.emailAddresses?.[0]?.emailAddress;
   if (!email) {
     return { url: null, error: "Add an email address to your account (Clerk)." };
   }
 
+  const vertical_type = await resolveVerticalTypeForStripe(sess.agencyId);
   const stripe = getStripeClient();
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const priceId = process.env.STRIPE_AGENCY_PRO_PRICE_ID;
@@ -31,7 +36,10 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${base}/admin/billing?upgraded=1`,
         cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
-        metadata: { type: "agency_os_upgrade" },
+        metadata: {
+          type: "agency_os_upgrade",
+          [STRIPE_META_VERTICAL_TYPE]: vertical_type,
+        },
       });
       return { url: session.url };
     }
@@ -52,7 +60,10 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
       ],
       success_url: `${base}/admin/billing?upgraded=1`,
       cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
-      metadata: { type: "agency_os_upgrade" },
+      metadata: {
+        type: "agency_os_upgrade",
+        [STRIPE_META_VERTICAL_TYPE]: vertical_type,
+      },
     });
     return { url: session.url };
   } catch (e: unknown) {

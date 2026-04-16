@@ -2,6 +2,10 @@
 
 import { db } from "@/lib/firebase";
 import { stripe } from "@/lib/stripe";
+import {
+  resolveVerticalTypeForStripe,
+  STRIPE_META_VERTICAL_TYPE,
+} from "@/lib/stripe-metadata";
 
 export async function createBookingDepositAction(params: {
   agencyId: string;
@@ -32,6 +36,8 @@ export async function createBookingDepositAction(params: {
       createdAt: new Date().toISOString(),
     });
 
+    const vertical_type = await resolveVerticalTypeForStripe(params.agencyId);
+
     // 2. Auth & Hold via Stripe Checkout (Revenue Protection)
     // Using manual capture means we authorize the card but don't pull funds until the service is complete,
     // OR we capture a flat deposit immediately if we want cash flow.
@@ -61,7 +67,8 @@ export async function createBookingDepositAction(params: {
       metadata: {
         bookingId: bookingRef.id,
         agencyId: params.agencyId,
-        type: 'revenue_protection_hold'
+        type: 'revenue_protection_hold',
+        [STRIPE_META_VERTICAL_TYPE]: vertical_type,
       }
     });
 

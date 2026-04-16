@@ -19,6 +19,8 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
  * Setup: In Stripe Dashboard → Developers → Webhooks → Add Endpoint
  * URL: https://viewer.designedbyanthony.com/api/webhooks/stripe
  * Events: checkout.session.completed, invoice.paid, customer.subscription.deleted
+ *
+ * Checkout sessions include `metadata.vertical_type` (from Cloud SQL tenant vertical) for analytics and routing.
  */
 export async function POST(request: NextRequest) {
   try {

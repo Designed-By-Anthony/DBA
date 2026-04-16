@@ -12,6 +12,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
+    "@dba/database": "workspace:*",
     "@dba/lead-form-contract": "workspace:*",
     "@dba/theme": "workspace:*",
     "@google/genai": "^1.48.0",
