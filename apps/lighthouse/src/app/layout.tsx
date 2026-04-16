@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Inter, Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { BRAND_ASSETS, BRAND_NAME, BRAND_SITE_URL } from "@dba/theme/brand";
 import "./globals.css";
@@ -83,6 +84,7 @@ export default function RootLayout({
         {children}
         <CookieConsentBanner />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
