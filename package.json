@@ -2,21 +2,38 @@
   "name": "designed-by-anthony-monorepo",
   "private": true,
   "packageManager": "pnpm@10.12.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "@firebase/util",
+      "@sentry/cli",
+      "@swc/core",
+      "esbuild",
+      "protobufjs",
+      "re2",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "dev": "turbo run dev",
     "dev:web": "pnpm --filter agency-os dev",
     "dev:web:test": "pnpm --filter agency-os dev:test",
     "dev:lighthouse": "pnpm --filter lighthouse-audit dev",
     "dev:marketing": "pnpm --filter designed-by-anthony dev",
-    "build": "pnpm -r run build",
-    "lint": "pnpm -r run lint",
     "db:push": "pnpm --filter @dba/database exec drizzle-kit push",
     "db:seed:master": "pnpm --filter @dba/database run db:seed:master",
     "test:e2e": "pnpm run test:e2e:marketing && pnpm run test:e2e:lighthouse && pnpm run test:e2e:web",
     "test:e2e:marketing": "pnpm --filter designed-by-anthony run test:release",
     "test:e2e:lighthouse": "pnpm --filter lighthouse-audit run test",
     "test:e2e:web": "pnpm --filter agency-os run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.6"
   }
 }
