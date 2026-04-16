@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { WifiOff, RefreshCw } from "lucide-react";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 export default function OfflinePage() {
   return (
@@ -13,7 +14,7 @@ export default function OfflinePage() {
       {/* Logo mark */}
       <div className="relative w-[120px] h-[90px] mb-8 shadow-[0_12px_48px_rgb(59_130_246/0.25)] animate-scale-in">
         <Image
-          src="/dba-logo.png"
+          src={BRAND_ASSETS.logo}
           alt="Designed by Anthony"
           width={240}
           height={180}

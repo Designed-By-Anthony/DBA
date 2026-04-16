@@ -3,12 +3,14 @@
 // ============================================
 
 import type { PipelineColumn } from './types';
+import { BRAND_ASSETS } from '@dba/theme/brand';
 
 export const brandConfig = {
   name: 'Designed by Anthony',
   shortName: 'DBA',
   primaryHue: 221,
-  logo: '/dba-mark.webp',
+  logo: BRAND_ASSETS.mark,
+  logoFull: BRAND_ASSETS.logo,
   domain: 'designedbyanthony.com',
   /** Public contact + mailto links in the app */
   supportEmail: 'anthony@designedbyanthony.com',

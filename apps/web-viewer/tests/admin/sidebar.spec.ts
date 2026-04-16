@@ -29,8 +29,8 @@ test.describe('Sidebar Navigation', () => {
   test('sidebar has the org brand mark', async ({ page }) => {
     const sidebar = page.locator('aside').first();
 
-    // Logo image (dba-mark) or collapsed brand — not .brand-mark class
-    const brandImg = sidebar.locator('img[src*="dba-mark"]').first();
+    // Logo image (centralized brand mark) or collapsed brand — not .brand-mark class
+    const brandImg = sidebar.locator('img[src*="/brand/"]').first();
     await expect(brandImg).toBeVisible({ timeout: 10_000 });
   });
 

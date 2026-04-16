@@ -8,6 +8,7 @@ import { useAdminPrefix } from "@/lib/useAdminPrefix";
 import { useVertical } from "@/lib/VerticalContext";
 import { filterSidebarForPlanSuite } from "@/lib/org-entitlements";
 import { PanelLeftClose, PanelLeftOpen, LogOut } from "lucide-react";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 
 export default function Sidebar({
@@ -64,7 +65,7 @@ export default function Sidebar({
           {!collapsed && (
             <div className="flex items-center gap-3 min-w-0">
               <Image
-                src="/dba-mark.webp"
+                src={BRAND_ASSETS.mark}
                 alt=""
                 width={36}
                 height={27}
@@ -79,7 +80,7 @@ export default function Sidebar({
           )}
           {collapsed && (
             <Image
-              src="/dba-mark.webp"
+              src={BRAND_ASSETS.mark}
               alt=""
               width={36}
               height={27}

@@ -2,7 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import LinkClusterSection, { type LinkClusterItem } from './LinkClusterSection.astro';
 import SourceList from './SourceList.astro';
-import { DEFAULT_SOCIAL_IMAGE, buildFaqPageSchema, type SchemaValue } from '../lib/seo';
+import {
+  DEFAULT_SOCIAL_IMAGE,
+  buildFaqPageSchema,
+  buildLighthouseSoftwareApplicationSchema,
+  type SchemaValue,
+} from '../lib/seo';
 import { PUBLIC_PRICING_PILL } from '../lib/offers';
 
 interface SupportingBlock {
@@ -103,7 +108,12 @@ const {
 } = Astro.props;
 
 const faqSchema = faqEntries.length > 0 ? buildFaqPageSchema(faqEntries) : null;
-const pageSchemas = faqSchema ? [schema, faqSchema] : schema;
+const softwareSchema = buildLighthouseSoftwareApplicationSchema();
+const pageSchemas: SchemaValue[] = [
+  ...(Array.isArray(schema) ? schema : [schema]),
+  ...(faqSchema ? [faqSchema] : []),
+  softwareSchema,
+];
 ---
 
 <Layout

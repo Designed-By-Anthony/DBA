@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { brandConfig } from "@/lib/theme.config";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 /**
  * Client Portal Login
@@ -130,7 +131,7 @@ export default function PortalLoginPage() {
           {!searchParams.get("org") ? (
             <div className="mx-auto mb-4 flex justify-center">
               <Image
-                src="/dba-mark.webp"
+                src={BRAND_ASSETS.mark}
                 alt=""
                 width={56}
                 height={42}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { SignIn } from "@clerk/nextjs";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 export default function AdminLogin() {
   return (
@@ -13,7 +14,7 @@ export default function AdminLogin() {
       <div className="relative text-center animate-scale-in">
         <div className="relative w-[140px] h-[42px] mx-auto mb-5">
           <Image
-            src="/dba-logo.png"
+            src={BRAND_ASSETS.logo}
             alt="Designed by Anthony"
             width={280}
             height={84}

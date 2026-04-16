@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -77,7 +78,7 @@ export default function PwaInstallPrompt() {
           {/* App icon */}
           <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#3b82f6] to-[#1d4ed8] flex items-center justify-center shrink-0 shadow-lg overflow-hidden p-1.5">
             {/* eslint-disable-next-line @next/next/no-img-element -- small inline app icon */}
-            <img src="/dba-mark.webp" alt="" className="w-full h-full object-contain" />
+            <img src={BRAND_ASSETS.mark} alt="" className="w-full h-full object-contain" />
           </div>
 
           <div className="flex-1 min-w-0">

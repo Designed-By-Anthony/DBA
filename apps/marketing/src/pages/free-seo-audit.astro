@@ -2,7 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import GbpRoiCalculator from '../components/GbpRoiCalculator.astro';
 import LighthouseAudit from '../components/LighthouseAudit.astro';
-import { toAbsoluteUrl, ORGANIZATION_ID, type SchemaValue } from '../lib/seo';
+import {
+  toAbsoluteUrl,
+  ORGANIZATION_ID,
+  buildLighthouseSoftwareApplicationSchema,
+  type SchemaValue,
+} from '../lib/seo';
 
 const pageSchema: SchemaValue = {
   '@context': 'https://schema.org',
@@ -24,7 +29,7 @@ const pageSchema: SchemaValue = {
   title="Free Instant Website Audit | Designed by Anthony"
   description="Run a free Lighthouse performance, accessibility, and SEO audit on any website instantly. Get your scores in under 60 seconds."
   pageType="WebPage"
-  schema={pageSchema}
+  schema={[pageSchema, buildLighthouseSoftwareApplicationSchema()]}
   hidePreFooterCTA={true}
 >
   <section class="page-hero centered">

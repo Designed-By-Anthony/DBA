@@ -1,0 +1,90 @@
+/**
+ * Root Vercel Edge Middleware — host-based routing for
+ * Designed by Anthony ("Chameleon" multi-app gateway).
+ *
+ * Vercel runs this file at the edge for every request to the apex
+ * Vercel project (the Astro marketing deployment). Depending on the
+ * Host header we either let the request fall through to the Astro site
+ * or rewrite it to the upstream URL of another Vercel project.
+ *
+ * Deploy model (see `ANTHONYS_INSTRUCTIONS.txt`):
+ *   - apps/marketing  — deployed as a standalone Vercel project; also
+ *     serves this middleware. Hostname: designedbyanthony.com.
+ *   - apps/web-viewer — deployed as a separate Vercel project; the
+ *     admin and accounts surfaces both live here. Hostname:
+ *     $ADMIN_UPSTREAM_URL / $ACCOUNTS_UPSTREAM_URL.
+ *   - apps/lighthouse — deployed as its own Vercel project. Hostname:
+ *     $LIGHTHOUSE_UPSTREAM_URL (subdomain routing optional).
+ *
+ * Why a root middleware instead of vercel.json `rewrites`?
+ *   - vercel.json rewrites run *before* middleware and are static; a
+ *     TypeScript middleware lets the "Chameleon" rules evolve (A/B
+ *     tests, tenant skins, feature flags) without a redeploy of the
+ *     config layer.
+ *   - Keeping the rules in TS also means our type-checker catches
+ *     mistakes (undefined env vars, bad URL shapes).
+ *
+ * Reference: https://vercel.com/docs/functions/edge-middleware
+ */
+import { next, rewrite, type RequestContext } from '@vercel/edge';
+
+const APEX_DOMAIN = 'designedbyanthony.com';
+
+const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
+const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
+const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
+
+/**
+ * Matcher — skip Vercel plumbing and static asset paths so we never
+ * rewrite an asset request for the wrong upstream. Everything else goes
+ * through host-based routing.
+ */
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|_vercel|favicon\\.ico|brand/|scripts/|fonts/|images/|assets/|sitemap|robots\\.txt).*)'],
+};
+
+function hostnameOf(request: Request): string {
+  const raw = request.headers.get('host') ?? '';
+  // Strip the port (e.g. :3000) for local dev, lowercase for safety.
+  return raw.split(':')[0]!.toLowerCase();
+}
+
+function buildUpstream(
+  upstreamBase: string,
+  pathname: string,
+  search: string,
+  pathPrefix = '',
+): URL {
+  const base = upstreamBase.replace(/\/$/, '');
+  const joinedPath = `${pathPrefix}${pathname}`.replace(/\/{2,}/g, '/');
+  return new URL(`${joinedPath}${search}`, base);
+}
+
+export default function middleware(request: Request, _ctx: RequestContext) {
+  const host = hostnameOf(request);
+  const url = new URL(request.url);
+  const { pathname, search } = url;
+
+  if (host === ADMIN_HOST) {
+    const upstream = process.env.ADMIN_UPSTREAM_URL;
+    if (!upstream) return next();
+    return rewrite(buildUpstream(upstream, pathname, search));
+  }
+
+  if (host === ACCOUNTS_HOST) {
+    const upstream =
+      process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
+    if (!upstream) return next();
+    // The web-viewer CRM exposes the accounts flow under /accounts/...
+    return rewrite(buildUpstream(upstream, pathname, search, '/accounts'));
+  }
+
+  if (host === LIGHTHOUSE_HOST) {
+    const upstream = process.env.LIGHTHOUSE_UPSTREAM_URL;
+    if (!upstream) return next();
+    return rewrite(buildUpstream(upstream, pathname, search));
+  }
+
+  // Apex + www + previews → fall through to Astro marketing site.
+  return next();
+}

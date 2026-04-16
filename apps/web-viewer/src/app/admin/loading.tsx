@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 export default function AdminLoading() {
   return (
@@ -10,7 +11,7 @@ export default function AdminLoading() {
           style={{ animation: "pulse-glow 2s ease-in-out infinite" }}
         >
           <Image
-            src="/dba-mark.webp"
+            src={BRAND_ASSETS.mark}
             alt=""
             width={108}
             height={32}

@@ -5,7 +5,7 @@ import FoundingPartnerSection from '../components/FoundingPartnerSection.astro';
 import PremiumPitchStrip from '../components/PremiumPitchStrip.astro';
 import { Image } from 'astro:assets';
 import { showcaseFeaturedItems } from '../data/showcase';
-import { buildItemListSchema } from '../lib/seo';
+import { buildItemListSchema, buildLighthouseSoftwareApplicationSchema } from '../lib/seo';
 import {
   FOUNDING_PARTNER_BUILD_SLOTS,
   FOUNDING_PARTNER_SEO_LABEL,
@@ -87,7 +87,7 @@ const homeFooterCta = {
   title="Web Design & Development Company — Mohawk Valley, Syracuse, CNY | Designed by Anthony"
   description="Web design and development company based in the Mohawk Valley, serving Syracuse, North Country, and Central New York. Custom websites, local SEO, and managed hosting for service businesses."
   hideBreadcrumbs={true}
-  schema={homeServiceSchema}
+  schema={[homeServiceSchema, buildLighthouseSoftwareApplicationSchema()]}
   footerCta={homeFooterCta}
 >
   <section class="page-hero page-hero--home">

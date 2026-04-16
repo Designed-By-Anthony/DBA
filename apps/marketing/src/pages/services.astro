@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import PremiumPitchStrip from '../components/PremiumPitchStrip.astro';
 import { MONTHLY_LOCAL_SEO_PRICE, PUBLIC_PAYMENT_STRUCTURE_COPY, PUBLIC_PRICING_PILL } from '../lib/offers';
-import { buildItemListSchema } from '../lib/seo';
+import { buildItemListSchema, buildLighthouseSoftwareApplicationSchema } from '../lib/seo';
 
 const serviceCards = [
   {
@@ -78,7 +78,7 @@ const servicesFooterCta = {
   title="Web Design & Development Services — Mohawk Valley & Syracuse | Designed by Anthony"
   description="Web development services for service businesses in the Mohawk Valley, Syracuse, and Central New York. Custom website design, local SEO, managed hosting, AI tools, and site rescue."
   pageType="CollectionPage"
-  schema={servicesSchema}
+  schema={[servicesSchema, buildLighthouseSoftwareApplicationSchema()]}
   footerCta={servicesFooterCta}
 >
   <section class="page-hero centered">

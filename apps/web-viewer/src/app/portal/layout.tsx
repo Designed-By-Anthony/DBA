@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import PortalNav from "@/components/portal/PortalNav";
+import { BRAND_ASSETS } from "@dba/theme/brand";
 
 export const metadata: Metadata = {
   title: "Client Portal | Designed by Anthony",
@@ -25,7 +26,7 @@ export default function PortalLayout({
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src="/dba-mark.webp"
+              src={BRAND_ASSETS.mark}
               alt=""
               width={36}
               height={27}

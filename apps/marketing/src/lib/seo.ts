@@ -57,6 +57,8 @@ interface ItemListSchemaInput {
   }>;
 }
 
+import { BRAND_ASSETS } from '@dba/theme/brand';
+
 export const SITE_URL = 'https://designedbyanthony.com';
 export const SITE_NAME = 'Designed by Anthony';
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
@@ -88,7 +90,9 @@ export const businessProfile = {
     'Marine Corps veteran and founder of Designed by Anthony, building custom websites, managed hosting, website rescues, and local SEO systems for service businesses.',
   description:
     'Designed by Anthony builds custom websites, website rescues, managed hosting, and local SEO systems for service businesses.',
-  logo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
+  logo: `${SITE_URL}${BRAND_ASSETS.logo}`,
+  /** Back-compat — existing `/images/designed-by-anthony-logo.png` is still mirrored and indexed. */
+  legacyLogo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
   image: `${SITE_URL}/images/og-site-premium.png`,
   priceRange: '$$',
   homeBase: 'Rome, New York',
@@ -662,6 +666,53 @@ export function buildBaseWebsiteSchema(): SchemaValue {
       '@id': ORGANIZATION_ID,
     },
     inLanguage: 'en-US',
+  };
+}
+
+/**
+ * SoftwareApplication schema for the Lighthouse audit tool.
+ * Emit on `/free-seo-audit` and the homepage so Google/Bing understand
+ * the free tool as a distinct product entity offered by the organization.
+ */
+export function buildLighthouseSoftwareApplicationSchema(): SchemaValue {
+  const url = toAbsoluteUrl('/free-seo-audit');
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': `${url}#software`,
+    name: 'Designed by Anthony — Free Lighthouse Audit',
+    description:
+      'Free in-house Lighthouse audit tool for service-business websites. Returns Google Core Web Vitals, accessibility, best-practices, and SEO scores in under 60 seconds with a written breakdown of practical fixes.',
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'WebPerformance',
+    operatingSystem: 'Web',
+    url,
+    image: buildOwnedImageObject(DEFAULT_SOCIAL_IMAGE),
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url,
+    },
+    featureList: [
+      'Google Lighthouse performance score',
+      'Accessibility score',
+      'Best-practices score',
+      'SEO score',
+      'Core Web Vitals (LCP / CLS / TBT) metrics',
+      'Mobile-first audit',
+      'Plain-language writeup of issues',
+    ],
+    creator: {
+      '@id': ORGANIZATION_ID,
+    },
+    publisher: {
+      '@id': ORGANIZATION_ID,
+    },
+    inLanguage: 'en-US',
+    isAccessibleForFree: true,
   };
 }
 

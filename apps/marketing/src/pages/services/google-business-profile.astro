@@ -4,6 +4,7 @@ import { GBP_FULL_PROGRAM_MONTHLY_PRICE, MONTHLY_LOCAL_SEO_PRICE } from '../../l
 import {
   businessProfile,
   buildFaqPageSchema,
+  buildLighthouseSoftwareApplicationSchema,
   buildServiceSchema,
   toAbsoluteUrl,
   type SchemaValue,
@@ -61,7 +62,12 @@ const gbpFaqEntries = [
   },
 ];
 
-const schemas = [pageSchema, serviceSchema, buildFaqPageSchema(gbpFaqEntries)];
+const schemas = [
+  pageSchema,
+  serviceSchema,
+  buildFaqPageSchema(gbpFaqEntries),
+  buildLighthouseSoftwareApplicationSchema(),
+];
 ---
 
 <Layout
