@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import {
   resolveVerticalTypeForStripe,
+  STRIPE_META_CLIENT_ID,
   STRIPE_META_VERTICAL_TYPE,
 } from '@/lib/stripe-metadata';
 
@@ -59,6 +60,7 @@ export async function createPaymentLink(params: {
     metadata: {
       prospectId: params.prospectId,
       type: params.type,
+      [STRIPE_META_CLIENT_ID]: params.organizationId,
       [STRIPE_META_VERTICAL_TYPE]: vertical_type,
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
@@ -107,6 +109,7 @@ export async function createSubscription(params: {
     metadata: {
       prospectId: params.prospectId,
       type: 'retainer',
+      [STRIPE_META_CLIENT_ID]: params.organizationId,
       [STRIPE_META_VERTICAL_TYPE]: vertical_type,
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,

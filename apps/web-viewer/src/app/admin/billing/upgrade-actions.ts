@@ -5,6 +5,7 @@ import { verifyAuth } from "@/app/admin/actions";
 import { getStripeClient } from "@/lib/stripe";
 import {
   resolveVerticalTypeForStripe,
+  STRIPE_META_CLIENT_ID,
   STRIPE_META_VERTICAL_TYPE,
 } from "@/lib/stripe-metadata";
 
@@ -38,6 +39,7 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
         cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
         metadata: {
           type: "agency_os_upgrade",
+          [STRIPE_META_CLIENT_ID]: sess.agencyId,
           [STRIPE_META_VERTICAL_TYPE]: vertical_type,
         },
       });
@@ -62,6 +64,7 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
       cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
       metadata: {
         type: "agency_os_upgrade",
+        [STRIPE_META_CLIENT_ID]: sess.agencyId,
         [STRIPE_META_VERTICAL_TYPE]: vertical_type,
       },
     });

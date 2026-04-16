@@ -9,6 +9,15 @@ export type CfDnsRecord = {
   ttl?: number;
 };
 
+export type CfCustomHostname = {
+  id: string;
+  hostname: string;
+  status: string;
+  created_at?: string;
+  ownership_verification?: { type?: string; name?: string; value?: string } | null;
+  ssl?: { status?: string; method?: string; type?: string } | null;
+};
+
 function headers(): HeadersInit {
   const token = process.env.CLOUDFLARE_API_TOKEN?.trim();
   if (!token) throw new Error("CLOUDFLARE_API_TOKEN is not set");
@@ -78,6 +87,62 @@ export async function deleteDnsRecord(recordId: string): Promise<void> {
   if (!res.ok || !json.success) {
     const msg = json.errors?.map((e) => e.message).join("; ") || res.statusText;
     throw new Error(msg || "Cloudflare delete failed");
+  }
+}
+
+export async function listCustomHostnames(): Promise<CfCustomHostname[]> {
+  const res = await fetch(
+    `${CF_API}/zones/${zoneId()}/custom_hostnames?per_page=100`,
+    { headers: headers(), next: { revalidate: 0 } },
+  );
+  const json = (await res.json()) as {
+    success: boolean;
+    result?: CfCustomHostname[];
+    errors?: { message: string }[];
+  };
+  if (!res.ok || !json.success) {
+    const msg = json.errors?.map((e) => e.message).join("; ") || res.statusText;
+    throw new Error(msg || "Cloudflare list custom hostnames failed");
+  }
+  return json.result ?? [];
+}
+
+export async function createCustomHostname(body: {
+  hostname: string;
+}): Promise<CfCustomHostname> {
+  const res = await fetch(`${CF_API}/zones/${zoneId()}/custom_hostnames`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify({
+      hostname: body.hostname,
+      ssl: { method: "http", type: "dv" },
+    }),
+  });
+  const json = (await res.json()) as {
+    success: boolean;
+    result?: CfCustomHostname;
+    errors?: { message: string }[];
+  };
+  if (!res.ok || !json.success) {
+    const msg = json.errors?.map((e) => e.message).join("; ") || res.statusText;
+    throw new Error(msg || "Cloudflare create custom hostname failed");
+  }
+  if (!json.result) throw new Error("Cloudflare returned no result");
+  return json.result;
+}
+
+export async function deleteCustomHostname(id: string): Promise<void> {
+  const res = await fetch(
+    `${CF_API}/zones/${zoneId()}/custom_hostnames/${encodeURIComponent(id)}`,
+    { method: "DELETE", headers: headers() },
+  );
+  const json = (await res.json()) as {
+    success: boolean;
+    errors?: { message: string }[];
+  };
+  if (!res.ok || !json.success) {
+    const msg = json.errors?.map((e) => e.message).join("; ") || res.statusText;
+    throw new Error(msg || "Cloudflare delete custom hostname failed");
   }
 }
 

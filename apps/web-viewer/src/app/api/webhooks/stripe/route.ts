@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { STRIPE_META_CLIENT_ID, STRIPE_META_VERTICAL_TYPE } from '@/lib/stripe-metadata';
 import { db } from '@/lib/firebase';
 import { Resend } from 'resend';
 import { complianceConfig } from '@/lib/theme.config';
@@ -47,6 +48,8 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const prospectId = session.metadata?.prospectId;
         const paymentType = session.metadata?.type as 'down_payment' | 'completion' | 'retainer';
+        const clientId = session.metadata?.[STRIPE_META_CLIENT_ID];
+        const verticalType = session.metadata?.[STRIPE_META_VERTICAL_TYPE];
 
         if (!prospectId) break;
 
@@ -57,6 +60,8 @@ export async function POST(request: NextRequest) {
         // Create invoice record
         await db.collection('invoices').add({
           prospectId,
+          clientId: clientId || null,
+          verticalType: verticalType || null,
           prospectName: session.customer_details?.name || '',
           type: paymentType || 'down_payment',
           amount,
@@ -78,6 +83,8 @@ export async function POST(request: NextRequest) {
           metadata: {
             amount,
             paymentType,
+            clientId,
+            verticalType,
             stripeSessionId: session.id,
             customerEmail: session.customer_details?.email,
           },

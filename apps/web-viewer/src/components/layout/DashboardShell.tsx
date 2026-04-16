@@ -18,11 +18,14 @@ export default function DashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      setCollapsed(localStorage.getItem("sidebar-collapsed") === "true");
-    } catch {
-      // ignore (storage disabled)
-    }
+    const t = setTimeout(() => {
+      try {
+        setCollapsed(localStorage.getItem("sidebar-collapsed") === "true");
+      } catch {
+        // ignore (storage disabled)
+      }
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   const handleToggle = () => {

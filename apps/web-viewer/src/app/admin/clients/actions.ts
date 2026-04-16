@@ -86,6 +86,23 @@ export async function createClientOrg(name: string, verticalTemplate: string = "
     createdBy: userId,
   });
 
+  // Golden thread: ensure Clerk org webhook can persist correct Postgres `tenants.vertical` + config.
+  // Clerk webhook reads `public_metadata.vertical` + optional engine config.
+  try {
+    const vertical =
+      verticalTemplate === "restaurant" || verticalTemplate === "service_pro" || verticalTemplate === "retail"
+        ? verticalTemplate
+        : "agency";
+    await client.organizations.updateOrganization(org.id, {
+      publicMetadata: {
+        vertical,
+        primaryColor: "#2563eb",
+      },
+    });
+  } catch (e) {
+    console.warn("[createClientOrg] failed to set public metadata", e);
+  }
+
   // Initialize branding + vertical defaults in Firestore
   await db.collection("org_settings").doc(org.id).set({
     brandName: name,

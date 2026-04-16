@@ -4,6 +4,7 @@ import { db } from "@/lib/firebase";
 import { stripe } from "@/lib/stripe";
 import {
   resolveVerticalTypeForStripe,
+  STRIPE_META_CLIENT_ID,
   STRIPE_META_VERTICAL_TYPE,
 } from "@/lib/stripe-metadata";
 
@@ -67,6 +68,7 @@ export async function createBookingDepositAction(params: {
       metadata: {
         bookingId: bookingRef.id,
         agencyId: params.agencyId,
+        [STRIPE_META_CLIENT_ID]: params.agencyId,
         type: 'revenue_protection_hold',
         [STRIPE_META_VERTICAL_TYPE]: vertical_type,
       }

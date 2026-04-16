@@ -67,7 +67,8 @@ export default function TopBar({
   const stripAdmin = useAdminPrefix();
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   // Load real activity data for notifications

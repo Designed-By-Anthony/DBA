@@ -20,11 +20,48 @@ export default async function VerticalExperience({ children }: { children: React
   const cfg = tenant?.config;
   const accent = cfg?.primaryColor ?? "#2563eb";
 
-  const showKitchen =
-    vertical === "restaurant" && (cfg?.showKitchenDisplay ?? false);
-  const showEstimator =
-    vertical === "service_pro" || Boolean(cfg?.customEstimator);
-  const showRetailStrip = vertical === "retail";
+  let header: React.ReactNode = null;
+  switch (vertical) {
+    case "restaurant": {
+      if (cfg?.showKitchenDisplay ?? false) {
+        header = (
+          <div
+            className="border-b border-t-2 border-glass-border bg-surface-1 px-4 py-3 lg:px-8"
+            style={{ borderTopColor: accent }}
+          >
+            <KitchenDisplay />
+          </div>
+        );
+      }
+      break;
+    }
+    case "service_pro": {
+      header = (
+        <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
+          <JobEstimator />
+        </div>
+      );
+      break;
+    }
+    case "retail": {
+      header = (
+        <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
+          <RetailWorkbench />
+        </div>
+      );
+      break;
+    }
+    default: {
+      if (cfg?.customEstimator) {
+        header = (
+          <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
+            <JobEstimator />
+          </div>
+        );
+      }
+      break;
+    }
+  }
 
   return (
     <div
@@ -34,24 +71,7 @@ export default async function VerticalExperience({ children }: { children: React
         } as CSSProperties
       }
     >
-      {showKitchen ? (
-        <div
-          className="border-b border-t-2 border-glass-border bg-surface-1 px-4 py-3 lg:px-8"
-          style={{ borderTopColor: accent }}
-        >
-          <KitchenDisplay />
-        </div>
-      ) : null}
-      {showEstimator ? (
-        <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
-          <JobEstimator />
-        </div>
-      ) : null}
-      {showRetailStrip ? (
-        <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
-          <RetailWorkbench />
-        </div>
-      ) : null}
+      {header}
       {children}
     </div>
   );

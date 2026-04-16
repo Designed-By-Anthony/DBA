@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:test": "NODE_ENV=test next dev -p 3001",
-    "build": "next build",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "start": "next start",
     "lint": "eslint",
     "verify:webhook": "node scripts/verify-lead-webhook.mjs",
