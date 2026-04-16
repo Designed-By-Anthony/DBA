@@ -26,6 +26,7 @@
     "@sentry/nextjs": "^10.48.0",
     "@serwist/turbopack": "^9.5.7",
     "@tanstack/react-table": "^8.21.3",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.3",

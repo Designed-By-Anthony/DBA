@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/outfit";
 import "./globals.css";
@@ -61,6 +62,7 @@ export default function RootLayout({
             </ClerkProvider>
           </PwaRoot>
         </div>
+        <Analytics />
       </body>
     </html>
   );
