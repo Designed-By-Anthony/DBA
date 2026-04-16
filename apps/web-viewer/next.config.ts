@@ -1,6 +1,11 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
+// The "Zod" environment guard — fails the build if a required key is missing
+// (see AGENTS.md > Code Quality & Purge Rules → Strict Typing + Zod).
+import { validateWebViewerEnv } from "@dba/env/web-viewer";
+
+validateWebViewerEnv();
 
 const nextConfig: NextConfig = {
   /** Native `pg` driver — avoid bundling issues in the server graph. */
@@ -16,12 +21,13 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             // Clerk FAPI (*.clerk.accounts.dev), telemetry, img, workers — see https://clerk.com/docs/security/clerk-csp
+            // `connect-src` includes *.designedbyanthony.com so admin./accounts. can call sibling subdomains (CRM family).
             value:
               "default-src 'self'; " +
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://challenges.cloudflare.com; " +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com; " +
-              "connect-src 'self' https://api.stripe.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com; " +
+              "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com; " +
               "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev; " +
               "worker-src 'self' blob:;",
           },

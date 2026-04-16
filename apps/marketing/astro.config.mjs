@@ -6,6 +6,13 @@ import indexNowStaticPages from './build/indexnow-integration.mjs';
 import sentry from '@sentry/astro';
 import spotlightjs from '@spotlightjs/astro';
 
+// The "Zod" environment guard — fails the Astro build if Agency OS
+// secrets (DATABASE_URL, CLERK_SECRET_KEY) bleed onto the marketing
+// Vercel project (env-bleed detection). See packages/env/README.md.
+import { validateMarketingEnv } from '@dba/env/marketing';
+
+validateMarketingEnv();
+
 const SITEMAP_EXCLUDED_URLS = new Set([
   'https://designedbyanthony.com/404',
   'https://designedbyanthony.com/404/',

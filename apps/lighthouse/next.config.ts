@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+// The "Zod" environment guard — fails the build if web-viewer / Stripe
+// secrets accidentally bleed onto the Lighthouse Vercel project.
+import { validateLighthouseEnv } from "@dba/env/lighthouse";
+
+validateLighthouseEnv();
 
 const nextConfig: NextConfig = {
   async headers() {
