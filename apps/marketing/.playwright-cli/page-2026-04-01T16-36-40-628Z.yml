@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: 🌧️ APRIL DEAL
+    - paragraph [ref=e5]:
+      - text: Save $300 this month — websites launch at $699 instead of $999. First 3 spots only —
+      - link "claim yours →" [ref=e6] [cursor=pointer]:
+        - /url: /contact
+  - banner [ref=e7]:
+    - generic [ref=e8]:
+      - link "Designed by Anthony Logo" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e10]
+      - navigation [ref=e11]:
+        - link "Our Edge" [ref=e12] [cursor=pointer]:
+          - /url: /ouredge
+        - link "Services" [ref=e13] [cursor=pointer]:
+          - /url: /services
+        - link "Service Areas" [ref=e14] [cursor=pointer]:
+          - /url: /service-areas
+        - link "Portfolio" [ref=e15] [cursor=pointer]:
+          - /url: /portfolio
+        - link "About" [ref=e16] [cursor=pointer]:
+          - /url: /about
+        - link "FAQ" [ref=e17] [cursor=pointer]:
+          - /url: /faq
+        - link "Blog" [ref=e18] [cursor=pointer]:
+          - /url: /blog
+        - link "Contact" [ref=e19] [cursor=pointer]:
+          - /url: /contact
+  - navigation "Breadcrumb" [ref=e20]:
+    - list [ref=e22]:
+      - listitem [ref=e23]:
+        - link "Home" [ref=e24] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e25]:
+        - text: /
+        - generic [ref=e26]: Free Website Audit
+  - main [ref=e27]:
+    - generic [ref=e29]:
+      - paragraph [ref=e30]: Free Website Audit
+      - heading "Find out what your website needs to fix to get more calls." [level=1] [ref=e31]
+      - paragraph [ref=e32]: We look at your site and tell you what is working, what is not, and what to fix first so you stop losing business to competitors with better websites.
+      - generic [ref=e33]:
+        - generic [ref=e34]: Reply within 24 hours
+        - generic [ref=e35]: No pressure follow-up
+        - generic [ref=e36]: Built for service businesses
+      - generic [ref=e37]:
+        - strong [ref=e38]: Custom projects start at $999.
+        - generic [ref=e39]: 50% down, 50% on completion. You see the site before it goes live.
+    - generic [ref=e41]:
+      - complementary [ref=e42]:
+        - generic [ref=e43]: What You Get
+        - heading "A straight answer on what to fix first." [level=2] [ref=e44]
+        - paragraph [ref=e45]: This is a practical audit, not a vague sales call. We look at why visitors are not calling, whether your site shows up on Google, and what needs to change.
+        - list [ref=e46]:
+          - listitem [ref=e47]: The biggest thing keeping visitors from picking up the phone.
+          - listitem [ref=e48]: How your site stacks up on speed, mobile, and Google search.
+          - listitem [ref=e49]: Whether a $999+ project makes sense or if a smaller fix is all you need.
+        - generic [ref=e50]:
+          - generic [ref=e51]: How we respond
+          - paragraph [ref=e52]: You will hear back within 24 hours with a clear next step, not an automated sequence.
+        - generic [ref=e53]:
+          - generic [ref=e54]: What to include
+          - paragraph [ref=e55]: Share your website URL and what feels off so we can give you the most useful feedback.
+        - generic [ref=e56]:
+          - generic [ref=e57]: Best fit
+          - paragraph [ref=e58]: Service businesses that want a website that actually brings in calls instead of just sitting there.
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - generic [ref=e61]: Get in Touch
+          - heading "Tell us about your project." [level=2] [ref=e62]
+          - paragraph [ref=e63]: Drop your website URL and what feels off — we reply within 24 hours with a straight answer.
+        - iframe [ref=e65]:
+          - generic [ref=f4e2]:
+            - generic [ref=f4e3]:
+              - generic [ref=f4e4]:
+                - textbox "Full Name" [ref=f4e5]:
+                  - /placeholder: Enter your full name…
+                - generic: Full Name
+              - generic [ref=f4e6]:
+                - textbox "Email Address" [ref=f4e7]:
+                  - /placeholder: Enter your email address…
+                - generic: Email Address
+              - generic [ref=f4e8]:
+                - textbox "Subject" [ref=f4e9]:
+                  - /placeholder: Enter a subject…
+                - generic: Subject
+              - generic [ref=f4e10]:
+                - textbox "Message" [ref=f4e11]:
+                  - /placeholder: Enter your message…
+                - generic: Message
+                - generic [ref=f4e12]: 0 / 40 characters minimum
+              - button "Send Message" [disabled] [ref=f4e13]
+            - paragraph [ref=f4e14]:
+              - text: This contact form runs on
+              - link "Crisp Inbox" [ref=f4e15] [cursor=pointer]:
+                - /url: https://crisp.chat/shared-inbox/?utm_source=loop&utm_medium=form
+              - text: .
+            - paragraph [ref=f4e16]:
+              - text: Protected by hCaptcha (
+              - link "Privacy Policy" [ref=f4e17] [cursor=pointer]:
+                - /url: https://hcaptcha.com/privacy
+              - text: –
+              - link "Terms of Service" [ref=f4e18] [cursor=pointer]:
+                - /url: https://hcaptcha.com/terms
+              - text: )
+  - contentinfo [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - paragraph [ref=e69]: © 2026 Designed by Anthony. All rights reserved.
+        - paragraph [ref=e70]: Serving the Mohawk Valley and Beyond
+        - generic [ref=e71]:
+          - link "Privacy Policy" [ref=e72] [cursor=pointer]:
+            - /url: /privacy
+          - generic [ref=e73]: "|"
+          - link "Terms of Service" [ref=e74] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e75]: "|"
+          - link "Cookie Policy" [ref=e76] [cursor=pointer]:
+            - /url: /cookie
+          - generic [ref=e77]: "|"
+          - link "Image License" [ref=e78] [cursor=pointer]:
+            - /url: /image-license
+      - paragraph [ref=e80]:
+        - text: "Contact:"
+        - link "Use the contact form" [ref=e81] [cursor=pointer]:
+          - /url: /contact

@@ -1,0 +1,66 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+
+const currentDate = new Date().toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<LegalPage
+  title="Privacy Policy | Designed by Anthony"
+  description="Read how Designed by Anthony collects, uses, stores, and protects personal information for website visitors and clients."
+  lastUpdated={currentDate}
+>
+  <p><strong>Effective Date:</strong> March 26, 2026</p>
+  <p>This Privacy Policy explains how Designed by Anthony collects, uses, stores, and shares personal information when you use <a href="/">designedbyanthony.com</a>, submit a form, book a call, or run the free audit. If we update this policy, we will post the revised version on this page with a new effective date.</p>
+
+  <h2>Information We Collect</h2>
+  <p>Depending on how you use the site, we may collect:</p>
+  <ul>
+    <li>Name, email address, phone number, website URL, and project details you submit through forms.</li>
+    <li>Scheduling details you provide when you book through Calendly.</li>
+    <li>Technical data such as page URL, referrer, browser information, and anti-spam verification data.</li>
+    <li>Analytics data about site usage only if you opt in to analytics tracking.</li>
+  </ul>
+
+  <h2>How We Use Your Information</h2>
+  <p>We use personal information to:</p>
+  <ul>
+    <li>Respond to inquiries and audit requests.</li>
+    <li>Review project fit, prepare follow-up, and provide requested services.</li>
+    <li>Protect forms and the site from spam, abuse, and automated submissions.</li>
+    <li>Understand aggregate site usage and improve the site when analytics consent is granted.</li>
+    <li>Maintain records needed for business operations, security, and legal compliance.</li>
+  </ul>
+  <p>
+    We use an on-site cookie banner to record your analytics preference. If you accept, we load Google Tag Manager and related tags (including how analytics cookies are handled). You can open <strong>Cookie settings</strong> in the footer to change your choice at any time.
+  </p>
+
+  <h2>How We Share Your Information</h2>
+  <p>We share information only with service providers that help us operate the site and deliver requested services. These may include:</p>
+  <ul>
+    <li>Google Tag Manager, Google Analytics 4, Microsoft Clarity, and Crazy Egg when you opt in via the cookie banner. Measurement is intended to run only after that opt-in.</li>
+    <li>Cloudflare Turnstile for spam and bot protection on forms.</li>
+    <li>Our Lighthouse audit backend API when you submit lead information through our site forms — that is the system of record for those submissions.</li>
+    <li>Calendly when you choose to book a meeting.</li>
+    <li>Our hosting and backend providers for site delivery, logging, and security.</li>
+  </ul>
+  <p>We may also disclose information when required by law, to protect the security of the site or our users, or in connection with a business transfer such as a merger, acquisition, or sale of assets.</p>
+
+  <h2>Retention of Your Information</h2>
+  <p>We keep personal information for as long as needed to respond to your inquiry, provide requested services, maintain business records, prevent abuse, and comply with legal obligations. Analytics data is retained according to the settings of the analytics tools in use. Aggregate or de-identified reporting may be retained longer.</p>
+
+  <h2>Your Rights</h2>
+  <p>Depending on where you live, you may have the right to request access to, correction of, deletion of, or restriction of certain personal information, and you may be able to withdraw consent for analytics processing. To make a privacy request, contact us through the <a href="/contact">contact page</a>. We will review and respond in accordance with applicable law.</p>
+
+  <h2>Cookies and Tracking</h2>
+  <p>To learn more about local storage, cookies, analytics, and consent choices, please review our <a href="/cookie">Cookie Policy</a>.</p>
+
+  <h2>Security</h2>
+  <p>We use reasonable technical and organizational safeguards to protect personal information, including HTTPS, security headers, form protection, and access controls. No internet transmission or storage system is completely secure, so we cannot guarantee absolute security.</p>
+
+  <h2>Contact</h2>
+  <p>If you have questions about this Privacy Policy or how your information is handled, reach out through the <a href="/contact">contact page</a> or email <a href="mailto:anthony@designedbyanthony.com">anthony@designedbyanthony.com</a>.</p>
+</LegalPage>

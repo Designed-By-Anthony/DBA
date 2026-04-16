@@ -1,0 +1,234 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GbpRoiCalculator from '../components/GbpRoiCalculator.astro';
+import LighthouseAudit from '../components/LighthouseAudit.astro';
+import { toAbsoluteUrl, ORGANIZATION_ID, type SchemaValue } from '../lib/seo';
+
+const pageSchema: SchemaValue = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${toAbsoluteUrl('/free-seo-audit')}#webpage`,
+  url: toAbsoluteUrl('/free-seo-audit'),
+  name: 'Free Instant Website Audit | Designed by Anthony',
+  description: 'Run a free Lighthouse performance, accessibility, and SEO audit on any website instantly. Built in-house by Designed by Anthony.',
+  isPartOf: {
+    '@id': `${toAbsoluteUrl('/')}#website`,
+  },
+  provider: {
+    '@id': ORGANIZATION_ID,
+  },
+};
+---
+
+<Layout
+  title="Free Instant Website Audit | Designed by Anthony"
+  description="Run a free Lighthouse performance, accessibility, and SEO audit on any website instantly. Get your scores in under 60 seconds."
+  pageType="WebPage"
+  schema={pageSchema}
+  hidePreFooterCTA={true}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner audit-hero">
+      <p class="page-eyebrow">Free Instant Audit</p>
+      <h1>See what is holding your website back — in 60 seconds.</h1>
+      <p>
+        Enter any URL below to instantly get your Google Lighthouse performance, accessibility, best practices, and SEO scores. This tool was built in-house by our web development team — the same team that builds 98+ scoring websites for service businesses.
+      </p>
+      <div class="hero-meta-row">
+        <span class="mini-pill">Instant Results</span>
+        <span class="mini-pill">Performance + SEO + Accessibility</span>
+        <span class="mini-pill">Built In-House</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell audit-embed-shell">
+    <div class="section-container">
+      <div class="section-header centered audit-run-header">
+        <h2>Run your instant Lighthouse audit</h2>
+        <p>
+          Enter a URL to fetch fresh performance, accessibility, best practices, and SEO scores. Results typically
+          arrive in about a minute.
+        </p>
+      </div>
+      <LighthouseAudit />
+    </div>
+  </section>
+
+  <section class="section-shell gbp-roi-audit-shell">
+    <div class="section-container gbp-roi-audit-inner">
+      <div class="section-header centered audit-gbp-header">
+        <p class="section-eyebrow">Local visibility</p>
+        <h2>Stress-test what a stronger Google Business Profile could be worth</h2>
+        <p>
+          The Lighthouse tool above checks your website. This calculator models incremental revenue if your Google Business Profile and local presence help you win even a few more customers per day — the same framing we use as a Merchynt agency partner.
+        </p>
+        <p class="audit-gbp-link">
+          <a href="/services/local-seo">See how we handle local SEO and GBP →</a>
+        </p>
+      </div>
+      <div class="surface-card gbp-roi-audit-card reveal-up">
+        <GbpRoiCalculator />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell audit-context-shell">
+    <div class="section-container audit-context-grid">
+      <div class="surface-card audit-context-card reveal-up">
+        <div class="card-tag">How It Works</div>
+        <h2>What this tool measures</h2>
+        <ul class="trust-list">
+          <li><strong>Performance</strong> — How fast your site loads, including Largest Contentful Paint and Total Blocking Time.</li>
+          <li><strong>Accessibility</strong> — Whether your site is usable for all visitors, including those using screen readers.</li>
+          <li><strong>Best Practices</strong> — Security, modern APIs, and browser compatibility checks.</li>
+          <li><strong>SEO</strong> — Meta tags, crawlability, mobile usability, and structured data validation.</li>
+        </ul>
+      </div>
+      <div class="surface-card audit-context-card reveal-up">
+        <div class="card-tag">What Happens Next</div>
+        <h2>Need help fixing what you found?</h2>
+        <p>If your scores show room for improvement, that is exactly what we specialize in. Every website we build scores 98+ across all four Lighthouse categories.</p>
+        <div class="hero-actions audit-card-actions">
+          <a href="/contact" class="btn btn-primary">Talk to Anthony</a>
+          <a href="/portfolio" class="btn btn-outline">See Example Builds</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .audit-hero {
+    max-width: 860px;
+  }
+
+  .audit-embed-shell {
+    padding-top: 0;
+    padding-bottom: 4rem;
+  }
+
+  .audit-run-header {
+    max-width: 640px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .audit-run-header h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 800;
+    color: var(--text-white);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.65rem;
+  }
+
+  .audit-run-header p {
+    margin: 0;
+    color: var(--text-gray);
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+
+  .gbp-roi-audit-shell {
+    padding-top: 0;
+    padding-bottom: 3rem;
+  }
+
+  .gbp-roi-audit-inner {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .audit-gbp-header {
+    max-width: 640px;
+    margin: 0 auto 1.75rem;
+  }
+
+  .audit-gbp-header h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+  }
+
+  .audit-gbp-header p {
+    color: var(--text-gray);
+    line-height: 1.65;
+  }
+
+  .audit-gbp-link {
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+
+  .audit-gbp-link a {
+    color: var(--accent-blue);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(91, 156, 248, 0.35);
+  }
+
+  .audit-gbp-link a:hover {
+    border-bottom-color: rgba(147, 197, 253, 0.65);
+  }
+
+  .gbp-roi-audit-card {
+    padding: 1.75rem 1.85rem;
+  }
+
+  .audit-context-shell {
+    padding-top: 0;
+    padding-bottom: 5rem;
+  }
+
+  .audit-context-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .audit-context-card {
+    padding: 2rem;
+  }
+
+  .audit-card-actions {
+    margin-top: 1.5rem;
+  }
+
+  .audit-context-card h2 {
+    font-size: clamp(1.6rem, 2.5vw, 2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 1rem 0 1rem;
+  }
+
+  .audit-context-card p {
+    color: var(--text-gray);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 900px) {
+    .audit-context-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Print: hide everything except the rendered report */
+  @media print {
+    .page-hero,
+    .audit-context-shell,
+    .audit-embed-shell .lh-form-container,
+    .audit-embed-shell [data-lh-loading],
+    .audit-embed-shell [data-lh-error],
+    .lh-error,
+    .hero-meta-row,
+    .page-eyebrow {
+      display: none !important;
+    }
+
+    .audit-embed-shell {
+      padding: 0 !important;
+    }
+
+    .section-container {
+      padding: 0 !important;
+      max-width: none !important;
+    }
+  }
+</style>

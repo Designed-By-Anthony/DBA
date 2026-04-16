@@ -1,0 +1,133 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: LIMITED
+    - paragraph [ref=e5]:
+      - text: Only
+      - strong [ref=e6]: 3 Build Slots Left
+      - text: for This Quarter —
+      - link "Reserve Yours Before They're Gone →" [ref=e7] [cursor=pointer]:
+        - /url: "#contact"
+  - banner [ref=e8]:
+    - generic [ref=e9]:
+      - link "Designed by Anthony Logo" [ref=e10] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e11]
+      - navigation [ref=e12]:
+        - link "Our Edge" [ref=e13] [cursor=pointer]:
+          - /url: /ouredge
+        - link "Services" [ref=e14] [cursor=pointer]:
+          - /url: /services
+        - link "Service Areas" [ref=e15] [cursor=pointer]:
+          - /url: /service-areas
+        - link "Portfolio" [ref=e16] [cursor=pointer]:
+          - /url: /portfolio
+        - link "FAQ" [ref=e17] [cursor=pointer]:
+          - /url: /faq
+        - link "Blog" [ref=e18] [cursor=pointer]:
+          - /url: /blog
+        - link "Contact" [ref=e19] [cursor=pointer]:
+          - /url: /contact
+  - navigation "Breadcrumb" [ref=e20]:
+    - list [ref=e22]:
+      - listitem [ref=e23]:
+        - link "Home" [ref=e24] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e25]:
+        - text: /
+        - link "Services" [ref=e26] [cursor=pointer]:
+          - /url: /services
+      - listitem [ref=e27]: / Custom Web Design
+  - main [ref=e28]:
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Service 01
+        - heading "Custom Web Design That Converts" [level=1] [ref=e32]
+        - paragraph [ref=e33]: We build custom Astro websites for businesses that want better performance control, cleaner SEO structure, and a site shaped around how their buyers actually make decisions.
+        - link "Get a Free Quote" [ref=e34] [cursor=pointer]:
+          - /url: "#"
+      - img "Premium custom web development" [ref=e36]
+    - generic [ref=e38]:
+      - heading "Why We Recommend a Custom Astro Build" [level=2] [ref=e39]
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - heading "Performance With a Clear Reason" [level=3] [ref=e42]
+          - paragraph [ref=e43]: Astro renders content-heavy pages with very little client-side JavaScript and prerenders static HTML by default. Google also recommends good Core Web Vitals and a strong mobile experience, so for brochure-style sites we prefer a stack that gives us tight control over what ships to the browser.
+        - generic [ref=e44]:
+          - heading "Built for Your Specific Audience" [level=3] [ref=e45]
+          - paragraph [ref=e46]: A template has to work for a wide range of industries. Your site does not. We design the structure, messaging, and calls to action around your actual customers so the experience feels clear and trustworthy from the first visit.
+        - generic [ref=e47]:
+          - heading "SEO Architecture Built In" [level=3] [ref=e48]
+          - paragraph [ref=e49]: We treat SEO as page architecture, not a plugin afterthought. That means clear headings, internal linking, metadata, and structured data where it makes sense so Google can better understand what your business does and where it operates.
+      - generic [ref=e50]:
+        - paragraph [ref=e51]: Sources
+        - heading "Why We Say This" [level=3] [ref=e52]
+        - paragraph [ref=e53]: We prefer this approach because the framework defaults and Google guidance line up with the goals of most local-business marketing sites.
+        - list [ref=e54]:
+          - listitem [ref=e55]:
+            - 'link "Astro Docs: Why Astro?" [ref=e56] [cursor=pointer]':
+              - /url: https://docs.astro.build/en/concepts/why-astro/
+            - text: "- Astro is designed for content-rich websites and emphasizes less client-side JavaScript."
+          - listitem [ref=e57]:
+            - 'link "Astro Docs: On-demand rendering" [ref=e58] [cursor=pointer]':
+              - /url: https://docs.astro.build/en/guides/on-demand-rendering/
+            - text: "- Astro prerenders static HTML by default for routes that do not need server logic."
+          - listitem [ref=e59]:
+            - 'link "Google Search Central: Understanding page experience" [ref=e60] [cursor=pointer]':
+              - /url: https://developers.google.com/search/docs/appearance/page-experience
+            - text: "- Google recommends good Core Web Vitals and strong mobile page experience."
+          - listitem [ref=e61]:
+            - 'link "Google Search Central: LocalBusiness structured data" [ref=e62] [cursor=pointer]':
+              - /url: https://developers.google.com/search/docs/appearance/structured-data/local-business
+            - text: "- Structured data can help Google better understand business details."
+    - generic [ref=e64]:
+      - heading "Ready to upgrade your digital footprint?" [level=2] [ref=e65]
+      - paragraph [ref=e66]: Stop paying for websites that act as digital brochures. Let's build a revenue-generating asset.
+      - link "Start Your Project" [ref=e67] [cursor=pointer]:
+        - /url: "#"
+  - contentinfo [ref=e68]:
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - paragraph [ref=e71]: © 2026 Designed by Anthony. All rights reserved.
+        - paragraph [ref=e72]: Serving the Mohawk Valley and Beyond
+        - generic [ref=e73]:
+          - link "Privacy Policy" [ref=e74] [cursor=pointer]:
+            - /url: /privacy
+          - generic [ref=e75]: "|"
+          - link "Terms of Service" [ref=e76] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e77]: "|"
+          - link "Cookie Policy" [ref=e78] [cursor=pointer]:
+            - /url: /cookie
+      - paragraph [ref=e80]:
+        - text: "Contact:"
+        - link "info@designedbyanthony.com" [ref=e81] [cursor=pointer]:
+          - /url: mailto:info@designedbyanthony.com
+  - button "Get a Quote Fast quote guidance for serious projects" [ref=e82] [cursor=pointer]:
+    - generic [ref=e83]: Get a Quote
+    - generic [ref=e84]: Fast quote guidance for serious projects
+  - complementary [ref=e85]:
+    - generic [ref=e86]:
+      - button [ref=e87] [cursor=pointer]: ×
+      - generic [ref=e88]: Free Scope Review
+      - heading [level=2] [ref=e89]: Get a Quote for Custom Web Design.
+      - paragraph [ref=e90]: Tell us where custom web design fits into your growth plan and we will map the clearest next step within one business day.
+      - generic [ref=e93]: Response within 24 hours
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - img [ref=e96]
+          - generic [ref=e98]: Service-specific recommendation
+        - generic [ref=e99]:
+          - img [ref=e100]
+          - generic [ref=e102]: Clear scope and next-step guidance
+        - generic [ref=e103]:
+          - img [ref=e104]
+          - generic [ref=e106]: Direct email and phone fallback
+      - generic [ref=e107]:
+        - link [ref=e108] [cursor=pointer]:
+          - /url: mailto:info@designedbyanthony.com
+          - text: info@designedbyanthony.com
+        - generic [ref=e109]: "|"
+        - link [ref=e110] [cursor=pointer]:
+          - /url: tel:+13159225592
+          - text: +1-315-922-5592
+      - paragraph [ref=e112]: No spam. No hard sell. Just a clear recommendation you can use.

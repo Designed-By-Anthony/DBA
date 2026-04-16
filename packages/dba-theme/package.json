@@ -1,0 +1,12 @@
+{
+  "name": "@dba/theme",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Global design tokens and styles — canonical source from Designed by Anthony (apps/marketing).",
+  "files": ["*.css"],
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./dba-global.css": "./dba-global.css",
+    "./tailwind-v4-bridge.css": "./tailwind-v4-bridge.css"
+  }
+}

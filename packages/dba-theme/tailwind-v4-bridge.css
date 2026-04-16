@@ -1,0 +1,44 @@
+/**
+ * Maps DBA :root tokens to Tailwind v4 @theme names (Agency OS, Lighthouse).
+ */
+@theme {
+  --color-bg-dark: var(--bg-dark);
+  --color-bg-deeper: var(--bg-deeper);
+  --color-bg-ink: var(--bg-ink);
+  --color-text-white: var(--text-white);
+  --color-text-cream: var(--text-cream);
+  --color-text-gray: var(--text-gray);
+  --color-text-muted: var(--text-muted);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-hover: var(--accent-blue-hover);
+  --color-accent-brass: var(--accent-brass);
+  --font-main: var(--font-main);
+  --font-display: var(--font-display);
+  --color-brand: var(--accent-blue-hover);
+  --color-brand-hover: #2563eb;
+  --color-brand-subtle: rgb(59 130 246 / 0.14);
+  --color-brand-glow: rgb(37 99 235 / 0.22);
+  --color-brand-ring: rgb(96 165 250 / 0.5);
+  --color-surface-0: var(--bg-ink);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-glass-bg: rgba(255, 255, 255, 0.03);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.12);
+  --color-success: var(--success-green);
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: var(--accent-blue-hover);
+
+  /* Lighthouse app */
+  --color-foreground: var(--text-white);
+  --color-primary: var(--accent-blue-hover);
+  --color-accent: var(--accent-blue);
+  --color-card: rgba(13, 19, 32, 0.96);
+  --color-card-border: rgba(255, 255, 255, 0.08);
+  --color-input: #0d1320;
+  --color-input-border: rgba(96, 165, 250, 0.18);
+  --color-label: #93c5fd;
+  --color-placeholder: rgba(255, 255, 255, 0.32);
+}

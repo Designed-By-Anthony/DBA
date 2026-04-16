@@ -1,0 +1,231 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PremiumPitchStrip from '../components/PremiumPitchStrip.astro';
+import { MONTHLY_LOCAL_SEO_PRICE, PUBLIC_PAYMENT_STRUCTURE_COPY, PUBLIC_PRICING_PILL } from '../lib/offers';
+import { buildItemListSchema } from '../lib/seo';
+
+const serviceCards = [
+  {
+    number: '01',
+    title: 'Google Business Profile & Local Marketing',
+    description:
+      'Full local marketing program: managed Google Business Profile, reviews, citations, heatmaps, AI visibility, and website alignment — Merchynt agency partner.',
+    href: '/services/google-business-profile',
+  },
+  {
+    number: '02',
+    title: 'Custom Web Design',
+    description: 'A website built from scratch that makes your business look professional and gets people to call.',
+    href: '/services/custom-web-design',
+  },
+  {
+    number: '03',
+    title: 'Website Rescue and Optimization',
+    description: 'Rescue work for sites that look outdated, run slow, or no longer support the business properly.',
+    href: '/services/website-rescue',
+  },
+  {
+    number: '04',
+    title: 'Managed Hosting and VIP Support',
+    description: `Hosting and support that keep the site fast, secure, and online after launch. $40/year or included in the ${MONTHLY_LOCAL_SEO_PRICE}/month SEO package.`,
+    href: '/services/managed-hosting',
+  },
+  {
+    number: '05',
+    title: 'Local SEO and Search Visibility',
+    description: 'Show up when people nearby search for what you do. More visibility, more calls.',
+    href: '/services/local-seo',
+  },
+  {
+    number: '06',
+    title: 'Custom Google AI Chatbots & Forms',
+    description: 'Automated lead capture using Google AI — chatbots trained on your data and smart forms that deliver leads straight to your inbox.',
+    href: '/services/ai-automation',
+  },
+  {
+    number: '07',
+    title: 'Google Workspace Setup',
+    description: 'Professional business email, shared Drive, and rock-solid email deliverability so you look legit from day one.',
+    href: '/services/workspace-setup',
+  },
+];
+
+const servicesSchema = buildItemListSchema({
+  name: 'Digital Services',
+  description:
+    'Designed by Anthony offers Google Business Profile and local marketing, custom web design, website rescue, managed hosting, local SEO, AI chatbot development, and Google Workspace setup for service businesses.',
+  path: '/services',
+  items: serviceCards.map((item) => ({
+    name: item.title,
+    url: item.href,
+    description: item.description,
+  })),
+});
+
+const servicesFooterCta = {
+  eyebrow: 'Free Website Audit',
+  title: 'Not sure which service fits? Start with the audit.',
+  description:
+    'Run the free Lighthouse audit on your site. I will review the results and tell you whether the clearest next move is design, SEO, a rescue, or nothing at all.',
+  primaryHref: '/free-seo-audit',
+  primaryLabel: 'Run the Free Audit',
+  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+  secondaryLabel: 'Book a 15-minute intro call',
+};
+---
+
+<Layout
+  title="Web Design & Development Services — Mohawk Valley & Syracuse | Designed by Anthony"
+  description="Web development services for service businesses in the Mohawk Valley, Syracuse, and Central New York. Custom website design, local SEO, managed hosting, AI tools, and site rescue."
+  pageType="CollectionPage"
+  schema={servicesSchema}
+  footerCta={servicesFooterCta}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner services-hero">
+      <p class="page-eyebrow">Services</p>
+      <h1>Web design and development services that help your business show up, look professional, and get more calls.</h1>
+      <p>
+        Every project is scoped around what your business needs right now. Clear recommendations, direct communication, and practical execution.
+      </p>
+      <div class="hero-meta-row">
+        <span class="mini-pill">{PUBLIC_PRICING_PILL}</span>
+        <span class="mini-pill">Audit first, project second</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell section-shell--premium-pitch">
+    <PremiumPitchStrip variant="services" />
+  </section>
+
+  <section class="section-shell">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">Where To Start</p>
+        <h2>Pick the service that matches what your business website needs most right now.</h2>
+        <p>
+          If you are not sure which one fits, start with the audit and I will point you toward the clearest first move.
+        </p>
+      </div>
+
+      <div class="services-grid">
+        {serviceCards.map((service) => (
+          <a href={service.href} class="surface-card service-card reveal-up">
+            <div class="service-card-top">
+              <span class="card-tag">{service.number}</span>
+              <span class="service-arrow">Explore</span>
+            </div>
+            <h2>{service.title}</h2>
+            <p>{service.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell services-proof-shell">
+    <div class="section-container services-proof">
+      <div class="surface-card proof-card reveal-up">
+        <div class="card-tag">Best Fit</div>
+        <h2>Your website should be doing more for your business.</h2>
+        <p>
+          This is a strong fit if you want a site that looks more established, shows up more clearly on Google, and does more than a template usually can. {PUBLIC_PAYMENT_STRUCTURE_COPY}
+        </p>
+      </div>
+      <div class="surface-card proof-card reveal-up">
+        <div class="card-tag">Not The Best Fit</div>
+        <h2>You only need the cheapest page online by tomorrow.</h2>
+        <p>
+          If speed to publish matters more than clarity, trust, or quality, a fast template option is probably the better match. Designed by Anthony is built for businesses that want something stronger.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .services-hero {
+    max-width: 860px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .service-card {
+    display: block;
+    padding: 1.9rem;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .service-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(96, 165, 250, 0.3);
+  }
+
+  .service-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .service-card h2 {
+    font-size: 1.45rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.7rem;
+  }
+
+  .service-card p,
+  .proof-card p {
+    color: var(--text-gray);
+  }
+
+  .service-arrow {
+    color: #bfdbfe;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  .services-proof-shell {
+    padding-top: 0;
+  }
+
+  .services-proof {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .proof-card {
+    padding: 2rem;
+  }
+
+  .proof-card h2 {
+    font-size: 1.6rem;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+    margin: 1rem 0 0.8rem;
+  }
+
+  @media (max-width: 900px) {
+    .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .services-proof {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .services-grid,
+    .services-proof {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

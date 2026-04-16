@@ -1,0 +1,343 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Designed by Anthony Logo" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e5]
+      - navigation [ref=e6]:
+        - link "Our Edge" [ref=e7] [cursor=pointer]:
+          - /url: /ouredge
+        - link "Services" [ref=e8] [cursor=pointer]:
+          - /url: /services
+        - link "Service Areas" [ref=e9] [cursor=pointer]:
+          - /url: /service-areas
+        - link "Portfolio" [ref=e10] [cursor=pointer]:
+          - /url: /portfolio
+        - link "About" [ref=e11] [cursor=pointer]:
+          - /url: /about
+        - link "FAQ" [ref=e12] [cursor=pointer]:
+          - /url: /faq
+        - link "Blog" [ref=e13] [cursor=pointer]:
+          - /url: /blog
+        - link "Contact" [ref=e14] [cursor=pointer]:
+          - /url: /contact
+  - main [ref=e15]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - paragraph [ref=e19]: Websites That Work For You
+        - heading "Service businesses lose jobs every week to competitors with worse work and a better website." [level=1] [ref=e20]
+        - paragraph [ref=e21]: A New York website design company offering custom web design services for small businesses that need to look credible faster. Run our free Lighthouse audit to see what is costing you calls, what to fix first, and whether a rebuild or a smaller cleanup makes more sense — instant results, no commitment.
+        - generic [ref=e22]:
+          - link "Run the Free Audit Now" [ref=e23] [cursor=pointer]:
+            - /url: /free-seo-audit
+          - link "See Example Builds" [ref=e24] [cursor=pointer]:
+            - /url: /portfolio
+        - generic [ref=e25]:
+          - strong [ref=e26]: "April Showers Deal: website contracts signed by April 30, 2026 start at $699 instead of the standard $999."
+          - generic [ref=e27]: Same build quality. Same founder-led process. 50% down to start, 50% at launch. April contracts only.
+        - generic [ref=e28]:
+          - generic [ref=e29]: Reply within 24 hours
+          - generic [ref=e30]: Built for service businesses
+          - generic [ref=e31]: You see it before it goes live
+      - generic [ref=e32]:
+        - generic [ref=e33]: What Happens After the Audit
+        - heading "From free report to live site — here is how the process works." [level=2] [ref=e34]
+        - list [ref=e35]:
+          - listitem [ref=e36]: You get a report showing exactly what is holding your site back — speed, trust, visibility, and conversion gaps.
+          - listitem [ref=e37]: If a rebuild makes sense, I quote it based on what I found. Standard website builds start at $999, and April contracts signed by April 30, 2026 start at $699.
+          - listitem [ref=e38]: You see the site before it goes live, and the second half is not due until launch after you sign off.
+    - generic [ref=e43]:
+      - generic [ref=e44]: NEW
+      - heading "Run your free Lighthouse audit — right now, on us." [level=2] [ref=e45]
+      - paragraph [ref=e46]: We built a Lighthouse-powered audit scanner in-house. Enter any URL and get instant performance, accessibility, best practices, and SEO scores. No email sequence. No waiting.
+      - link "Run Your Free Audit" [ref=e47] [cursor=pointer]:
+        - /url: /free-seo-audit
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]: 60 sec
+        - text: Instant Lighthouse audit
+      - generic [ref=e54]:
+        - generic [ref=e55]: $999/$699
+        - text: Standard / April contract rate
+      - generic [ref=e56]:
+        - generic [ref=e57]: 98+
+        - text: Google Lighthouse scores
+      - generic [ref=e58]:
+        - generic [ref=e59]: US-based
+        - text: Direct communication and delivery
+    - generic [ref=e63]:
+      - paragraph [ref=e64]: Starter Package
+      - heading "A professional website that gets your phone ringing — starting at $699." [level=2] [ref=e65]
+      - paragraph [ref=e66]: No templates. No page builders. A custom site built around your business that loads fast, shows up on Google, and earns trust the moment someone lands on it.
+      - list [ref=e67]:
+        - listitem [ref=e68]: Custom design and copy written around your services
+        - listitem [ref=e69]: Mobile-first build that scores 98+ on Google Lighthouse
+        - listitem [ref=e70]: Local SEO structure so you show up in your area
+        - listitem [ref=e71]: Logo and branding assistance included if you need it
+        - listitem [ref=e72]: In-house payment plans available — no credit checks
+      - generic [ref=e73]:
+        - generic [ref=e74]: $699 Standard $999
+        - generic [ref=e75]: 50% down to start, 50% at launch. April contracts only.
+      - generic [ref=e76]:
+        - link "Start with the Free Audit" [ref=e77] [cursor=pointer]:
+          - /url: /free-seo-audit
+        - link "See Common Questions" [ref=e78] [cursor=pointer]:
+          - /url: /faq
+    - generic [ref=e80]:
+      - generic [ref=e81]:
+        - paragraph [ref=e82]: What You Get
+        - heading "In 60 seconds, see exactly why your site is not getting calls — and what to do about it." [level=2] [ref=e83]
+        - paragraph [ref=e84]: This is not a quick glance at the homepage. I check the stack, test the page, and compile the findings into a report you can actually use.
+      - generic [ref=e85]:
+        - article [ref=e86]:
+          - generic [ref=e87]: "01"
+          - heading "Run the free Lighthouse audit" [level=3] [ref=e88]
+          - paragraph [ref=e89]: Enter any URL into our in-house scanner and get instant performance, accessibility, best practices, and SEO scores — no signup, no waiting.
+        - article [ref=e90]:
+          - generic [ref=e91]: "02"
+          - heading "See where the gaps are" [level=3] [ref=e92]
+          - paragraph [ref=e93]: Your scores show exactly where the biggest technical weak points are — slow loading, poor accessibility, missing SEO signals, or outdated practices.
+        - article [ref=e94]:
+          - generic [ref=e95]: "03"
+          - heading "Get a practical next step" [level=3] [ref=e96]
+          - paragraph [ref=e97]: If your scores show room for improvement, Anthony reviews the results and tells you whether the right move is a smaller cleanup or a full rebuild.
+    - generic [ref=e99]:
+      - generic [ref=e100]:
+        - paragraph [ref=e101]: Before and After
+        - heading "A cleaner look at the kind of technical gap we fix." [level=2] [ref=e102]
+        - paragraph [ref=e103]: Flip between a redacted sample audit and the benchmark from this site. Both examples shown here are mobile Lighthouse runs captured in Chrome private mode on the same MacBook setup.
+      - generic [ref=e104]:
+        - tablist "Audit proof examples" [ref=e105]:
+          - tab "Before" [selected] [ref=e106] [cursor=pointer]
+          - tab "After" [ref=e107] [cursor=pointer]
+        - tabpanel "Before" [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: Redacted sample
+            - heading "Heavier stack. More friction." [level=3] [ref=e111]
+            - paragraph [ref=e112]: "This is the kind of drag we usually find in template-heavy builds: slower loading, weaker accessibility, and more moving parts than most owners realize."
+          - img "Redacted sample Lighthouse audit showing lower scores before technical cleanup." [ref=e114]
+        - generic [ref=e115]:
+          - article [ref=e116]:
+            - paragraph [ref=e117]: Performance
+            - heading "73 100" [level=3] [ref=e118]:
+              - generic [ref=e119]: "73"
+              - generic [ref=e120]: to
+              - generic [ref=e121]: "100"
+          - article [ref=e122]:
+            - paragraph [ref=e123]: LCP
+            - heading "6.3s 1.3s" [level=3] [ref=e124]:
+              - generic [ref=e125]: 6.3s
+              - generic [ref=e126]: to
+              - generic [ref=e127]: 1.3s
+          - article [ref=e128]:
+            - paragraph [ref=e129]: Accessibility
+            - heading "75 100" [level=3] [ref=e130]:
+              - generic [ref=e131]: "75"
+              - generic [ref=e132]: to
+              - generic [ref=e133]: "100"
+    - generic [ref=e135]:
+      - generic [ref=e136]: APRIL DEAL
+      - generic [ref=e137]:
+        - generic [ref=e138]:
+          - heading "April Showers Deal. Premium public projects, lighter April entry point." [level=2] [ref=e139]
+          - paragraph [ref=e140]:
+            - text: Standard website builds start at
+            - strong [ref=e141]: $999
+            - text: . Any website contract signed by
+            - strong [ref=e142]: April 30, 2026
+            - text: starts at
+            - strong [ref=e143]: $699
+            - text: . Same build quality, same founder-led process, and the same SEO-first foundation.
+        - generic [ref=e144]:
+          - paragraph [ref=e145]: Website contracts signed by April 30, 2026 lock in the $699 April rate.
+          - paragraph [ref=e146]: 50% down to start, 50% at launch. Start with the audit so the quote matches the actual work instead of a guess.
+          - link "Run the Free Audit" [ref=e147] [cursor=pointer]:
+            - /url: /free-seo-audit
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - paragraph [ref=e151]: Services
+        - heading "Four ways we help service businesses get more from their website." [level=2] [ref=e152]
+        - paragraph [ref=e153]: Every project is built around what your business actually needs. No cookie-cutter packages.
+      - generic [ref=e154]:
+        - link "01 Explore Custom Web Design A website built from scratch that makes your business look trustworthy and gets people to pick up the phone." [ref=e155] [cursor=pointer]:
+          - /url: /services/custom-web-design
+          - generic [ref=e156]:
+            - generic [ref=e157]: "01"
+            - generic [ref=e158]: Explore
+          - heading "Custom Web Design" [level=3] [ref=e159]
+          - paragraph [ref=e160]: A website built from scratch that makes your business look trustworthy and gets people to pick up the phone.
+        - link "02 Explore Local SEO Show up when people nearby search for what you do. More visibility, more calls." [ref=e161] [cursor=pointer]:
+          - /url: /services/local-seo
+          - generic [ref=e162]:
+            - generic [ref=e163]: "02"
+            - generic [ref=e164]: Explore
+          - heading "Local SEO" [level=3] [ref=e165]
+          - paragraph [ref=e166]: Show up when people nearby search for what you do. More visibility, more calls.
+        - link "03 Explore Managed Hosting We keep your site fast, safe, and online so you never have to think about it. $40/year or included in our SEO package." [ref=e167] [cursor=pointer]:
+          - /url: /services/managed-hosting
+          - generic [ref=e168]:
+            - generic [ref=e169]: "03"
+            - generic [ref=e170]: Explore
+          - heading "Managed Hosting" [level=3] [ref=e171]
+          - paragraph [ref=e172]: We keep your site fast, safe, and online so you never have to think about it. $40/year or included in our SEO package.
+        - link "04 Explore Website Rescue Already have a site that looks dated or runs slow? We fix that." [ref=e173] [cursor=pointer]:
+          - /url: /services/website-rescue
+          - generic [ref=e174]:
+            - generic [ref=e175]: "04"
+            - generic [ref=e176]: Explore
+          - heading "Website Rescue" [level=3] [ref=e177]
+          - paragraph [ref=e178]: Already have a site that looks dated or runs slow? We fix that.
+    - generic [ref=e180]:
+      - generic [ref=e181]:
+        - paragraph [ref=e182]: How It Works
+        - heading "From free audit to live site — no pressure at any step." [level=2] [ref=e183]
+        - paragraph [ref=e184]: No long sales calls. No commitment until you are ready. Here is the full process from first click to launch.
+      - generic [ref=e185]:
+        - generic [ref=e186]:
+          - generic [ref=e187]: "01"
+          - heading "Run the free audit on your site" [level=3] [ref=e188]
+          - paragraph [ref=e189]: Enter your URL into our in-house Lighthouse scanner. You get performance, accessibility, best practices, and SEO scores in under 60 seconds.
+        - generic [ref=e190]:
+          - generic [ref=e191]: "02"
+          - heading "See where you stand instantly" [level=3] [ref=e192]
+          - paragraph [ref=e193]: Your scores show up in real time. No waiting, no email sequence. You see exactly where the gaps are right on screen.
+        - generic [ref=e194]:
+          - generic [ref=e195]: "03"
+          - heading "Anthony reviews and follows up" [level=3] [ref=e196]
+          - paragraph [ref=e197]: If you want a deeper read, Anthony reviews the results and sends a practical summary of the clearest fixes and the likely gains.
+        - generic [ref=e198]:
+          - generic [ref=e199]: "04"
+          - heading "If a rebuild makes sense, I quote it" [level=3] [ref=e200]
+          - paragraph [ref=e201]: The quote is based on what I actually found — not a generic price list. Standard website builds start at $999, and the April rate is $699 if you sign by April 30, 2026.
+        - generic [ref=e202]:
+          - generic [ref=e203]: "05"
+          - heading "You see the site before it goes live" [level=3] [ref=e204]
+          - paragraph [ref=e205]: Nothing launches until you approve it. 50% down to start, 50% at launch after you sign off on the final site.
+      - link "Run the Free Audit — See Your Scores Instantly" [ref=e207] [cursor=pointer]:
+        - /url: /free-seo-audit
+    - generic [ref=e209]:
+      - generic [ref=e210]:
+        - paragraph [ref=e211]: Why Designed by Anthony
+        - heading "A fast, professional website that actually helps your business make money." [level=2] [ref=e212]
+        - paragraph [ref=e213]: Speed, clean code, and search visibility matter because they change how the business feels online and how often the phone rings. The technical work is there to help the business, not impress other developers.
+        - link "See Our Technical Edge" [ref=e215] [cursor=pointer]:
+          - /url: /ouredge
+      - list [ref=e217]:
+        - listitem [ref=e218]: Built so the right people call you, not just visit your page.
+        - listitem [ref=e219]: You talk directly to the person writing the code — no account managers, no overseas handoffs.
+        - listitem [ref=e220]: Every build scores 98+ on Google Lighthouse — faster pages, better Google visibility.
+        - listitem [ref=e221]: We built our own Lighthouse audit scanner in-house — the same engineering behind your site.
+        - listitem [ref=e222]: You see the site before it goes live. Nothing launches until you approve it.
+    - generic [ref=e224]:
+      - generic [ref=e225]:
+        - paragraph [ref=e226]: Selected Examples
+        - heading "A quick look at the example-build quality behind the work." [level=2] [ref=e227]
+        - paragraph [ref=e228]: Finished example builds show the design standard, structure, and conversion thinking behind the sites.
+      - generic [ref=e229]:
+        - link "Custom handyman website design for The Long Beach Handyman — a client build by Designed by Anthony featuring local SEO, lead capture, and mobile-friendly responsive design Client Build Handyman The Long Beach Handyman A custom handyman website designed for a contractor in Long Beach, CA — built turn-key so the owner manages his own content, captures leads, and tracks local SEO performance without calling a developer. View Case Study" [ref=e230] [cursor=pointer]:
+          - /url: /portfolio/the-long-beach-handyman
+          - img "Custom handyman website design for The Long Beach Handyman — a client build by Designed by Anthony featuring local SEO, lead capture, and mobile-friendly responsive design" [ref=e232]
+          - generic [ref=e233]:
+            - generic [ref=e234]:
+              - generic [ref=e235]: Client Build
+              - generic [ref=e236]: Handyman
+            - heading "The Long Beach Handyman" [level=3] [ref=e237]
+            - paragraph [ref=e238]: A custom handyman website designed for a contractor in Long Beach, CA — built turn-key so the owner manages his own content, captures leads, and tracks local SEO performance without calling a developer.
+            - text: View Case Study
+        - link "Summit Roofing example website by Designed by Anthony Example Build Roofing Summit Roofing A roofing example build focused on credibility, clearer service framing, and a more confident estimate path. Open Example" [ref=e239] [cursor=pointer]:
+          - /url: https://roofing-demo.web.app/
+          - img "Summit Roofing example website by Designed by Anthony" [ref=e241]
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - generic [ref=e244]: Example Build
+              - generic [ref=e245]: Roofing
+            - heading "Summit Roofing" [level=3] [ref=e246]
+            - paragraph [ref=e247]: A roofing example build focused on credibility, clearer service framing, and a more confident estimate path.
+            - text: Open Example
+        - link "Copperline Plumbing example website by Designed by Anthony Example Build Plumbing Copperline Plumbing A plumbing example build designed for fast first impressions, stronger trust, and an easier path to the phone on mobile. Open Example" [ref=e248] [cursor=pointer]:
+          - /url: https://plumber-demo-404e2.web.app/
+          - img "Copperline Plumbing example website by Designed by Anthony" [ref=e250]
+          - generic [ref=e251]:
+            - generic [ref=e252]:
+              - generic [ref=e253]: Example Build
+              - generic [ref=e254]: Plumbing
+            - heading "Copperline Plumbing" [level=3] [ref=e255]
+            - paragraph [ref=e256]: A plumbing example build designed for fast first impressions, stronger trust, and an easier path to the phone on mobile.
+            - text: Open Example
+      - link "View Full Portfolio" [ref=e258] [cursor=pointer]:
+        - /url: /portfolio
+  - generic [ref=e261]:
+    - generic [ref=e262]:
+      - paragraph [ref=e263]: Free Instant Audit
+      - heading "See what your website needs to fix — in 60 seconds." [level=2] [ref=e264]
+      - paragraph [ref=e265]: Run our in-house Lighthouse scanner against your URL and get instant performance, accessibility, best practices, and SEO scores. No signup. No waiting.
+      - paragraph [ref=e266]: Instant results. No pressure and no email sequence.
+    - generic [ref=e267]:
+      - link "Run the Free Audit Now" [ref=e268] [cursor=pointer]:
+        - /url: /free-seo-audit
+      - link "See Example Builds" [ref=e269] [cursor=pointer]:
+        - /url: /portfolio
+  - contentinfo [ref=e270]:
+    - generic [ref=e271]:
+      - generic [ref=e272]:
+        - link "Designed by Anthony home":
+          - /url: /
+          - img "Designed by Anthony Logo"
+        - paragraph [ref=e273]: Custom websites and local SEO for service businesses that need to look more established online and turn more visits into real inquiries.
+        - generic [ref=e274]:
+          - link "Run the free audit" [ref=e275] [cursor=pointer]:
+            - /url: /free-seo-audit
+          - link "See example builds" [ref=e276] [cursor=pointer]:
+            - /url: /portfolio
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - paragraph [ref=e279]: Explore
+          - generic [ref=e280]:
+            - link "Services" [ref=e281] [cursor=pointer]:
+              - /url: /services
+            - link "Service Areas" [ref=e282] [cursor=pointer]:
+              - /url: /service-areas
+            - link "Portfolio" [ref=e283] [cursor=pointer]:
+              - /url: /portfolio
+            - link "Blog" [ref=e284] [cursor=pointer]:
+              - /url: /blog
+        - generic [ref=e285]:
+          - paragraph [ref=e286]: Reach Out
+          - generic [ref=e287]:
+            - link "Use the contact form" [ref=e288] [cursor=pointer]:
+              - /url: /contact
+            - link "Meet Anthony" [ref=e289] [cursor=pointer]:
+              - /url: /about
+            - generic [ref=e290]: Typical reply within 24 hours
+            - generic [ref=e291]: Serving the Mohawk Valley and beyond
+      - generic [ref=e292]:
+        - link "American Operator's Locally Owned and Operated Certification" [ref=e293] [cursor=pointer]:
+          - /url: https://locallyownedandoperated.org/
+          - img "American Operator's Locally Owned and Operated Certification" [ref=e294]
+        - paragraph [ref=e295]: Founder-led, locally owned, and built without outsourcing the work.
+      - generic [ref=e296]:
+        - paragraph [ref=e297]: Copyright 2026 Designed by Anthony. All rights reserved.
+        - generic [ref=e298]:
+          - link "Privacy Policy" [ref=e299] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e300] [cursor=pointer]:
+            - /url: /terms
+          - link "Cookie Policy" [ref=e301] [cursor=pointer]:
+            - /url: /cookie
+          - link "Image License" [ref=e302] [cursor=pointer]:
+            - /url: /image-license
+  - generic [ref=e305]:
+    - button "Menu" [ref=e306]:
+      - img [ref=e308]
+      - generic: Menu
+    - button "Inspect" [ref=e312]:
+      - img [ref=e314]
+      - generic: Inspect
+    - button "Audit" [ref=e316]:
+      - generic [ref=e317]:
+        - img [ref=e318]
+        - img [ref=e321]
+      - generic: Audit
+    - button "Settings" [ref=e324]:
+      - img [ref=e326]
+      - generic: Settings

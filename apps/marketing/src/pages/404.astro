@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { SITE_URL } from '../lib/seo';
+
+const siteHost = new URL(SITE_URL).hostname;
+const siteSearchUrl = `https://www.google.com/search?q=site%3A${encodeURIComponent(siteHost)}`;
+---
+
+<Layout
+  title="Page Not Found | Designed by Anthony"
+  description="This page could not be found."
+  hideBreadcrumbs={true}
+  noindex={true}
+>
+  <section class="error-section">
+    <div class="error-content">
+      <h1>404</h1>
+      <h2>Page Not Found</h2>
+      <p>This page does not exist, but I can still help. If you were looking for information about web design services, start with a free audit.</p>
+      <div class="error-actions">
+        <a href="/free-seo-audit" class="btn btn-primary">Run the Free Audit</a>
+        <a href="/services" class="btn btn-outline">View Services</a>
+        <a href="/" class="btn btn-outline">Back to Home</a>
+      </div>
+
+      <p class="error-popular-label">Popular pages</p>
+      <ul class="error-popular-grid">
+        <li><a href="/portfolio">Portfolio</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+
+      <p class="error-search-hint">
+        Looking for something specific? Try a
+        <a href={siteSearchUrl} rel="noopener noreferrer">Google search scoped to {siteHost}</a>
+        — it often surfaces the right page faster than guessing the URL.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .error-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: clamp(7rem, 12vw, 10rem) var(--container-gutter);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .error-content h1 {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 14vw, 8rem);
+    font-weight: 800;
+    color: var(--accent-blue);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-content h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-bottom: 1.25rem;
+    color: var(--text-cream);
+  }
+
+  .error-content p {
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    color: var(--text-gray);
+    line-height: 1.78;
+    max-width: 52ch;
+    margin: 0 auto 2.5rem;
+  }
+
+  .error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  .error-popular-label {
+    margin: 2.5rem 0 0.85rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .error-popular-grid {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+    margin: 0 auto 2rem;
+    padding: 0;
+    max-width: 40rem;
+  }
+
+  .error-popular-grid a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  .error-popular-grid a:hover {
+    color: var(--accent-blue-hover);
+  }
+
+  .error-search-hint {
+    font-size: clamp(0.92rem, 1.4vw, 1rem);
+    color: var(--text-muted);
+    line-height: 1.65;
+    max-width: 46ch;
+    margin: 0 auto;
+  }
+
+  .error-search-hint a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  @media (max-width: 640px) {
+    .error-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .error-actions .btn {
+      width: 100%;
+    }
+  }
+</style>

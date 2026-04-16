@@ -1,0 +1,58 @@
+{
+  "name": "designed-by-anthony",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
+    "watch:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --outfile=public/scripts/site.js --watch",
+    "predev": "npm run build:site-script",
+    "dev": "astro dev",
+    "dev:spotlight": "SPOTLIGHT=1 astro dev",
+    "sync:firebase-csp": "node build/sync-firebase-csp.mjs",
+    "prebuild": "npm run build:site-script && npm run sync:firebase-csp",
+    "build": "astro build",
+    "prepreview": "npm run build:site-script",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test:e2e": "playwright test",
+    "test:e2e:hosting": "playwright test -c playwright.hosting.config.ts",
+    "test:security-headers": "playwright test -c playwright.hosting.config.ts --project=5-hosting",
+    "test:release:hosting": "npm run test:api && playwright test -c playwright.hosting.config.ts",
+    "test:smoke": "playwright test e2e/smoke.spec.ts",
+    "test:smoke:local": "playwright test --project=smoke",
+    "test:api": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test --project=7-api",
+    "test:release": "npm run test:api && npm run test:e2e",
+    "test:smoke:live": "BASE_URL=https://designedbyanthony.com PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test e2e/smoke-live.spec.ts --workers=1",
+    "test:seo": "playwright test --project=4-seo",
+    "test:seo:live": "BASE_URL=https://designedbyanthony.com PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test e2e/seo-live.spec.ts --workers=1"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.2",
+    "@dba/lead-form-contract": "workspace:*",
+    "@dba/theme": "workspace:*",
+    "@fontsource-variable/fraunces": "^5.2.9",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/outfit": "^5.2.8",
+    "@fontsource/abril-fatface": "^5.2.7",
+    "@sentry/astro": "^10.48.0",
+    "@spotlightjs/astro": "^3.2.6",
+    "astro": "^6.1.0",
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "esbuild": "^0.28.0",
+    "firebase-tools": "^15.14.0"
+  },
+  "overrides": {
+    "yaml-language-server": {
+      "yaml": "^2.8.3"
+    }
+  }
+}

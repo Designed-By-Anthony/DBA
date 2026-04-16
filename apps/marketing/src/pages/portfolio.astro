@@ -1,0 +1,375 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import FeedSubscribeCluster from '../components/FeedSubscribeCluster.astro';
+import { showcaseExampleItems, showcaseInProgressItems } from '../data/showcase';
+import { PUBLIC_PRICING_PILL, PUBLIC_SITE_SOCIAL_IMAGE } from '../lib/offers';
+import { buildItemListSchema } from '../lib/seo';
+import { releases } from '../data/releases';
+
+const sortedReleases = [...releases].sort(
+  (a, b) => new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
+);
+
+const portfolioSchema = buildItemListSchema({
+  name: 'Portfolio and Example Sites',
+  description: 'Finished example builds that show how Designed by Anthony approaches trust, clarity, and conversion.',
+  path: '/portfolio',
+  items: showcaseExampleItems.map((item) => ({
+    name: item.name,
+    url: item.href,
+    description: `${item.problem} ${item.solution}`,
+    image: item.image,
+  })),
+});
+
+const portfolioFooterCta = {
+  eyebrow: 'Free Instant Audit',
+  title: 'Want your site to perform like these examples?',
+  description:
+    'Run our in-house Lighthouse scanner against your URL and see how you compare. Instant performance, accessibility, best practices, and SEO scores.',
+  primaryHref: '/free-seo-audit',
+  primaryLabel: 'Run the Free Audit',
+  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+  secondaryLabel: 'Book a 15-minute intro call',
+};
+---
+
+<Layout
+  title="Website Portfolio & Case Examples | Designed by Anthony"
+  description="Small business website examples and case studies showing how Designed by Anthony approaches trust, clarity, and conversion for service business websites."
+  pageType="CollectionPage"
+  image={showcaseExampleItems[0].image}
+  socialImage={PUBLIC_SITE_SOCIAL_IMAGE}
+  schema={portfolioSchema}
+  footerCta={portfolioFooterCta}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner portfolio-hero">
+      <p class="page-eyebrow">Portfolio</p>
+      <h1>A look at the web design and development standard behind the work.</h1>
+      <p>
+        These are finished example builds plus active work in progress. They show the design standard, structure, and conversion thinking behind the sites. Our first client project — The Long Beach Handyman — is now live. We also built our own <a href="/free-seo-audit">Lighthouse audit scanner</a> in-house, powered by the same engineering behind every site we deliver.
+      </p>
+      <div class="hero-meta-row">
+        <span class="mini-pill">Finished example builds</span>
+        <span class="mini-pill">Active work in progress</span>
+        <span class="mini-pill">{PUBLIC_PRICING_PILL}</span>
+      </div>
+      <FeedSubscribeCluster
+        eyebrow="Stay Updated"
+        title="Follow new launches as the portfolio grows."
+        description={`Subscribe to the releases feed for new client sites and case studies. ${sortedReleases.length} launch${sortedReleases.length === 1 ? '' : 'es'} currently in the feed, with more to come.`}
+        primaryHref="/releases.xml"
+        primaryLabel="Open Releases Feed (XML)"
+        secondaryHref="/rss.xml"
+        secondaryLabel="Open Blog Feed (XML)"
+      />
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="section-container">
+      <div class="section-header centered portfolio-index-header">
+        <h2>Finished example builds you can open today</h2>
+        <p>
+          Live sites and case studies that show structure, speed, and conversion choices — plus in-progress work we
+          ship the same way.
+        </p>
+      </div>
+      <div class="portfolio-grid">
+      {showcaseExampleItems.map((item) => (
+        <article class="surface-card portfolio-card reveal-up">
+          <a href={item.caseStudySlug ? `/portfolio/${item.caseStudySlug}` : item.href} target={item.caseStudySlug ? undefined : '_blank'} rel={item.caseStudySlug ? undefined : 'noopener noreferrer'} class="portfolio-image-link">
+            <div class="portfolio-image-wrap">
+              <Image
+                src={item.displayImage}
+                alt={item.imageAlt}
+                class="portfolio-image"
+                widths={[520, 760, 1040, 1440]}
+                sizes="(max-width: 900px) 100vw, 50vw"
+                format="webp"
+                quality={72}
+                loading="lazy"
+              />
+            </div>
+          </a>
+          <div class="portfolio-copy">
+            <div class="portfolio-meta">
+              <span class="card-tag">{item.statusLabel}</span>
+              <span class="portfolio-industry">{item.industry}</span>
+            </div>
+            <h2>{item.name}</h2>
+            <p class="portfolio-desc">{item.description}</p>
+            <div class="portfolio-actions">
+              {item.caseStudySlug ? (
+                <>
+                  <a href={`/portfolio/${item.caseStudySlug}`} class="portfolio-link">View Case Study</a>
+                  <span class="portfolio-nudge">
+                    <a href={item.href} target="_blank" rel="noopener noreferrer">
+                      Open {item.name} example
+                      <span class="sr-only">(opens in new window)</span>
+                    </a>{' '}
+                    or <a href="/free-seo-audit">run the free audit</a>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" class="portfolio-link">
+                    Open {item.name} example
+                    <span class="sr-only">(opens in new window)</span>
+                  </a>
+                  <span class="portfolio-nudge">or <a href="/free-seo-audit">run the free audit</a></span>
+                </>
+              )}
+            </div>
+          </div>
+        </article>
+      ))}
+      </div>
+    </div>
+  </section>
+
+  {
+    showcaseInProgressItems.length > 0 && (
+      <section class="section-shell">
+        <div class="section-container">
+          <div class="section-header centered">
+            <p class="section-eyebrow">In Progress</p>
+            <h2>Active builds that are not finished proof yet.</h2>
+            <p>
+              These are included for transparency, not as finished examples. They stay marked as in progress until the build is complete.
+            </p>
+          </div>
+
+          <div class="portfolio-grid upcoming-grid">
+            {showcaseInProgressItems.map((item) => (
+              <article class="surface-card portfolio-card portfolio-upcoming-card reveal-up">
+                <div class="portfolio-copy">
+                  <div class="portfolio-meta">
+                    <span class="card-tag">{item.statusLabel}</span>
+                    <span class="portfolio-industry">{item.industry}</span>
+                  </div>
+                  <h2>{item.name}</h2>
+                  <p class="portfolio-upcoming-summary">{item.description}</p>
+                  <div class="portfolio-section-copy">
+                    <h3>Current status</h3>
+                    <p>{item.problem}</p>
+                  </div>
+                  <div class="portfolio-section-copy">
+                    <h3>Planned direction</h3>
+                    <p>{item.solution}</p>
+                  </div>
+                  <p class="portfolio-upcoming-note">{item.note}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+</Layout>
+
+<style>
+  .portfolio-hero {
+    max-width: 860px;
+  }
+
+  .portfolio-hero :global(.feed-subscribe-shell) {
+    text-align: left;
+  }
+
+  .portfolio-index-header {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+  }
+
+  .portfolio-index-header h2 {
+    font-size: clamp(1.65rem, 3vw, 2.1rem);
+    font-weight: 800;
+    color: var(--text-white);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .portfolio-index-header p {
+    color: var(--text-gray);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .portfolio-card {
+    overflow: hidden;
+  }
+
+  .portfolio-image-link {
+    display: block;
+  }
+
+  .portfolio-image-wrap {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .portfolio-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+
+  .portfolio-copy {
+    padding: 1.6rem;
+  }
+
+  .portfolio-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .portfolio-industry {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .portfolio-copy h2 {
+    font-size: 1.45rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.65rem;
+  }
+
+  .portfolio-desc {
+    color: var(--text-gray);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    line-height: 1.65;
+  }
+
+  .portfolio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .portfolio-section-copy + .portfolio-section-copy {
+    margin-top: 1rem;
+  }
+
+  .portfolio-section-copy h3 {
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #93c5fd;
+    margin-bottom: 0.35rem;
+  }
+
+  .portfolio-section-copy p {
+    color: var(--text-gray);
+  }
+
+  .portfolio-link {
+    display: inline-flex;
+    margin-top: 1.2rem;
+    color: #bfdbfe;
+    font-weight: 700;
+  }
+
+  .portfolio-nudge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+  }
+
+  .portfolio-nudge a {
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .upcoming-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-upcoming-card {
+    border-style: dashed;
+    border-color: rgba(147, 197, 253, 0.28);
+    background:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 36%),
+      rgba(10, 16, 28, 0.9);
+  }
+
+  .portfolio-upcoming-summary,
+  .portfolio-upcoming-note {
+    color: var(--text-gray);
+  }
+
+  .portfolio-upcoming-note {
+    margin-top: 1.25rem;
+    font-size: 0.92rem;
+  }
+
+  /* ── Features section ── */
+  .portfolio-features {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(147, 197, 253, 0.12);
+  }
+
+  .portfolio-features h3 {
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #93c5fd;
+    margin-bottom: 0.9rem;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .feature-list li {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .feature-label {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--text-white);
+  }
+
+  .feature-detail {
+    font-size: 0.92rem;
+    color: var(--text-gray);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 900px) {
+    .portfolio-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

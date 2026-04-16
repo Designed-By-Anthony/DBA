@@ -1,0 +1,63 @@
+Designed by Anthony — monorepo manual checklist
+===============================================
+
+Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
+
+Apps under apps/
+  • web-viewer     — Agency OS (Next.js CRM + portal)
+  • lighthouse     — Lighthouse audit tool (Next.js)
+  • marketing      — designedbyanthony.com (Astro)
+
+Global theme (single source of truth)
+---------------------------------------
+• Author ALL global theme changes in: apps/marketing/src/styles/theme.css
+• Next.js apps consume tokens via workspace package @dba/theme:
+  - packages/dba-theme/dba-global.css re-imports that file for Astro/layout use.
+  - packages/dba-theme/tokens.css duplicates the :root block for Next + Tailwind.
+• When you change :root { ... } in theme.css, update packages/dba-theme/tokens.css
+  to match (same variables/values), then run apps as usual.
+
+First-time setup
+----------------
+1. cd to Designed_By_Anthony
+2. corepack enable && pnpm install
+3. Copy env files: each app may need .env.local (see each app’s README or prior repo).
+
+Development
+-----------
+From monorepo root:
+  pnpm dev:web          — Agency OS (port 3000)
+  pnpm dev:lighthouse   — Lighthouse app
+  pnpm dev:marketing    — Astro site
+
+Cursor / IDE
+------------
+Open the folder "Designed_By_Anthony" as the workspace root (not the old Web Viewer path).
+
+Vercel (when ready)
+-------------------
+Create three projects pointing at the same repo with Root Directory:
+  apps/web-viewer
+  apps/lighthouse
+  apps/marketing
+
+Cloudflare / GCP / Clerk
+------------------------
+Follow your platform blueprint separately; env vars are per app.
+
+Cloud SQL + Drizzle (packages/database)
+-----------------------------------------
+• Schema: packages/database/schema.ts — tenants (id, name, vertical enum, crm_config jsonb); sites (subdomain, content jsonb).
+• Push: `pnpm db:push` from repo root (needs DATABASE_URL). Drizzle uses `drizzle-kit push` (there is no `push:pg` in current CLI).
+• Seed master tenant: `pnpm db:seed:master` — inserts agency_master / Designed By Anthony / agency + crm_config theme + features.
+• Agency OS: DATABASE_URL and optional DATABASE_SSL=true in apps/web-viewer/.env.local.
+• Clerk org sync: POST /api/webhooks/clerk — set CLERK_WEBHOOK_SIGNING_SECRET from Clerk Dashboard; subscribe to organization.* events.
+
+Public leads (CRM as source of truth)
+--------------------------------------
+• Marketing audit/contact forms POST JSON to Agency OS `POST /api/lead` (not Lighthouse `/api/contact`).
+• Env (marketing build): `PUBLIC_CRM_LEAD_URL` — full URL, default `https://viewer.designedbyanthony.com/api/lead`.
+• Env (marketing): `PUBLIC_API_URL` — Lighthouse base for `/api/audit` and report viewer only.
+• Shared contract & env notes: `packages/lead-form-contract/src/index.ts`.
+• Org product tier: Firestore `org_settings.planSuite` = `starter` | `full` (default full). Starter hides Automations, Sequences, Billing, Price Book in the admin sidebar.
+

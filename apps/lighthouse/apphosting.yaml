@@ -1,0 +1,68 @@
+# Firebase App Hosting configuration
+# https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  # Increase if Lighthouse + Gemini calls need more time
+  timeoutSeconds: 120
+  # Lighthouse is memory-hungry; bump if you see OOM in logs
+  memoryMiB: 1024
+  maxInstances: 10
+  minInstances: 0
+  concurrency: 80
+  cpu: 1
+
+env:
+  - variable: GOOGLE_PAGESPEED_API_KEY
+    secret: GOOGLE_PAGESPEED_API_KEY
+    availability:
+      - RUNTIME
+
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+    availability:
+      - RUNTIME
+
+  - variable: FORMSPREE_ENDPOINT
+    value: https://formspree.io/f/mqegjkor
+    availability:
+      - RUNTIME
+
+  - variable: GMAIL_SERVICE_ACCOUNT_KEY
+    secret: GMAIL_SERVICE_ACCOUNT_KEY
+    availability:
+      - RUNTIME
+
+  - variable: SHEETS_ID
+    secret: SHEETS_ID
+    availability:
+      - RUNTIME
+
+  - variable: TURNSTILE_SECRET_KEY
+    secret: TURNSTILE_SECRET_KEY
+    availability:
+      - RUNTIME
+  - variable: DRIVE_PROJECTS_FOLDER_ID
+    secret: DRIVE_PROJECTS_FOLDER_ID
+    availability:
+      - RUNTIME
+
+  - variable: MOZ_API_CREDENTIALS
+    secret: MOZ_API_CREDENTIALS
+    availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SENTRY_DSN
+    secret: NEXT_PUBLIC_SENTRY_DSN
+    availability:
+      - RUNTIME
+  - variable: SENTRY_DSN
+    secret: SENTRY_DSN
+    availability:
+      - RUNTIME
+  - variable: AGENCY_OS_WEBHOOK_URL
+    secret: AGENCY_OS_WEBHOOK_URL
+    availability:
+      - RUNTIME
+  - variable: AGENCY_OS_WEBHOOK_SECRET
+    secret: AGENCY_OS_WEBHOOK_SECRET
+    availability:
+      - RUNTIME

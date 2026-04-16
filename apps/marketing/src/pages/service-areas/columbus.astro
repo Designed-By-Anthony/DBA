@@ -1,0 +1,95 @@
+---
+import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
+import { buildServiceAreaSchema } from '../../lib/seo';
+
+const pageTitle = 'Columbus OH Web Design for Services | Designed by Anthony';
+const pageDescription =
+  'Custom web design, website rescue, managed hosting, and local SEO for Columbus, OH service businesses competing across Franklin County.';
+
+const areaSchema = buildServiceAreaSchema({
+  name: 'Web Design and Hosting Services in Columbus, Ohio',
+  description: pageDescription,
+  path: '/service-areas/columbus',
+  areaServed: 'Columbus, Ohio',
+  serviceType: 'Web design, website rescue, managed hosting, and local SEO',
+  cityName: 'Columbus',
+  regionName: 'Ohio',
+  regionAbbr: 'OH',
+  geo: { latitude: 39.9612, longitude: -82.9988 },
+});
+
+const blocks = [
+  {
+    level: 'h2' as const,
+    title: 'Why Columbus service businesses need clearer digital positioning',
+    paragraphs: [
+      'Columbus is a growing market with plenty of strong local businesses, which means a weak website stands out fast. If the page feels generic, slow, or vague about what you actually do, buyers have no reason to stay with you when they can compare several options in one search.',
+      'A stronger Columbus page needs to do the basics well: explain the service clearly, feel credible on mobile, and make the next step obvious without sounding like recycled agency copy.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Franklin County search behavior is split by suburb and service area',
+    paragraphs: [
+      'Columbus demand is spread across neighborhoods and suburbs like Dublin, Hilliard, Westerville, Grove City, and Worthington. A business that genuinely works across those pockets may eventually need more than one page, but each page still has to be useful on its own instead of feeling like a thin city-name swap.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: 'Mobile trust matters before price ever comes up',
+    paragraphs: [
+      'A lot of local buyers are comparing businesses on phones between errands, appointments, and job sites. If the page loads slowly or buries the contact path, the business looks harder to work with before the conversation even starts.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'Specific service pages beat one broad metro claim',
+    paragraphs: [
+      'Columbus businesses usually do better when service pages and location pages work together instead of forcing one page to carry every keyword, suburb, and offer on its own.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Website rescues for Columbus businesses with history but weak presentation',
+    paragraphs: [
+      'Many established businesses in Columbus already have useful authority, branded searches, or service pages that have earned some visibility. A rescue project lets the site keep that history while replacing the clutter, plugin drag, and dated design that quietly make the business look less current online.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Protect what already ranks while improving the experience',
+    paragraphs: [
+      'The rebuild has to preserve the URLs, page intent, and local relevance that still have value. Redirect discipline, cleaner metadata, and stronger internal linking are what keep a better site from creating avoidable volatility.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Managed hosting and local SEO for Central Ohio growth',
+    paragraphs: [
+      'Columbus businesses usually need a site that stays fast, stays easy to update, and supports more local coverage over time. Managed hosting keeps the technical layer stable while local SEO work keeps service pages, service-area coverage, and business information aligned.',
+      'That combination works especially well for service businesses expanding from one core area into a few nearby markets without turning the site into a maze of low-value pages.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'When Columbus and nearby suburb pages should split',
+    paragraphs: [
+      'If the business truly competes in places like Dublin, Westerville, or Grove City with different search behavior and different expectations, separate pages can make sense. The key is only creating them when the service area and sales reality are there to support the page.',
+    ],
+  },
+];
+---
+
+<ServiceAreaPage
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbLabel="Columbus"
+  schema={areaSchema}
+  eyebrow="Columbus, Ohio"
+  heroTitlePrefix="Web Design and Hosting for"
+  heroHighlight="Columbus"
+  heroDescription="A Columbus web designer building custom websites, website rescues, managed hosting, and local SEO for service businesses competing across Franklin County."
+  heroPills={['Columbus service-business websites', 'Franklin County local SEO', 'Managed hosting and rescues']}
+  blocks={blocks}
+  ctaLabel="Get a Free Columbus Website Audit"
+/>

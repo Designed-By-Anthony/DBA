@@ -1,0 +1,610 @@
+---
+/**
+ * LighthouseAudit.astro
+ * Native audit form that calls the Lighthouse API directly.
+ * Replaces the iframe embed for pixel-perfect design consistency.
+ */
+import InlineReport from './InlineReport.astro';
+import { getTurnstileSiteKey } from '../lib/turnstile';
+
+const API_ENDPOINT = (import.meta.env.PUBLIC_API_URL || 'https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app') + '/api/audit';
+const turnstileSiteKey = getTurnstileSiteKey();
+
+const LOADING_MESSAGES = [
+  'Connecting to Google PageSpeed Insights...',
+  'Analyzing First Contentful Paint (FCP)...',
+  'Did you know? 53% of visits are abandoned if a mobile site takes longer than 3 seconds to load.',
+  'Checking for render-blocking third-party scripts...',
+  'Reviewing SEO Meta Tags and semantic HTML...',
+  'Fact: Secure, fast-loading sites run by service businesses rank significantly higher on local Google Search.',
+  'Scanning for unoptimized images and heavy payloads...',
+  'Compiling final diagnostic and running AI analysis...',
+];
+---
+
+<div class="lh-audit" data-lh-audit data-lh-endpoint={API_ENDPOINT}>
+  <!-- ── Form ── -->
+  <form class="lh-form" data-lh-form>
+    <div class="lh-field-group">
+      <label for="lh-url" class="lh-label">Website URL</label>
+      <input
+        id="lh-url"
+        name="url"
+        type="text"
+        required
+        placeholder="e.g. designedbyanthony.com"
+        class="lh-input"
+        data-lh-url
+      />
+    </div>
+
+    <div class="lh-row">
+      <div class="lh-field-group">
+        <label for="lh-name" class="lh-label">Your Name</label>
+        <input
+          id="lh-name"
+          name="name"
+          type="text"
+          required
+          placeholder="Anthony"
+          class="lh-input"
+          data-lh-name
+        />
+      </div>
+      <div class="lh-field-group">
+        <label for="lh-company" class="lh-label">Company</label>
+        <input
+          id="lh-company"
+          name="company"
+          type="text"
+          required
+          placeholder="Your Business Name"
+          class="lh-input"
+          data-lh-company
+        />
+      </div>
+    </div>
+
+    <div class="lh-field-group">
+      <label for="lh-email" class="lh-label">Where should we send the report?</label>
+      <input
+        id="lh-email"
+        name="email"
+        type="email"
+        required
+        placeholder="you@yourbusiness.com"
+        class="lh-input"
+        data-lh-email
+      />
+    </div>
+
+    <div class="lh-field-group">
+      <label for="lh-location" class="lh-label">City & State</label>
+      <input
+        id="lh-location"
+        name="location"
+        type="text"
+        required
+        placeholder="e.g. Syracuse, NY"
+        class="lh-input"
+        data-lh-location
+      />
+    </div>
+
+    <div class="lh-error" data-lh-error hidden></div>
+
+    <div
+      class="cf-turnstile"
+      data-sitekey={turnstileSiteKey}
+      data-theme="dark"
+      data-size="normal"
+      data-lh-turnstile
+      data-error-callback="__dbaTurnstileError"></div>
+
+    <button type="submit" class="btn btn-primary lh-submit" data-lh-submit>
+      Run Free Audit
+    </button>
+  </form>
+
+  <!-- ── Loading Overlay ── -->
+  <div class="lh-loading" data-lh-loading hidden>
+    <div class="lh-progress-track">
+      <div class="lh-progress-fill" data-lh-progress></div>
+    </div>
+    <p class="lh-loading-text" data-lh-loading-text></p>
+    <p class="lh-loading-sub">This deep scan usually takes around 20-25 seconds.</p>
+  </div>
+
+  <!-- ── Results ── -->
+  <div data-lh-results-container hidden>
+    <InlineReport />
+
+    <div class="lh-results-actions" style="display:flex; justify-content:center; margin-top:2rem;">
+      <a
+        href="https://calendly.com/anthony-designedbyanthony/web-design-consult?utm_source=dba_audit_results&utm_medium=site&utm_campaign=post_audit_strategy_call"
+        class="btn btn-primary-book lh-book-btn"
+        data-calendar-link
+      >
+        Book a 15-min strategy call
+      </a>
+      <button type="button" class="btn btn-outline lh-reset-btn" data-lh-reset>Run Another Audit</button>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ LOADING_MESSAGES }}>
+(function () {
+  var root = document.querySelector('[data-lh-audit]');
+  if (!root) return;
+
+  var endpoint = root.dataset.lhEndpoint;
+  var form = root.querySelector('[data-lh-form]');
+  var loadingEl = root.querySelector('[data-lh-loading]');
+  var loadingText = root.querySelector('[data-lh-loading-text]');
+  var resultsEl = root.querySelector('[data-lh-results-container]');
+  var inlineReport = root.querySelector('inline-report');
+  var errorEl = root.querySelector('[data-lh-error]');
+  var submitBtn = root.querySelector('[data-lh-submit]');
+  var resetBtn = root.querySelector('[data-lh-reset]');
+  var turnstileEl = root.querySelector('[data-lh-turnstile]');
+
+  var msgInterval = null;
+  var progressInterval = null;
+
+  function showLoading() {
+    form.hidden = true;
+    loadingEl.hidden = false;
+    resultsEl.hidden = true;
+    errorEl.hidden = true;
+
+    // Scroll loader directly into the center of the viewport
+    setTimeout(() => {
+      loadingEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+
+    var progressEl = root.querySelector('[data-lh-progress]');
+    var startTime = Date.now();
+    var duration = 22000; // estimated 22s
+    
+    if (progressEl) {
+      progressEl.style.width = '0%';
+      progressInterval = setInterval(function () {
+        var elapsed = Date.now() - startTime;
+        var pct = Math.min((elapsed / duration) * 100, 96);
+        progressEl.style.width = pct + '%';
+      }, 200);
+    }
+
+    var idx = 0;
+    loadingText.textContent = LOADING_MESSAGES[0];
+    msgInterval = setInterval(function () {
+      idx = (idx + 1) % LOADING_MESSAGES.length;
+      loadingText.textContent = LOADING_MESSAGES[idx];
+    }, 4000);
+  }
+
+  function hideLoading() {
+    loadingEl.hidden = true;
+    if (msgInterval) clearInterval(msgInterval);
+    if (progressInterval) clearInterval(progressInterval);
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+    form.hidden = false;
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Run Free Audit';
+  }
+
+  function showResults(data) {
+    hideLoading();
+    form.hidden = true;
+    resultsEl.hidden = false;
+    
+    if (inlineReport && inlineReport.setReportData) {
+      inlineReport.setReportData(data);
+    }
+  }
+
+  function resetTurnstile() {
+    if (turnstileEl && typeof window.turnstile !== 'undefined') {
+      window.turnstile.reset(turnstileEl);
+    }
+  }
+
+  function reset() {
+    resultsEl.hidden = true;
+    form.hidden = false;
+    form.reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Run Free Audit';
+    errorEl.hidden = true;
+    resetTurnstile();
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var urlVal = root.querySelector('[data-lh-url]').value.trim();
+    var nameVal = root.querySelector('[data-lh-name]').value.trim();
+    var companyVal = root.querySelector('[data-lh-company]').value.trim();
+    var emailVal = root.querySelector('[data-lh-email]').value.trim();
+    var locationInput = root.querySelector('[data-lh-location]');
+    var locationVal = locationInput ? locationInput.value.trim() : '';
+
+    // Get Turnstile token
+    var turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
+    var turnstileToken = turnstileInput ? turnstileInput.value : '';
+
+    if (!urlVal || !emailVal) return;
+
+    if (!turnstileToken) {
+      showError('Please complete the security check.');
+      return;
+    }
+
+    var finalUrl = urlVal;
+    if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+      finalUrl = 'https://' + finalUrl;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Starting scan…';
+    errorEl.hidden = true;
+    showLoading();
+
+    try {
+      var res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: finalUrl,
+          email: emailVal,
+          name: nameVal,
+          company: companyVal,
+          location: locationVal,
+          turnstileToken: turnstileToken,
+        }),
+      });
+
+      var json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.error || 'Something went wrong.');
+      }
+
+      if (json.results) {
+        showResults({ ...json.results, reportId: json.reportId });
+        
+        if (json.reportId) {
+          window.history.pushState({ reportId: json.reportId }, '', '/report/' + json.reportId);
+        }
+
+        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          window.gtag('event', 'ads_conversion_Submit_lead_form_1', {});
+          window.gtag('event', 'conversion_event_submit_lead_form', {});
+          window.gtag('event', 'ads_conversion_Form_1', {});
+        }
+      } else {
+        hideLoading();
+        showError('The audit ran but returned no results. Please try again.');
+      }
+    } catch (err) {
+      hideLoading();
+      showError(err.message || 'Failed to reach the audit server. Please try again.');
+    } finally {
+      resetTurnstile();
+    }
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', reset);
+  }
+})();
+</script>
+
+<style>
+  /* ── Hidden state (must win over display: flex/block below) ── */
+  .lh-form[hidden],
+  .lh-loading[hidden],
+  [data-lh-results-container][hidden],
+  .lh-error[hidden] {
+    display: none !important;
+  }
+
+  .lh-audit {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* ── Form ── */
+  .lh-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .lh-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .lh-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #93c5fd;
+  }
+
+  .lh-input {
+    width: 100%;
+    padding: 0.95rem 1.1rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    background: var(--surface-1, #0d1320);
+    color: var(--text-white, #fff);
+    font-size: 1rem;
+    font-family: var(--font-main);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .lh-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .lh-input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .lh-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .lh-submit {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 1.1rem;
+    font-size: 1.05rem;
+  }
+
+  .lh-error {
+    padding: 0.9rem 1.1rem;
+    border-radius: 0.85rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #fca5a5;
+    font-size: 0.92rem;
+  }
+
+  /* ── Loading ── */
+  .lh-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5rem 2rem;
+  }
+
+  .lh-progress-track {
+    width: 100%;
+    max-width: 400px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .lh-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-blue) 0%, #93c5fd 100%);
+    border-radius: 99px;
+    transition: width 0.2s ease;
+  }
+
+  .lh-loading-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  .lh-loading-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Results ── */
+  .lh-results {
+    animation: lh-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes lh-fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .lh-results-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .lh-results-title {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .lh-results-url {
+    color: var(--accent-blue);
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+  }
+
+  .lh-results-url:hover {
+    color: #93c5fd;
+  }
+
+  /* ── Score Rings ── */
+  .lh-score-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .lh-score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .lh-ring-wrap {
+    position: relative;
+    width: 5.5rem;
+    height: 5.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lh-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .lh-ring-bg {
+    stroke: rgba(255, 255, 255, 0.08);
+  }
+
+  .lh-ring-progress {
+    stroke: var(--accent-blue);
+    stroke-dasharray: 226.2;
+    stroke-dashoffset: 226.2;
+    transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.5s ease;
+  }
+
+  .lh-ring-value {
+    position: absolute;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--accent-blue);
+  }
+
+  .lh-score-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-gray);
+    text-align: center;
+  }
+
+  /* ── Metrics Card ── */
+  .lh-metrics {
+    padding: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .lh-metrics-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .lh-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .lh-metric-label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-gray);
+    margin-bottom: 0.3rem;
+  }
+
+  .lh-metric-value {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-white);
+  }
+
+  /* ── Reset Button ── */
+  .lh-results-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .lh-book-btn {
+    min-width: min(100%, 18rem);
+  }
+
+  .lh-reset-btn {
+    border-radius: 999px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .lh-row {
+      grid-template-columns: 1fr;
+    }
+
+    .lh-score-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lh-metrics-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  /* ── Print: hide everything except the rendered report ── */
+  @media print {
+    .lh-form,
+    .lh-loading,
+    .lh-error,
+    .lh-results-actions,
+    .lh-reset-btn {
+      display: none !important;
+    }
+
+    [data-lh-audit] {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+
+    [data-lh-results-container] {
+      padding: 0 !important;
+    }
+  }
+</style>

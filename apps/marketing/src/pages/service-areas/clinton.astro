@@ -1,0 +1,118 @@
+---
+import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
+import { buildServiceAreaSchema } from '../../lib/seo';
+
+const pageTitle = 'Web Design in Clinton, NY | Designed by Anthony';
+const pageDescription =
+  'A local web designer for Clinton service businesses building custom websites, local SEO, hosting, and rescue work around trust and clarity.';
+
+const areaSchema = buildServiceAreaSchema({
+  name: 'Web Design and Hosting Services in Clinton, New York',
+  description: pageDescription,
+  path: '/service-areas/clinton',
+  areaServed: 'Clinton, New York',
+  serviceType: 'Web design, hosting, and local SEO',
+  cityName: 'Clinton',
+  regionName: 'New York',
+  regionAbbr: 'NY',
+  geo: { latitude: 43.0481, longitude: -75.3804 },
+});
+
+const blocks = [
+  {
+    level: 'h2' as const,
+    title: 'Why Clinton businesses need a more trust-centered website',
+    paragraphs: [
+      'Clinton is a smaller market, but that does not make the website less important. It makes trust more important. In a village where reputation travels fast and customers often compare businesses through word of mouth and search at the same time, your site has to reinforce the feeling that you are established, thoughtful, and easy to work with.',
+      'That is especially true for service businesses, consultants, healthcare providers, and other professional brands that depend on a calm, credible first impression instead of aggressive sales language.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Local familiarity should show up in the experience',
+    paragraphs: [
+      'A Clinton page should feel grounded in the market. It should be clear, human, and well structured. Customers here do not need hype. They need a site that looks intentional, answers practical questions, and makes reaching out feel low friction.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: 'Design can feel premium without feeling loud',
+    paragraphs: [
+      'For Clinton businesses, subtle polish often converts better than flashy effects. Better spacing, better hierarchy, and stronger copy create confidence without making the page feel overproduced.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'Quiet confidence fits this market better than hype',
+    paragraphs: [
+      'A calmer page experience can reinforce the kind of thoughtful, dependable reputation that trust-based Clinton businesses usually depend on.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Website rescues for businesses that have grown past their first build',
+    paragraphs: [
+      'Many Clinton businesses started with a basic site because that was enough at the time. But as the business grows, the gaps start to show: awkward messaging, unclear service pages, poor mobile behavior, and weak calls to action that leave interested visitors with no clear next step.',
+      'A rescue solves that by rebuilding the structure around what the business actually needs now. It keeps the site approachable while making it more effective at earning inquiries and referrals.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Protecting the local reputation you already built',
+    paragraphs: [
+      'For smaller markets like Clinton, existing reputation matters a lot. Rebuild work has to preserve the parts of the site that already support trust while removing the clutter and friction that are making the business look less current than it is.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'SEO and hosting for Clinton businesses serving nearby towns',
+    paragraphs: [
+      'A Clinton business may serve customers from New Hartford, Utica, Kirkland, or other nearby towns, but the website should not blur those audiences together carelessly. If there are distinct search targets worth pursuing, separate pages create clearer relevance for both users and search engines.',
+      'Managed hosting supports that strategy by keeping the site fast and dependable while the copy and page structure do the heavier conversion work. That combination is what turns a polite online presence into a useful lead channel.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'When a Clinton page should stay focused',
+    paragraphs: [
+      'If most of your business comes from trust and referrals, the page should stay tightly focused on Clinton and the nearby areas you genuinely serve. That produces a page that feels more honest and more convincing than a broad regional claim that no one fully believes.',
+    ],
+  },
+];
+
+const relatedMarkets = [
+  {
+    title: 'Web Design in New Hartford, NY',
+    href: '/service-areas/new-hartford',
+    description: 'A stronger nearby page when the business also competes in a more presentation-driven local market.',
+    tag: 'New Hartford',
+  },
+  {
+    title: 'Website Design, Hosting & SEO in Utica, NY',
+    href: '/service-areas/utica',
+    description: 'The better fit when the business needs separate coverage for the larger Utica search landscape.',
+    tag: 'Utica',
+  },
+  {
+    title: 'Rome NY Website Designer',
+    href: '/service-areas/rome',
+    description: 'A useful companion page for businesses serving both Rome and the smaller towns around it.',
+    tag: 'Rome',
+  },
+];
+---
+
+<ServiceAreaPage
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbLabel="Clinton"
+  schema={areaSchema}
+  eyebrow="Clinton, New York"
+  heroTitlePrefix="Web Design and Hosting for"
+  heroHighlight="Clinton"
+  heroDescription="A Clinton, NY web designer building calmer, sharper websites for local service businesses that earn customers through trust, referrals, and clean local search."
+  heroPills={['Trust-first local positioning', 'Clinton and Kirkland coverage', 'Managed hosting and local SEO']}
+  blocks={blocks}
+  ctaLabel="Get a Free Clinton Website Audit"
+  relatedMarkets={relatedMarkets}
+/>

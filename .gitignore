@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+# Monorepo uses root pnpm-lock.yaml; npm lockfiles here break tooling (e.g. Vercel picks npm).
+apps/web-viewer/package-lock.json
+.env
+.env.*
+!.env.example
+.DS_Store
+.next
+dist
+.turbo
+.vercel
+*.log
+apps/marketing/.astro-indexnow-cache.json

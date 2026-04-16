@@ -1,0 +1,251 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogBackButton from '../../components/BlogBackButton.astro';
+import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
+import SourceList from '../../components/SourceList.astro';
+import { evidenceLinks } from '../../data/evidence';
+import { buildBlogPostingSchema } from '../../lib/seo';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+
+const localSeoPostSources = [
+  {
+    ...evidenceLinks.googleMobileFirst,
+    note: 'Google uses the mobile version of a page for indexing.',
+  },
+  {
+    ...evidenceLinks.googleLocalBusiness,
+    note: 'Structured data can help Google understand business details such as hours and departments.',
+  },
+  {
+    ...evidenceLinks.googlePageExperience,
+    note: 'Google recommends good Core Web Vitals and strong mobile usability as part of page experience.',
+  },
+  {
+    ...evidenceLinks.astroWhy,
+    note: 'Astro is designed for content-driven websites with less client-side JavaScript.',
+  },
+];
+
+const articleImage = '/images/local_seo_visibility_cover.png';
+const publishedTime = '2026-02-28T09:00:00-05:00';
+const articleSchema = buildBlogPostingSchema({
+  headline: 'Technical Local SEO for Utica & Central NY Service Businesses',
+  description:
+    'A local SEO guide for Utica, Rome, Syracuse, and Central New York service businesses covering structure, mobile-first SEO, schema, and Map Pack gains.',
+  path: '/blog/local-seo-death',
+  image: articleImage,
+  datePublished: publishedTime,
+  articleSection: 'SEO',
+  keywords: ['Local SEO', 'Structured data', 'Mobile-first indexing', 'Technical SEO'],
+});
+---
+<Layout
+  title="Utica & CNY Technical Local SEO | Designed by Anthony"
+  description="A local SEO guide for Utica, Rome, Syracuse, and Central New York service businesses covering structure, mobile-first SEO, schema, and Map Pack gains."
+  image={articleImage}
+  ogType="article"
+  publishedTime={publishedTime}
+  modifiedTime={publishedTime}
+  articleSection="SEO"
+  articleTags={['Local SEO', 'Structured data', 'Mobile-first indexing', 'Technical SEO']}
+  schema={articleSchema}
+  bodyClass="has-progress-bar"
+>
+  <article class="blog-post">
+    <BlogBackButton />
+    <div class="post-header">
+      <div class="meta">
+        <span>February 28, 2026</span> | <span>12 min read</span>
+      </div>
+      <h1>Technical Local SEO for Utica &amp; Central NY Service Businesses</h1>
+    </div>
+    
+    <div class="post-image">
+      <img src={articleImage} alt="Map location pins fading from bright to dim spreading outward from a central business representing local search visibility" width="1024" height="1024" loading="eager" decoding="async" fetchpriority="high" />
+    </div>
+
+    <div class="post-content">
+      <p>Local SEO is less about tricks and more about clarity. Google wants pages that explain what a business does, where it operates, and what a user will find after they click. That is why technical structure matters so much for Main Street businesses. The companies that consistently appear at the top of local search results are not running secret tactics — they are building sites that communicate clearly to both users and search engines at every level of the technology stack.</p>
+      
+      <h2>Google Reads the Mobile Version First</h2>
+      <p>Google's mobile-first indexing guidance says the mobile version of a page is what gets used for indexing. That means mobile design is not a separate design pass at the end of the project. It is part of SEO from the beginning.</p>
+      <p>For local businesses, this is especially consequential. The majority of local searches happen on mobile devices — people searching for "plumber near me" or "emergency HVAC repair" while standing in their home staring at a broken pipe or a dead air conditioner. If the mobile version of your site is a stripped-down afterthought with hidden menu items, slow-loading hero images, and tap targets the size of a pinhead, Google is indexing that inferior experience as the definitive representation of your business. The desktop version you spent weeks perfecting is essentially invisible to the ranking algorithm.</p>
+
+      <h2>The Role of Structured Data</h2>
+      <p>Google's LocalBusiness documentation explains that structured data can communicate business hours, departments, reviews, and other business details in a machine-readable format. We use that guidance to mark up key business information clearly instead of leaving search engines to infer everything on their own.</p>
+
+      <h3>JSON-LD: The Preferred Format for Local Business Markup</h3>
+      <p>Structured data acts as a translation layer between your website's visual content and the search engine's understanding of your business. Without it, Google has to guess what your business hours are based on text it finds somewhere on the page. With proper JSON-LD markup, you are telling Google explicitly: "We are open Monday through Friday from 7 AM to 6 PM, we serve these specific zip codes, and here is our verified phone number." That precision eliminates ambiguity and increases the likelihood of appearing in rich results, knowledge panels, and map pack listings.</p>
+
+      <h4>Essential Schema Properties for Service Businesses</h4>
+      <p>The most effective LocalBusiness schema implementations go beyond the basics. In addition to name, address, and phone, you should include <code>areaServed</code> with specific geographic boundaries, <code>hasOfferCatalog</code> listing each service with its own description, <code>aggregateRating</code> for review stars, and <code>openingHoursSpecification</code> with holiday exceptions. Each additional property gives Google another data point to match your business to relevant queries.</p>
+
+      <h5>Layering Multiple Schema Types on a Single Page</h5>
+      <p>The highest-performing local business sites do not stop at LocalBusiness schema. They layer FAQPage schema for common questions, BreadcrumbList for navigation context, Service schema for individual offerings, and Review schema for testimonials. This multi-schema approach maximizes the number of rich result opportunities per URL and creates a comprehensive machine-readable profile that competitors with basic markup cannot match.</p>
+
+      <h2>NAP Consistency: The Foundation Most Businesses Get Wrong</h2>
+      <p>NAP stands for Name, Address, and Phone number — and inconsistency in these three data points across the web is one of the most common and damaging local SEO mistakes. When your business name appears as "Smith Plumbing LLC" on your website but "Smith's Plumbing" on Yelp, "Smith Plumbing Inc" on the BBB listing, and "John Smith Plumbing" on your Google Business Profile, search engines lose confidence in which entry is authoritative.</p>
+      <p>This inconsistency creates a trust deficit in the algorithm. Google's goal is to serve accurate information, and when it encounters conflicting data about the same business across multiple sources, it may choose to display a competitor whose information is clean and consistent instead. Fixing NAP consistency is not glamorous work, but it is foundational. Before investing in content marketing or link building, every local business should audit their NAP data across their website, Google Business Profile, social media profiles, directory listings, and any industry-specific platforms where they appear.</p>
+
+      <h2>Google Business Profile and Website Synergy</h2>
+      <p>Your Google Business Profile and your website are not separate marketing channels — they are two halves of the same signal that Google uses to evaluate your local authority. When the information on your GBP matches the structured data on your website, and both align with your citations across the web, the combined signal is significantly stronger than any single source alone.</p>
+      <p>We see many businesses treat their GBP as a set-it-and-forget-it listing while pouring resources into their website, or vice versa. The strongest local SEO performance comes from maintaining both in parallel: posting regular updates to your GBP, responding to reviews, uploading fresh photos, keeping service categories accurate, and ensuring your website reflects the same information with structured data markup that validates every claim. This bidirectional consistency creates a reinforcing loop that is very difficult for competitors to overcome.</p>
+
+      <h2>The Structure Still Matters</h2>
+      <p>Strong local SEO usually starts with good headings, service pages that match actual search intent, and internal links that make sense to a reader. It also helps when the technical stack keeps page weight under control so the mobile experience stays smooth.</p>
+      <p>Heading hierarchy is more than a formatting convention — it is a semantic map that tells search engines how your content is organized. An H1 that says "Residential Plumbing Services in Syracuse, NY" followed by H2s for each specific service (drain cleaning, water heater installation, pipe repair) creates a clear topical outline that search engines can parse instantly. When that hierarchy is broken — multiple H1 tags, skipped heading levels, or headings that do not match the actual content beneath them — the signal degrades and Google has to work harder to understand your page.</p>
+
+      <h2>Why Dedicated Service Pages Win</h2>
+      <p>One of the most common mistakes local businesses make is cramming every service into a single page. Search engines perform better when each primary service has its own dedicated page with a unique title tag, targeted heading structure, and content that directly addresses the questions a potential customer is actually searching for. A plumber who separates "Emergency Drain Repair" from "Water Heater Installation" gives Google two distinct opportunities to rank instead of one diluted page competing for both terms.</p>
+      <p>Each service page should also include location-specific language, relevant FAQs, and internal links to related services. This creates topical depth that search engines reward. A single "Services" page with bullet points cannot compete with a competitor who has five dedicated, content-rich pages targeting the same keywords with specificity and authority.</p>
+
+      <h2>Internal Linking as Architecture</h2>
+      <p>Internal links are not just navigation shortcuts — they are part of your site's information architecture. When your homepage links to service pages, and those service pages link to relevant blog content, search engines can follow a clear topical hierarchy. This signals depth of expertise on a subject and helps Google understand which pages are the most important. For local businesses, linking your service area pages together through a logical structure also reinforces geographic relevance across your entire domain.</p>
+      <p>Think of internal links as votes of confidence from one page to another within your own site. Your homepage typically carries the most authority because it receives the most external links. By strategically linking from your homepage to your most important service pages, you are distributing that authority to the pages that need it most. A flat site with no internal linking structure wastes the authority your homepage has earned and forces every interior page to fight for visibility on its own.</p>
+
+      <h2>Citation Building: Earning Trust Through Repetition</h2>
+      <p>Citations are mentions of your business on other websites — directories, industry listings, local chamber of commerce pages, and review platforms. Each citation that includes consistent NAP data acts as a third-party validation of your business information. The more trusted sources that confirm your business exists at a specific address with a specific phone number, the more confident Google becomes in surfacing your business for local queries.</p>
+
+      <h3>Priority Citation Sources for Service Businesses</h3>
+      <p>Priority citations for most service businesses include Google Business Profile, Yelp, BBB, Angi, HomeAdvisor (for contractors), industry-specific directories, and local business associations. The key is not volume — it is accuracy and relevance. Fifty citations with inconsistent data are worse than fifteen citations with perfect NAP alignment. We recommend an annual citation audit as part of any serious local SEO maintenance program.</p>
+
+      <h4>Citation Audit Methodology</h4>
+      <p>A proper citation audit starts with a comprehensive scan of every place your business appears online. Tools like Moz Local, BrightLocal, and Whitespark can automate this discovery process, producing a report of every directory listing, social profile, and industry platform where your NAP data appears. From there, each listing is compared against your canonical business information and flagged for inconsistencies.</p>
+
+      <h5>Automating Citation Monitoring Over Time</h5>
+      <p>Citation data drift is inevitable. Directories update formats, aggregators push outdated information, and platform mergers create duplicate listings. Setting up quarterly automated scans through a citation management tool catches new inconsistencies before they accumulate. This proactive monitoring converts a one-time audit into an ongoing quality assurance process that protects your local search authority continuously.</p>
+
+      <h2>Content Freshness and Ongoing Signals</h2>
+      <p>Google values content that demonstrates ongoing engagement and expertise. A website that was built three years ago and never updated sends a weaker signal than one that regularly publishes relevant content, updates service pages to reflect current offerings, and maintains accurate business information. For local businesses, this does not mean you need to blog daily — it means you should have a content rhythm that shows search engines your business is active and evolving.</p>
+      <p>Seasonal content is particularly effective for service businesses. A landscaping company that publishes a spring lawn preparation guide in March and a winterization checklist in October demonstrates topical authority and gives search engines fresh content to index at the exact moments when customers are searching for those services. Combined with strong technical SEO fundamentals, this content strategy creates a compounding advantage that grows year over year.</p>
+
+      <p>That is a big reason we often build with Astro for marketing sites. It gives us a lean content-focused starting point so the site can be clear for users and easier to maintain for search-focused updates.</p>
+
+      <SourceList
+        title="Sources"
+        intro="These are the primary references behind the technical SEO claims in this article."
+        items={localSeoPostSources}
+      />
+    </div>
+
+    <BlogBridgeLinks />
+
+    <RelatedPosts
+      posts={[
+        {
+          title: 'Local Business Schema: The Markup That Gets You Found',
+          href: '/blog/local-business-schema',
+          description: 'Structured data tells Google exactly who you are and what you do.',
+          image: '/images/local_schema_cover_v2.png',
+          imageAlt: 'Data network over a city map',
+          tag: 'SEO',
+        },
+        {
+          title: 'Mobile-First Indexing and Fast Sites',
+          href: '/blog/mobile-first-seo',
+          description: 'Google indexes your mobile site first. If it loads slow, rankings suffer.',
+          image: '/images/mobile_first_seo_cover.png',
+          imageAlt: 'Smartphone with a responsive website',
+          tag: 'SEO',
+        },
+        {
+          title: 'Seasonal SEO in Central New York',
+          href: '/blog/seasonal-business-seo',
+          description: 'How seasonal businesses in Central New York can stay visible before demand spikes.',
+          image: '/images/local_seo_visibility_cover.png',
+          imageAlt: 'Local business storefront',
+          tag: 'SEO',
+        },
+      ]}
+    />
+  </article>
+</Layout>
+
+<style>
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .post-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .meta {
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .post-header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .post-image {
+    width: 100%;
+    margin-bottom: 4rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .post-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .post-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-content h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .post-content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-top: 1.75rem;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .post-content p {
+    font-size: 1.25rem;
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 2.5rem;
+    }
+  }
+</style>

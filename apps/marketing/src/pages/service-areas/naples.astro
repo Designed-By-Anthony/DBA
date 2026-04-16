@@ -1,0 +1,132 @@
+---
+import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
+import { buildServiceAreaSchema } from '../../lib/seo';
+
+const pageTitle = 'Naples FL Web Design & Local SEO | Designed by Anthony';
+const pageDescription =
+  'Premium web design, website rescue, managed hosting, and local SEO for Naples, FL service businesses selling trust in Southwest Florida.';
+
+const areaSchema = buildServiceAreaSchema({
+  name: 'Web Design and Hosting Services in Naples, Florida',
+  description: pageDescription,
+  path: '/service-areas/naples',
+  areaServed: 'Naples, Florida',
+  serviceType: 'Web design, website rescue, managed hosting, and local SEO',
+  cityName: 'Naples',
+  regionName: 'Florida',
+  regionAbbr: 'FL',
+  geo: { latitude: 26.1420, longitude: -81.7948 },
+});
+
+const blocks = [
+  {
+    level: 'h2' as const,
+    title: "Why Naples' luxury market requires premium web infrastructure",
+    paragraphs: [
+      'Naples is a market where polish matters. A high-end contractor, wealth manager, or interior designer cannot credibly sell premium service through a site that feels slow, generic, or cheaply assembled.',
+      'The seasonal population swing in Southwest Florida also creates a compressed window for high-intent demand. If the site is weak during peak season, that lost opportunity is hard to make back later.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'High-net-worth search behavior in Collier County',
+    paragraphs: [
+      'Affluent buyers usually research more carefully before they reach out. They compare multiple pages, pay attention to quality signals, and notice when a business presentation feels generic.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: 'Targeting near-me searches in Naples and Marco Island',
+    paragraphs: [
+      'Naples includes distinct sub-markets with different expectations and different local intent. Granular location targeting helps the site feel more relevant and more credible to the right buyer.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'Seasonal content strategy for snowbird search capture',
+    paragraphs: [
+      'Publishing seasonal content before the influx begins gives the site time to earn visibility before the highest-value traffic arrives.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Website rescue for established Naples service businesses',
+    paragraphs: [
+      'Many long-standing Naples businesses have real authority and strong brand recognition tied to sites that are now technically behind. A rescue preserves that equity while rebuilding the experience around speed, trust, and modern presentation.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Why Naples businesses lose rankings to newer competitors',
+    paragraphs: [
+      'Newer entrants often launch with cleaner, faster sites and immediately look more current online. Performance, usability, and clear positioning can let a younger competitor outrank a more established brand.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: 'Preserving client testimonials and portfolio assets during migration',
+    paragraphs: [
+      'For premium businesses, social proof and visual work samples are some of the most valuable assets on the site. A rescue has to preserve and improve those assets, not treat them like disposable content.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'White-glove migration for premium Naples brands',
+    paragraphs: [
+      'Luxury positioning depends on smooth execution. The migration plan needs to feel as careful and polished as the service the business is trying to sell.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Managed hosting and optimization for Southwest Florida',
+    paragraphs: [
+      'Naples businesses need a site that stays available through seasonal demand swings and regional weather risk. That is part of making the website a dependable sales asset instead of another point of failure.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: "Performance optimization for Naples' outdoor-lifestyle audience",
+    paragraphs: [
+      'A lot of local demand comes from mobile users on the move. The site has to stay fast and usable on cellular connections, not just on a perfect desktop setup.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: "Hosting solutions scaled for Naples' seasonal traffic patterns",
+    paragraphs: [
+      'Traditional shared hosting struggles with dramatic traffic changes between the off-season and peak months. CDN-based delivery handles those shifts far more comfortably.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'Infrastructure monitoring and quarterly performance reviews',
+    paragraphs: [
+      'Ongoing monitoring helps catch regressions early and keeps the site aligned with the expectations of a premium market that notices quality quickly.',
+    ],
+  },
+];
+
+const relatedMarkets = [
+  {
+    title: 'Miami Web Design Company',
+    href: '/service-areas/miami',
+    description: 'A related South Florida page for businesses that also need visibility in the faster and broader Miami-Dade market.',
+    tag: 'Miami',
+  },
+];
+---
+
+<ServiceAreaPage
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbLabel="Naples"
+  schema={areaSchema}
+  eyebrow="Naples, Florida"
+  heroTitlePrefix="Premium Web Design for"
+  heroHighlight="Naples"
+  heroDescription="A Naples FL web designer building premium custom websites and local SEO for Southwest Florida service businesses serving Marco Island and Collier County."
+  heroPills={['Premium local positioning', 'Naples and Marco Island coverage', 'Managed hosting and local SEO']}
+  blocks={blocks}
+  ctaLabel="Get a Free Naples Website Audit"
+  relatedMarkets={relatedMarkets}
+/>
