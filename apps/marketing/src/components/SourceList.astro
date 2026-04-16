@@ -1,0 +1,101 @@
+---
+interface SourceItem {
+  label: string;
+  note?: string;
+  url: string;
+}
+
+interface Props {
+  title?: string;
+  intro?: string;
+  items: SourceItem[];
+  compact?: boolean;
+}
+
+const {
+  title = "Sources",
+  intro,
+  items = [],
+  compact = false,
+} = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class={`source-list ${compact ? 'source-list--compact' : ''}`}>
+      <p class="source-list-label">Sources</p>
+      <h3>{title}</h3>
+      {intro && <p class="source-list-intro">{intro}</p>}
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a href={item.url} target="_blank" rel="noreferrer">{item.label}<span class="sr-only">(opens in new window)</span></a>
+            {item.note && <span> - {item.note}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .source-list {
+    margin-top: 3rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .source-list--compact {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .source-list-label {
+    color: #bfdbfe;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .source-list h3 {
+    font-size: 1.35rem;
+    color: var(--text-white);
+    margin-bottom: 0.75rem;
+  }
+
+  .source-list-intro {
+    color: var(--text-gray);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .source-list ul {
+    list-style: none;
+    display: grid;
+    gap: 0.9rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .source-list li {
+    color: var(--text-gray);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .source-list a {
+    color: var(--text-white);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    transition: color 0.2s ease;
+  }
+
+  .source-list a:hover {
+    color: var(--accent-blue);
+  }
+</style>

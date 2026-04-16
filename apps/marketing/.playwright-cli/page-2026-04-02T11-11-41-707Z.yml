@@ -1,0 +1,274 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: APRIL DEAL
+    - paragraph [ref=e5]:
+      - strong [ref=e6]: April Showers Deal.
+      - text: Public website projects launch at $699 this month instead of $999. First 3 spots only.
+      - link "Claim your spot" [ref=e7] [cursor=pointer]:
+        - /url: /contact
+  - banner [ref=e8]:
+    - generic [ref=e9]:
+      - link "Designed by Anthony Logo" [ref=e10] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e11]
+      - navigation [ref=e12]:
+        - link "Our Edge" [ref=e13] [cursor=pointer]:
+          - /url: /ouredge
+        - link "Services" [ref=e14] [cursor=pointer]:
+          - /url: /services
+        - link "Service Areas" [ref=e15] [cursor=pointer]:
+          - /url: /service-areas
+        - link "Portfolio" [ref=e16] [cursor=pointer]:
+          - /url: /portfolio
+        - link "About" [ref=e17] [cursor=pointer]:
+          - /url: /about
+        - link "FAQ" [ref=e18] [cursor=pointer]:
+          - /url: /faq
+        - link "Blog" [ref=e19] [cursor=pointer]:
+          - /url: /blog
+        - link "Contact" [ref=e20] [cursor=pointer]:
+          - /url: /contact
+  - navigation "Breadcrumb" [ref=e21]:
+    - list [ref=e23]:
+      - listitem [ref=e24]:
+        - link "Home" [ref=e25] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e26]:
+        - text: /
+        - link "Services" [ref=e27] [cursor=pointer]:
+          - /url: /services
+      - listitem [ref=e28]:
+        - text: /
+        - generic [ref=e29]: Local SEO
+  - main [ref=e30]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - paragraph [ref=e34]: Service 04
+        - heading "Show Up When People Search for What You Do" [level=1] [ref=e35]
+        - paragraph [ref=e36]: We help service businesses get found on Google by the people nearby who are already looking for what you offer.
+        - strong [ref=e38]: SEO maintenance is $100 per month and includes hosting.
+        - generic [ref=e39]:
+          - link "Get a Free Website Audit" [ref=e40] [cursor=pointer]:
+            - /url: /contact
+          - link "View All Services" [ref=e41] [cursor=pointer]:
+            - /url: /services
+        - generic [ref=e42]:
+          - generic [ref=e43]: Structured for local relevance
+          - generic [ref=e44]: Built for Google Maps and Search
+          - generic [ref=e45]: Stronger service and area coverage
+      - img "Local SEO search marketing" [ref=e47]
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - paragraph [ref=e51]: What This Includes
+        - heading "How we get your business found on Google" [level=2] [ref=e52]
+        - paragraph [ref=e53]: Local SEO works best when the website, the business profile, and the service-area strategy all support the same message.
+      - generic [ref=e54]:
+        - article [ref=e55]:
+          - heading "Helping Google understand your business" [level=3] [ref=e56]
+          - paragraph [ref=e57]: We add behind-the-scenes structure that tells Google exactly what your business does, what services you offer, and where you are located. This makes it easier for the right people to find you.
+          - heading "Clear structure beats vague marketing copy" [level=4] [ref=e58]
+          - paragraph [ref=e59]: Search visibility improves when the site clearly explains your services, service areas, and supporting details instead of trying to say everything on one page.
+          - heading "Schema fills in the details machines need" [level=5] [ref=e60]
+          - paragraph [ref=e61]: Structured data helps search engines connect your business entity, service pages, and location coverage without guessing.
+        - article [ref=e62]:
+          - heading "Making your Google listing work harder" [level=3] [ref=e63]
+          - paragraph [ref=e64]: Your Google Business Profile needs to match your website. We make sure your business name, address, phone number, services, and categories line up so Google shows you to the right searchers.
+          - heading "Consistency protects trust and rankings" [level=4] [ref=e65]
+          - paragraph [ref=e66]: If your site says one thing and your Google profile says another, the market notices and search engines do too. Alignment makes the business feel more established.
+          - heading "The site and profile should reinforce each other" [level=5] [ref=e67]
+          - paragraph [ref=e68]: The best local SEO setups use the website to deepen credibility and the profile to win visibility, not treat them like separate marketing channels.
+        - article [ref=e69]:
+          - heading "Pages built around what you do and where you do it" [level=3] [ref=e70]
+          - paragraph [ref=e71]: We build dedicated pages for each service you offer and each area you serve. That way, when someone searches for a plumber in Rome or a roofer in Utica, your page has a clearer chance to show up.
+          - heading "Separate intent deserves separate pages" [level=4] [ref=e72]
+          - paragraph [ref=e73]: A broad catch-all page usually underperforms because it does not feel specific enough for the user or the search engine. Focused pages create better relevance.
+          - heading "Internal linking turns pages into a system" [level=5] [ref=e74]
+          - paragraph [ref=e75]: When service pages and location pages are planned together, they strengthen each other instead of competing for the same vague keywords.
+        - article [ref=e76]:
+          - heading "Why the work has to continue monthly" [level=3] [ref=e77]
+          - paragraph [ref=e78]: Local SEO is not a switch you flip once. Hours change, services expand, reviews come in, competitors publish new pages, and Google keeps comparing how complete and useful each business looks.
+          - paragraph [ref=e79]: That is why the monthly work matters. It keeps the Google Business Profile current, keeps the website supporting the profile, and keeps the business adding signals that feel active and trustworthy instead of stale.
+          - heading "Directories are part of the foundation, not the whole strategy" [level=4] [ref=e80]
+          - paragraph [ref=e81]: Citation consistency still matters, but it is not the whole monthly package. We treat citation cleanup as setup work first, then light maintenance inside the retainer so the core business info stays aligned.
+          - heading "Monthly SEO should create visible business assets" [level=5] [ref=e82]
+          - paragraph [ref=e83]: "A healthy retainer should produce updates you can point to: profile improvements, review support, service pages, location pages, or offer pages that make the business stronger over time."
+      - generic [ref=e84]:
+        - paragraph [ref=e85]: Sources
+        - heading "Why We Emphasize Structure" [level=3] [ref=e86]
+        - paragraph [ref=e87]: Here is the documentation behind the approach we use for local search.
+        - list [ref=e88]:
+          - listitem [ref=e89]:
+            - 'link "Google Search Central: LocalBusiness structured data" [ref=e90] [cursor=pointer]':
+              - /url: https://developers.google.com/search/docs/appearance/structured-data/local-business
+            - text: "- Google documents how LocalBusiness structured data can communicate business details in a machine-readable way."
+          - listitem [ref=e91]:
+            - 'link "Google Business Profile Help: Tips to improve your local ranking on Google" [ref=e92] [cursor=pointer]':
+              - /url: https://support.google.com/business/answer/7091/improve-your-local-ranking-on-google?hl=en
+            - text: "- Google says local ranking depends on relevance, distance, and prominence, and that complete profile info and reviews help."
+          - listitem [ref=e93]:
+            - 'link "Google Business Profile Help: How Google sources business information" [ref=e94] [cursor=pointer]':
+              - /url: https://support.google.com/business/answer/2721884
+            - text: "- Google explains that business information can come from the official site, users, and third-party sources."
+          - listitem [ref=e95]:
+            - 'link "Google Business Profile Help: Manage customer reviews" [ref=e96] [cursor=pointer]':
+              - /url: https://support.google.com/business/answer/3474050
+            - text: "- Google notes that review replies are public and help show that a business values feedback."
+          - listitem [ref=e97]:
+            - 'link "Google Business Profile Help: Manage your services" [ref=e98] [cursor=pointer]':
+              - /url: https://support.google.com/business/answer/9455399?hl=en
+            - text: "- Google lets businesses manage services directly on the profile, which helps clarify what the business actually offers."
+          - listitem [ref=e99]:
+            - 'link "Google Search Central: Mobile-first indexing best practices" [ref=e100] [cursor=pointer]':
+              - /url: https://developers.google.com/search/docs/crawling-indexing/mobile/mobile-sites-mobile-first-indexing
+            - text: "- Google uses the mobile version of a page for indexing."
+          - listitem [ref=e101]:
+            - 'link "Google Search Central: Understanding page experience" [ref=e102] [cursor=pointer]':
+              - /url: https://developers.google.com/search/docs/appearance/page-experience
+            - text: "- Google recommends strong page experience and good Core Web Vitals."
+    - generic [ref=e104]:
+      - generic [ref=e105]:
+        - paragraph [ref=e106]: Pricing
+        - heading "How we structure local SEO work" [level=2] [ref=e107]
+        - paragraph [ref=e108]: The strongest local SEO setups usually separate one-time cleanup from ongoing monthly work so the business owner can see what is foundation and what is maintenance.
+      - generic [ref=e109]:
+        - article [ref=e110]:
+          - generic [ref=e111]:
+            - generic [ref=e112]: Local SEO Foundation
+            - generic [ref=e113]: Best first step
+          - heading "One-time" [level=3] [ref=e114]
+          - paragraph [ref=e115]: Used when the site, profile, and tracking need cleanup before a monthly retainer makes sense.
+          - list [ref=e116]:
+            - listitem [ref=e117]: Google Business Profile cleanup and alignment
+            - listitem [ref=e118]: Core citation and directory consistency work
+            - listitem [ref=e119]: Tracking setup and review-link setup
+            - listitem [ref=e120]: On-site local SEO fixes and service-area planning
+        - article [ref=e121]:
+          - generic [ref=e123]: Monthly SEO
+          - heading "$100 /month" [level=3] [ref=e124]:
+            - text: $100
+            - generic [ref=e125]: /month
+          - paragraph [ref=e126]: Ongoing local SEO maintenance for businesses that want the website and profile to keep moving after launch.
+          - list [ref=e127]:
+            - listitem [ref=e128]: Hosting included
+            - listitem [ref=e129]: Google Business Profile updates and maintenance
+            - listitem [ref=e130]: Review support and profile trust work
+            - listitem [ref=e131]: One meaningful growth asset each month
+        - article [ref=e132]:
+          - generic [ref=e134]: Citation Cleanup
+          - heading "Standalone" [level=3] [ref=e135]
+          - paragraph [ref=e136]: A one-time option when directories and business info need cleanup without a full monthly engagement.
+          - list [ref=e137]:
+            - listitem [ref=e138]: Best for messy or inconsistent listings
+            - listitem [ref=e139]: Good pre-work before monthly SEO begins
+            - listitem [ref=e140]: Focused on consistency, not full growth strategy
+            - listitem [ref=e141]: Can also be folded into a broader setup phase
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - paragraph [ref=e145]: Common Questions
+        - heading "Questions we hear before a project starts" [level=2] [ref=e146]
+        - paragraph [ref=e147]: Straight answers about fit, pricing, and what this service actually changes for your business.
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - button "What does local SEO actually change for a service business?" [ref=e150] [cursor=pointer]:
+            - generic [ref=e152]: What does local SEO actually change for a service business?
+          - paragraph [ref=e155]: Local SEO helps Google understand what you do, where you work, and which pages should rank for each service or market. That usually means stronger visibility for nearby searches, cleaner service-area coverage, and a better chance of getting in front of buyers before they call a competitor.
+        - generic [ref=e156]:
+          - button "Is local SEO just setting up a Google Business Profile?" [ref=e157] [cursor=pointer]:
+            - generic [ref=e159]: Is local SEO just setting up a Google Business Profile?
+          - paragraph [ref=e162]: No. Your Google Business Profile matters, but it works best when the website supports it with strong service pages, location pages, internal links, and structured data. The profile brings attention, but the website is what proves relevance and trust once someone clicks.
+        - generic [ref=e163]:
+          - button "What does local SEO cost after the site is built?" [ref=e164] [cursor=pointer]:
+            - generic [ref=e166]: What does local SEO cost after the site is built?
+          - paragraph [ref=e169]: Ongoing SEO maintenance is $100 per month and includes hosting. That covers ongoing Google Business Profile work, review support, on-site local SEO updates, and one meaningful growth asset each month so the business keeps moving instead of treating SEO like a one-time setup.
+        - generic [ref=e170]:
+          - button "Are directories and citations included in the monthly SEO package?" [ref=e171] [cursor=pointer]:
+            - generic [ref=e173]: Are directories and citations included in the monthly SEO package?
+          - paragraph [ref=e176]: Core citation cleanup is best handled during setup or as a standalone one-time project when listings are messy. After that, light citation maintenance can sit inside the monthly package so the business information stays consistent without turning directory work into the entire SEO strategy.
+    - generic [ref=e178]:
+      - generic [ref=e179]:
+        - paragraph [ref=e180]: Service Areas
+        - heading "Markets where this service can gain traction" [level=2] [ref=e181]
+        - paragraph [ref=e182]: These location pages show how the strategy adapts to different levels of competition and buyer intent.
+      - generic [ref=e183]:
+        - link "Rome Web Design in Rome, NY See how a local page is structured for tighter service-area targeting in Oneida County. Explore page" [ref=e184] [cursor=pointer]:
+          - /url: /service-areas/rome
+          - generic [ref=e185]: Rome
+          - heading "Web Design in Rome, NY" [level=3] [ref=e186]
+          - paragraph [ref=e187]: See how a local page is structured for tighter service-area targeting in Oneida County.
+          - generic [ref=e188]: Explore page
+        - link "Syracuse Web Design in Syracuse, NY Review how broader competition changes page structure, service framing, and local intent coverage. Explore page" [ref=e189] [cursor=pointer]:
+          - /url: /service-areas/syracuse
+          - generic [ref=e190]: Syracuse
+          - heading "Web Design in Syracuse, NY" [level=3] [ref=e191]
+          - paragraph [ref=e192]: Review how broader competition changes page structure, service framing, and local intent coverage.
+          - generic [ref=e193]: Explore page
+        - link "North Country Web Design in the North Country, NY Look at how local SEO shifts when the business serves wide geographic areas across multiple towns. Explore page" [ref=e194] [cursor=pointer]:
+          - /url: /service-areas/north-country
+          - generic [ref=e195]: North Country
+          - heading "Web Design in the North Country, NY" [level=3] [ref=e196]
+          - paragraph [ref=e197]: Look at how local SEO shifts when the business serves wide geographic areas across multiple towns.
+          - generic [ref=e198]: Explore page
+      - link "View All Service Areas" [ref=e200] [cursor=pointer]:
+        - /url: /service-areas
+    - generic [ref=e202]:
+      - generic [ref=e203]:
+        - paragraph [ref=e204]: Related Articles
+        - heading "Supporting articles that deepen the strategy" [level=2] [ref=e205]
+        - paragraph [ref=e206]: These guides go further into the technical and SEO decisions that make the service work.
+      - generic [ref=e207]:
+        - link "Schema The Hidden Code That Gets Local Businesses Ranked See how schema helps connect business details, services, and service areas. Explore page" [ref=e208] [cursor=pointer]:
+          - /url: /blog/local-business-schema
+          - generic [ref=e209]: Schema
+          - heading "The Hidden Code That Gets Local Businesses Ranked" [level=3] [ref=e210]
+          - paragraph [ref=e211]: See how schema helps connect business details, services, and service areas.
+          - generic [ref=e212]: Explore page
+        - link "SEO Is Local SEO Dead? What Actually Works in 2025 Learn which old local tactics stopped working and what stronger site structure looks like now. Explore page" [ref=e213] [cursor=pointer]:
+          - /url: /blog/local-seo-death
+          - generic [ref=e214]: SEO
+          - heading "Is Local SEO Dead? What Actually Works in 2025" [level=3] [ref=e215]
+          - paragraph [ref=e216]: Learn which old local tactics stopped working and what stronger site structure looks like now.
+          - generic [ref=e217]: Explore page
+        - link "Content How to Fix Thin Content Without Nuking Your Rankings Understand how to build topical depth without leaving weak location and service pages all over the site. Explore page" [ref=e218] [cursor=pointer]:
+          - /url: /blog/fix-thin-content
+          - generic [ref=e219]: Content
+          - heading "How to Fix Thin Content Without Nuking Your Rankings" [level=3] [ref=e220]
+          - paragraph [ref=e221]: Understand how to build topical depth without leaving weak location and service pages all over the site.
+          - generic [ref=e222]: Explore page
+        - link "SEO Why Monthly SEO Matters for Local Service Businesses A clearer look at why local SEO needs monthly follow-through instead of a one-time setup only. Explore page" [ref=e223] [cursor=pointer]:
+          - /url: /blog/why-monthly-seo-matters
+          - generic [ref=e224]: SEO
+          - heading "Why Monthly SEO Matters for Local Service Businesses" [level=3] [ref=e225]
+          - paragraph [ref=e226]: A clearer look at why local SEO needs monthly follow-through instead of a one-time setup only.
+          - generic [ref=e227]: Explore page
+      - link "View All Articles" [ref=e229] [cursor=pointer]:
+        - /url: /blog
+    - generic [ref=e232]:
+      - paragraph [ref=e233]: Free Website Audit
+      - heading "Ready to start showing up when people search for what you do?" [level=2] [ref=e234]
+      - paragraph [ref=e235]: Start with a free audit and I will show you exactly where you stand on Google and what needs to change first.
+      - generic [ref=e236]:
+        - link "Get a Free Website Audit" [ref=e237] [cursor=pointer]:
+          - /url: /contact
+        - link "See Our Work" [ref=e238] [cursor=pointer]:
+          - /url: /portfolio
+  - contentinfo [ref=e239]:
+    - generic [ref=e240]:
+      - generic [ref=e241]:
+        - paragraph [ref=e242]: Copyright 2026 Designed by Anthony. All rights reserved.
+        - paragraph [ref=e243]: Serving the Mohawk Valley and Beyond
+        - generic [ref=e244]:
+          - link "Privacy Policy" [ref=e245] [cursor=pointer]:
+            - /url: /privacy
+          - generic [ref=e246]: "|"
+          - link "Terms of Service" [ref=e247] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e248]: "|"
+          - link "Cookie Policy" [ref=e249] [cursor=pointer]:
+            - /url: /cookie
+          - generic [ref=e250]: "|"
+          - link "Image License" [ref=e251] [cursor=pointer]:
+            - /url: /image-license
+      - paragraph [ref=e253]:
+        - text: "Contact:"
+        - link "Use the contact form" [ref=e254] [cursor=pointer]:
+          - /url: /contact

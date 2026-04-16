@@ -1,0 +1,118 @@
+---
+import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
+import { buildServiceAreaSchema } from '../../lib/seo';
+
+const pageTitle = 'Rome NY Website Designer | Designed by Anthony';
+const pageDescription =
+  'A Rome website designer building custom websites, local SEO, hosting, and rescues for Rome, NY service businesses that need more trust and more calls.';
+
+const areaSchema = buildServiceAreaSchema({
+  name: 'Web Design and Hosting Services in Rome, New York',
+  description: pageDescription,
+  path: '/service-areas/rome',
+  areaServed: 'Rome, New York',
+  serviceType: 'Web design, hosting, and local SEO',
+  cityName: 'Rome',
+  regionName: 'New York',
+  regionAbbr: 'NY',
+  geo: { latitude: 43.2128, longitude: -75.4557 },
+});
+
+const blocks = [
+  {
+    level: 'h2' as const,
+    title: 'Why Rome businesses need websites that feel trustworthy immediately',
+    paragraphs: [
+      'Rome is a relationship-driven market. Whether someone is looking for a contractor, attorney, med spa, roofer, or cleaning company, they are usually comparing a short list of local businesses and making a trust decision fast. If your site looks dated, loads slowly, or feels vague about what you actually do, that trust falls apart before the phone ever rings.',
+      'A strong Rome service page needs to do more than list services. It has to show that your business is established, responsive, and easy to work with, while still loading fast on mobile for people searching from work, home, or the road.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Competing across Griffiss, downtown, and the wider Mohawk Valley',
+    paragraphs: [
+      'Rome businesses often serve more than one pocket of demand. Some leads come from downtown, some from Griffiss Business and Technology Park, and many from surrounding towns where customers simply search for the nearest reliable option. That means your site has to support both Rome-specific trust signals and broader service-area coverage without turning into thin filler.',
+    ],
+  },
+  {
+    level: 'h4' as const,
+    title: 'What a Rome landing page has to prove',
+    paragraphs: [
+      'It should show exactly what you do, who you help, and how to contact you within seconds. Clean copy, strong service framing, fast load times, and location-aware SEO matter more here than design tricks that slow everything down.',
+    ],
+  },
+  {
+    level: 'h5' as const,
+    title: 'The best Rome pages feel prepared, not flashy',
+    paragraphs: [
+      'When the page answers practical questions quickly and feels easy to use on mobile, the business comes across as more dependable before the customer ever reaches out.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Website rescues for Rome companies stuck on old templates',
+    paragraphs: [
+      'A lot of established businesses in Rome are still running on sites that were built years ago and never really improved. They may technically work, but they often have weak mobile layouts, bloated plugins, soft calls to action, and pages that do not rank well for the actual searches local customers use.',
+      'A website rescue keeps the useful parts of your current site while rebuilding the experience around speed, clarity, and lead generation. The goal is not to make the site look modern for its own sake. The goal is to make it easier for the right customer to trust you and take the next step.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'Preserving rankings and citations during a rebuild',
+    paragraphs: [
+      'If your business already has citation history, backlinks, or a few pages that rank, the rebuild has to protect that equity. Redirect mapping, page continuity, and careful local schema work are what keep a cleanup from turning into an SEO setback.',
+    ],
+  },
+  {
+    level: 'h2' as const,
+    title: 'Managed hosting and local SEO support for Rome service companies',
+    paragraphs: [
+      'Rome businesses do not need complicated hosting stacks. They need a site that stays fast, stays secure, and stays easy to update when offers, service areas, or seasonal priorities change. Managed hosting removes the maintenance burden while keeping performance strong.',
+      'On the SEO side, Rome businesses usually benefit from a tight local structure: a strong Rome page, separate pages for nearby priority towns when appropriate, and copy that reflects how people in this market actually search. That combination is far more effective than a single broad page trying to rank everywhere.',
+    ],
+  },
+  {
+    level: 'h3' as const,
+    title: 'When separate location pages make sense',
+    paragraphs: [
+      'If your business actively targets Rome, Utica, and New Hartford with different search behavior or competition levels, separate pages usually outperform one generic regional page. They give Google clearer relevance and give potential customers a page that feels like it was built for their market.',
+    ],
+  },
+];
+
+const relatedMarkets = [
+  {
+    title: 'Website Design, Hosting & SEO in Utica, NY',
+    href: '/service-areas/utica',
+    description: 'A stronger fit when the business is actively competing in Utica and needs a page tailored to that city search behavior.',
+    tag: 'Utica',
+  },
+  {
+    title: 'Web Design in New Hartford, NY',
+    href: '/service-areas/new-hartford',
+    description: 'Useful when the business also sells into a more presentation-sensitive market around New Hartford and Utica.',
+    tag: 'New Hartford',
+  },
+  {
+    title: 'Syracuse Web Design Company',
+    href: '/service-areas/syracuse',
+    description: 'A broader Central New York page for businesses that are ready to expand beyond the Mohawk Valley.',
+    tag: 'Syracuse',
+  },
+];
+---
+
+<ServiceAreaPage
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbLabel="Rome"
+  schema={areaSchema}
+  eyebrow="Rome, New York"
+  heroTitlePrefix="Web Design and Hosting for"
+  heroHighlight="Rome"
+  heroDescription="A Rome website designer building faster sites, cleaner positioning, and more confidence for local businesses already getting found by the people they serve."
+  heroPills={['Rome and Griffiss coverage', 'Local SEO and website rescue', 'Managed hosting support']}
+  blocks={blocks}
+  ctaLabel="Get a Free Rome Website Audit"
+  relatedMarkets={relatedMarkets}
+/>

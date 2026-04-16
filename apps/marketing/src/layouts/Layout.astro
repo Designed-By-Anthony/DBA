@@ -1,0 +1,1510 @@
+---
+import { Image } from 'astro:assets';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import FooterCTA from '../components/FooterCTA.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import iconLogo from '../assets/IconLogo.png';
+import interLatinNormalWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+
+import '@fontsource-variable/outfit/wght.css';
+import outfitLatinWoff2 from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
+import '@fontsource-variable/fraunces';
+import '@fontsource/abril-fatface/latin-400.css';
+import abrilFatfaceLatinWoff2 from '@fontsource/abril-fatface/files/abril-fatface-latin-400-normal.woff2?url';
+import '@dba/theme/dba-global.css';
+import { MONTHLY_LOCAL_SEO_PRICE } from '../lib/offers';
+import {
+  DEFAULT_SOCIAL_IMAGE,
+  ORGANIZATION_ID,
+  WEBSITE_ID,
+  buildBaseOrganizationSchema,
+  buildFounderPersonSchema,
+  buildBaseWebsiteSchema,
+  buildBreadcrumbSchema,
+  buildBreadcrumbs,
+  buildImageObject,
+  businessProfile,
+  normalizePath,
+  stripSiteSuffix,
+  toAbsoluteUrl,
+  type SchemaValue,
+} from '../lib/seo';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  socialImage?: string;
+  ogType?: 'website' | 'article';
+  pageType?: string;
+  breadcrumbLabel?: string;
+  hideBreadcrumbs?: boolean;
+  minimalChrome?: boolean;
+  noindex?: boolean;
+  schema?: SchemaValue | SchemaValue[];
+  publishedTime?: string;
+  modifiedTime?: string;
+  articleSection?: string;
+  articleTags?: string[];
+  bodyClass?: string;
+  priorityAnalytics?: boolean;
+  hidePreFooterCTA?: boolean;
+  footerCta?: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    primaryHref: string;
+    primaryLabel: string;
+    secondaryHref?: string;
+    secondaryLabel?: string;
+    note?: string;
+  };
+}
+
+const {
+  title,
+  description,
+  image,
+  socialImage: customSocialImage,
+  ogType = 'website',
+  pageType = 'WebPage',
+  breadcrumbLabel,
+  hideBreadcrumbs = false,
+  minimalChrome = false,
+  noindex = false,
+  schema,
+  publishedTime,
+  modifiedTime,
+  articleSection,
+  articleTags = [],
+  bodyClass,
+  priorityAnalytics = false,
+  hidePreFooterCTA = false,
+  footerCta,
+} = Astro.props;
+
+const pathname = normalizePath(Astro.url.pathname);
+const canonicalUrl = toAbsoluteUrl(pathname);
+const pageTitle = breadcrumbLabel ?? stripSiteSuffix(title);
+const socialImage = toAbsoluteUrl(customSocialImage ?? image ?? DEFAULT_SOCIAL_IMAGE);
+// Hash of bundled script — stable across builds when `site.js` is unchanged (deterministic HTML).
+const siteScriptVersion = createHash('sha256')
+  .update(readFileSync(join(process.cwd(), 'public/scripts/site.js')))
+  .digest('hex')
+  .slice(0, 12);
+const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent('Website inquiry — Designed by Anthony')}`;
+
+const robotsContent = noindex
+  ? 'noindex, nofollow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const breadcrumbItems = hideBreadcrumbs ? [] : buildBreadcrumbs(pathname, pageTitle);
+const breadcrumbSchema = hideBreadcrumbs ? null : buildBreadcrumbSchema(pathname, breadcrumbItems);
+const webPageSchema: SchemaValue = {
+  '@context': 'https://schema.org',
+  '@type': pageType,
+  '@id': `${canonicalUrl}#webpage`,
+  url: canonicalUrl,
+  name: pageTitle,
+  description,
+  isPartOf: {
+    '@id': WEBSITE_ID,
+  },
+  about: {
+    '@id': ORGANIZATION_ID,
+  },
+  primaryImageOfPage: buildImageObject(socialImage),
+  breadcrumb: breadcrumbSchema
+    ? {
+        '@id': `${canonicalUrl}#breadcrumb`,
+      }
+    : undefined,
+  inLanguage: 'en-US',
+};
+const extraSchemas = Array.isArray(schema) ? schema : schema ? [schema] : [];
+const resolvedFooterCta =
+  footerCta ??
+  (ogType === 'article'
+    ? {
+        eyebrow: 'Apply This to Your Site',
+        title: 'Want a direct read on whether this applies to your website?',
+        description:
+          'Run our free Lighthouse audit to see your performance, accessibility, and SEO scores instantly. If you want a deeper analysis, Anthony will follow up with a practical next step.',
+        primaryHref: '/free-seo-audit',
+        primaryLabel: 'Run the Free Audit',
+        secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+        secondaryLabel: 'Book a 15-minute intro call',
+        note: 'Instant results and a founder reply when you want deeper guidance.',
+      }
+    : undefined);
+const structuredData = [
+  buildBaseOrganizationSchema(),
+  buildFounderPersonSchema(),
+  buildBaseWebsiteSchema(),
+  webPageSchema,
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  ...extraSchemas,
+];
+
+/** Preconnect when DSN is set (falls back to production default used by CSP helpers). */
+const DEFAULT_SENTRY_DSN =
+  'https://0d490516ab9f385b16ea4210a1f9622e@o4511201601912832.ingest.us.sentry.io/4511201603158016';
+const sentryDsnForOrigin = import.meta.env.PUBLIC_SENTRY_DSN ?? DEFAULT_SENTRY_DSN;
+let sentryIngestOrigin: string | undefined;
+try {
+  sentryIngestOrigin = new URL(sentryDsnForOrigin).origin;
+} catch {
+  sentryIngestOrigin = undefined;
+}
+---
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Trusted Types: permissive default policy; must be first script so CSP require-trusted-types-for does not break GTM/Astro/third parties. Tighten createHTML/createScript later. -->
+    <script is:inline>
+      (function () {
+        if (!window.trustedTypes || !window.trustedTypes.createPolicy) return;
+        try {
+          window.trustedTypes.createPolicy('default', {
+            createHTML: function (s) {
+              return s;
+            },
+            createScript: function (s) {
+              return s;
+            },
+            createScriptURL: function (s) {
+              return s;
+            },
+          });
+        } catch (_) {}
+      })();
+    </script>
+    {sentryIngestOrigin && <link rel="preconnect" href={sentryIngestOrigin} crossorigin />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/site-icon-48.png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#22d3ee" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- LCP (home hero) uses Abril first; body/UI use Inter + Outfit. -->
+    <link rel="preload" href={abrilFatfaceLatinWoff2} as="font" type="font/woff2" crossorigin fetchpriority="high" />
+    <link rel="preload" href={interLatinNormalWoff2} as="font" type="font/woff2" crossorigin fetchpriority="high" />
+    <link rel="preload" href={outfitLatinWoff2} as="font" type="font/woff2" crossorigin />
+    <!-- DNS prefetch for deferred third-party origins -->
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="en-US" href={canonicalUrl} />
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+    <link rel="license" href="https://designedbyanthony.com/image-license" />
+    <link rel="alternate" type="application/rss+xml" title="Designed by Anthony Blog" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Designed by Anthony Releases" href="/releases.xml" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robotsContent} />
+    <meta name="googlebot" content={robotsContent} />
+    <meta name="author" content={businessProfile.name} />
+    <meta name="publisher" content={businessProfile.name} />
+    <meta name="application-name" content={businessProfile.name} />
+    <meta name="apple-mobile-web-app-title" content={businessProfile.name} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#0f1218" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="theme-color" content="#0f1218" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={businessProfile.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:secure_url" content={socialImage} />
+    <meta property="og:image:width" content="2400" />
+    <meta property="og:image:height" content="1260" />
+    <meta property="og:image:alt" content={`${pageTitle} | ${businessProfile.name}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={`${pageTitle} | ${businessProfile.name}`} />
+    <!-- Google Tag Manager (loaded only after in-house cookie consent; see cookie-consent-root) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function () {
+        window.dataLayer.push(arguments);
+      };
+      window.gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+      });
+      var gtmLoaded = false;
+      window.__dbaCookieConsentKey = 'dba_cookie_consent';
+      window.__dbaLoadGTM = function () {
+        if (gtmLoaded) return;
+        gtmLoaded = true;
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-W2JBTH5L');
+        // Extra tags (e.g. Clarity, heatmaps) are configured in the GTM web UI — not in this repo.
+      };
+      window.__dbaGrantAnalyticsConsent = function () {
+        window.gtag('consent', 'update', {
+          analytics_storage: 'granted',
+          ad_storage: 'granted',
+          ad_user_data: 'granted',
+          ad_personalization: 'granted',
+        });
+      };
+    </script>
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {articleSection && <meta property="article:section" content={articleSection} />}
+    {articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
+    {
+      structuredData.map((entry) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />
+      ))
+    }
+    <slot name="head" />
+  </head>
+  <body
+    class:list={[bodyClass]}
+    data-priority-analytics={priorityAnalytics ? 'true' : undefined}
+    data-reach-out-sticky={!minimalChrome ? 'true' : undefined}
+  >
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    {!minimalChrome && <div id="reading-progress-bar" aria-hidden="true"></div>}
+
+    {
+      !minimalChrome && (
+        <>
+          <div class="site-banner">
+            <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="site-banner-link" data-calendar-link>
+              <span class="site-banner-dot" aria-hidden="true"></span>
+              <span><strong>Launch pilot: 10 client spots</strong> — complimentary custom build + {MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the program is open →</span>
+            </a>
+          </div>
+          <header class="header">
+            <div class="header-container">
+              <a href="/" class="brand-lockup" data-astro-prefetch>
+                <Image
+                  src={iconLogo}
+                  alt="Designed by Anthony"
+                  widths={[36, 72]}
+                  sizes="36px"
+                  width={36}
+                  height={27}
+                  class="nav-icon"
+                  loading="eager"
+                  fetchpriority="high"
+                />
+              </a>
+              <nav class="nav nav-desktop">
+                <a href="/ouredge" data-astro-prefetch>Our Edge</a>
+                <a href="/services" data-astro-prefetch>Services</a>
+                <a href="/service-areas" data-astro-prefetch>Service Areas</a>
+                <a href="/portfolio" data-astro-prefetch>Portfolio</a>
+                <a href="/about" data-astro-prefetch>About</a>
+                <a href="/faq" data-astro-prefetch>FAQ</a>
+                <a href="/blog" data-astro-prefetch>Blog</a>
+                <a href="/contact" class="nav-contact-link" data-astro-prefetch>Contact</a>
+                <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary btn-sm nav-book-btn" id="nav-book-call-btn" data-calendar-link>
+                  Book a Free Call
+                </a>
+              </nav>
+              <button
+                class="hamburger"
+                id="hamburger-btn"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-controls="mobile-nav"
+                aria-expanded="false"
+              >
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+              </button>
+            </div>
+          </header>
+
+          <div class="mobile-nav-overlay" id="mobile-nav">
+            <nav class="mobile-nav-links">
+              <a href="/ouredge" data-astro-prefetch>Our Edge</a>
+              <a href="/services" data-astro-prefetch>Services</a>
+              <a href="/service-areas" data-astro-prefetch>Service Areas</a>
+              <a href="/portfolio" data-astro-prefetch>Portfolio</a>
+              <a href="/about" data-astro-prefetch>About</a>
+              <a href="/faq" data-astro-prefetch>FAQ</a>
+              <a href="/blog" data-astro-prefetch>Blog</a>
+              <a href="/contact" data-astro-prefetch>Contact</a>
+              <a href="/contact" class="mobile-nav-cta" data-astro-prefetch>
+                Contact Us
+              </a>
+            </nav>
+          </div>
+        </>
+      )
+    }
+
+    {
+      !minimalChrome && breadcrumbItems.length > 0 && (
+        <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+          <div class="breadcrumb-container">
+            <ol class="breadcrumbs">
+              {breadcrumbItems.map((item, index) => {
+                const isLast = index === breadcrumbItems.length - 1;
+
+                return (
+                  <li class="breadcrumb-item">
+                    {isLast ? (
+                      <span aria-current="page">{item.name}</span>
+                    ) : (
+                      <a href={item.path} data-astro-prefetch>
+                        {item.name}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </nav>
+      )
+    }
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    {!minimalChrome && !hidePreFooterCTA && resolvedFooterCta && <FooterCTA {...resolvedFooterCta} />}
+
+    { !minimalChrome && <SiteFooter /> }
+
+    {
+      !minimalChrome && (
+        <>
+          <div class="reach-out-sticky" id="reachOutSticky">
+            <button
+              type="button"
+              class="reach-out-sticky-btn"
+              id="reachOutOpenBtn"
+              aria-haspopup="dialog"
+              aria-controls="reachOutModal"
+              aria-expanded="false"
+            >
+              <span class="reach-out-sticky-label">Get in touch</span>
+              <svg class="reach-out-sticky-chevron" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <dialog id="reachOutModal" class="reach-out-dialog" aria-labelledby="reachOutModalTitle" aria-modal="true">
+            <div class="reach-out-dialog-panel splash-shell splash-shell--reach-out">
+              <div class="reach-out-dialog-header">
+                <Image
+                  src={iconLogo}
+                  alt="Designed by Anthony"
+                  widths={[40, 80]}
+                  sizes="40px"
+                  width={40}
+                  class="reach-out-dialog-logo"
+                  loading="eager"
+                  decoding="async"
+                />
+                <button type="button" class="reach-out-dialog-close splash-close" id="reachOutCloseBtn" data-reach-out-close aria-label="Close">
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <h2 id="reachOutModalTitle" class="reach-out-dialog-title">Reach out now</h2>
+              <p class="reach-out-dialog-lede">
+                Choose how you want to connect — form, phone, email, or a quick calendar booking.
+              </p>
+              <a href="/contact" class="reach-out-dialog-primary" data-reach-out-close data-astro-prefetch>
+                Contact us
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+              <div class="reach-out-dialog-actions" role="group" aria-label="Other ways to reach us">
+                <a href={businessProfile.telephoneHref} class="reach-out-action" data-reach-out-close>
+                  <span class="reach-out-action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                  </span>
+                  <span class="reach-out-action-text">
+                    <span class="reach-out-action-label">Call</span>
+                    <span class="reach-out-action-detail">{businessProfile.telephone.replace('+1-', '')}</span>
+                  </span>
+                </a>
+                <a href={mailtoContactHref} class="reach-out-action" data-reach-out-close>
+                  <span class="reach-out-action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                      <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                  </span>
+                  <span class="reach-out-action-text">
+                    <span class="reach-out-action-label">Email</span>
+                    <span class="reach-out-action-detail">{businessProfile.email}</span>
+                  </span>
+                </a>
+                <button
+                  type="button"
+                  class="reach-out-action reach-out-action--calendly"
+                  id="reachOutCalendlyBtn"
+                  aria-label="Book a call — opens calendar in this window"
+                >
+                  <span class="reach-out-action-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </span>
+                  <span class="reach-out-action-text">
+                    <span class="reach-out-action-label">Book a call</span>
+                    <span class="reach-out-action-detail">Calendly</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </dialog>
+
+          <div
+            class="layout-calendly-modal"
+            id="layoutCalendlyModal"
+            hidden
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="layoutCalendlyModalTitle"
+          >
+            <div class="layout-calendly-modal__content splash-shell splash-shell--calendly">
+              <h2 id="layoutCalendlyModalTitle" class="sr-only">
+                Schedule a web design consultation
+              </h2>
+              <button type="button" class="layout-calendly-modal__close splash-close" id="layoutCalendlyCloseBtn" aria-label="Close calendar">
+                &times;
+              </button>
+              <div class="layout-calendly-modal__body" id="layoutCalendlyModalBody">
+                <div class="calendly-embed-loading" data-calendly-loading>
+                  <div class="calendly-embed-loading__spinner" aria-hidden="true" />
+                  <p class="calendly-embed-loading__text">Loading calendar…</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )
+    }
+
+    <div
+      id="cookie-consent-root"
+      class="cookie-consent"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cookie-consent-title"
+      aria-describedby="cookie-consent-desc"
+    >
+      <div class="cookie-consent__inner">
+        <p id="cookie-consent-title" class="cookie-consent__title">
+          Cookies and analytics
+        </p>
+        <p id="cookie-consent-desc" class="cookie-consent__text">
+          We use essential tools to secure forms and run the site. With your permission we also load Google Tag Manager
+          and Google Analytics to understand traffic. Read the{' '}
+          <a href="/cookie" data-astro-prefetch>Cookie Policy</a> and <a href="/privacy" data-astro-prefetch>Privacy Policy</a>.
+        </p>
+        <div class="cookie-consent__actions">
+          <button type="button" class="btn btn-primary btn-sm" id="cookie-consent-accept">
+            Accept
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" id="cookie-consent-reject">
+            Decline
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      (function () {
+        if (window.__dbaCookieConsentBootstrapped) return;
+        window.__dbaCookieConsentBootstrapped = true;
+        var key = window.__dbaCookieConsentKey || 'dba_cookie_consent';
+        var root = document.getElementById('cookie-consent-root');
+        var accept = document.getElementById('cookie-consent-accept');
+        var reject = document.getElementById('cookie-consent-reject');
+        function hide() {
+          if (root) root.setAttribute('hidden', '');
+        }
+        function show() {
+          if (root) root.removeAttribute('hidden');
+          var first = document.getElementById('cookie-consent-accept');
+          if (first && typeof first.focus === 'function') {
+            window.requestAnimationFrame(function () {
+              first.focus();
+            });
+          }
+        }
+        function grantAndLoad() {
+          if (typeof window.__dbaGrantAnalyticsConsent === 'function') window.__dbaGrantAnalyticsConsent();
+          if (typeof window.__dbaLoadGTM === 'function') window.__dbaLoadGTM();
+        }
+        function applyStored() {
+          var stored = null;
+          try {
+            stored = localStorage.getItem(key);
+          } catch (e) {
+            stored = null;
+          }
+          if (stored === 'accepted') {
+            grantAndLoad();
+            hide();
+          } else if (stored === 'rejected') {
+            hide();
+          } else {
+            show();
+          }
+        }
+        if (accept) {
+          accept.addEventListener('click', function () {
+            try {
+              localStorage.setItem(key, 'accepted');
+            } catch (e) {}
+            grantAndLoad();
+            hide();
+          });
+        }
+        if (reject) {
+          reject.addEventListener('click', function () {
+            try {
+              localStorage.setItem(key, 'rejected');
+            } catch (e) {}
+            hide();
+          });
+        }
+        window.__dbaOpenCookieConsent = function () {
+          try {
+            localStorage.removeItem(key);
+          } catch (e) {}
+          show();
+        };
+        applyStored();
+      })();
+    </script>
+
+    <script is:inline type="module" src={`/scripts/site.js?v=${siteScriptVersion}`}></script>
+    <script is:inline>
+      (function() {
+        /** Must match `TURNSTILE_SITE_KEY_TEST_ALWAYS_PASS` in `src/lib/turnstile.ts`. */
+        var TURNSTILE_TEST_SITEKEY = '1x00000000000000000000AA';
+
+        window.__dbaTurnstileError = function () {
+          document.querySelectorAll('.cf-turnstile').forEach(function (w) {
+            var lhRoot = w.closest('[data-lh-audit]');
+            if (lhRoot) {
+              var err = lhRoot.querySelector('[data-lh-error]');
+              if (err) {
+                err.textContent =
+                  'Security check could not load. Refresh the page, or submit from the live site if this keeps happening.';
+                err.hidden = false;
+              }
+              return;
+            }
+            var form = w.closest('[data-audit-form]');
+            if (form) {
+              var box = form.querySelector('[data-form-error]');
+              if (box) {
+                box.textContent =
+                  'Security check could not load. Refresh the page, or submit from the live site if this keeps happening.';
+                box.removeAttribute('hidden');
+              }
+            }
+          });
+        };
+
+        function applyLoopbackTurnstileSiteKey() {
+          var h = location.hostname;
+          if (h !== 'localhost' && h !== '127.0.0.1') return;
+          document.querySelectorAll('.cf-turnstile').forEach(function (el) {
+            el.setAttribute('data-sitekey', TURNSTILE_TEST_SITEKEY);
+          });
+        }
+
+        var turnstileLoaded = false;
+        function loadTurnstileWhenNeeded() {
+          applyLoopbackTurnstileSiteKey();
+          if (turnstileLoaded) return;
+          if (!document.querySelector('.cf-turnstile, [data-lh-turnstile]')) return;
+          turnstileLoaded = true;
+          var script = document.createElement('script');
+          script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+          script.async = true;
+          script.defer = true;
+          script.setAttribute('data-astro-rerun', '');
+          document.body.appendChild(script);
+        }
+        document.addEventListener('DOMContentLoaded', loadTurnstileWhenNeeded, { once: true });
+        document.addEventListener('astro:page-load', loadTurnstileWhenNeeded);
+        if (document.readyState !== 'loading') {
+          loadTurnstileWhenNeeded();
+        }
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    z-index: 9999;
+    background: var(--accent-blue);
+    color: var(--text-white);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  .skip-link:focus {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 1rem 1.25rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    outline: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .announcement-bar {
+    background:
+      linear-gradient(135deg, rgba(18, 37, 72, 0.98) 0%, rgba(29, 78, 216, 0.98) 100%);
+    color: white;
+    padding: 0.7rem 1rem;
+    text-align: center;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    position: relative;
+    z-index: 101;
+  }
+
+  .announcement-bar--launch {
+    background:
+      linear-gradient(135deg, rgba(6, 78, 59, 0.96) 0%, rgba(16, 185, 129, 0.92) 50%, rgba(5, 150, 105, 0.96) 100%);
+  }
+
+  .announcement-bar--launch .announcement-badge {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .announcement-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  .announcement-badge {
+    background: rgba(255, 255, 255, 0.14);
+    padding: 0.22rem 0.68rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+  }
+
+  .announcement-link {
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-bottom: 1px;
+    transition: border-color 0.3s ease;
+  }
+
+  .announcement-link:hover {
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* ── Announcement Banner ── */
+  .site-banner {
+    background: linear-gradient(90deg, rgba(11, 18, 32, 0.98) 0%, rgba(15, 23, 42, 0.98) 50%, rgba(11, 18, 32, 0.98) 100%);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.14);
+    text-align: center;
+    position: relative;
+    z-index: 101;
+  }
+
+  .site-banner-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.82);
+    transition: color 0.25s ease;
+  }
+
+  .site-banner-link:hover {
+    color: #93c5fd;
+  }
+
+  .site-banner-link strong {
+    color: #60a5fa;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+  }
+
+  .site-banner-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.65);
+    animation: banner-pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes banner-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.92);
+    }
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    background:
+      linear-gradient(180deg, rgba(7, 13, 24, 0.94) 0%, rgba(10, 18, 32, 0.88) 100%);
+    backdrop-filter: blur(18px);
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 30px rgba(3, 7, 18, 0.22);
+  }
+
+  .header-container {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: 0.5rem var(--container-gutter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    transition: opacity 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .brand-lockup:hover {
+    opacity: 0.94;
+  }
+
+  .nav-icon {
+    width: 36px;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+    display: block;
+  }
+
+  .nav {
+    display: flex;
+    gap: 1.35rem;
+    align-items: center;
+  }
+
+  .nav a {
+    font-size: 0.77rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: rgba(255, 255, 255, 0.54);
+    transition: color 0.35s ease;
+    position: relative;
+  }
+
+  .nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--accent-blue);
+    transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav a:hover {
+    color: var(--text-white);
+  }
+
+  .nav a:hover::after {
+    width: 100%;
+  }
+
+  .nav-contact-link {
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    color: rgba(255, 255, 255, 0.92) !important;
+    background: linear-gradient(135deg, rgba(26, 70, 154, 0.3) 0%, rgba(17, 29, 53, 0.84) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-contact-link::after {
+    display: none;
+  }
+
+  .nav-contact-link:hover {
+    color: var(--text-white) !important;
+    border-color: rgba(147, 197, 253, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* Nav Book Call button — override link pseudo-element */
+  .nav-book-btn {
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .nav-book-btn::after {
+    display: none !important;
+  }
+
+  .breadcrumb-nav {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 0;
+  }
+
+  .breadcrumb-container {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: 0 var(--container-gutter);
+  }
+
+  .breadcrumbs {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    overflow: hidden;
+  }
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .breadcrumb-item:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .breadcrumb-item:last-child span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    opacity: 0.3;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 201;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text-white);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .hamburger.active .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 20, 0.97);
+    backdrop-filter: blur(20px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .mobile-nav-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .mobile-nav-links a {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: color 0.2s ease;
+    text-decoration: none;
+  }
+
+  .mobile-nav-links a:hover {
+    color: var(--text-white);
+  }
+
+  .mobile-nav-cta {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: var(--text-white) !important;
+    padding: 1rem 2.5rem;
+    border-radius: 999px;
+    font-size: 1rem !important;
+    letter-spacing: 0.06em !important;
+    box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45);
+  }
+
+  @media (max-width: 768px) {
+    .announcement-container {
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .header-container {
+      padding: 0.5rem var(--container-gutter);
+    }
+
+    .nav-icon {
+      width: 32px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .nav-desktop {
+      display: none;
+    }
+    .hamburger {
+      display: flex;
+    }
+
+    .breadcrumb-container {
+      padding: 0 var(--container-gutter);
+    }
+
+    .breadcrumbs {
+      font-size: 0.78rem;
+    }
+  }
+
+  /* ── Global Print Styles ── */
+  @media print {
+    /* Hide ALL site chrome */
+    .site-banner,
+    .header,
+    .mobile-nav-overlay,
+    .breadcrumb-nav,
+    .footer,
+    .reach-out-sticky,
+    #reading-progress-bar,
+    .hamburger,
+    .no-print {
+      display: none !important;
+    }
+
+    .reach-out-dialog {
+      display: none !important;
+    }
+
+    .layout-calendly-modal {
+      display: none !important;
+    }
+
+    body {
+      background: white !important;
+      color: black !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Reset layout constraints */
+    #main-content {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
+
+  /* ── Sticky “Get in touch” bar + modal ── */
+  body[data-reach-out-sticky='true'] {
+    padding-bottom: calc(4.35rem + env(safe-area-inset-bottom));
+  }
+
+  .reach-out-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 150;
+    display: flex;
+    justify-content: center;
+    padding: 0.65rem var(--container-gutter);
+    padding-bottom: calc(0.65rem + env(safe-area-inset-bottom));
+    pointer-events: none;
+    animation: reach-out-slide-up 0.45s ease-out forwards;
+  }
+
+  @keyframes reach-out-slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0.85;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reach-out-sticky {
+      animation: none;
+    }
+  }
+
+  .reach-out-sticky-btn {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 420px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.35rem;
+    border: 1px solid rgba(147, 197, 253, 0.72);
+    border-radius: 0.9rem 0.9rem 0 0;
+    background:
+      linear-gradient(135deg, rgba(96, 165, 250, 0.34), rgba(37, 99, 235, 1)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+    color: var(--text-white);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: var(--font-display, 'Outfit Variable', system-ui, sans-serif);
+    cursor: pointer;
+    box-shadow:
+      0 -6px 24px rgba(0, 0, 0, 0.35),
+      0 22px 40px -22px rgba(37, 99, 235, 0.85),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  .reach-out-sticky-btn:hover {
+    background:
+      linear-gradient(135deg, rgba(147, 197, 253, 0.38), rgba(29, 78, 216, 1)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    border-color: rgba(191, 219, 254, 0.82);
+  }
+
+  .reach-out-sticky-btn:active {
+    transform: scale(0.99);
+  }
+
+  .reach-out-sticky-btn:focus-visible {
+    outline: 3px solid rgba(147, 197, 253, 0.45);
+    outline-offset: 3px;
+  }
+
+  .reach-out-sticky-chevron {
+    flex-shrink: 0;
+    opacity: 0.95;
+  }
+
+  @media (min-width: 769px) {
+    .reach-out-sticky-btn {
+      border-radius: 999px;
+      max-width: 380px;
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.38),
+        0 22px 40px -22px rgba(37, 99, 235, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+  }
+
+  /* Pin to viewport center — avoids the default top-left flash some browsers show before layout. */
+  .reach-out-dialog {
+    padding: 0;
+    border: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    width: min(440px, 94vw);
+    max-width: min(440px, 94vw);
+    max-height: min(90dvh, 640px);
+    border-radius: 1rem;
+    background: transparent;
+    overflow: auto;
+    overscroll-behavior: contain;
+    color: inherit;
+    box-sizing: border-box;
+  }
+
+  .reach-out-dialog[open] {
+    animation: reach-out-dialog-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes reach-out-dialog-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 20px)) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes reach-out-dialog-in-fade {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reach-out-dialog[open] {
+      animation: reach-out-dialog-in-fade 0.2s ease both;
+    }
+  }
+
+  .reach-out-dialog::backdrop {
+    background: var(--splash-scrim);
+    backdrop-filter: blur(var(--splash-scrim-blur));
+    -webkit-backdrop-filter: blur(var(--splash-scrim-blur));
+  }
+
+  .reach-out-dialog-panel.splash-shell--reach-out {
+    color: var(--text-soft);
+  }
+
+  .reach-out-dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .reach-out-dialog-logo {
+    width: 40px;
+    height: auto;
+    display: block;
+  }
+
+  .reach-out-dialog-close.splash-close {
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .reach-out-dialog-close svg {
+    display: block;
+  }
+
+  .reach-out-dialog-title {
+    margin: 0 0 0.45rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-cream);
+    font-family: var(--font-heading, 'Outfit Variable', system-ui, sans-serif);
+  }
+
+  .reach-out-dialog-lede {
+    margin: 0 0 1.1rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text-gray);
+  }
+
+  .reach-out-dialog-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.95rem 1.1rem;
+    margin-bottom: 1.15rem;
+    border-radius: 999px;
+    border: 1px solid rgba(147, 197, 253, 0.72);
+    background:
+      linear-gradient(135deg, rgba(96, 165, 250, 0.34), rgba(37, 99, 235, 1)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+    color: var(--text-white) !important;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: var(--font-display, 'Outfit Variable', system-ui, sans-serif);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    box-shadow:
+      0 22px 40px -22px rgba(37, 99, 235, 1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .reach-out-dialog-primary:hover {
+    background:
+      linear-gradient(135deg, rgba(147, 197, 253, 0.38), rgba(29, 78, 216, 1)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    border-color: rgba(191, 219, 254, 0.82);
+    box-shadow:
+      0 20px 36px -22px rgba(37, 99, 235, 0.88),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .reach-out-dialog-primary:active {
+    transform: scale(0.99);
+  }
+
+  .reach-out-dialog-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 252, 245, 0.08);
+    background: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin: 0 -1.35rem -1.15rem;
+    padding: 1rem 1rem 1.1rem;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .reach-out-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.65rem;
+    text-decoration: none;
+    color: var(--text-soft);
+    text-align: center;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+    min-width: 0;
+  }
+
+  .reach-out-action:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .reach-out-action:active {
+    transform: scale(0.98);
+  }
+
+  .reach-out-action:focus-visible {
+    outline: 2px solid rgba(147, 197, 253, 0.45);
+    outline-offset: 2px;
+  }
+
+  .reach-out-action-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    /* Strong boundary for WCAG 1.4.11 non-text contrast (3:1 vs dialog action strip). */
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-blue);
+    box-shadow: 0 2px 14px rgba(37, 99, 235, 0.15);
+  }
+
+  .reach-out-action-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .reach-out-action-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .reach-out-action-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(147, 197, 253, 0.85);
+  }
+
+  .reach-out-action-detail {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-cream);
+    word-break: break-word;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 380px) {
+    .reach-out-action-detail {
+      font-size: 0.65rem;
+    }
+  }
+
+  button.reach-out-action {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  /* Global Calendly embed (same iframe URL as contact page modal) */
+  .layout-calendly-modal[hidden] {
+    display: none !important;
+  }
+
+  .layout-calendly-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: var(--splash-scrim);
+    backdrop-filter: blur(var(--splash-scrim-blur));
+    -webkit-backdrop-filter: blur(var(--splash-scrim-blur));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: layout-calendly-fade-in 0.25s ease;
+  }
+
+  @keyframes layout-calendly-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Calendly body: sizing + overscroll in theme.css (.splash-shell--calendly, .layout-calendly-modal__body) */
+
+</style>

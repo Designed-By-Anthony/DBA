@@ -1,0 +1,150 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Designed by Anthony Logo" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e5]
+      - button "Open navigation menu" [ref=e6] [cursor=pointer]
+  - navigation "Breadcrumb" [ref=e10]:
+    - list [ref=e12]:
+      - listitem [ref=e13]:
+        - link "Home" [ref=e14] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e15]:
+        - text: /
+        - generic [ref=e16]: Contact Us
+  - main [ref=e17]:
+    - generic [ref=e19]:
+      - paragraph [ref=e20]: Get in Touch
+      - heading "Let's talk about your project." [level=1] [ref=e21]
+      - paragraph [ref=e22]: Whether you need a new website, a rescue of your existing site, local SEO, or managed hosting — tell me about the project and I will get back to you within 24 hours.
+      - generic [ref=e23]:
+        - generic [ref=e24]: Reply within 24 hours
+        - generic [ref=e25]: Custom Web Design
+        - generic [ref=e26]: No pressure follow-up
+      - generic [ref=e27]:
+        - generic [ref=e28]: Looking for an instant site check?
+        - link "Run our free Lighthouse audit →" [ref=e29] [cursor=pointer]:
+          - /url: /free-seo-audit
+    - generic [ref=e31]:
+      - complementary [ref=e32]:
+        - generic [ref=e33]: Why Work With Us
+        - heading "Direct communication, founder-led builds, and no outsourcing." [level=2] [ref=e34]
+        - paragraph [ref=e35]: You talk directly to the person writing the code. No account managers, no offshore teams, no handoffs. Every project is handled in-house from first call to final launch.
+        - list [ref=e36]:
+          - listitem [ref=e37]: Custom-built sites that score 98+ on Google Lighthouse.
+          - listitem [ref=e38]: We built our own Lighthouse audit scanner in-house — the same engineering quality behind your site.
+          - listitem [ref=e39]: SEO structure included in every new build.
+        - generic [ref=e40]:
+          - generic [ref=e41]: How I respond
+          - paragraph [ref=e42]: You will hear back within 24 hours with a clear next step — not an automated sequence.
+        - generic [ref=e43]:
+          - generic [ref=e44]: What to include
+          - paragraph [ref=e45]: Share your website URL (if you have one) and what you are looking to accomplish so I can give you the most useful feedback.
+        - generic [ref=e46]:
+          - generic [ref=e47]: Best fit
+          - paragraph [ref=e48]: Service businesses that want a website that actually brings in calls instead of just sitting there.
+        - generic [ref=e49]:
+          - generic [ref=e50]: No commitment. No catch.
+          - list [ref=e51]:
+            - listitem [ref=e52]: No deposit required to start the conversation.
+            - listitem [ref=e53]: You will not be added to a mailing list.
+            - listitem [ref=e54]: If I am not the right fit, I will tell you that too.
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: Start a Conversation
+          - heading "Tell me about the project." [level=2] [ref=e58]
+          - paragraph [ref=e59]: Share what you are looking to build, fix, or improve. I will reply within 24 hours with the clearest next step.
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - generic [ref=e63]: First name
+              - textbox "First name" [ref=e64]
+            - generic [ref=e66]:
+              - generic [ref=e67]: Email
+              - textbox "Email" [ref=e68]
+            - generic [ref=e70]:
+              - generic [ref=e71]: Website URL (if you have one)
+              - textbox "Website URL (if you have one)" [ref=e72]:
+                - /placeholder: yourwebsite.com
+            - generic [ref=e74]:
+              - generic [ref=e75]:
+                - generic [ref=e76]: What are you looking to accomplish?
+                - generic [ref=e77]: Optional
+              - textbox "What are you looking to accomplish? Optional" [ref=e78]:
+                - /placeholder: New website, site rescue, local SEO, managed hosting, or something else...
+            - generic [ref=e80]:
+              - generic [ref=e81]:
+                - generic [ref=e82]: Phone
+                - generic [ref=e83]: Optional
+              - textbox "Phone Optional" [ref=e84]
+            - generic [ref=e86]:
+              - generic [ref=e87]: Company
+              - textbox [ref=e88]
+          - generic [ref=e89]:
+            - button "Send Message" [ref=e90] [cursor=pointer]
+            - paragraph [ref=e91]: No pressure. No spam. Direct reply within 24 hours from Anthony.
+  - contentinfo [ref=e92]:
+    - generic [ref=e93]:
+      - generic [ref=e94]:
+        - link "Designed by Anthony home":
+          - /url: /
+          - img "Designed by Anthony Logo"
+        - paragraph [ref=e95]: Custom websites and local SEO for service businesses that need to look more established online and turn more visits into real inquiries.
+        - generic [ref=e96]:
+          - link "Run the free audit" [ref=e97] [cursor=pointer]:
+            - /url: /free-seo-audit
+          - link "See example builds" [ref=e98] [cursor=pointer]:
+            - /url: /portfolio
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: Explore
+          - generic [ref=e102]:
+            - link "Services" [ref=e103] [cursor=pointer]:
+              - /url: /services
+            - link "Service Areas" [ref=e104] [cursor=pointer]:
+              - /url: /service-areas
+            - link "Portfolio" [ref=e105] [cursor=pointer]:
+              - /url: /portfolio
+            - link "Blog" [ref=e106] [cursor=pointer]:
+              - /url: /blog
+        - generic [ref=e107]:
+          - paragraph [ref=e108]: Reach Out
+          - generic [ref=e109]:
+            - link "Use the contact form" [ref=e110] [cursor=pointer]:
+              - /url: /contact
+            - link "Meet Anthony" [ref=e111] [cursor=pointer]:
+              - /url: /about
+            - generic [ref=e112]: Typical reply within 24 hours
+            - generic [ref=e113]: Serving the Mohawk Valley and beyond
+      - generic [ref=e114]:
+        - link "American Operator's Locally Owned and Operated Certification" [ref=e115] [cursor=pointer]:
+          - /url: https://locallyownedandoperated.org/
+          - img "American Operator's Locally Owned and Operated Certification" [ref=e116]
+        - paragraph [ref=e117]: Founder-led, locally owned, and built without outsourcing the work.
+      - generic [ref=e118]:
+        - paragraph [ref=e119]: Copyright 2026 Designed by Anthony. All rights reserved.
+        - generic [ref=e120]:
+          - link "Privacy Policy" [ref=e121] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e122] [cursor=pointer]:
+            - /url: /terms
+          - link "Cookie Policy" [ref=e123] [cursor=pointer]:
+            - /url: /cookie
+          - link "Image License" [ref=e124] [cursor=pointer]:
+            - /url: /image-license
+  - generic [ref=e127]:
+    - button "Menu" [ref=e128]:
+      - img [ref=e130]
+      - generic: Menu
+    - button "Inspect" [ref=e134]:
+      - img [ref=e136]
+      - generic: Inspect
+    - button "Audit" [ref=e138]:
+      - generic [ref=e139]:
+        - img [ref=e140]
+        - img [ref=e143]
+      - generic: Audit
+    - button "Settings" [ref=e146]:
+      - img [ref=e148]
+      - generic: Settings

@@ -1,0 +1,213 @@
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - link "Designed by Anthony home" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "Designed by Anthony Logo" [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - paragraph [ref=e9]: Private Facebook Offer
+        - heading "Give the business Facebook already found a website that feels calmer, sharper, and easier to trust." [level=1] [ref=e10]
+        - paragraph [ref=e11]: If most of your traffic still lands on social media or a dated site, the first impression stays rented and fragile. This invite-only offer replaces that with a custom website that feels more established, more credible, and easier for the right client to act on.
+        - generic [ref=e12]:
+          - link "Get My Private Review" [ref=e13] [cursor=pointer]:
+            - /url: "#claim-offer"
+          - link "See Example Builds" [ref=e14] [cursor=pointer]:
+            - /url: /portfolio
+        - paragraph [ref=e15]: About 60 seconds. No phone call required. If a smaller cleanup makes more sense than a rebuild, I will say so.
+        - generic [ref=e16]:
+          - generic [ref=e17]: Invite-only Facebook offer
+          - generic [ref=e18]: $500 custom website build
+          - generic [ref=e19]: 50% down to start, 50% at launch
+          - generic [ref=e20]: First 2 months of local SEO included
+        - generic [ref=e21]:
+          - article [ref=e22]:
+            - generic [ref=e23]: $500
+            - generic [ref=e24]: Invite-only build rate
+          - article [ref=e25]:
+            - generic [ref=e26]: 2 months
+            - generic [ref=e27]: Local SEO included
+          - article [ref=e28]:
+            - generic [ref=e29]: Direct
+            - generic [ref=e30]: Founder-led reply path
+        - generic [ref=e31]:
+          - generic [ref=e32]: What this offer covers
+          - heading "$500 flat-rate website build" [level=2] [ref=e33]
+          - paragraph [ref=e34]: Private Facebook Offer. Invite-only rate reserved for direct outreach. The build is custom, the presentation is cleaner, and the first two months of local SEO are included so the launch comes with structure rather than surface polish alone.
+          - list [ref=e35]:
+            - listitem [ref=e36]: Built to receive the mobile clicks that come from Facebook more gracefully.
+            - listitem [ref=e37]: Designed to feel more established, more trustworthy, and easier to contact.
+            - listitem [ref=e38]: Structured so the launch feels like a real upgrade, not just a prettier homepage.
+      - complementary [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: Private Offer
+          - generic [ref=e42]: Private review request
+        - heading "Get a private review of what customers see now." [level=2] [ref=e43]
+        - paragraph [ref=e44]: Send the Facebook page or website people are landing on now. Anthony reviews it personally and replies with the clearest next step, whether that is this build or a smaller cleanup.
+        - paragraph [ref=e45]: No website yet is fine. If Facebook is the main destination right now, just send that.
+        - generic [ref=e46]:
+          - generic [ref=e47]: Founder-led
+          - generic [ref=e48]: Reply in 24 hours
+          - generic [ref=e49]: No phone call required
+        - generic [ref=e50]:
+          - paragraph [ref=e51]: Why this stays easy
+          - paragraph [ref=e52]: This starts as a simple review, not a commitment. You are just sending the current link so you can get a direct opinion without being pulled into a long sales process.
+        - generic [ref=e55]: Reserved for direct outreach and a small number of build slots at a time
+        - generic [ref=e56]:
+          - generic [ref=e57]: What happens next
+          - list [ref=e58]:
+            - listitem [ref=e59]: You send the Facebook page or current site.
+            - listitem [ref=e60]: Anthony reviews it and reaches out within 24 hours.
+            - listitem [ref=e61]: You get a direct recommendation and decide from there.
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - generic [ref=e65]: First name
+              - textbox "First name" [ref=e66]
+            - generic [ref=e68]:
+              - generic [ref=e69]: Email
+              - textbox "Email" [ref=e70]
+            - generic [ref=e72]:
+              - generic [ref=e73]: Facebook page or website URL
+              - textbox "Facebook page or website URL" [ref=e74]:
+                - /placeholder: facebook.com/yourbusiness or yourwebsite.com
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - generic [ref=e78]: What do you want the new site to do better?
+                - generic [ref=e79]: Optional
+              - textbox "What do you want the new site to do better? Optional" [ref=e80]:
+                - /placeholder: Feel more established, look sharper, explain the offer more clearly...
+            - generic [ref=e82]:
+              - generic [ref=e83]: Company
+              - textbox [ref=e84]
+          - generic [ref=e85]:
+            - button "Get My Private Review" [ref=e86] [cursor=pointer]
+            - paragraph [ref=e87]: About 60 seconds. No phone call required. No spam. Anthony reaches out within 24 hours.
+        - generic [ref=e88]:
+          - generic [ref=e89]: Prefer email?
+          - paragraph [ref=e90]:
+            - text: Send the Facebook page or current site directly to
+            - link "anthony@designedbyanthony.com" [ref=e91] [cursor=pointer]:
+              - /url: mailto:anthony@designedbyanthony.com?subject=Private%20Facebook%20Offer%20Review
+            - text: and Anthony can review it there.
+  - generic [ref=e94]:
+    - generic [ref=e95]:
+      - paragraph [ref=e96]: How The Offer Is Structured
+      - heading "A cleaner package structure you can actually explain in one breath." [level=2] [ref=e97]
+      - paragraph [ref=e98]: The build is the one-time website project. The included SEO runway gets the launch moving. After that, monthly SEO is there if the business wants ongoing visibility work instead of letting the site sit still.
+    - generic [ref=e99]:
+      - article [ref=e100]:
+        - heading "Private website build" [level=3] [ref=e101]
+        - paragraph [ref=e102]: $500 flat rate on this private offer. 50% down to start, 50% at launch.
+      - article [ref=e103]:
+        - heading "Included SEO runway" [level=3] [ref=e104]
+        - paragraph [ref=e105]: The first 2 months of local SEO are included so the site launches with momentum instead of being left alone on day one.
+      - article [ref=e106]:
+        - heading "Monthly SEO after launch" [level=3] [ref=e107]
+        - paragraph [ref=e108]: $100 per month after the included runway. Hosting is included along with profile updates, review support, and one meaningful growth asset each month.
+      - article [ref=e109]:
+        - heading "Citation cleanup if needed" [level=3] [ref=e110]
+        - paragraph [ref=e111]: Directory and citation cleanup can be handled as a one-time standalone item when listings are inconsistent, then maintained lightly inside the monthly package.
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - paragraph [ref=e114]: What To Send
+        - heading "You do not need a full brief." [level=3] [ref=e115]
+        - list [ref=e116]:
+          - listitem [ref=e117]: The Facebook page or current site people are landing on now
+          - listitem [ref=e118]: One sentence on what feels weak or underwhelming
+          - listitem [ref=e119]: That is enough for Anthony to tell you whether this is the right move
+      - generic [ref=e120]:
+        - link "Get My Private Review" [ref=e121] [cursor=pointer]:
+          - /url: "#claim-offer"
+        - link "Email Anthony Directly" [ref=e122] [cursor=pointer]:
+          - /url: mailto:anthony@designedbyanthony.com?subject=Private%20Facebook%20Offer%20Review
+  - generic [ref=e124]:
+    - generic [ref=e125]:
+      - paragraph [ref=e126]: What You Get
+      - heading "A leaner offer with enough substance to materially improve how the business is perceived online." [level=2] [ref=e127]
+      - paragraph [ref=e128]: This is built for businesses that already have attention and need a better destination after the click, not a bloated package full of add-ons they will never use.
+    - generic [ref=e129]:
+      - article [ref=e130]:
+        - generic [ref=e131]: "01"
+        - heading "A custom site that feels more established" [level=3] [ref=e132]
+        - paragraph [ref=e133]: The goal is not another template. It is a more polished digital front door that reflects the quality of the business more convincingly.
+      - article [ref=e134]:
+        - generic [ref=e135]: "02"
+        - heading "A calmer technical foundation" [level=3] [ref=e136]
+        - paragraph [ref=e137]: No builder sprawl. No plugin maze. Just a leaner setup built for speed, clarity, and a smoother mobile experience.
+      - article [ref=e138]:
+        - generic [ref=e139]: "03"
+        - heading "A better destination after the click" [level=3] [ref=e140]
+        - paragraph [ref=e141]: Instead of sending people back into a feed, you give them a page built to frame the offer properly and make the next step feel easy.
+      - article [ref=e142]:
+        - generic [ref=e143]: "04"
+        - heading "Local SEO runway from the start" [level=3] [ref=e144]
+        - paragraph [ref=e145]: The first two months are included so the site launches with local structure, page targeting, and momentum instead of starting flat.
+  - generic [ref=e148]:
+    - generic [ref=e149]:
+      - paragraph [ref=e150]: How It Works
+      - heading "Simple process. Direct communication. A cleaner experience from the first touch." [level=2] [ref=e151]
+      - paragraph [ref=e152]: "The offer is meant to stay clear and selective: you send the current link, I review the gap, and I tell you directly whether this is the right next move."
+    - generic [ref=e153]:
+      - generic [ref=e154]:
+        - generic [ref=e155]: Best Fit
+        - heading "This offer makes the most sense when:" [level=3] [ref=e156]
+        - list [ref=e157]:
+          - listitem [ref=e158]: You are already getting attention on Facebook, but the destination after the click feels thin or underwhelming.
+          - listitem [ref=e159]: Your current site looks dated, loads slowly, or undersells the quality of the actual business.
+          - listitem [ref=e160]: You want a direct founder-level read, not a big agency package or a long handoff process.
+      - generic [ref=e161]:
+        - article [ref=e162]:
+          - generic [ref=e163]: "01"
+          - heading "Share the current destination" [level=3] [ref=e164]
+          - paragraph [ref=e165]: Send the website or Facebook page people are landing on now and a short note on what you want the next version to do better.
+        - article [ref=e166]:
+          - generic [ref=e167]: "02"
+          - heading "Get a cleaner read on the gap" [level=3] [ref=e168]
+          - paragraph [ref=e169]: I review the offer, the destination, and the current level of trust the site creates to see whether this is the right move.
+        - article [ref=e170]:
+          - generic [ref=e171]: "03"
+          - heading "Move into a sharper plan if it fits" [level=3] [ref=e172]
+          - paragraph [ref=e173]: If it makes sense, you get a direct reply with a cleaner plan and the next step instead of being dropped into a funnel.
+  - generic [ref=e175]:
+    - generic [ref=e176]:
+      - paragraph [ref=e177]: Proof
+      - heading "A more refined look at the technical difference between a heavier build and a cleaner custom system." [level=2] [ref=e178]
+      - paragraph [ref=e179]: Both examples shown here are mobile Lighthouse runs captured in Chrome private mode on the same MacBook setup.
+    - generic [ref=e180]:
+      - tablist "Audit proof examples" [ref=e181]:
+        - tab "Before" [selected] [ref=e182] [cursor=pointer]
+        - tab "After" [ref=e183] [cursor=pointer]
+      - tabpanel "Before" [ref=e184]:
+        - generic [ref=e185]:
+          - generic [ref=e186]: Typical baseline
+          - heading "More moving parts. Less confidence." [level=3] [ref=e187]
+          - paragraph [ref=e188]: "This is the kind of audit we often find in builder-heavy sites: slower loading, weaker accessibility, and more technical drag than most owners realize."
+        - img "Redacted sample Lighthouse audit showing lower scores before technical cleanup." [ref=e190]
+      - generic [ref=e191]:
+        - article [ref=e192]:
+          - paragraph [ref=e193]: Performance
+          - heading "73 100" [level=3] [ref=e194]:
+            - generic [ref=e195]: "73"
+            - generic [ref=e196]: to
+            - generic [ref=e197]: "100"
+        - article [ref=e198]:
+          - paragraph [ref=e199]: LCP
+          - heading "6.3s 1.3s" [level=3] [ref=e200]:
+            - generic [ref=e201]: 6.3s
+            - generic [ref=e202]: to
+            - generic [ref=e203]: 1.3s
+        - article [ref=e204]:
+          - paragraph [ref=e205]: Accessibility
+          - heading "75 100" [level=3] [ref=e206]:
+            - generic [ref=e207]: "75"
+            - generic [ref=e208]: to
+            - generic [ref=e209]: "100"
+  - generic [ref=e212]:
+    - paragraph [ref=e213]: Ready To Replace Rented Space?
+    - heading "If Facebook is creating the first touch, the destination should feel just as intentional." [level=2] [ref=e214]
+    - paragraph [ref=e215]: Claim the offer, send the current link, and I will tell you directly whether this is the right move for the business.
+    - generic [ref=e216]:
+      - link "Get My Private Review" [ref=e217] [cursor=pointer]:
+        - /url: "#claim-offer"
+      - link "See Example Builds" [ref=e218] [cursor=pointer]:
+        - /url: /portfolio

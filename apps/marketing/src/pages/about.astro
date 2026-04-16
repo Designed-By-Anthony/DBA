@@ -1,0 +1,454 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {
+  FOUNDING_PARTNER_BUILD_SLOTS,
+  FOUNDING_PARTNER_SEO_MONTHLY,
+  PUBLIC_SITE_SOCIAL_IMAGE,
+} from '../lib/offers';
+import { PERSON_ID, toAbsoluteUrl, type SchemaValue } from '../lib/seo';
+
+const aboutImage = '/images/about_cover.png';
+
+const aboutSchema: SchemaValue = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  '@id': `${toAbsoluteUrl('/about')}#about`,
+  url: toAbsoluteUrl('/about'),
+  name: 'About | Designed by Anthony',
+  description:
+    'Anthony is a Marine Corps veteran and technical sales professional who builds custom websites for service businesses that need to win more customers online.',
+  mainEntity: {
+    '@id': PERSON_ID,
+  },
+};
+
+const aboutFooterCta = {
+  eyebrow: "Let's Talk",
+  title: 'Get a clear baseline before you commit to anything.',
+  description:
+    'Run the free audit first, then book a short intro call if you want a direct recommendation on what to fix next.',
+  primaryHref: '/free-seo-audit',
+  primaryLabel: 'Run the Free Audit',
+  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+  secondaryLabel: 'Book a 15-minute intro call',
+};
+---
+
+<Layout
+  title="About Anthony — Web Design & Development | Designed by Anthony"
+  description="Work directly with Anthony, a Marine Corps veteran building custom websites and web development solutions for service businesses — no templates, no outsourcing."
+  image={aboutImage}
+  socialImage={PUBLIC_SITE_SOCIAL_IMAGE}
+  ogType="website"
+  pageType="AboutPage"
+  schema={aboutSchema}
+  breadcrumbLabel="About"
+  footerCta={aboutFooterCta}
+>
+  <!-- Hero -->
+  <section class="page-hero about-hero">
+    <div class="page-hero-inner">
+      <div class="about-hero-grid">
+        <div class="about-hero-copy">
+          <p class="page-eyebrow">About Designed by Anthony</p>
+          <h1>Built with discipline.<br />Designed for real business growth.</h1>
+          <p class="lead-copy">
+            I'm Anthony, a Marine Corps veteran and former technical sales professional who now
+            builds custom websites for service businesses. I know what the buyer on the other side of
+            the screen is looking for, because I spent years being that person.
+          </p>
+          <div class="hero-actions">
+            <a href="/contact" class="btn btn-primary">
+              See If Your Site Needs a Rebuild
+            </a>
+            <a href="/blog" class="btn btn-outline">Read the blog</a>
+          </div>
+        </div>
+        <div class="about-hero-image">
+          <div class="about-image-frame">
+            <img
+              src={aboutImage}
+              alt="Anthony Jones, Web Designer and Marine Corps veteran"
+              width="560"
+              height="680"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell section-shell--wash">
+    <div class="section-container">
+      <div class="about-studio-promise surface-card reveal-up">
+        <p class="page-eyebrow">Studio promise</p>
+        <h2 class="about-studio-promise__title">Direct to the builder. Modern web development stack. No agency bloat.</h2>
+        <p class="about-studio-promise__lead">
+          You work with one senior builder end to end. Sites ship on a lean, performance-first stack
+          (static-first Astro, structured data, Core Web Vitals discipline) so you get speed, clear
+          search visibility, and pricing that reflects real scope.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values / Background -->
+  <section class="section-shell">
+    <div class="section-container about-content">
+
+      <!-- The Marine Standard -->
+      <div class="about-block surface-card reveal-up">
+        <div class="about-block-icon">Discipline</div>
+        <div class="about-block-copy">
+          <h2>The Marine Corps taught me what high standards actually look like</h2>
+          <p>
+            In the Marine Corps, "good enough" doesn't exist. You ship clean, you execute with
+            precision, and you don't hand something off until it's right. I carry that into every
+            website I build. If something isn't working the way it should, I don't move on. I fix it.
+          </p>
+          <p>
+            That is not a value I market. It is the only way I know how to operate. Some clients
+            notice it immediately. Others notice it six months later when their site is still fast,
+            still ranking, and still converting while their competitor's site has already started
+            falling apart.
+          </p>
+        </div>
+      </div>
+
+      <!-- Technical Sales Background -->
+      <div class="about-block surface-card reveal-up">
+        <div class="about-block-icon">Buyer Lens</div>
+        <div class="about-block-copy">
+          <h2>I know how buyers make decisions because I was one</h2>
+          <p>
+            Before web design, I spent years in technical sales. My job was to understand what
+            decision-makers actually cared about, cut through the noise, and make the case clearly
+            and quickly. I learned that buyers don't read brochures. They scan for trust signals.
+            They look for proof. They need a reason to believe you in the first five seconds.
+          </p>
+          <p>
+            That knowledge is baked into every site I build. The copy, the layout, and the calls to
+            action are all structured around how a real potential customer moves through a
+            page and decides whether to call or click away.
+          </p>
+        </div>
+      </div>
+
+      <!-- Why I work with service businesses -->
+      <div class="about-block surface-card reveal-up">
+        <div class="about-block-icon">Service Fit</div>
+        <div class="about-block-copy">
+          <h2>Why I focus on service businesses</h2>
+          <p>
+            Contractors, plumbers, roofers, landscapers, and cleaners are businesses built on
+            real skills and hard work. Most of them are losing jobs every week to competitors with
+            worse service but a better website. That shouldn't happen.
+          </p>
+          <p>
+            A great website doesn't mean paying $10,000 for a bloated WordPress site that needs
+            constant updates and still loads slow on a phone. It means a fast, focused site that
+            shows up on Google, loads instantly, and makes it easy for a homeowner to call you.
+            That's what I build.
+          </p>
+        </div>
+      </div>
+
+      <!-- No outsourcing -->
+      <div class="about-block surface-card reveal-up">
+        <div class="about-block-icon">Direct Work</div>
+        <div class="about-block-copy">
+          <h2>No outsourcing. No templates. No surprises.</h2>
+          <p>
+            When you work with me, you work with me. I write the code, I do the design, I handle
+            the SEO setup, and I talk to you directly when something needs to change. There's no
+            account manager who passes messages between us, no overseas team you've never spoken to,
+            and no surprises after you've paid the deposit.
+          </p>
+          <p>
+            You see the site before it goes live. You sign off before a dollar is paid on delivery.
+            And you will not hear fluff like "synergistic digital ecosystems," just a straight answer
+            about what your site needs.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Stats band -->
+  <section class="section-shell about-stats-section">
+    <div class="section-container">
+      <div class="proof-band reveal-up">
+        <div class="proof-grid about-proof-grid">
+          <div class="proof-item">
+            <span class="proof-value">98+</span>
+            <span class="proof-label">Lighthouse scores across Performance, SEO, Accessibility, and Best Practices</span>
+          </div>
+          <div class="proof-item">
+            <span class="proof-value">&lt;1s</span>
+            <span class="proof-label">Typical page load time on custom-built sites</span>
+          </div>
+          <div class="proof-item">
+            <span class="proof-value">{FOUNDING_PARTNER_BUILD_SLOTS}</span>
+            <span class="proof-label">Free founder builds at launch — custom site + {FOUNDING_PARTNER_SEO_MONTHLY}/mo growth included</span>
+          </div>
+          <div class="proof-item">
+            <span class="proof-value">24hr</span>
+            <span class="proof-label">Audit turnaround, free, direct, and no sales call required</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What Working With Me Looks Like -->
+  <section class="section-shell">
+    <div class="section-container">
+      <div class="section-header centered about-process-header">
+        <p class="section-eyebrow">The Process</p>
+        <h2>What it looks like to work with me.</h2>
+      </div>
+      <div class="about-process-grid">
+        <div class="surface-card about-process-card reveal-up">
+          <span class="process-number">01</span>
+          <h3>Free audit before any money is discussed</h3>
+          <p>You send your URL, I run the audit, and you get a straight report within 24 hours. No deposit, no commitment.</p>
+        </div>
+        <div class="surface-card about-process-card reveal-up">
+          <span class="process-number">02</span>
+          <h3>Projects quoted based on what the audit finds</h3>
+          <p>The quote reflects the actual scope — not a generic price list. You know exactly what you are paying for before anything starts.</p>
+        </div>
+        <div class="surface-card about-process-card reveal-up">
+          <span class="process-number">03</span>
+          <h3>50% down to start, 50% at launch after approval</h3>
+          <p>Simple payment structure. No surprise charges. The second half is not due until you sign off on the final site.</p>
+        </div>
+        <div class="surface-card about-process-card reveal-up">
+          <span class="process-number">04</span>
+          <h3>You see the site before it goes live</h3>
+          <p>Most projects wrap in a few weeks. You get a full preview, request changes, and nothing launches until you say it is ready.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .about-hero {
+    padding-bottom: 5rem;
+  }
+
+  .about-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 420px);
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .about-hero-copy h1 {
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1.04;
+    margin-bottom: 1.2rem;
+    color: var(--text-white);
+  }
+
+  .about-hero-image {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .about-image-frame {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    box-shadow:
+      0 32px 80px -24px rgba(15, 23, 42, 0.95),
+      0 0 0 1px rgba(255,255,255,0.04);
+    background: var(--surface-1);
+  }
+
+  .about-image-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .about-block {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    padding: 2rem 2rem 2rem 1.75rem;
+  }
+
+  .about-block-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.1rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    color: #bfdbfe;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .about-block-copy h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .about-block-copy p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 0.85rem;
+  }
+
+  .about-block-copy p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-stats-section {
+    padding-top: 0;
+  }
+
+  .about-proof-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .about-proof-grid .proof-label {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .about-process-header {
+    max-width: 860px;
+  }
+
+  .about-process-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .about-process-card {
+    padding: 1.8rem;
+  }
+
+  .about-process-card .process-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.26);
+    color: #bfdbfe;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .about-process-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.18rem;
+    letter-spacing: -0.025em;
+    line-height: 1.22;
+    margin-bottom: 0.65rem;
+  }
+
+  .about-process-card p {
+    color: var(--text-gray);
+  }
+
+  .about-studio-promise {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(1.85rem, 3.5vw, 2.35rem);
+    text-align: center;
+  }
+
+  .about-studio-promise .page-eyebrow {
+    margin-bottom: 0.65rem;
+  }
+
+  .about-studio-promise__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 3.2vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--text-cream);
+  }
+
+  .about-studio-promise__lead {
+    margin: 0 auto;
+    color: var(--text-gray);
+    font-size: clamp(1rem, 1.5vw, 1.08rem);
+    line-height: 1.75;
+    max-width: 62ch;
+  }
+
+  @media (max-width: 860px) {
+    .about-hero-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-hero-image {
+      justify-content: center;
+      order: -1;
+    }
+
+    .about-image-frame {
+      max-width: 320px;
+    }
+
+    .about-proof-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .about-block {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .about-proof-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

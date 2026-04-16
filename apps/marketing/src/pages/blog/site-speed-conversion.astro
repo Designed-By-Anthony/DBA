@@ -1,0 +1,252 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogBackButton from '../../components/BlogBackButton.astro';
+import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
+import SourceList from '../../components/SourceList.astro';
+import { evidenceLinks } from '../../data/evidence';
+import { buildBlogPostingSchema } from '../../lib/seo';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+
+const speedSources = [
+  {
+    ...evidenceLinks.googlePageExperience,
+    note: 'Google says Core Web Vitals are used by its ranking systems and are part of page experience.',
+  },
+  {
+    ...evidenceLinks.astroPrerender,
+    note: 'Astro prerenders static HTML by default for routes that do not need server logic.',
+  },
+  {
+    ...evidenceLinks.wixThirdPartyCode,
+    note: 'Wix documents that third-party code can affect loading time and performance.',
+  },
+  {
+    ...evidenceLinks.dudaCoreWebVitals,
+    note: 'Duda notes that some default platform code cannot be removed.',
+  },
+];
+
+const articleImage =
+  '/images/speed_conversion_cover.png';
+const publishedTime = '2026-03-15T09:00:00-04:00';
+const articleSchema = buildBlogPostingSchema({
+  headline: 'Why Site Speed Still Affects Conversion — From Central NY to Houston',
+  description:
+    'A practical look at why page speed still costs service businesses real money — with examples from Houston, Miami, and Central New York.',
+  path: '/blog/site-speed-conversion',
+  image: articleImage,
+  datePublished: publishedTime,
+  articleSection: 'Performance',
+  keywords: ['Site speed', 'Core Web Vitals', 'Conversion', 'Houston web design', 'Miami web design', 'Central NY web design'],
+});
+---
+<Layout
+  title="Why Site Speed Still Costs Leads | Designed by Anthony"
+  description="A practical look at why page speed still costs service businesses real money — with examples from Houston, Miami, and Central New York."
+  image={articleImage}
+  ogType="article"
+  publishedTime={publishedTime}
+  modifiedTime={publishedTime}
+  articleSection="Performance"
+  articleTags={['Site speed', 'Core Web Vitals', 'Conversion', 'Houston', 'Miami', 'Central NY']}
+  schema={articleSchema}
+  bodyClass="has-progress-bar"
+>
+  <article class="blog-post">
+    <BlogBackButton />
+    <div class="post-header">
+      <div class="meta">
+        <span>March 15, 2026</span> | <span>10 min read</span>
+      </div>
+      <h1>Why Site Speed Still Affects Conversion — From Central NY to Houston</h1>
+    </div>
+    
+    <div class="post-image">
+      <img src={articleImage} alt="Speedometer gauge hitting green zone fused with website conversion funnel showing performance impact on leads" width="1024" height="1024" loading="eager" decoding="async" fetchpriority="high" />
+    </div>
+
+    <div class="post-content">
+      <p>Site speed is not a vanity metric. When a page feels slow, visitors trust it less, explore less, and leave faster. Google's own documentation also makes clear that Core Web Vitals and mobile usability are part of the broader page experience it wants site owners to improve. For service businesses competing in local markets, the gap between a two-second load and a five-second load is not a technical footnote — it is the difference between capturing a lead and losing one to the competitor who loads first.</p>
+      
+      <h2>What Google Actually Looks At</h2>
+      <p>Google recommends that site owners focus on good Core Web Vitals, mobile usability, and overall page experience rather than obsessing over one vanity number. For a local business, that usually translates into stable layouts, fast visible content, and pages that feel easy to use from the first tap.</p>
+
+      <h3>The Three Core Web Vitals That Drive Rankings</h3>
+      <p>The three Core Web Vitals that matter most are Largest Contentful Paint (LCP), which measures how quickly the main content loads; Interaction to Next Paint (INP), which measures how responsive your page is to user input; and Cumulative Layout Shift (CLS), which measures visual stability. Each of these signals feeds directly into Google's ranking algorithms as part of its page experience evaluation. When a local plumber's site hits green on all three metrics while a competitor's site flags red, that technical advantage compounds over time into a meaningful ranking gap.</p>
+
+      <h4>LCP: The Metric That Matters Most for First Impressions</h4>
+      <p>Largest Contentful Paint measures when the largest visible element — typically a hero image, headline, or featured section — finishes rendering. Google's target is under 2.5 seconds. For service business sites, this is almost always the hero area with a headline and call-to-action. Static-first frameworks like Astro deliver this content as pre-built HTML from a CDN, achieving LCP times under one second. Page builders that rely on client-side rendering often cannot hit the 2.5-second threshold without significant compromise.</p>
+
+      <h5>Optimizing LCP Through Image Strategy and Preloading</h5>
+      <p>The most effective LCP optimization combines three techniques: serving hero images in next-generation formats (WebP or AVIF) at responsive breakpoints, adding <code>fetchpriority="high"</code> to the LCP image element, and using <code>&lt;link rel="preload"&gt;</code> tags to tell the browser about critical resources before it discovers them in the HTML. These optimizations alone can shave 500ms to 1.5 seconds off LCP on mobile devices.</p>
+
+      <h2>The Bounce Rate Economics Nobody Talks About</h2>
+      <p>Most business owners think of bounce rate as an abstract percentage. But behind every bounce is a real dollar amount. Consider a roofing contractor spending $40 per click on Google Ads. If their site takes four seconds to load and 53% of mobile visitors leave before the page finishes rendering, nearly half of that ad spend is going to waste before a single visitor reads a headline. Over a $3,000 monthly ad budget, that represents roughly $1,590 in wasted clicks — money that produces zero phone calls, zero estimate requests, and zero revenue.</p>
+      <p>The fix is not more ad budget. The fix is a faster page. Reducing load time from four seconds to under two seconds can cut mobile bounce rates dramatically, turning the same ad spend into meaningfully more leads without increasing the marketing budget by a single dollar.</p>
+
+      <h2>Why Platform Choice Matters</h2>
+      <p>Platform choice shapes how much control you have over the final page. Astro lets us keep most marketing pages as static HTML and only add JavaScript where it helps the user. Wix documents that third-party code can affect site performance, and Duda notes that some platform code cannot be removed. That does not make those platforms wrong for every project, but it does mean we have less control over the final payload.</p>
+      <p>The performance ceiling of a platform matters more than most business owners realize. A builder that forces 800KB of JavaScript onto every page regardless of content creates a floor below which your performance cannot improve, no matter how much you optimize images or reduce text. Custom-built sites on frameworks like Astro start with near-zero overhead and only add weight when a specific feature demands it. This architectural difference is why hand-built marketing sites consistently outperform builder-based competitors on Core Web Vitals — and why that performance gap translates directly into ranking advantages.</p>
+
+      <h2>How We Apply That in Client Builds</h2>
+      <p>We keep pages lean, minimize third-party scripts, compress media, and only add interactivity where it improves the experience. The goal is not chasing an ultra-high Lighthouse score for bragging rights. The goal is a site that feels immediate when someone visits from search results, an ad, or a referral.</p>
+
+      <h3>Our Performance Build Checklist</h3>
+      <p>In practice, our build checklist includes serving images in next-generation formats like WebP or AVIF at responsive breakpoints, deferring non-critical scripts until after the initial render, implementing proper resource hints like preconnect and prefetch for third-party origins, and eliminating render-blocking CSS through critical inline styles paired with deferred stylesheet loading. Each of these optimizations shaves milliseconds off the load time — and collectively they can reduce perceived load time by fifty percent or more.</p>
+
+      <h4>Critical Rendering Path Optimization</h4>
+      <p>The critical rendering path is the sequence of steps the browser takes between receiving the first byte of HTML and rendering the first pixel on screen. Every render-blocking resource — external stylesheets, synchronous scripts, unoptimized font loads — extends this path and delays the moment your visitor sees content. We inline critical above-the-fold CSS directly into the HTML, defer all non-essential stylesheets, and load fonts with <code>font-display: swap</code> to ensure text is visible immediately even before custom fonts finish downloading.</p>
+
+      <h5>Resource Hints: Preconnect, Prefetch, and Preload</h5>
+      <p>Resource hints tell the browser about resources it will need before it discovers them through normal parsing. We use <code>preconnect</code> for third-party origins like Google Fonts and analytics endpoints, <code>preload</code> for critical above-the-fold images and fonts, and <code>prefetch</code> for resources needed on the next likely page interaction. This proactive approach eliminates the connection setup latency that adds hundreds of milliseconds to each third-party resource load.</p>
+
+      <h2>Mobile Speed: Where the Stakes Are Highest</h2>
+      <p>Google's mobile-first indexing means the mobile version of your site is the version that gets indexed and ranked. For local service businesses, this is especially critical because the vast majority of "near me" searches originate from smartphones. A potential customer searching for an emergency plumber at 10 PM is not browsing on a desktop — they are tapping your site on a phone with an inconsistent cellular connection.</p>
+      <p>Mobile networks introduce latency, bandwidth constraints, and connection variability that desktops rarely face. A page that loads acceptably on a fiber connection in your office may take three to four times longer on a mobile device over LTE. The only way to guarantee fast mobile performance is to build for mobile constraints from the ground up — not to start with a desktop design and hope the responsive breakpoints handle the rest.</p>
+
+      <h2>The Real Cost of a Slow Page</h2>
+      <p>When a potential customer lands on a slow-loading page, the damage goes beyond a single bounce. That visitor is unlikely to return later, meaning the cost of the ad click or organic ranking that brought them there is entirely wasted. For service businesses running local campaigns, every lost visit is a lost estimate request. Over the course of a quarter, even a one-second delay in load time can compound into dozens of missed leads and thousands of dollars in unrealized revenue.</p>
+      <p>There is also a compounding reputational effect. Visitors who encounter a slow site often infer that the business behind it is outdated, underfunded, or inattentive. That split-second judgment happens before they read a testimonial, scan a portfolio, or see a price. First impressions on the web are formed in milliseconds, and speed is the first signal that reaches the user's brain.</p>
+
+      <h2>Speed as a Trust Signal</h2>
+      <p>Speed is not just a technical metric — it is a psychological signal. A site that loads instantly communicates professionalism, investment, and attention to detail. Visitors unconsciously associate page speed with the quality of service they can expect. Contractors and service providers who invest in high-performance web architecture are telling potential clients that they take their business seriously before a single word of copy is ever read.</p>
+      <p>This psychological effect is amplified in high-stakes service contexts. When a homeowner is comparing three roofing contractors after a storm, the one whose site loads instantly and presents a clean, professional interface earns a trust advantage that no amount of clever copywriting on a slow page can overcome. Speed is the foundation on which all other conversion signals are built.</p>
+
+      <h2>Competitive Advantage Through Speed</h2>
+      <p>In most local markets, the majority of service business websites are built on templates or page builders that ship heavy, unoptimized code. This means that a hand-built, performance-first site does not just meet expectations — it dramatically exceeds them relative to the competition. When every competitor in your market loads in three to five seconds and your site loads in under one second, the experience gap is visceral and immediate.</p>
+      <p>That speed advantage translates into tangible business outcomes: lower bounce rates, higher time-on-page, more form submissions, and better organic rankings. Over a twelve-month horizon, the cumulative effect of consistent sub-second load times can represent a significant competitive moat that builder-based competitors cannot replicate without fundamentally changing their technology stack.</p>
+      
+      <p>In practice, site speed is less about hype and more about trust. Fast pages make the business feel sharper, clearer, and easier to contact.</p>
+
+      <h3>How This Plays Out in Houston, Miami, and Other Growing Markets</h3>
+      <p>The speed penalty is amplified in large, competitive metros. A plumber in <a href="/service-areas/houston">Houston</a> running Google Ads across The Woodlands, Katy, and Sugar Land is paying $35 to $50 per click. If their Wix site takes 4.2 seconds to load on mobile and half of visitors bounce before the page renders, that is $1,500 per month evaporating before anyone reads a headline. The same dynamic plays out in <a href="/service-areas/miami">Miami-Dade</a>, where mobile search dominates and cellular connections in transit are inconsistent. Service businesses in <a href="/service-areas/columbus">Columbus OH</a> face the same math — the suburbs of Dublin, Westerville, and Grove City all generate high-intent mobile searches that punish slow sites the hardest.</p>
+      <p>Even in smaller markets like <a href="/service-areas/utica">Utica</a> and the <a href="/service-areas/north-country">North Country</a>, the gap between a two-second site and a five-second site determines who gets the call. The businesses that invest in speed are not just earning better Google scores — they are winning the split-second trust decision that happens before a visitor reads a single word.</p>
+
+      <SourceList
+        title="Sources"
+        intro="These are the docs behind the performance points in this article."
+        items={speedSources}
+      />
+    </div>
+
+    <BlogBridgeLinks />
+
+    <RelatedPosts
+      posts={[
+        {
+          title: 'Mobile-First Indexing and Fast Sites',
+          href: '/blog/mobile-first-seo',
+          description: 'Google indexes your mobile site first. If it loads slow, your rankings suffer.',
+          image: '/images/mobile_first_seo_cover.png',
+          imageAlt: 'Smartphone with responsive website',
+          tag: 'SEO',
+        },
+        {
+          title: '5 Things Wrong With Most Contractor Websites',
+          href: '/blog/contractor-website-mistakes',
+          description: 'The most common website mistakes that cost contractors leads.',
+          image: '/images/contractor_mistakes_cover.png',
+          imageAlt: 'Contractor at a laptop on a job site',
+          tag: 'Web Design',
+        },
+        {
+          title: 'Astro vs Wix for SEO Speed and Small Business Websites',
+          href: '/blog/astro-vs-wix',
+          description: 'Your platform choice affects speed, SEO, and cost long-term.',
+          image: '/images/astro_rocket_cover.png',
+          imageAlt: 'Developer coding at night',
+          tag: 'Tech Stack',
+        },
+      ]}
+    />
+  </article>
+</Layout>
+
+<style>
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .post-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .meta {
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .post-header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .post-image {
+    width: 100%;
+    margin-bottom: 4rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .post-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .post-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-content h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .post-content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-top: 1.75rem;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .post-content p {
+    font-size: 1.25rem;
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 2.5rem;
+    }
+  }
+</style>

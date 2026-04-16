@@ -1,0 +1,139 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: LIMITED
+    - paragraph [ref=e5]:
+      - text: Only
+      - strong [ref=e6]: 3 Build Slots Left
+      - text: for This Quarter —
+      - link "Reserve Yours Before They're Gone →" [ref=e7] [cursor=pointer]:
+        - /url: "#contact"
+  - banner [ref=e8]:
+    - generic [ref=e9]:
+      - link "Designed by Anthony Logo" [ref=e10] [cursor=pointer]:
+        - /url: /
+        - img "Designed by Anthony Logo" [ref=e11]
+      - navigation [ref=e12]:
+        - link "Our Edge" [ref=e13] [cursor=pointer]:
+          - /url: /ouredge
+        - link "Services" [ref=e14] [cursor=pointer]:
+          - /url: /services
+        - link "Service Areas" [ref=e15] [cursor=pointer]:
+          - /url: /service-areas
+        - link "Portfolio" [ref=e16] [cursor=pointer]:
+          - /url: /portfolio
+        - link "FAQ" [ref=e17] [cursor=pointer]:
+          - /url: /faq
+        - link "Blog" [ref=e18] [cursor=pointer]:
+          - /url: /blog
+        - link "Contact" [ref=e19] [cursor=pointer]:
+          - /url: /contact
+  - navigation "Breadcrumb" [ref=e20]:
+    - list [ref=e22]:
+      - listitem [ref=e23]:
+        - link "Home" [ref=e24] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e25]: / Web Design, SEO & Hosting Services
+  - main [ref=e26]:
+    - generic [ref=e28]:
+      - paragraph [ref=e29]: Our Services
+      - heading "Precision-Built Digital Infrastructure For Businesses That Compete." [level=1] [ref=e30]:
+        - text: Precision-Built Digital
+        - text: Infrastructure For
+        - text: Businesses That Compete.
+      - paragraph [ref=e31]: Every engagement is a custom build. No templates, no shortcuts, no excuses.
+    - region "Our Process" [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]: "01"
+          - generic [ref=e36]: Strategy
+        - generic [ref=e37]: →
+        - generic [ref=e38]:
+          - generic [ref=e39]: "02"
+          - generic [ref=e40]: Architecture
+        - generic [ref=e41]: →
+        - generic [ref=e42]:
+          - generic [ref=e43]: "03"
+          - generic [ref=e44]: Design
+        - generic [ref=e45]: →
+        - generic [ref=e46]:
+          - generic [ref=e47]: "04"
+          - generic [ref=e48]: Deploy
+    - generic [ref=e50]:
+      - link "01 Custom Web Design Bespoke Astro websites built around how your customers search, decide, and convert. Every element has a purpose. Nothing added without a reason. Explore Service →" [ref=e51] [cursor=pointer]:
+        - /url: /services/custom-web-design
+        - generic [ref=e53]: "01"
+        - heading "Custom Web Design" [level=2] [ref=e54]
+        - paragraph [ref=e55]: Bespoke Astro websites built around how your customers search, decide, and convert. Every element has a purpose. Nothing added without a reason.
+        - generic [ref=e56]: Explore Service →
+      - link "02 Website Rescue & Optimization A slow, outdated site isn't just ugly — it's costing you leads every single day. We pull legacy builds off failing infrastructure and rebuild them on modern, performance-first architecture. Explore Service →" [ref=e57] [cursor=pointer]:
+        - /url: /services/website-rescue
+        - generic [ref=e59]: "02"
+        - heading "Website Rescue & Optimization" [level=2] [ref=e60]
+        - paragraph [ref=e61]: A slow, outdated site isn't just ugly — it's costing you leads every single day. We pull legacy builds off failing infrastructure and rebuild them on modern, performance-first architecture.
+        - generic [ref=e62]: Explore Service →
+      - link "03 Managed Hosting & VIP Support Enterprise-grade hosting on Google's global edge network with 24-hour emergency response for managed clients. Your site never becomes a liability. Explore Service →" [ref=e63] [cursor=pointer]:
+        - /url: /services/managed-hosting
+        - generic [ref=e65]: "03"
+        - heading "Managed Hosting & VIP Support" [level=2] [ref=e66]
+        - paragraph [ref=e67]: Enterprise-grade hosting on Google's global edge network with 24-hour emergency response for managed clients. Your site never becomes a liability.
+        - generic [ref=e68]: Explore Service →
+      - link "04 Local SEO & Search Visibility Full technical and on-page SEO infrastructure — schema markup, breadcrumbs, sitemap architecture, and keyword targeting — designed to dominate your local search results. Explore Service →" [ref=e69] [cursor=pointer]:
+        - /url: /services/local-seo
+        - generic [ref=e71]: "04"
+        - heading "Local SEO & Search Visibility" [level=2] [ref=e72]
+        - paragraph [ref=e73]: Full technical and on-page SEO infrastructure — schema markup, breadcrumbs, sitemap architecture, and keyword targeting — designed to dominate your local search results.
+        - generic [ref=e74]: Explore Service →
+    - generic [ref=e76]:
+      - paragraph [ref=e77]: The Next Step
+      - heading "Stop Losing Ground to Competitors With Inferior Sites." [level=2] [ref=e78]:
+        - text: Stop Losing Ground to
+        - text: Competitors With Inferior Sites.
+      - link "Reserve Your Build Slot" [ref=e79] [cursor=pointer]:
+        - /url: "#"
+  - contentinfo [ref=e80]:
+    - generic [ref=e81]:
+      - generic [ref=e82]:
+        - paragraph [ref=e83]: © 2026 Designed by Anthony. All rights reserved.
+        - paragraph [ref=e84]: Serving the Mohawk Valley and Beyond
+        - generic [ref=e85]:
+          - link "Privacy Policy" [ref=e86] [cursor=pointer]:
+            - /url: /privacy
+          - generic [ref=e87]: "|"
+          - link "Terms of Service" [ref=e88] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e89]: "|"
+          - link "Cookie Policy" [ref=e90] [cursor=pointer]:
+            - /url: /cookie
+      - paragraph [ref=e92]:
+        - text: "Contact:"
+        - link "info@designedbyanthony.com" [ref=e93] [cursor=pointer]:
+          - /url: mailto:info@designedbyanthony.com
+  - button "Talk Strategy Talk through scope, timing, and fit" [ref=e94] [cursor=pointer]:
+    - generic [ref=e95]: Talk Strategy
+    - generic [ref=e96]: Talk through scope, timing, and fit
+  - complementary [ref=e97]:
+    - generic [ref=e98]:
+      - button [ref=e99] [cursor=pointer]: ×
+      - generic [ref=e100]: Free Strategy Call
+      - heading [level=2] [ref=e101]: Find the Right Service Mix for Your Site.
+      - paragraph [ref=e102]: Tell us which service mix you are considering and we will recommend the smartest starting point for your business and budget.
+      - generic [ref=e105]: Response within 24 hours
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - img [ref=e108]
+          - generic [ref=e110]: Right-fit service recommendation
+        - generic [ref=e111]:
+          - img [ref=e112]
+          - generic [ref=e114]: Clear timeline expectations
+        - generic [ref=e115]:
+          - img [ref=e116]
+          - generic [ref=e118]: Direct access to the person building it
+      - generic [ref=e119]:
+        - link [ref=e120] [cursor=pointer]:
+          - /url: mailto:info@designedbyanthony.com
+          - text: info@designedbyanthony.com
+        - generic [ref=e121]: "|"
+        - link [ref=e122] [cursor=pointer]:
+          - /url: tel:+13159225592
+          - text: +1-315-922-5592
+      - paragraph [ref=e124]: No spam. No pressure. Just a focused strategy conversation.

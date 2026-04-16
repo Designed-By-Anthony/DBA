@@ -1,0 +1,254 @@
+---
+import ServiceDetailPage from '../../components/ServiceDetailPage.astro';
+import { evidenceLinks } from '../../data/evidence';
+import {
+  FOUNDING_PARTNER_SEO_LABEL,
+  MONTHLY_LOCAL_SEO_PRICE,
+  PUBLIC_PAYMENT_STRUCTURE_COPY,
+  PUBLIC_PRICING_NOTE,
+  STANDARD_WEBSITE_STARTING_PRICE,
+} from '../../lib/offers';
+import { buildServiceSchema } from '../../lib/seo';
+
+const customDesignSources = [
+  {
+    ...evidenceLinks.astroWhy,
+    note: 'Astro is designed for content-rich websites and emphasizes less client-side JavaScript.',
+  },
+  {
+    ...evidenceLinks.astroPrerender,
+    note: 'Astro prerenders static HTML by default for routes that do not need server logic.',
+  },
+  {
+    ...evidenceLinks.googlePageExperience,
+    note: 'Google recommends good Core Web Vitals and strong mobile page experience.',
+  },
+  {
+    ...evidenceLinks.googleLocalBusiness,
+    note: 'Structured data can help Google better understand business details.',
+  },
+];
+
+const serviceImage =
+  'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop';
+const serviceSchema = buildServiceSchema({
+  name: 'Custom Web Design',
+  description:
+    'Custom websites for service businesses that want stronger trust, cleaner SEO structure, and better lead flow.',
+  path: '/services/custom-web-design',
+  image: serviceImage,
+  serviceType: 'Custom web design',
+});
+
+const detailBlocks = [
+  {
+    title: 'Fast load times that keep visitors on your page',
+    paragraphs: [
+      'Your site loads in under a second instead of 3 to 5 seconds like most template sites. Faster sites keep visitors around longer and make it easier for the page to earn trust before someone bounces back to Google.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'What faster load times change',
+        paragraphs: [
+          'Speed affects how polished your business feels. When a page responds immediately, the experience feels organized, current, and dependable before the visitor has even read the full pitch.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Why that matters on a phone',
+        paragraphs: [
+          'Most searches for service businesses happen on mobile. A fast mobile-first build protects your first impression where buyers are most impatient.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Designed around your customers, not a generic template',
+    paragraphs: [
+      'A template has to work for a wide range of industries. Your site does not. We design the structure, messaging, and calls to action around your actual customers, your real objections, and the way your business earns trust.',
+      'You give us the topics and ideas, and Anthony writes the copy so the page sounds like a business owner talking to real buyers instead of a drag-and-drop template trying to sound professional.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Copy written around real objections',
+        paragraphs: [
+          'Instead of filler sections, we focus on the questions that stop people from calling: whether you are reliable, what you actually do, and why they should trust you over the next option in the search results.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Clear next steps beat clever design',
+        paragraphs: [
+          'The goal is not to look artistic for other designers. The goal is to make it obvious what the visitor should do next and make them feel good about doing it.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Built to show up on Google',
+    paragraphs: [
+      'We build SEO into the site from day one with clear page structure, proper headings, strong internal linking, and the technical setup that helps Google understand what your business does and where you operate.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Structure helps search engines and customers',
+        paragraphs: [
+          'A clean page hierarchy makes the site easier to read, easier to crawl, and easier to expand later when you add new services or location pages.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Service pages and location pages work together',
+        paragraphs: [
+          'When the site is built the right way, your core service pages support local visibility instead of competing with it. That gives you a stronger foundation for long-term SEO.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'A custom site that can grow without turning into a mess',
+    paragraphs: [
+      'A strong custom build should not paint you into a corner. It should make it easier to add service pages, refresh proof, tighten offers, and improve local coverage later without rebuilding the whole site around a bloated template.',
+      'That flexibility matters when your business changes seasonally, expands into nearby markets, or needs a sharper trust story than the original launch version carried.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Built around the next version of the business too',
+        paragraphs: [
+          'The goal is a site that stays fast, clear, and easy to trust as you add testimonials, expand services, or tighten market positioning over time.',
+        ],
+      },
+    ],
+  },
+];
+
+const faqEntries = [
+  {
+    question: 'Who is custom web design the right fit for?',
+    answer:
+      'It is the right fit for service businesses that have outgrown templates and need a site that feels more trustworthy, loads faster, and gives each service a clearer sales pitch. If your current site looks generic or does not convert well, a custom build usually makes more sense than another patch.',
+  },
+  {
+    question: 'How much does a custom website project cost?',
+    answer:
+      `${PUBLIC_PRICING_NOTE} Final pricing still depends on the number of pages, the amount of copy we need to write, and whether we are building from scratch or replacing an older site without losing what already works.`,
+  },
+  {
+    question: 'How do payments work on a website project?',
+    answer:
+      `${PUBLIC_PAYMENT_STRUCTURE_COPY} That keeps the process simple, gives both sides a clear commitment point, and makes it obvious when the final payment is due.`,
+  },
+  {
+    question: 'Do you write the copy for a custom website?',
+    answer:
+      'Yes. You give us the raw business details, the services you want to emphasize, and anything important your customers ask. Anthony writes the copy so the finished site sounds clear, direct, and built for buyers instead of feeling like a template with your logo swapped in.',
+  },
+];
+
+const relatedAreas = [
+  {
+    title: 'Web Design in Rome, NY',
+    href: '/service-areas/rome',
+    description: 'See how a trust-first site is positioned for a relationship-driven market close to home.',
+    tag: 'Rome',
+  },
+  {
+    title: 'Web Design in Syracuse, NY',
+    href: '/service-areas/syracuse',
+    description: 'Look at how the same design system adapts to a larger and more competitive regional market.',
+    tag: 'Syracuse',
+  },
+  {
+    title: 'Web Design in Columbus, OH',
+    href: '/service-areas/columbus',
+    description: 'See how custom web design positioning adapts for a fast-growing Midwest market with broader local competition.',
+    tag: 'Columbus',
+  },
+];
+
+const relatedArticles = [
+  {
+    title: 'Astro vs. Wix for Serious Business Websites',
+    href: '/blog/astro-vs-wix',
+    description: 'Compare a performance-first custom build against a visual builder approach.',
+    tag: 'Web Design',
+  },
+  {
+    title: '5 Things Wrong With Most Contractor Websites',
+    href: '/blog/contractor-website-mistakes',
+    description: 'See the design and trust mistakes that make a business look dated before the phone rings.',
+    tag: 'Trust',
+  },
+  {
+    title: 'Why Astro Is the Best Tech Stack for a Small Business Website',
+    href: '/blog/astro-tech-stack',
+    description: 'Understand why a lean stack supports better speed, support, and long-term flexibility.',
+    tag: 'Tech Stack',
+  },
+];
+
+const pricingSection = {
+  title: 'A cleaner way to structure the work after launch',
+  intro:
+    'Website builds and ongoing SEO are related, but they are not the same line item. The website is the one-time build. SEO is the monthly work that keeps the business moving after launch.',
+  cards: [
+    {
+      label: 'Website Build',
+      amount: STANDARD_WEBSITE_STARTING_PRICE,
+      badge: 'Most common start',
+      description: `Custom project pricing depends on scope. Standard builds start at ${STANDARD_WEBSITE_STARTING_PRICE}, and a limited number of founding partner builds are complimentary at relaunch when you enroll in the ${FOUNDING_PARTNER_SEO_LABEL}—payment structure stays simple either way.`,
+      features: [
+        '50% down to start',
+        '50% at launch',
+        'Custom design and copy',
+        'Built for service pages, local trust, and conversions',
+      ],
+      recommended: true,
+    },
+    {
+      label: 'Monthly SEO',
+      amount: MONTHLY_LOCAL_SEO_PRICE,
+      period: '/month',
+      description: 'Best after launch when the site needs ongoing local visibility work instead of a one-time setup only.',
+      features: [
+        'Hosting included',
+        'Google Business Profile updates and maintenance',
+        'Review support and local trust work',
+        'One meaningful growth asset or site update each month',
+      ],
+    },
+  ],
+};
+---
+
+<ServiceDetailPage
+  title="Custom Web Design for Service Brands | Designed by Anthony"
+  description="Custom web design for service businesses that need stronger trust, cleaner SEO structure, and a website built to drive more calls."
+  breadcrumbLabel="Custom Web Design"
+  schema={serviceSchema}
+  serviceNumber="02"
+  heroTitle="A Custom Website That Gets Your Phone to Ring"
+  heroDescription="We build custom websites for service businesses that need to look professional, show up on Google, and turn visitors into calls and quote requests."
+  pricingNote={`${PUBLIC_PRICING_NOTE} ${PUBLIC_PAYMENT_STRUCTURE_COPY}`}
+  heroPills={['Custom-built, not templated', 'Copy written for trust', 'Built for SEO from day one']}
+  image={serviceImage}
+  imageAlt="Premium custom web development"
+  imageWidth={2072}
+  imageHeight={1381}
+  sectionTitle="Why a custom-built site gets better results"
+  sectionIntro="A custom site is not about bells and whistles. It is about making the page feel trustworthy, loading fast, and making the next step obvious."
+  detailBlocks={detailBlocks}
+  pricingSection={pricingSection}
+  faqEntries={faqEntries}
+  relatedAreas={relatedAreas}
+  relatedArticles={relatedArticles}
+  sourcesTitle="Why We Say This"
+  sourcesIntro="Here is the documentation behind the approach we use."
+  sourcesItems={customDesignSources}
+  ctaTitle="Ready to get a website that works for your business?"
+  ctaDescription="Start with a free audit. You see the site before it goes live, and nothing launches until you approve it."
+/>

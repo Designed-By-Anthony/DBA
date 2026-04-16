@@ -1,0 +1,238 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LinkClusterSection, { type LinkClusterItem } from './LinkClusterSection.astro';
+import { PUBLIC_PRICING_PILL } from '../lib/offers';
+import type { SchemaValue } from '../lib/seo';
+
+interface ContentBlock {
+  level: 'h2' | 'h3' | 'h4' | 'h5';
+  title: string;
+  paragraphs: string[];
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  breadcrumbLabel: string;
+  schema: SchemaValue | SchemaValue[];
+  eyebrow: string;
+  heroTitlePrefix: string;
+  heroHighlight: string;
+  heroDescription: string;
+  blocks: ContentBlock[];
+  ctaLabel: string;
+  ctaTitle?: string;
+  heroPills?: string[];
+  relatedMarkets?: LinkClusterItem[];
+}
+
+const {
+  title,
+  description,
+  breadcrumbLabel,
+  schema,
+  eyebrow,
+  heroTitlePrefix,
+  heroHighlight,
+  heroDescription,
+  blocks,
+  ctaLabel,
+  ctaTitle,
+  heroPills = ['Custom web design', 'Managed hosting support', 'Local SEO strategy', PUBLIC_PRICING_PILL],
+  relatedMarkets = [],
+} = Astro.props;
+
+const resolvedCtaTitle = ctaTitle ?? `Your competitors in ${heroHighlight} are already showing up on Google. Are you?`;
+
+const relatedServices = [
+  {
+    title: 'Custom Web Design',
+    href: '/services/custom-web-design',
+    description: 'Build a custom website that feels credible fast and gives each service a clearer sales pitch.',
+    tag: 'Service',
+  },
+  {
+    title: 'Local SEO and Search Visibility',
+    href: '/services/local-seo',
+    description: 'Support this market page with cleaner local structure, schema, and service-area targeting.',
+    tag: 'Service',
+  },
+  {
+    title: 'Website Rescues and Mobile Optimization',
+    href: '/services/website-rescue',
+    description: 'Keep the authority you already have while fixing mobile usability, speed, and trust issues.',
+    tag: 'Service',
+  },
+];
+
+const relatedArticles = [
+  {
+    title: 'The Hidden Code That Gets Local Businesses Ranked',
+    href: '/blog/local-business-schema',
+    description: 'See how structured data helps Google understand your services, entity details, and markets.',
+    tag: 'SEO',
+  },
+  {
+    title: 'Is Local SEO Dead? What Actually Works in 2025',
+    href: '/blog/local-seo-death',
+    description: 'Understand why thin service pages fail and what a stronger local SEO system looks like now.',
+    tag: 'SEO',
+  },
+  {
+    title: 'How Site Speed Impacts Revenue',
+    href: '/blog/site-speed-conversion',
+    description: 'Faster pages change trust, conversions, and how your business feels the second someone lands.',
+    tag: 'Performance',
+  },
+];
+---
+
+<Layout
+  title={title}
+  description={description}
+  breadcrumbLabel={breadcrumbLabel}
+  schema={schema}
+  footerCta={{
+    eyebrow: 'Local Website Audit',
+    title: resolvedCtaTitle,
+    description:
+      'I will review how this market page is positioned, where trust is breaking down, and what to fix first so the site does a better job turning local traffic into real inquiries.',
+    primaryHref: '/contact',
+    primaryLabel: ctaLabel,
+    secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+    secondaryLabel: 'Book a 15-minute intro call',
+  }}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner area-hero-inner">
+      <p class="page-eyebrow">{eyebrow}</p>
+      <h1>{heroTitlePrefix} <span class="text-blue">{heroHighlight}</span></h1>
+      <p>{heroDescription}</p>
+      <div class="hero-meta-row area-meta-row">
+        {heroPills.map((pill) => <span class="mini-pill">{pill}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="section-container">
+      <article class="surface-card area-content-card reveal-up">
+        <div class="area-content-inner">
+          {blocks.map((block) => {
+            const Tag = block.level;
+
+            return (
+              <Fragment>
+                <Tag>{block.title}</Tag>
+                {block.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+              </Fragment>
+            );
+          })}
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <LinkClusterSection
+    eyebrow="Related Markets"
+    title="Other service-area pages tied to this market"
+    intro="These pages help connect nearby or closely related markets without flattening them into one generic location page."
+    items={relatedMarkets}
+    ctaHref="/service-areas"
+    ctaLabel="View All Service Areas"
+  />
+
+  <LinkClusterSection
+    eyebrow="Related Services"
+    title="The services that usually move this market page forward"
+    intro="Most location pages work best when they are backed by stronger design, sharper technical SEO, and a faster mobile experience."
+    items={relatedServices}
+    ctaHref="/services"
+    ctaLabel="View All Services"
+  />
+
+  <LinkClusterSection
+    eyebrow="Related Articles"
+    title="Guides that explain the strategy behind this page"
+    intro="These articles break down the SEO, schema, and performance work that helps a local page compete."
+    items={relatedArticles}
+    ctaHref="/blog"
+    ctaLabel="View All Articles"
+  />
+
+</Layout>
+
+<style>
+  .area-hero-inner {
+    max-width: 920px;
+  }
+
+  .area-meta-row {
+    justify-content: center;
+  }
+
+  .area-content-card {
+    padding: 2.5rem;
+  }
+
+  .area-content-inner {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .area-content-inner h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-top: 3.5rem;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .area-content-inner h2:first-child {
+    margin-top: 0;
+  }
+
+  .area-content-inner h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .area-content-inner h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .area-content-inner h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-top: 1.75rem;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .area-content-inner p {
+    font-size: 1.15rem;
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .area-content-card {
+      padding: 1.5rem;
+    }
+
+    .area-content-inner h2 {
+      font-size: 1.6rem;
+    }
+  }
+</style>

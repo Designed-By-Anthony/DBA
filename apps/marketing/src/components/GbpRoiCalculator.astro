@@ -1,0 +1,149 @@
+---
+/**
+ * Illustrative ROI model for Google Business Profile optimization.
+ * Logic matches the partner calculator: incremental daily customers × ticket × 30 vs monthly cost.
+ */
+---
+
+<div class="gbp-roi" data-gbp-roi-calculator>
+  <h3 class="gbp-roi-title">GBP optimization ROI calculator</h3>
+  <p class="gbp-roi-lede">
+    Model what a lift in daily customers could mean for monthly revenue after profile and local visibility work. Numbers are illustrative — not a guarantee of results.
+  </p>
+  <form class="gbp-roi-form" novalidate>
+    <label class="gbp-roi-field">
+      <span class="gbp-roi-label-text">Customers per day (today)</span>
+      <input
+        name="customers"
+        type="number"
+        min="0"
+        step="any"
+        inputmode="decimal"
+        autocomplete="off"
+        required
+      />
+    </label>
+    <label class="gbp-roi-field">
+      <span class="gbp-roi-label-text">Average customer value ($)</span>
+      <input name="value" type="number" min="0" step="any" inputmode="decimal" autocomplete="off" required />
+    </label>
+    <label class="gbp-roi-field">
+      <span class="gbp-roi-label-text">Expected increase in daily customers (%)</span>
+      <input
+        name="increase"
+        type="number"
+        min="0"
+        step="any"
+        inputmode="decimal"
+        autocomplete="off"
+        required
+      />
+    </label>
+    <label class="gbp-roi-field">
+      <span class="gbp-roi-label-text">Service cost ($ / month)</span>
+      <input name="cost" type="number" min="0" step="any" inputmode="decimal" autocomplete="off" required />
+    </label>
+    <button type="submit" class="btn btn-primary gbp-roi-submit">Calculate ROI</button>
+  </form>
+  <div class="gbp-roi-result surface-card" data-role="result" hidden aria-live="polite"></div>
+  <p class="gbp-roi-disclaimer">
+    For planning only. Actual results depend on your market, competition, and how completely your website and Google Business Profile support the same story.
+  </p>
+</div>
+
+<style>
+  .gbp-roi {
+    text-align: left;
+  }
+
+  .gbp-roi-title {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.2rem, 2vw, 1.35rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-cream);
+    font-family: var(--font-display, 'Outfit Variable', system-ui, sans-serif);
+  }
+
+  .gbp-roi-lede {
+    margin: 0 0 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-gray);
+  }
+
+  .gbp-roi-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .gbp-roi-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    color: var(--text-soft);
+  }
+
+  .gbp-roi-label-text {
+    font-weight: 600;
+    color: var(--text-gray);
+  }
+
+  .gbp-roi-field input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 252, 245, 0.12);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text-cream);
+    font: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .gbp-roi-field input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .gbp-roi-field input:focus {
+    outline: none;
+    border-color: rgba(147, 197, 253, 0.45);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .gbp-roi-submit {
+    width: 100%;
+    margin-top: 0.25rem;
+    justify-content: center;
+  }
+
+  .gbp-roi-result {
+    margin-top: 1.25rem;
+    padding: 1.1rem 1.15rem;
+    border: 1px solid rgba(147, 197, 253, 0.22);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-soft);
+  }
+
+  .gbp-roi-result strong {
+    color: var(--accent-blue);
+    font-weight: 800;
+  }
+
+  .gbp-roi-result[hidden] {
+    display: none !important;
+  }
+
+  .gbp-roi-disclaimer {
+    margin: 1rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+</style>

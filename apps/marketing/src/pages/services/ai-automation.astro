@@ -1,0 +1,218 @@
+---
+import ServiceDetailPage from '../../components/ServiceDetailPage.astro';
+import { buildServiceSchema } from '../../lib/seo';
+
+const serviceImage =
+  '/images/reference/vectorelements-QJ6TnSLID6c-unsplash-d23213f8-a74f-4119-8702-69cd295852c5.png';
+const serviceSchema = buildServiceSchema({
+  name: 'Custom Google AI Chatbots & Forms',
+  description:
+    'Automated chatbots and smart forms built on Google technology to capture client info and deliver leads straight to your inbox.',
+  path: '/services/ai-automation',
+  image: serviceImage,
+  serviceType: 'AI Automation',
+});
+
+const detailBlocks = [
+  {
+    title: 'Stop missing leads after hours',
+    paragraphs: [
+      'When someone visits your website at 9 PM, they expect answers. If they don\'t get them, they move on to the next business. We build intelligent, local chatbots trained specifically on your business data to answer common questions and lock in the lead instantly.',
+      'The chatbot works 24/7, handles multiple conversations at once, and never takes a day off. That means every visitor gets a professional response — even when you are on a job site, asleep, or on vacation.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Trained on your business, not generic data',
+        paragraphs: [
+          'Your bot knows your services, hours, pricing, and service areas. It speaks like you and answers questions exactly the way you would — no hallucinated responses about services you don\'t offer.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Built on Google Gemini',
+        paragraphs: [
+          'We use Google\'s state-of-the-art AI infrastructure that is fast, reliable, and perfectly integrated into your site. No third-party resellers in the middle.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Smart Forms that do the heavy lifting',
+    paragraphs: [
+      'Standard contact forms are boring and often ignored. We build intelligent forms that ask the right follow-up questions based on what the user selects, ensuring you get all the information you need before the first phone call.',
+      'Conditional logic means a plumber sees different follow-up questions than a roofer. The experience feels personal even though it is fully automated.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Delivered straight to your inbox',
+        paragraphs: [
+          'No complex dashboards to log into. When a form is submitted or a chat finishes, the structured lead data is sent directly to your email or CRM. You get name, service needed, timeline, and contact info in one clean message.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Spam-free by design',
+        paragraphs: [
+          'Every form submission runs through Cloudflare Turnstile verification. That means real leads in your inbox — not bot spam.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Conversation visibility without a bulky dashboard',
+    paragraphs: [
+      'You should be able to review what visitors are asking without living inside yet another tool. We structure chatbot and form workflows so the important lead details are easy to review fast and hand off cleanly.',
+      'That gives you visibility into customer questions and lead quality without turning the system into a complicated live-support operation.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Know what your customers are thinking',
+        paragraphs: [
+          'The conversations your chatbot handles are a goldmine of customer intent data. You learn what services people are searching for, what questions stop them from calling, and where your messaging might be unclear.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Integration with your existing tools',
+    paragraphs: [
+      'We do not force you into a new ecosystem. The chatbot and forms integrate with Gmail, Google Sheets, Google Chat, and most CRM platforms. If you already use a tool, we build around it instead of replacing it.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Built to grow with your business',
+        paragraphs: [
+          'Start with a simple lead capture chatbot. Later, add appointment booking, multi-location routing, or intake form logic. The system scales without starting over.',
+        ],
+      },
+    ],
+  },
+];
+
+const pricingSection = {
+  title: 'Straightforward AI setup pricing',
+  intro: 'Every business has different complexity. Here is how we structure it.',
+  cards: [
+    {
+      label: 'Smart Forms',
+      amount: '$299',
+      description: 'Intelligent, conditional forms with spam protection and direct inbox delivery. Perfect for businesses that need better lead capture without the complexity of a chatbot.',
+      features: [
+        'Custom conditional logic',
+        'Cloudflare Turnstile bot protection',
+        'Direct email delivery',
+        'Mobile-optimized design',
+      ],
+    },
+    {
+      label: 'AI Chatbot + Forms',
+      amount: '$599',
+      badge: 'Most popular',
+      description: 'Full chatbot trained on your business data plus smart forms. Includes conversation visibility and ongoing optimization.',
+      features: [
+        'Everything in Smart Forms',
+        'Google Gemini-powered chatbot',
+        'Trained on your services, hours, and pricing',
+        'Conversation review workflow',
+        '30 days of post-launch optimization',
+      ],
+      recommended: true,
+    },
+  ],
+};
+
+const faqEntries = [
+  {
+    question: 'Will the AI say something wrong to my customers?',
+    answer:
+      'No. The AI is strictly prompt-engineered and sandboxed to only use the information we provide it about your business. It is instructed to politely decline answering completely unrelated queries and point the user to your direct contact info instead. We test extensively before launch.',
+  },
+  {
+    question: 'Do I need to maintain the chatbot?',
+    answer:
+      'Not at all. We handle the initial training, deployment, and 30 days of post-launch optimization. After that, the bot runs on its own. If you add new services or change pricing, we update the bot as part of a quick support request.',
+  },
+  {
+    question: 'How long does setup take?',
+    answer:
+      'Most chatbot and form projects are live within 5 to 7 business days. We gather your business information, build the system, test it thoroughly, and deploy it to your live site with zero downtime.',
+  },
+  {
+    question: 'Can I see what the chatbot is telling my customers?',
+    answer:
+      'Yes. We structure the system so you can review the conversations, see what people are asking, and spot the leads worth following up on quickly. The launch setup is focused on visibility first, with live two-way handoff available later if you want it.',
+  },
+];
+
+const relatedAreas = [
+  {
+    title: 'Web Design in Rome, NY',
+    href: '/service-areas/rome',
+    description: 'See how AI-powered lead capture supports a local service market where responsiveness wins jobs.',
+    tag: 'Rome',
+  },
+  {
+    title: 'Web Design in Syracuse, NY',
+    href: '/service-areas/syracuse',
+    description: 'Look at how automated forms scale for a larger metro area with higher search volume.',
+    tag: 'Syracuse',
+  },
+  {
+    title: 'Web Design in Columbus, OH',
+    href: '/service-areas/columbus',
+    description: 'Explore how AI chatbots help service businesses compete in fast-growing Midwest markets.',
+    tag: 'Columbus',
+  },
+];
+
+const relatedArticles = [
+  {
+    title: '5 Things Wrong With Most Contractor Websites',
+    href: '/blog/contractor-website-mistakes',
+    description: 'See the design and trust mistakes that make a business look dated before the phone rings.',
+    tag: 'Trust',
+  },
+  {
+    title: 'How Site Speed Impacts Revenue',
+    href: '/blog/site-speed-conversion',
+    description: 'Learn why the technical foundation behind your chatbot matters as much as the bot itself.',
+    tag: 'Performance',
+  },
+  {
+    title: 'Mobile-First SEO Is the Only SEO That Matters Now',
+    href: '/blog/mobile-first-seo',
+    description: 'Understand why mobile-first design is the foundation for effective AI-powered lead capture.',
+    tag: 'Mobile SEO',
+  },
+];
+
+---
+
+<ServiceDetailPage
+  title="Custom Google AI Chatbots & Forms | Designed by Anthony"
+  description="Google AI chatbots and smart forms that qualify visitors and send organized leads to your inbox."
+  breadcrumbLabel="AI Automation"
+  schema={serviceSchema}
+  serviceNumber="06"
+  heroTitle="Capture Every Lead Automatically"
+  heroDescription="We build intelligent, data-driven chatbots and forms that talk to your customers when you can't, sending organized leads straight to your inbox."
+  pricingNote="Smart forms from $299. Full AI chatbot packages from $599."
+  heroPills={['Trained on your data', 'Powered by Google Gemini', 'Straight-to-inbox lead delivery']}
+  image={serviceImage}
+  imageAlt="Illustration of people using devices with a large SEO search window"
+  imageWidth={1024}
+  imageHeight={575}
+  sectionTitle="How we put AI to work for your business"
+  sectionIntro="We do not use gimmicks. We use AI to solve the single biggest problem small businesses face: missing calls and losing leads."
+  detailBlocks={detailBlocks}
+  pricingSection={pricingSection}
+  faqEntries={faqEntries}
+  relatedAreas={relatedAreas}
+  relatedArticles={relatedArticles}
+  ctaTitle="Ready to automate your lead capture?"
+  ctaDescription="Let's build a smart system that works for you 24/7. Start with the free audit and we'll show you where automation fits."
+/>

@@ -1,0 +1,186 @@
+import { NextResponse } from 'next/server';
+import { db, Timestamp, FieldValue, REPORTS_COLLECTION } from '@/lib/firestore';
+import { isValidReportId } from '@/lib/reportId';
+import { buildReceiptEmail, isGmailConfigured, sendViaGmail } from '@/lib/gmail';
+import { buildCorsHeaders } from '@/lib/http';
+import { normalizeEmail } from '@/lib/validation';
+
+export const runtime = 'nodejs';
+
+const MAX_SENDS_PER_REPORT = 3;
+const MIN_INTERVAL_MS = 60_000;
+const SEND_LOCK_WINDOW_MS = 30_000;
+
+class ApiError extends Error {
+  status: number;
+  headers?: Record<string, string>;
+
+  constructor(status: number, message: string, headers?: Record<string, string>) {
+    super(message);
+    this.status = status;
+    this.headers = headers;
+  }
+}
+
+async function reserveEmailSend(ref: FirebaseFirestore.DocumentReference) {
+  return db.runTransaction(async (transaction) => {
+    const snap = await transaction.get(ref);
+
+    if (!snap.exists) {
+      throw new ApiError(404, 'Report not found');
+    }
+
+    const data = snap.data()!;
+    const sentCount = data.emailSentCount || 0;
+    if (sentCount >= MAX_SENDS_PER_REPORT) {
+      throw new ApiError(
+        429,
+        'This report has already been emailed the maximum number of times.'
+      );
+    }
+
+    const lastSentAt: Timestamp | null = data.emailLastSentAt || null;
+    if (lastSentAt) {
+      const elapsed = Date.now() - lastSentAt.toMillis();
+      if (elapsed < MIN_INTERVAL_MS) {
+        const waitSec = Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000);
+        throw new ApiError(
+          429,
+          `Please wait ${waitSec} seconds before requesting another copy.`,
+          { 'Retry-After': String(waitSec) }
+        );
+      }
+    }
+
+    const lockUntil: Timestamp | null = data.emailSendLockUntil || null;
+    if (lockUntil && lockUntil.toMillis() > Date.now()) {
+      const waitSec = Math.ceil((lockUntil.toMillis() - Date.now()) / 1000);
+      throw new ApiError(
+        429,
+        `This report email is already being processed. Please wait ${waitSec} seconds and try again.`,
+        { 'Retry-After': String(waitSec) }
+      );
+    }
+
+    const lead = data.lead || {};
+    const recipient = normalizeEmail(lead.email);
+    if (!recipient) {
+      throw new ApiError(400, 'No valid email address is on file for this report.');
+    }
+
+    const scores = data.scores || {};
+    transaction.update(ref, {
+      emailSendLockUntil: Timestamp.fromMillis(Date.now() + SEND_LOCK_WINDOW_MS),
+    });
+
+    return {
+      recipient,
+      firstName: lead.name ? String(lead.name).split(' ')[0] : '',
+      url: String(lead.url || ''),
+      trustScore: scores.trustScore || 0,
+      performance: scores.performance || 0,
+      accessibility: scores.accessibility || 0,
+      bestPractices: scores.bestPractices || 0,
+      seo: scores.seo || 0,
+    };
+  });
+}
+
+/**
+ * POST /api/report/[id]/email
+ *
+ * Sends the short transactional receipt email to the address stored on the
+ * report's lead record. Triggered by the "Email me a copy" button on the Astro
+ * report page.
+ *
+ * Rate-limited: max 3 sends per report, min 60s between sends.
+ */
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const corsHeaders = buildCorsHeaders(request, 'POST, OPTIONS', 'Content-Type');
+  const responseHeaders = { ...corsHeaders, 'Cache-Control': 'no-store' };
+  const { id } = await params;
+
+  if (!isValidReportId(id)) {
+    return NextResponse.json(
+      { error: 'Invalid report ID format' },
+      { status: 400, headers: responseHeaders }
+    );
+  }
+
+  if (!isGmailConfigured()) {
+    return NextResponse.json(
+      { error: 'Email delivery is not configured right now.' },
+      { status: 503, headers: responseHeaders }
+    );
+  }
+
+  const ref = db.collection(REPORTS_COLLECTION).doc(id);
+  let lockReserved = false;
+
+  try {
+    const reserved = await reserveEmailSend(ref);
+    lockReserved = true;
+
+    const { subject, html } = buildReceiptEmail({
+      firstName: reserved.firstName,
+      url: reserved.url,
+      reportId: id,
+      trustScore: reserved.trustScore,
+      performance: reserved.performance,
+      accessibility: reserved.accessibility,
+      bestPractices: reserved.bestPractices,
+      seo: reserved.seo,
+    });
+
+    await sendViaGmail(reserved.recipient, subject, html);
+
+    await ref.update({
+      emailSentCount: FieldValue.increment(1),
+      emailLastSentAt: Timestamp.now(),
+      emailSendLockUntil: FieldValue.delete(),
+    });
+
+    return NextResponse.json(
+      { success: true, message: 'Report emailed.' },
+      { headers: responseHeaders }
+    );
+  } catch (err) {
+    if (lockReserved) {
+      await ref.update({
+        emailSendLockUntil: FieldValue.delete(),
+      }).catch((unlockErr) => {
+        console.error(
+          'Report email lock release failed:',
+          unlockErr instanceof Error ? unlockErr.message : unlockErr
+        );
+      });
+    }
+
+    if (err instanceof ApiError) {
+      return NextResponse.json(
+        { error: err.message },
+        {
+          status: err.status,
+          headers: {
+            ...responseHeaders,
+            ...err.headers,
+          },
+        }
+      );
+    }
+
+    console.error('Report email send failed:', err instanceof Error ? err.message : err);
+    return NextResponse.json(
+      { error: 'Failed to send email' },
+      { status: 500, headers: responseHeaders }
+    );
+  }
+}
+
+export async function OPTIONS(request: Request) {
+  const corsHeaders = buildCorsHeaders(request, 'POST, OPTIONS', 'Content-Type');
+  return new Response(null, { status: 204, headers: corsHeaders });
+}

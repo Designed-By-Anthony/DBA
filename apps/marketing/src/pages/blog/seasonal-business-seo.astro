@@ -1,0 +1,269 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogBackButton from '../../components/BlogBackButton.astro';
+import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
+import SourceList from '../../components/SourceList.astro';
+import { evidenceLinks } from '../../data/evidence';
+import { buildBlogPostingSchema } from '../../lib/seo';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+
+const postSources = [
+  {
+    ...evidenceLinks.googleLocalBusiness,
+    note: 'Google rewards businesses that frequently update seasonal operating hours and localized schema.',
+  },
+  {
+    ...evidenceLinks.googlePageExperience,
+    note: 'Sustained user engagement through targeted content helps mitigate off-peak traffic drops.',
+  }
+];
+
+const articleImage = '/images/seasonal_seo_cover.png';
+const publishedTime = '2026-04-15T09:00:00-05:00';
+const articleSchema = buildBlogPostingSchema({
+  headline: 'Seasonal SEO in Central New York',
+  description: 'How seasonal businesses in Central New York can use local SEO, content planning, and profile updates to stay visible year-round.',
+  path: '/blog/seasonal-business-seo',
+  image: articleImage,
+  datePublished: publishedTime,
+  articleSection: 'Local SEO Strategy',
+  keywords: ['Seasonal business SEO', 'Local SEO', 'Central New York', 'Google Business Profile', 'Naples FL', 'Snowbird market'],
+});
+---
+<Layout
+  title="Seasonal SEO in Central New York | Designed by Anthony"
+  description="How seasonal businesses in Central New York can use local SEO, content planning, and profile updates to stay visible year-round."
+  image={articleImage}
+  ogType="article"
+  publishedTime={publishedTime}
+  modifiedTime={publishedTime}
+  articleSection="Local SEO Strategy"
+  articleTags={['Seasonal Business', 'Local SEO', 'Central New York', 'Content Strategy', 'Naples FL']}
+  schema={articleSchema}
+  bodyClass="has-progress-bar"
+>
+  <article class="blog-post">
+    <BlogBackButton />
+    <div class="post-header">
+      <div class="meta">
+        <span>April 15, 2026</span> | <span>10 min read</span>
+      </div>
+      <h1>Seasonal SEO in Central New York</h1>
+    </div>
+    
+    <div class="post-image">
+      <img src={articleImage} alt="Modern office workspace with panoramic view of seasonal Central New York landscape showing transition between winter and spring" width="1024" height="1024" loading="eager" decoding="async" fetchpriority="high" />
+    </div>
+
+    <div class="post-content">
+      <p>Seasonal businesses in Central New York have to stay visible even when demand shifts hard throughout the year. Landscapers, snow contractors, patio companies, HVAC businesses, and tourism-driven brands all deal with uneven search demand, which means the website and Google Business Profile need a plan that works before, during, and after the busy season.</p>
+      
+      <p>The strongest seasonal SEO strategy does not disappear in the off-season. It uses quieter months to improve service pages, publish the next round of seasonal content, update hours and offers, and prepare the site before search volume rises again. That rhythm is what keeps a business easier to find when competitors wait too long to react.</p>
+
+      <h2>Why Seasonal SEO Matters More in Central New York</h2>
+      <p>Central New York businesses often deal with short windows of heavy demand. A landscaper might have a rush in spring, a snow contractor in winter, and an HVAC company in both the hottest and coldest parts of the year. If the website and business profile are not ready before that rush starts, the business ends up reacting after the best search traffic has already moved.</p>
+
+      <p>That is why seasonal SEO is mostly about timing. The businesses that win are usually the ones that update early, publish early, and tighten their local signals before the phone starts ringing.</p>
+
+      <h3>Key Local SEO Moves for Seasonal Businesses</h3>
+      <ul>
+        <li><strong>Keep the Google Business Profile current:</strong> Hours, services, photos, offers, and service areas should reflect the season you are actually in.</li>
+        <li><strong>Refresh seasonal service pages:</strong> Make sure the page matches the problem customers are searching for right now.</li>
+        <li><strong>Collect reviews around seasonal jobs:</strong> Reviews that mention the service and timing help reinforce relevance.</li>
+      </ul>
+
+      <h2>Use the Off-Season to Prepare the Next Wave</h2>
+      <p>The off-season is when most of the valuable work should happen. That is the time to update service pages, improve internal links, rebuild weak city pages, add FAQs, refresh photos, and publish the content you want indexed before the rush. Waiting until the busy season means publishing too late.</p>
+
+      <p>For example, a snow removal company should not wait until the first storm to update its winter landing pages. A patio builder should not wait until May to publish spring content. Search visibility usually rewards businesses that move earlier than that.</p>
+
+      <h3>What to Update Before Demand Spikes</h3>
+      <ul>
+        <li><strong>Primary service pages:</strong> Make sure the copy matches the seasonal offer people are actually looking for.</li>
+        <li><strong>Business profile content:</strong> Update service categories, descriptions, photos, and seasonal offers.</li>
+        <li><strong>Local landing pages:</strong> Strengthen the pages tied to the towns or regions that matter most — see how this works on our <a href="/service-areas/utica">Utica</a>, <a href="/service-areas/rome">Rome</a>, and <a href="/service-areas/syracuse">Syracuse</a> service-area pages.</li>
+      </ul>
+
+      <h2>How to Plan Seasonal Content Without Creating Filler</h2>
+      <p>Seasonal content works best when it answers a real decision-making question. Good examples are pages about when to book a service, what changes with the season, what homeowners should do before weather shifts, or how pricing and availability change during peak months.</p>
+
+      <p>Weak seasonal content usually sounds generic or rushed. It uses the season as a keyword but does not say anything useful. The better approach is to tie each piece to an actual local need. That keeps the content helpful and gives it a reason to exist beyond rankings.</p>
+
+      <h3>Useful Seasonal Content Ideas</h3>
+      <ul>
+        <li><strong>Pre-season planning pages:</strong> What customers should book before demand peaks.</li>
+        <li><strong>Seasonal FAQ content:</strong> Questions that show up every year and deserve a clean answer.</li>
+        <li><strong>Service transition content:</strong> Pages that help move visitors from one seasonal need into the next.</li>
+      </ul>
+
+      <h2>Use Google Trends and Search Data for Timing</h2>
+      <p>Search volume moves earlier than many business owners expect. Google Trends, Search Console, and your own year-over-year traffic data can show when people start researching, not just when they start buying. That matters because SEO work needs lead time.</p>
+
+      <p>If a term starts climbing in March, you usually want the page refreshed in January or February. If it starts rising in September, you do not want to wait until October to touch it.</p>
+
+      <h3>A Simple Seasonal SEO Calendar</h3>
+      <ul>
+        <li><strong>8-12 weeks before peak season:</strong> Refresh service pages, update titles and descriptions, and tighten internal linking.</li>
+        <li><strong>6-8 weeks before peak season:</strong> Publish or update supporting content and add fresh photos or reviews.</li>
+        <li><strong>During the season:</strong> Keep hours, posts, and conversion details current.</li>
+        <li><strong>After the season:</strong> Review what ranked, what converted, and what needs improvement next cycle.</li>
+      </ul>
+
+      <h2>What Seasonal Businesses Should Measure</h2>
+      <p>Do not just measure rankings. Track whether the right pages are gaining impressions before the season, whether the Google Business Profile is getting more actions, and whether the refreshed pages actually produce calls or form fills. That is how you tell the difference between seasonal activity and seasonal growth.</p>
+
+      <p>For most local businesses, the best seasonal SEO strategy is simple: prepare early, update with purpose, and keep the profile and site aligned. That approach is not flashy, but it is what keeps you visible when the busy season arrives.</p>
+
+      <h3>Seasonal SEO Beyond Central NY: The Naples Snowbird Model</h3>
+      <p>The seasonal dynamics that affect Central New York businesses are amplified in markets like <a href="/service-areas/naples">Naples FL</a>, where the entire Southwest Florida economy shifts with snowbird migration. Premium service businesses — luxury contractors, wealth managers, interior designers — have a compressed 4-5 month window of peak demand when high-net-worth seasonal residents arrive. The businesses that publish seasonal content and update their profiles before that influx begins are the ones who capture the highest-value leads. The ones who wait until January are already too late. This model works anywhere seasonal population shifts drive demand — from the Adirondacks tourism corridor in the <a href="/service-areas/north-country">North Country</a> to the hurricane-season urgency that drives contractor searches across <a href="/service-areas/miami">Miami-Dade</a> and <a href="/service-areas/houston">Houston</a>.</p>
+
+      <SourceList
+        title="Sources"
+        intro="The evidence behind maintaining organic footprint stability during local off-peak months."
+        items={postSources}
+      />
+    </div>
+
+    <BlogBridgeLinks />
+
+    <RelatedPosts
+      posts={[
+        {
+          title: 'Is Local SEO Dead? What Actually Works in 2025',
+          href: '/blog/local-seo-death',
+          description: 'The old tactics are gone. Here is what local SEO looks like in 2025.',
+          image: '/images/local_seo_visibility_cover.png',
+          imageAlt: 'Local storefront at dusk',
+          tag: 'SEO',
+        },
+        {
+          title: 'Fix Thin Content Without Hurting SEO',
+          href: '/blog/fix-thin-content',
+          description: 'A practical guide to finding weak pages, consolidating overlap, and improving the ones worth keeping.',
+          image: '/images/thin_content_cover.png',
+          imageAlt: 'Content audit workspace',
+          tag: 'SEO',
+        },
+        {
+          title: '5 Things Wrong With Most Contractor Websites',
+          href: '/blog/contractor-website-mistakes',
+          description: 'The most common website mistakes that cost contractors leads.',
+          image: '/images/contractor_mistakes_cover.png',
+          imageAlt: 'Contractor at a laptop',
+          tag: 'Web Design',
+        },
+      ]}
+    />
+  </article>
+</Layout>
+
+<style>
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .post-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .meta {
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .post-header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .post-image {
+    width: 100%;
+    margin-bottom: 4rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .post-content h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .post-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-content h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .post-content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-top: 1.75rem;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .post-content p {
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+  
+  .post-content ul {
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+    padding-left: 2rem;
+  }
+
+  .post-content li {
+    font-size: 1.15rem;
+    color: var(--text-gray);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .post-content strong {
+    color: var(--text-white);
+  }
+
+  @media (max-width: 768px) {
+    .post-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .post-content h2 {
+      font-size: 1.75rem;
+    }
+  }
+</style>

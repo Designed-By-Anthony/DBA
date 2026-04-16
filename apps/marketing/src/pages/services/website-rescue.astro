@@ -1,0 +1,188 @@
+---
+import ServiceDetailPage from '../../components/ServiceDetailPage.astro';
+import { evidenceLinks } from '../../data/evidence';
+import { PUBLIC_PAYMENT_STRUCTURE_COPY, PUBLIC_PRICING_NOTE } from '../../lib/offers';
+import { buildServiceSchema } from '../../lib/seo';
+
+const rescueSources = [
+  {
+    ...evidenceLinks.googleMobileFirst,
+    note: 'Google uses the mobile version of a page for indexing.',
+  },
+  {
+    ...evidenceLinks.googlePageExperience,
+    note: 'Google calls out Core Web Vitals and mobile usability as part of page experience.',
+  },
+  {
+    ...evidenceLinks.astroPrerender,
+    note: 'Astro can keep rebuilt marketing pages static by default unless they need server rendering.',
+  },
+];
+
+const serviceImage =
+  '/images/reference/sarah-b-wpAjO6H_65c-unsplash-f25e48a2-1938-42e1-b010-8f859f06763f.png';
+const serviceSchema = buildServiceSchema({
+  name: 'Website Rescues and Mobile Optimization',
+  description:
+    'Refresh an outdated website with stronger mobile usability, cleaner performance, and a more current design system.',
+  path: '/services/website-rescue',
+  image: serviceImage,
+  serviceType: 'Website rescue and mobile optimization',
+});
+
+const detailBlocks = [
+  {
+    title: 'Your site has to work on a phone',
+    paragraphs: [
+      'Most people searching for a service business are on their phone. If your site is hard to use on mobile, they leave and call someone else. We rebuild the experience so it works just as well on a phone as it does on a computer.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'Mobile usability is the first trust test',
+        paragraphs: [
+          'Spacing, button size, readable copy, and clean page flow matter more than fancy animation. A rescue starts by making the site feel usable immediately on the smallest screen.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Google sees the mobile version first',
+        paragraphs: [
+          'If the mobile version is weak, the site usually underperforms in search too. Fixing mobile usability helps both conversion and visibility at the same time.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Making your site faster',
+    paragraphs: [
+      'Older websites collect bloat over time: oversized images, extra scripts, outdated code, and plugin layers that slow every page down. We clean all of that up so your pages load fast and visitors stick around instead of bouncing.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'The rescue is as much subtraction as redesign',
+        paragraphs: [
+          'A lot of performance gains come from removing what should not be there anymore. Leaner pages are easier to maintain and less likely to break after launch.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'Faster pages make the business look more current',
+        paragraphs: [
+          'Visitors do not separate speed from quality. If the page feels clunky, the business feels less dependable even when the service itself is excellent.',
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Making it look like you are still in business',
+    paragraphs: [
+      'Design trends change fast. If your site looks like it was built five years ago, visitors notice. We modernize the look, update the layout, and make sure your site reflects the quality of your actual work.',
+    ],
+    supporting: [
+      {
+        level: 'h4' as const,
+        title: 'The goal is clarity, not trend-chasing',
+        paragraphs: [
+          'A rescue should make the site feel sharper and easier to trust, not overloaded with design tricks that age badly or slow the page down.',
+        ],
+      },
+      {
+        level: 'h5' as const,
+        title: 'You keep what still works',
+        paragraphs: [
+          'We do not rebuild for the sake of rebuilding. If content, service framing, or existing authority still has value, we preserve it and improve what is dragging the site down.',
+        ],
+      },
+    ],
+  },
+];
+
+const faqEntries = [
+  {
+    question: 'How do I know if I need a website rescue instead of a full rebuild?',
+    answer:
+      'A rescue makes sense when the business still has useful content, some search visibility, or a basic structure worth keeping, but the site feels outdated, slow, or hard to use on mobile. If the foundation is still salvageable, a rescue can improve results without throwing everything away.',
+  },
+  {
+    question: 'Will a rescue help with mobile performance?',
+    answer:
+      'Yes. Mobile usability is one of the main reasons businesses come in for a rescue. We clean up layout issues, oversized assets, clunky buttons, and page bloat so the site feels easier to trust and easier to use on a phone.',
+  },
+  {
+    question: 'What does a website rescue cost?',
+    answer:
+      `${PUBLIC_PRICING_NOTE} The exact price still depends on how much of the current site we can keep, how many pages need cleanup, and whether the job is mostly a performance fix, a design refresh, or both.`,
+  },
+];
+
+const relatedAreas = [
+  {
+    title: 'Web Design in New Hartford, NY',
+    href: '/service-areas/new-hartford',
+    description: 'See how a cleaner site can help a business look sharper in a quality-sensitive local market.',
+    tag: 'New Hartford',
+  },
+  {
+    title: 'Web Design in Utica, NY',
+    href: '/service-areas/utica',
+    description: 'Look at how a rescue supports trust and visibility in a broader, more competitive city search landscape.',
+    tag: 'Utica',
+  },
+  {
+    title: 'Web Design in Clinton, NY',
+    href: '/service-areas/clinton',
+    description: 'Explore why older sites underperform when the market expects clarity and trust right away.',
+    tag: 'Clinton',
+  },
+];
+
+const relatedArticles = [
+  {
+    title: 'How Site Speed Impacts Revenue',
+    href: '/blog/site-speed-conversion',
+    description: 'See how slow pages drain trust and how speed cleanup changes conversion behavior.',
+    tag: 'Performance',
+  },
+  {
+    title: '5 Things Wrong With Most Contractor Websites',
+    href: '/blog/contractor-website-mistakes',
+    description: 'Review the common design and usability issues that usually trigger a rescue project.',
+    tag: 'Web Design',
+  },
+  {
+    title: 'Mobile-First SEO Is the Only SEO That Matters Now',
+    href: '/blog/mobile-first-seo',
+    description: 'Understand why mobile usability is often the first real problem that has to be fixed.',
+    tag: 'Mobile SEO',
+  },
+];
+---
+
+<ServiceDetailPage
+  title="Website Redesign & Rescue Services | Designed by Anthony"
+  description="Website redesign and rescue services that refresh outdated sites with stronger mobile usability, cleaner performance, and a more current design system."
+  breadcrumbLabel="Website Rescue"
+  schema={serviceSchema}
+  serviceNumber="03"
+  heroTitle="Website Rescues and Mobile Optimization"
+  heroDescription="If your website is slow, looks outdated, or does not work right on a phone, we fix it. You do not need a full redesign to start over from scratch."
+  pricingNote={`${PUBLIC_PRICING_NOTE} ${PUBLIC_PAYMENT_STRUCTURE_COPY}`}
+  heroPills={['Mobile-first rebuilds', 'Speed and trust cleanup', 'Keep the good, fix the broken']}
+  image={serviceImage}
+  imageAlt="Wooden letter tiles spelling Web Design on a dark wood surface"
+  imageWidth={1024}
+  imageHeight={719}
+  sectionTitle="What we fix in a website rescue"
+  sectionIntro="A rescue is for businesses that have useful history, useful content, or useful rankings but a site that no longer supports the way they want to grow."
+  detailBlocks={detailBlocks}
+  faqEntries={faqEntries}
+  relatedAreas={relatedAreas}
+  relatedArticles={relatedArticles}
+  sourcesTitle="Why Rescues Focus on Mobile and Speed"
+  sourcesIntro="Here is the documentation behind the standards we use when fixing underperforming sites."
+  sourcesItems={rescueSources}
+  ctaTitle="Your website does not have to stay broken."
+  ctaDescription="Start with the free audit and I will show you exactly what needs fixing, whether that means a rescue or a full rebuild."
+/>

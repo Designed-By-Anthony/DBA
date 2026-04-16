@@ -1,0 +1,223 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PUBLIC_PRICING_PILL } from '../lib/offers';
+import { buildItemListSchema } from '../lib/seo';
+
+const areas = [
+  {
+    name: 'Rome',
+    slug: 'rome',
+    region: 'Mohawk Valley',
+    tagline: 'Local pages built for Rome businesses that need stronger trust, faster load times, and cleaner lead flow.',
+  },
+  {
+    name: 'New Hartford',
+    slug: 'new-hartford',
+    region: 'Mohawk Valley',
+    tagline: 'Performance-first pages for New Hartford service businesses competing on polish, trust, and responsiveness.',
+  },
+  {
+    name: 'Utica',
+    slug: 'utica',
+    region: 'Mohawk Valley',
+    tagline: 'City-specific positioning for Utica businesses that need to stand out in a busier local search market.',
+  },
+  {
+    name: 'Clinton',
+    slug: 'clinton',
+    region: 'Mohawk Valley',
+    tagline: 'Credibility-focused web pages for Clinton businesses selling trust, care, and quality at a local level.',
+  },
+  {
+    name: 'Syracuse',
+    slug: 'syracuse',
+    region: 'Central New York',
+    tagline: 'Competitive local pages for Syracuse businesses that need broader coverage and sharper positioning.',
+  },
+  {
+    name: 'North Country',
+    slug: 'north-country',
+    region: 'Northern New York',
+    tagline: 'Service-area strategy for wide travel territories where clarity, speed, and mobile reliability matter most.',
+  },
+  {
+    name: 'Manhattan',
+    slug: 'manhattan',
+    region: 'New York City',
+    tagline: 'High-competition local pages built to feel credible and easy to trust fast.',
+  },
+  {
+    name: 'Miami',
+    slug: 'miami',
+    region: 'South Florida',
+    tagline: 'Local page strategy for fast-moving service markets where positioning matters immediately.',
+  },
+  {
+    name: 'Naples',
+    slug: 'naples',
+    region: 'Southwest Florida',
+    tagline: 'Premium local positioning for service businesses selling trust and responsiveness.',
+  },
+  {
+    name: 'Columbus',
+    slug: 'columbus',
+    region: 'Central Ohio',
+    tagline: 'Local visibility pages built for a growing service market and mobile-first decision-making.',
+  },
+  {
+    name: 'Houston',
+    slug: 'houston',
+    region: 'Southeast Texas',
+    tagline: 'Service-area strategy for a large, competitive market where clarity and coverage matter.',
+  },
+];
+
+const serviceAreasSchema = buildItemListSchema({
+  name: 'Service Areas',
+  description:
+    'Designed by Anthony provides custom web design, website rescue, managed hosting, and local SEO for service businesses across its active service areas.',
+  path: '/service-areas',
+  items: areas.map((area) => ({
+    name: area.name,
+    url: `/service-areas/${area.slug}`,
+    description: area.tagline,
+  })),
+});
+
+const serviceAreasFooterCta = {
+  eyebrow: 'Local Website Audit',
+  title: 'Want to see what your site looks like in your market?',
+  description:
+    'Use the audit and I will show you the clearest trust, conversion, and visibility gaps for the city or region you care about most.',
+  primaryHref: '/contact',
+  primaryLabel: 'Get a Free Market Audit',
+  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+  secondaryLabel: 'Book a 15-minute intro call',
+};
+---
+
+<Layout
+  title="Web Design Service Areas | Designed by Anthony"
+  description="Custom web design, website rescue, managed hosting, and local SEO across Rome, Utica, Syracuse, North Country, Manhattan, Miami, Naples, Columbus, and Houston."
+  pageType="CollectionPage"
+  schema={serviceAreasSchema}
+  footerCta={serviceAreasFooterCta}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner areas-hero">
+      <p class="page-eyebrow">Service Areas</p>
+      <h1>Web design and development for every market — service-area pages built to connect local intent with a stronger website experience.</h1>
+      <p>
+        These local pages are built for the search language, expectations, and competition level of each market without turning into generic filler or recycled city copy.
+      </p>
+      <div class="hero-meta-row">
+        <span class="mini-pill">Location-specific audit offers</span>
+        <span class="mini-pill">{PUBLIC_PRICING_PILL}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="section-container">
+      <div class="section-header centered areas-index-header">
+        <h2>Which cities and regions we cover</h2>
+        <p>
+          Each card opens a dedicated market page with local positioning, rescue and SEO context, and a clear next
+          step for that area.
+        </p>
+      </div>
+      <div class="areas-grid">
+      {areas.map((area, index) => (
+        <a href={`/service-areas/${area.slug}`} class="surface-card area-card reveal-up">
+          <div class="area-card-top">
+            <span class="card-tag">{String(index + 1).padStart(2, '0')}</span>
+            <span class="area-region">{area.region}</span>
+          </div>
+          <h2>{area.name}</h2>
+          <p>{area.tagline}</p>
+          <span class="area-link">Open Area Page</span>
+        </a>
+      ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .areas-hero {
+    max-width: 900px;
+  }
+
+  .areas-index-header {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+  }
+
+  .areas-index-header h2 {
+    font-size: clamp(1.65rem, 3vw, 2.1rem);
+    font-weight: 800;
+    color: var(--text-white);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .areas-index-header p {
+    color: var(--text-gray);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .areas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .area-card {
+    display: block;
+    padding: 1.8rem;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .area-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(96, 165, 250, 0.3);
+  }
+
+  .area-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .area-region {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .area-card h2 {
+    font-size: 1.4rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.7rem;
+  }
+
+  .area-card p {
+    color: var(--text-gray);
+    margin-bottom: 1rem;
+  }
+
+  .area-link {
+    color: #bfdbfe;
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .areas-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
