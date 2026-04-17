@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { Resend } from 'resend';
+import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * Calendly Webhook Handler
@@ -108,8 +106,7 @@ export async function POST(request: NextRequest) {
 
       // Notify you
       try {
-        if (resend) {
-          await resend.emails.send({
+        await sendMail({
           from: `Agency OS <${complianceConfig.fromEmail}>`,
           to: [complianceConfig.adminNotificationEmail],
           subject: `📞 Call Booked: ${inviteeName || inviteeEmail}`,
@@ -125,8 +122,7 @@ export async function POST(request: NextRequest) {
               </a>
             </div>
           `,
-          });
-        }
+        });
       } catch (e) {
         console.error('Calendly notification email failed:', e);
       }

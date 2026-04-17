@@ -3,7 +3,7 @@
 import { db } from "@/lib/firebase";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import * as Sentry from "@sentry/nextjs";
-import { Resend } from "resend";
+import { sendMail } from "@/lib/mailer";
 import {
   wrapLinksForTracking,
   appendComplianceFooter,
@@ -25,8 +25,6 @@ import { pipelineStages } from "@/lib/theme.config";
 import { recalculateLeadScore, evaluateProspectHealth } from "@/lib/intelligence";
 import { processAutomations } from "@/lib/automations";
 import { generateClientId, getIdSource } from "@/lib/client-id";
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Base URL for tracking endpoints — uses NEXTAUTH_URL in dev, or infer from headers
 const BASE_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -659,33 +657,24 @@ export async function sendEmail(params: {
 </html>`;
 
     try {
-      const resendPayload: {
-        from: string;
-        to: string;
-        reply_to: string;
-        subject: string;
-        html: string;
-        scheduledAt?: string;
-      } = {
-        // Multi-tenant email domains logic will go here. Defaulting to system env for now.
+      const subjectLine = mergeTemplateVars(params.subject, {
+        name: prospect.name.split(" ")[0],
+        company: prospect.company || prospect.name,
+      });
+
+      const result = await sendMail({
         from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
         to: prospect.email,
-        reply_to: params.fromEmail || complianceConfig.replyTo,
-        subject: mergeTemplateVars(params.subject, {
-          name: prospect.name.split(" ")[0],
-          company: prospect.company || prospect.name,
-        }),
+        replyTo: params.fromEmail || complianceConfig.replyTo,
+        subject: subjectLine,
         html: fullHtml,
-      };
+        ...(params.scheduledAt ? { scheduledAt: params.scheduledAt } : {}),
+      });
 
-      if (params.scheduledAt) {
-        resendPayload.scheduledAt = params.scheduledAt;
+      if (!result.ok) {
+        errors.push(`Failed to send to ${prospect.name}: ${result.error}`);
+        continue;
       }
-
-      if (!resend) {
-        throw new Error("Missing RESEND_API_KEY");
-      }
-      const result = await resend.emails.send(resendPayload);
 
       const emailRecord: Omit<EmailRecord, "clicks"> & { clicks: unknown[] } = {
         id: emailId,
@@ -693,12 +682,12 @@ export async function sendEmail(params: {
         prospectId,
         prospectEmail: prospect.email,
         prospectName: prospect.name,
-        subject: resendPayload.subject,
+        subject: subjectLine,
         bodyHtml: params.bodyHtml,
         status: params.scheduledAt ? "scheduled" : "sent",
         scheduledAt: params.scheduledAt || null,
         sentAt: params.scheduledAt ? null : new Date().toISOString(),
-        resendId: 'data' in result && result.data ? String((result.data as unknown as {id:string}).id) : null,
+        resendId: result.mode === "resend" ? result.id : null,
         opens: 0,
         clicks: [],
         createdAt: new Date().toISOString(),
@@ -730,10 +719,8 @@ export async function sendTestEmail(params: {
   fromName?: string;
   fromEmail?: string;
 }): Promise<{ success: boolean; error?: string }> {
-  await verifyAuth(); 
+  await verifyAuth();
 
-  if (!resend) return { success: false, error: "Missing RESEND_API_KEY" };
-  
   let pName = "Jane";
   let pCompany = "Acme Corp";
   let pWebsite = "https://acme.com";
@@ -770,18 +757,15 @@ export async function sendTestEmail(params: {
 </body>
 </html>`;
 
-  try {
-    await resend.emails.send({
-      from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
-      to: params.testEmailAddress,
-      replyTo: params.fromEmail || complianceConfig.replyTo,
-      subject: `[TEST] ` + mergeTemplateVars(params.subject, { name: pName, company: pCompany }),
-      html: fullHtml,
-    });
-    return { success: true };
-  } catch (err: unknown) {
-    return { success: false, error: err instanceof Error ? err.message : String(err) };
-  }
+  const result = await sendMail({
+    from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
+    to: params.testEmailAddress,
+    replyTo: params.fromEmail || complianceConfig.replyTo,
+    subject: `[TEST] ` + mergeTemplateVars(params.subject, { name: pName, company: pCompany }),
+    html: fullHtml,
+  });
+  if (!result.ok) return { success: false, error: result.error };
+  return { success: true };
 }
 
 // ============================================

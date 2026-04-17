@@ -35,6 +35,13 @@ export default defineConfig({
           timeout: 120_000,
           stdout: "pipe",
           stderr: "pipe",
+          env: {
+            ...process.env,
+            // Force Lighthouse Gmail into test-fire mode so Playwright
+            // runs never call gmail.users.messages.send; inspect via
+            // GET /api/test/emails.
+            EMAIL_TEST_MODE: "true",
+          },
         },
       }),
 });

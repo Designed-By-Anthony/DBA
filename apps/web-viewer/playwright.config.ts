@@ -72,6 +72,10 @@ export default defineConfig({
           env: {
             ...process.env,
             NODE_ENV: 'test',
+            // Force the centralized mailer into test-fire mode so Playwright
+            // runs never send real email via Resend. The outbox is inspectable
+            // through GET /api/test/emails.
+            EMAIL_TEST_MODE: 'true',
           },
         },
       }),

@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { getDb, leads, portalTokens } from "@dba/database";
-import { Resend } from "resend";
+import { sendMail, isEmailTestMode } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * Magic Link Authentication for Client Portal.
@@ -59,12 +57,11 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "[REDACTED]";
     const magicLink = `${baseUrl}/portal/verify?token=${token}`;
 
-    if (process.env.NEXT_PUBLIC_IS_TEST !== "true" && resend) {
-      await resend.emails.send({
-        from: `Designed by Anthony <${complianceConfig.fromEmail}>`,
-        to: [normalizedEmail],
-        subject: "Your Portal Login Link",
-        html: `
+    await sendMail({
+      from: `Designed by Anthony <${complianceConfig.fromEmail}>`,
+      to: [normalizedEmail],
+      subject: "Your Portal Login Link",
+      html: `
           <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 24px;">
             <div style="background: #0a0a0f; border-radius: 16px; padding: 40px; text-align: center;">
               <div style="width: 56px; height: 56px; background: #2563eb; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin-bottom: 24px;">
@@ -87,10 +84,9 @@ export async function POST(request: NextRequest) {
             </p>
           </div>
         `,
-      });
-    }
+    });
 
-    if (process.env.NEXT_PUBLIC_IS_TEST === "true" || request.headers.get("x-e2e-testing") === "true") {
+    if (isEmailTestMode() || request.headers.get("x-e2e-testing") === "true") {
       return NextResponse.json({ success: true, testModeLink: magicLink });
     }
 

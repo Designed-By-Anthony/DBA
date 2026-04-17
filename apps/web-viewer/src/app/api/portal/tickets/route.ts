@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";
-import { Resend } from "resend";
+import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * GET /api/portal/tickets
@@ -99,11 +97,10 @@ export async function POST(request: NextRequest) {
 
     // Notify admin via email (best-effort).
     try {
-      if (resend) {
-        await resend.emails.send({
-          from: `Agency OS <${complianceConfig.fromEmail}>`,
-          to: [complianceConfig.adminNotificationEmail],
-          subject: `🎫 Support Ticket: ${subject.trim()} — ${session.prospectName}`,
+      await sendMail({
+        from: `Agency OS <${complianceConfig.fromEmail}>`,
+        to: [complianceConfig.adminNotificationEmail],
+        subject: `🎫 Support Ticket: ${subject.trim()} — ${session.prospectName}`,
           html: `
             <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
               <h2 style="color: #fff; margin: 0 0 16px;">🎫 New Support Ticket</h2>
@@ -119,8 +116,7 @@ export async function POST(request: NextRequest) {
               </a>
             </div>
           `,
-        });
-      }
+      });
     } catch (e) {
       console.error("Ticket notification email failed:", e);
     }

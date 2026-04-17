@@ -1,11 +1,9 @@
 import { db } from "@/lib/firebase";
-import { Resend } from "resend";
+import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { generateClientId, getIdSource } from "@/lib/client-id";
 import { resolveLeadAgencyId } from "@/lib/lead-webhook-agency";
 import type { LeadIntakeResult, LeadIntakeSource } from "@/lib/lead-intake/types";
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * Creates/updates prospect, activity, admin notification, optional submitter confirmation.
@@ -106,8 +104,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://viewer.designedbyanthony.com";
 
   try {
-    if (resend) {
-      await resend.emails.send({
+    await sendMail({
       from: `Agency OS <${complianceConfig.fromEmail}>`,
       to: [complianceConfig.adminNotificationEmail],
       subject: `🔔 New ${isNew ? "Lead" : "Activity"}: ${name} ${company ? `(${company})` : ""}`,
@@ -135,15 +132,14 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
             </div>
           </div>
         `,
-      });
-    }
+    });
   } catch (emailErr) {
     console.error("Lead notification email failed:", emailErr);
   }
 
-  if (process.env.LEAD_SEND_SUBMITTER_CONFIRMATION === "true" && resend) {
+  if (process.env.LEAD_SEND_SUBMITTER_CONFIRMATION === "true") {
     try {
-      await resend.emails.send({
+      await sendMail({
         from: `${complianceConfig.companyName} <${complianceConfig.fromEmail}>`,
         to: [email],
         replyTo: complianceConfig.replyTo,

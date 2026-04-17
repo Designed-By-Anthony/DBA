@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/firebase';
-import { Resend } from 'resend';
+import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import type Stripe from 'stripe';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
 /**
@@ -112,11 +111,10 @@ export async function POST(request: NextRequest) {
 
         // Notify admin
         try {
-          if (resend) {
-            await resend.emails.send({
-              from: `Agency OS <${complianceConfig.fromEmail}>`,
-              to: [complianceConfig.adminNotificationEmail],
-              subject: `💰 Payment Received: $${amount.toLocaleString()} — ${session.customer_details?.name || 'Unknown'}`,
+          await sendMail({
+            from: `Agency OS <${complianceConfig.fromEmail}>`,
+            to: [complianceConfig.adminNotificationEmail],
+            subject: `💰 Payment Received: $${amount.toLocaleString()} — ${session.customer_details?.name || 'Unknown'}`,
               html: `
                 <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
                   <h2 style="color: #10b981; margin: 0 0 16px;">💰 Payment Received</h2>
@@ -131,8 +129,7 @@ export async function POST(request: NextRequest) {
                   </a>
                 </div>
               `,
-            });
-          }
+          });
         } catch (e) {
           console.error('Payment notification email failed:', e);
         }

@@ -12,6 +12,47 @@ export function isGmailConfigured(): boolean {
 }
 
 /**
+ * Test-fire mode for Lighthouse: record sends in-memory instead of hitting
+ * the Gmail API. Enabled when `EMAIL_TEST_MODE=true`, `NEXT_PUBLIC_IS_TEST=true`,
+ * or when running under Playwright.
+ */
+export function isGmailTestMode(): boolean {
+  if (process.env.EMAIL_TEST_MODE === 'true') return true;
+  if (process.env.NEXT_PUBLIC_IS_TEST === 'true') return true;
+  if (process.env.PLAYWRIGHT_TEST_BASE_URL) return true;
+  return false;
+}
+
+export type GmailCapturedEmail = {
+  id: string;
+  firedAt: string;
+  to: string;
+  subject: string;
+  html: string;
+};
+
+type GmailMailerGlobal = { outbox: GmailCapturedEmail[]; counter: number };
+const gmailGlobalKey = '__DBA_LIGHTHOUSE_GMAIL_OUTBOX__' as const;
+const gmailG = globalThis as unknown as Record<typeof gmailGlobalKey, GmailMailerGlobal | undefined>;
+
+function getGmailStore(): GmailMailerGlobal {
+  if (!gmailG[gmailGlobalKey]) {
+    gmailG[gmailGlobalKey] = { outbox: [], counter: 0 };
+  }
+  return gmailG[gmailGlobalKey]!;
+}
+
+export function getGmailTestOutbox(): GmailCapturedEmail[] {
+  return [...getGmailStore().outbox];
+}
+
+export function clearGmailTestOutbox(): void {
+  const s = getGmailStore();
+  s.outbox = [];
+  s.counter = 0;
+}
+
+/**
  * Sends an HTML email via the Gmail API using domain-wide delegation.
  *
  * Requires GMAIL_SERVICE_ACCOUNT_KEY env var containing the JSON of a service
@@ -23,6 +64,19 @@ export async function sendViaGmail(to: string, subject: string, html: string): P
   const recipient = normalizeEmail(to);
   if (!recipient) {
     throw new Error('Invalid recipient email address.');
+  }
+
+  if (isGmailTestMode()) {
+    const store = getGmailStore();
+    store.counter += 1;
+    store.outbox.push({
+      id: `gmail-test-fire-${store.counter}-${Date.now()}`,
+      firedAt: new Date().toISOString(),
+      to: recipient,
+      subject,
+      html,
+    });
+    return;
   }
 
   const keyJson = process.env.GMAIL_SERVICE_ACCOUNT_KEY;

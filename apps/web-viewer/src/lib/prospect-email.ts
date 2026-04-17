@@ -3,7 +3,7 @@
  * Mirrors the core pipeline in sendEmail but callable from cron and automations.
  */
 import { db } from "@/lib/firebase";
-import { Resend } from "resend";
+import { sendMail } from "@/lib/mailer";
 import {
   appendComplianceFooter,
   injectTrackingPixel,
@@ -13,7 +13,6 @@ import {
 import { complianceConfig } from "@/lib/theme.config";
 import type { EmailRecord } from "@/lib/types";
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const BASE_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export async function sendProspectEmailFromTemplate(params: {
@@ -71,43 +70,41 @@ export async function sendProspectEmailFromTemplate(params: {
     company,
   });
 
-  if (!resend) return { ok: false, error: "Missing RESEND_API_KEY" };
+  const result = await sendMail({
+    from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
+    to: email,
+    replyTo: complianceConfig.replyTo,
+    subject: subjectLine,
+    html: fullHtml,
+  });
 
-  try {
-    const result = await resend.emails.send({
-      from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
-      to: email,
-      replyTo: complianceConfig.replyTo,
-      subject: subjectLine,
-      html: fullHtml,
-    });
-
-    const emailRecord: Omit<EmailRecord, "clicks"> & { clicks: unknown[] } = {
-      id: emailId,
-      agencyId: params.agencyId,
-      prospectId: params.prospectId,
-      prospectEmail: email,
-      prospectName: name,
-      subject: subjectLine,
-      bodyHtml: params.bodyHtml,
-      status: "sent",
-      scheduledAt: null,
-      sentAt: new Date().toISOString(),
-      resendId: "data" in result && result.data ? String((result.data as { id: string }).id) : null,
-      opens: 0,
-      clicks: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    await emailRef.set(emailRecord as Record<string, unknown>);
-
-    await db.collection("prospects").doc(params.prospectId).update({
-      lastContactedAt: new Date().toISOString(),
-      ...(data.status === "lead" ? { status: "contacted" } : {}),
-    });
-
-    return { ok: true };
-  } catch (e: unknown) {
-    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  if (!result.ok) {
+    return { ok: false, error: result.error };
   }
+
+  const emailRecord: Omit<EmailRecord, "clicks"> & { clicks: unknown[] } = {
+    id: emailId,
+    agencyId: params.agencyId,
+    prospectId: params.prospectId,
+    prospectEmail: email,
+    prospectName: name,
+    subject: subjectLine,
+    bodyHtml: params.bodyHtml,
+    status: "sent",
+    scheduledAt: null,
+    sentAt: new Date().toISOString(),
+    resendId: result.mode === "resend" ? result.id : null,
+    opens: 0,
+    clicks: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  await emailRef.set(emailRecord as Record<string, unknown>);
+
+  await db.collection("prospects").doc(params.prospectId).update({
+    lastContactedAt: new Date().toISOString(),
+    ...(data.status === "lead" ? { status: "contacted" } : {}),
+  });
+
+  return { ok: true };
 }

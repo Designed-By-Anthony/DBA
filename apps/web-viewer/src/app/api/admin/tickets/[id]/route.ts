@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";
-import { Resend } from "resend";
+import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * PATCH /api/admin/tickets/[id]
@@ -77,9 +75,9 @@ export async function PATCH(
       })
       .where(and(eq(tickets.id, ticketId), eq(tickets.tenantId, orgId)));
 
-    if (ticket.prospectEmail && resend && hasReply) {
+    if (ticket.prospectEmail && hasReply) {
       try {
-        await resend.emails.send({
+        await sendMail({
           from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
           to: [ticket.prospectEmail],
           subject: `Re: ${ticket.subject}`,
