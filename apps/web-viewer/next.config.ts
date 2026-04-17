@@ -22,8 +22,13 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             // Clerk FAPI (*.clerk.accounts.dev), telemetry, img, workers — see https://clerk.com/docs/security/clerk-csp
             // `connect-src` includes *.designedbyanthony.com so admin./accounts. can call sibling subdomains (CRM family).
+            // `frame-ancestors 'self'` supersedes the legacy X-Frame-Options and is the
+            // check modern browsers actually honor.
             value:
               "default-src 'self'; " +
+              "base-uri 'self'; " +
+              "object-src 'none'; " +
+              "frame-ancestors 'self'; " +
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://challenges.cloudflare.com; " +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com; " +
@@ -31,18 +36,37 @@ const nextConfig: NextConfig = {
               "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev; " +
               "worker-src 'self' blob:;",
           },
+          // HSTS: pin the host to HTTPS for two years (preload-eligible once you
+          // verify apex+subdomain coverage). Safe to apply on Vercel which is
+          // HTTPS-only for production deployments.
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
+          // Legacy header kept only for IE/old Safari; modern browsers ignore it
+          // and `frame-ancestors 'self'` above is the canonical control.
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
-          }
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            // Deny sensor/device APIs we never use; allow PaymentRequest for Stripe.
+            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            // Keeps Stripe Checkout popups working while isolating the window.
+            value: 'same-origin-allow-popups',
+          },
         ],
       },
     ];

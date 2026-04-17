@@ -8,6 +8,17 @@ validateLighthouseEnv();
 
 const nextConfig: NextConfig = {
   async headers() {
+    const isProd = process.env.VERCEL_ENV === "production" ||
+      (process.env.NODE_ENV === "production" && process.env.VERCEL === "1");
+    const frameAncestors = [
+      "'self'",
+      "https://designedbyanthony.com",
+      "https://*.designedbyanthony.com",
+      // Dev-only: Astro marketing preview on localhost embeds the audit app.
+      // Stripped from prod responses so an attacker can't load us in a frame via
+      // a DNS-collision or http proxy.
+      ...(isProd ? [] : ["http://localhost:3000", "http://localhost:4321"]), // pragma: allowlist secret
+    ].join(" ");
     return [
       {
         source: "/(.*)",
@@ -15,7 +26,11 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "frame-ancestors 'self' https://designedbyanthony.com https://*.designedbyanthony.com http://localhost:3000 http://localhost:4321;",
+              `frame-ancestors ${frameAncestors}; base-uri 'self'; object-src 'none';`,
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           {
             key: "Referrer-Policy",
@@ -26,8 +41,16 @@ const nextConfig: NextConfig = {
             value: "nosniff",
           },
           {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+            value: "camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()",
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
           },
         ],
       },
