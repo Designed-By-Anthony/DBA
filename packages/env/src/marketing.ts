@@ -39,11 +39,26 @@ const marketingSchema = z
   .passthrough()
   .superRefine((env, ctx) => {
     // Env-bleed guard — fail loudly if a web-viewer or lighthouse secret
-    // ended up on the marketing Vercel project by mistake. Only runs on
-    // actual Vercel builds (where `VERCEL=1` is injected); on local /
-    // cloud-agent machines the whole monorepo shares one env so this
-    // check would false-positive.
+    // ended up on the marketing Vercel project by mistake. Only applies
+    // when:
+    //   1. We are on Vercel (`VERCEL=1`), AND
+    //   2. The three-project split is actually in effect — signalled by
+    //      `ADMIN_UPSTREAM_URL` being present on the apex project (set
+    //      per the deploy model in README.md / turbo.json).
+    //
+    // In a single-project Turborepo build (one Vercel project builds
+    // every app via turbo), CRM secrets are expected to coexist with
+    // the marketing build — the guard would fire a false positive.
+    // Local / cloud-agent machines already share one env, so they are
+    // exempt by the VERCEL check.
     if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
+    const hasThreeProjectSplit =
+      typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
+        "string" &&
+      ((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
+        .length > 0;
+    if (!hasThreeProjectSplit) return;
+
     const forbidden = [
       "CLERK_SECRET_KEY",
       "DATABASE_URL",

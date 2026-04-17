@@ -41,9 +41,18 @@ const lighthouseSchema = z
   .passthrough()
   .superRefine((env, ctx) => {
     // Only enforce on Vercel (`VERCEL=1`) where each project has
-    // isolated env; skip on local/CI where the whole monorepo shares
-    // one env.
+    // isolated env AND the three-project split is actually deployed
+    // (signalled by `ADMIN_UPSTREAM_URL` on the apex project). Skip on
+    // local/CI and single-project Turborepo builds where the whole
+    // monorepo shares one env by design.
     if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
+    const hasThreeProjectSplit =
+      typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
+        "string" &&
+      ((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
+        .length > 0;
+    if (!hasThreeProjectSplit) return;
+
     const forbidden = [
       "CLERK_SECRET_KEY",
       "DATABASE_URL",
