@@ -17,10 +17,13 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.1.0",
+    "@dba/automation": "workspace:*",
     "@dba/database": "workspace:*",
     "@dba/env": "workspace:*",
     "@dba/lead-form-contract": "workspace:*",
     "@dba/theme": "workspace:*",
+    "@dba/ui": "workspace:*",
+    "zod": "^3.25.76",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/outfit": "^5.2.8",
     "@react-email/components": "^1.0.12",

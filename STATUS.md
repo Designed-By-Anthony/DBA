@@ -94,6 +94,66 @@ Coverage: `apps/web-viewer/tests/lead-spam-guard.spec.ts` (pure-logic tests for 
   - plus portal token/session support tables used by migrated auth flows
 - Added `apps/web-viewer/src/lib/vertical-config.ts` and integrated it so vertical UI config is derived from SQL tenant `vertical_type`.
 
+### Phase 8: Versioned ingest route + Astro handshake rewire
+
+- **`POST /api/v1/ingest`** (`apps/web-viewer/src/app/api/v1/ingest/route.ts`): stable versioned alias for the Global Ingest Engine. Same body + auth + behavior as `POST /api/leads/ingest`; both delegate to the shared `handleIngestPost` in `lib/lead-intake/ingest-handler.ts`.
+- **Multi-path auth**: `handleIngestPost` now accepts **any one** of — `X-DBA-SECRET` header (matches new `INGEST_SECRET` env), legacy `x-webhook-secret` / `x-lead-secret` header (matches `LEAD_WEBHOOK_SECRET`, kept for existing integrations), or a valid Cloudflare Turnstile token in the body (the browser path the marketing Astro forms already use — browsers can't safely hold a shared secret). Constant-time compare for all header paths. `LEAD_INGEST_REQUIRE_SECRET=false` bypasses auth for dev loops.
+- **Astro handshake rewire** (`apps/marketing/src/components/AuditForm.astro` + `apps/marketing/src/scripts/audit-forms.ts`): form `action` and `fetch` target resolve `PUBLIC_INGEST_URL` → `PUBLIC_CRM_LEAD_URL` → baked default (`https://admin.designedbyanthony.com/api/v1/ingest`). Form carries `data-tenant-id` from `PUBLIC_TENANT_ID`; the submit script reads it and attaches the `X-Tenant-Id` header. Verified on `/`, `/contact`, `/facebook-offer`.
+- **`turbo.json` env allow-list** grows to include `INGEST_SECRET`, `LEAD_INGEST_REQUIRE_SECRET`, `PUBLIC_LEAD_INGEST_DISABLED`, `PUBLIC_INGEST_URL`, `PUBLIC_TENANT_ID`. `apps/marketing/.env.example` documents the new Augusta env vars.
+- **Firebase audit for `apps/marketing`**: the Astro browser bundle has **zero Firebase SDK** (verified — no imports under `src/`, no SDK scripts in layout `<head>`, no `firebaseConfig*` / `init-firebase*` files). The only Firebase artefacts are `firebase.json` + `build/sync-firebase-csp.mjs` (Hosting emulator for Playwright security-headers tests, per `apps/marketing/AGENTS.md`), `firebase-tools` devDep, the separate `functions/` Cloud Functions chat bridge (different runtime), and the `firebase-hosting-*.yml` CI workflows (deploy target superseded by Vercel). Leaving those alone — removing them needs an explicit operator call because they touch CI + test infra; the lead-ingest rewire doesn't depend on them.
+
+### Phase 7: Global Lead Contract + Global Ingest Engine
+
+- **Polymorphic `leads` schema** (`packages/database/schema.ts`): added `firstName`, `lastName`, `phone`, `source` as nullable columns + switched the default `status` from `"lead"` to `"new"` to align with the Augusta blueprint. `metadata` JSONB stays as the Chameleon super-field — agency audit scores, service-pro dispatch/geo, restaurant party_size/table, retail SKUs/CLV all live there.
+
+- **Global Lead Contract** (`@dba/lead-form-contract`): new `globalLeadCoreSchema` + `globalLeadIngestBodySchema` + `parseGlobalLeadIngestBody` handle the polymorphic payload — global core fields at the top level, everything else folded into `metadata`. Also ships `constantTimeEqual` for safe secret comparison.
+
+- **Global Ingest Engine** (`POST /api/leads/ingest`): the authenticated Switchboard. One endpoint for every vertical.
+  - Tenant identity: `x-tenant-id` / `x-agency-id` header (preferred) or body fallback, with the `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` env catching the primary tenant.
+  - Auth: constant-time-compared shared secret via `x-webhook-secret` / `x-lead-secret` header or body `secret`. Gated by `LEAD_INGEST_REQUIRE_SECRET` (defaults on).
+  - Validation: Zod on the global core + honeypot short-circuit (runs BEFORE Zod). Unknown top-level fields are automatically folded into `metadata`, and the metadata payload is additionally Zod-validated against the tenant's vertical schema (agency/service_pro/restaurant/florist) via `safeParseVerticalLeadMetadata`.
+  - Persistence: `insertSqlLead` writes firstName/lastName/phone/source + shallow-merges metadata on re-submits (so partial updates don't clobber). DB failures respond 503 (retryable) instead of 500.
+  - Automation: fires `lead_created` through the engine with the tenant's vertical so factory rules (service_pro SMS, restaurant ack, florist welcome, agency audit email) run automatically.
+
+- **GenericLeadCard** (`@dba/ui`): vertical-aware React card. Renders global fields (name/email/phone/source/status) in the header and pulls vertical-specific metadata keys from JSONB per the tenant's `vertical_type`. Unknown verticals fall back to the agency field set. Mounted into `VerticalDashboard` as the "Recent leads" strip.
+
+- **Marketing backward-compat**: `POST /api/lead` (the browser-safe no-secret form endpoint) still works end-to-end — it calls `executeLeadIntake`, which writes via `insertSqlLead` and fires the same automation engine. The marketing Astro forms don't need to change. New partner integrations and server-to-server callers use `POST /api/leads/ingest`.
+
+### Phase 6: Chassis — Communication Engine + Generic Automation Engine
+
+- **Communication Engine** (`apps/web-viewer/src/lib/comms.ts`): single utility for every outbound notification — `sendEmail` (Resend), `sendSms` (Twilio via HTTP REST, no SDK), and `notify` for multi-channel fan-out. All inputs are Zod-validated (E.164 for SMS, RFC 5322 email). Missing credentials return `{ ok: false, skipped: "no_credentials" }` instead of throwing, so the Automation Engine and public lead intake keep running when envs aren't wired. Tenant-scoped by `tenantId` on every call (Zero-Trust guardrail). `turbo.json` tracks `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `COMMS_EMAIL_DISABLED`, `COMMS_SMS_DISABLED`.
+
+- **Automation Engine** (`packages/automation` → `@dba/automation`): transport-free, SQL-first rules runner. Strict Zod types for every surface:
+  - 8 triggers — `lead_created`, `prospect_status_changed`, `activity_added`, `ticket_created`, `form_submission`, `audit_completed`, `job_finished`, `payment_received`.
+  - 6 action types — `send_email`, `send_sms`, `add_tag`, `change_status`, `create_activity`, `assign_owner` (discriminated-union Zod schema so `action.payload` is strongly typed per `type`).
+  - Condition DSL — tiny, fully-typed predicate list (AND semantics) with `equals` / `contains` / `gt` / `lt` / `in` on any JSON-pointer path into the event. Empty condition = always true.
+  - Engine loads active rules from the SQL `automations` table (`@dba/database`), validates each row with Zod (invalid rows are dropped with a `console.warn` instead of crashing the pipeline), merges with caller-supplied factory rules (SQL wins on `(trigger, name)` collisions), and fires matching actions through caller-supplied handlers — keeping the package transport-free so Lighthouse / cron / other workers can import it without pulling in Resend or Twilio.
+  - Factory rules ship per vertical: `agency → audit_completed → email report`; `service_pro → lead_created → speed-to-lead SMS` + `job_finished → ask for Google review`; `restaurant → lead_created → acknowledge-order SMS`; `florist → lead_created → welcome email`. Tenants override via the SQL `automations` row.
+
+- **`automations.condition` column** (`packages/database/schema.ts`): new JSONB column (default `{}`) so the engine's condition DSL is persistable. `leads.metadata` is unchanged; vertical-specific payloads still live there per the Augusta blueprint.
+
+- **Bridge** (`apps/web-viewer/src/lib/automation-runner.ts`): single entry point `fireAutomationEvent({ trigger, tenantId, vertical, data })`. Wires the engine's action handlers to the Communication Engine (Resend + Twilio), templates `{{lead.name}}` etc. from the event payload, and logs outcomes per rule for audit.
+
+- **Lead intake emits `lead_created`**: `executeLeadIntake` now resolves the tenant's vertical from SQL and fires the automation event after a successful insert. DB / comms failures are swallowed so the public form never breaks.
+
+### Phase 5: Master Vertical Module System
+
+- **Lean SQL / fat JSONB**: added `metadata` JSONB column on `leads` (default `{}`) alongside the existing `tenants.crm_config`. Re-running `pnpm db:push` will apply it without altering the other columns — per the Augusta blueprint, all vertical-specific data (agency audit scores, service-pro geo + dispatch state, restaurant order stream, retail loyalty) lives in these two JSONB buckets so the SQL schema stays lean.
+- **Vertical metadata contracts** (`@dba/ui`): Zod schemas for each vertical's `leads.metadata` payload — `agencyLeadMetadataSchema`, `servicePtoLeadMetadataSchema`, `restaurantLeadMetadataSchema`, `retailLeadMetadataSchema` — plus `parseVerticalLeadMetadata` / `safeParseVerticalLeadMetadata` helpers keyed off `tenants.vertical_type`. Invalid payloads throw `ZodError`; unknown verticals fall back to `agency`.
+- **`<VerticalSwitch />`** (`@dba/ui`): React multiplexer that renders different Feature Set components based on `tenant.vertical`. Ships four feature-set components:
+  - `AgencyFeatureSet` — Lighthouse audit viewer + SEO lead scoring (Moz DA, backlinks, PageSpeed).
+  - `ServiceProFeatureSet` — Job dispatch Kanban (New → Dispatched → On-Site → Completed) with geo-tag + SMS-dispatch badges.
+  - `RestaurantFeatureSet` — Menu Management + Daily Order Feed; mobile-first stacked grid.
+  - `RetailFeatureSet` — Inventory + Loyalty loop ("We miss you" re-engagement, CLV, Stripe Terminal reader hook-up).
+- **Dashboard wire-up**: `apps/web-viewer/src/components/vertical/VerticalDashboard.tsx` is a tolerant server component that reads tenant vertical + lead metadata from SQL, hands off to `<VerticalSwitch />`, and is mounted into `/admin`. Falls back gracefully to the Agency feature set when the DB is unreachable or no tenant row exists.
+
+### Phase 4: Chameleon + Augusta SQL handshake
+
+- **Chameleon UI (`@dba/ui`)**: new workspace package `packages/ui` exposes a framework-agnostic `getVerticalConfig(verticalId)` whose `enabledModules` list flips the CRM surface per tenant — restaurants expose `menu_management` / `reservations` / `reviews`; `agency` keeps `backlink_audit` + full Lighthouse suite; unknown values fall back to `agency`. The Next-local `lib/vertical-config.ts` now returns both the UI template and the shared module matrix, sourced from SQL `tenants.vertical_type`.
+- **Lead contract (`@dba/lead-form-contract`)**: now zod-validated. `publicLeadIngestBodySchema` + `parsePublicLeadIngestBody` normalize the marketing AuditForm aliases (`first_name`, `biggest_issue`, `cf-turnstile-response`, etc.) into the canonical `PublicLeadIngestBody`. `/api/lead` uses the parser and returns 400 + `issues` on invalid input. Honeypot short-circuit preserved.
+- **Lead ingest → Postgres**: `lib/lead-intake/sql.ts` (`insertSqlLead`, `listSqlLeads`) writes/reads tenant-scoped `leads` rows via Drizzle. `executeLeadIntake` treats SQL as the source of truth (tolerant of DB outages), and `getProspects` in the admin actions merges SQL leads into the Kanban pipeline so marketing submissions land in the board without Firestore.
+- **Drizzle push**: `drizzle.config.ts` now honors `DATABASE_SSL=true`. `pnpm exec drizzle-kit push` from this cloud-agent VM gets `ECONNRESET` from `34.172.29.180:5432` — TCP connects, but the Postgres 18 instance drops the stream, which means the VM's egress IP (`54.161.91.42` / `44.208.231.58`) is not in the Cloud SQL authorized-networks allowlist. Action required from the operator: add those IPs (or enable the Cloud SQL proxy / private VPC) before rerunning `pnpm db:push`.
+
 ## Firebase string audit
 
 - Zero `firebase` string matches in:

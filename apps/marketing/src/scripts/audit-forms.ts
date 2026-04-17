@@ -1,8 +1,14 @@
 import { buildPublicLeadPayloadFromFormData } from '@dba/lead-form-contract';
 import { pushAnalyticsEvent, requestGaClientId } from './analytics';
 
-/** Default `POST /api/lead` on Agency OS; override with `PUBLIC_CRM_LEAD_URL` at build time. */
-const DEFAULT_FORM_ENDPOINT = 'https://admin.designedbyanthony.com/api/lead';
+/**
+ * Lead endpoint resolution order (Augusta Global Ingest Protocol):
+ *   1. `PUBLIC_INGEST_URL` — the new versioned `POST /api/v1/ingest` route.
+ *   2. `PUBLIC_CRM_LEAD_URL` — legacy browser-safe `/api/lead`; kept for
+ *      backward compatibility with older deploys.
+ *   3. Baked default: `https://admin.designedbyanthony.com/api/v1/ingest`.
+ */
+const DEFAULT_FORM_ENDPOINT = 'https://admin.designedbyanthony.com/api/v1/ingest';
 
 export interface AuditFormError {
   field?: string;
@@ -276,13 +282,20 @@ async function finalizeAuditFormSubmission(
 
   const payload = buildPublicLeadPayloadFromFormData(formData);
 
+  // Read the Augusta tenant id off the form (data attribute) so a single
+  // marketing codebase can represent any tenant in the future. Defaults to
+  // whichever value was wired at build time via PUBLIC_TENANT_ID.
+  const tenantId = form.dataset.tenantId?.trim();
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+  if (tenantId) headers['X-Tenant-Id'] = tenantId;
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 

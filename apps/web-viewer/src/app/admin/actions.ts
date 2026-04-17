@@ -157,20 +157,60 @@ async function findDuplicateProspectForEmail(
 
 export async function getProspects(): Promise<Prospect[]> {
   const session = await verifyAuth();
+  const agencyId = session.user.agencyId;
+
+  // Augusta (Postgres 18) is the source of truth for prospects/leads.
+  let sqlProspects: Prospect[] = [];
+  try {
+    const { listSqlLeads } = await import("@/lib/lead-intake/sql");
+    const rows = await listSqlLeads(agencyId);
+    sqlProspects = rows.map((row) => ({
+      id: row.prospectId,
+      agencyId: row.tenantId,
+      name: row.name || "",
+      email: row.email || "",
+      phone: "",
+      company: "",
+      website: "",
+      targetUrl: "",
+      status: (row.status as ProspectStatus) || "lead",
+      dealValue: 0,
+      source: "marketing_site",
+      tags: [],
+      notes: "",
+      assignedTo: "",
+      createdAt: row.createdAt,
+      lastContactedAt: row.updatedAt,
+      unsubscribed: false,
+    }));
+  } catch (err) {
+    console.error("SQL prospect fetch error:", err);
+  }
+
+  // Merge any legacy Firestore prospects that haven't been migrated yet.
+  // `db` is a shim (returns empty) when SQL is the only backend — this keeps
+  // the UI working against both until the migration is complete.
+  let firestoreProspects: Prospect[] = [];
   try {
     const snapshot = await db
       .collection("prospects")
-      .where("agencyId", "==", session.user.agencyId)
+      .where("agencyId", "==", agencyId)
       .orderBy("createdAt", "desc")
       .get();
-    
-    if (!snapshot || snapshot.empty) return [];
-    
-    return snapshot.docs.map((doc) => toProspect(doc.id, doc.data()));
+    if (snapshot && !snapshot.empty) {
+      firestoreProspects = snapshot.docs.map((doc) => toProspect(doc.id, doc.data()));
+    }
   } catch (err) {
-    console.error("Prospect fetch error:", err);
-    return [];
+    console.error("Legacy prospect fetch error:", err);
   }
+
+  const byId = new Map<string, Prospect>();
+  for (const p of [...sqlProspects, ...firestoreProspects]) {
+    if (!byId.has(p.id)) byId.set(p.id, p);
+  }
+  return Array.from(byId.values()).sort((a, b) =>
+    (b.createdAt || "").localeCompare(a.createdAt || ""),
+  );
 }
 
 export async function getProspect(id: string): Promise<Prospect | null> {

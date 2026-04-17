@@ -4,9 +4,19 @@ import { normalizePath } from '../lib/seo';
 
 const turnstileSiteKey = getTurnstileSiteKey();
 
-/** Public leads POST to Agency OS CRM (`POST /api/lead`). Lighthouse is only for audits/report APIs. */
+/**
+ * Augusta Global Ingest Protocol — public leads POST to the versioned CRM
+ * route `POST /api/v1/ingest`. `PUBLIC_INGEST_URL` is the new primary env;
+ * `PUBLIC_CRM_LEAD_URL` is kept for backward compatibility with older
+ * deploys that still point at `/api/lead`.
+ */
 const defaultFormEndpoint =
-  import.meta.env.PUBLIC_CRM_LEAD_URL || 'https://admin.designedbyanthony.com/api/lead';
+  import.meta.env.PUBLIC_INGEST_URL ||
+  import.meta.env.PUBLIC_CRM_LEAD_URL ||
+  'https://admin.designedbyanthony.com/api/v1/ingest';
+
+/** Clerk org id (tenant) for this marketing build — threaded through the `X-Tenant-Id` header. */
+const tenantId = import.meta.env.PUBLIC_TENANT_ID || '';
 
 export interface Props {
   ctaSource: string;
@@ -94,6 +104,7 @@ const leadSourceLabel = leadSourceLabelForOfferType(offerType);
   data-audit-form
   data-success-mode={successMode}
   data-success-redirect={successRedirect}
+  data-tenant-id={tenantId}
 >
   <input type="hidden" name="_subject" value={subjectLine} />
   <input type="hidden" name="source_page" value={sourcePath} />

@@ -13,16 +13,16 @@ export default async function VerticalExperience({ children }: { children: React
     return <>{children}</>;
   }
 
-  const vertical = await getVerticalConfig(orgId);
+  const { ui } = await getVerticalConfig(orgId);
 
   return (
     <>
-      {vertical.id === "food" ? (
+      {ui.id === "food" ? (
         <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
           <KitchenDisplay />
         </div>
       ) : null}
-      {vertical.id === "contractor" ? (
+      {ui.id === "contractor" ? (
         <div className="border-b border-glass-border bg-surface-1 px-4 py-3 lg:px-8">
           <JobEstimator />
         </div>

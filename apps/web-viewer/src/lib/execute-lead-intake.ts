@@ -3,6 +3,10 @@ import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { generateClientId, getIdSource } from "@/lib/client-id";
 import { resolveLeadAgencyId } from "@/lib/lead-webhook-agency";
+import { insertSqlLead } from "@/lib/lead-intake/sql";
+import { fireAutomationEvent } from "@/lib/automation-runner";
+import { getTenantByOrgId } from "@/lib/tenant-db";
+import type { VerticalId } from "@dba/ui";
 import type { LeadIntakeResult, LeadIntakeSource } from "@/lib/lead-intake/types";
 
 /**
@@ -31,37 +35,35 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     throw new Error("Name and email are required");
   }
 
-  let existing;
-  try {
-    existing = await db
-      .collection("prospects")
-      .where("email", "==", email.toLowerCase().trim())
-      .limit(1)
-      .get();
-  } catch {
-    existing = null;
-  }
-
   let prospectId: string;
   let isNew = true;
 
-  if (existing && !existing.empty) {
-    prospectId = existing.docs[0].id;
-    isNew = false;
+  // SQL (Postgres 18 — Augusta) is the source of truth for prospects/leads.
+  let sqlResult: { prospectId: string; isNew: boolean } | null = null;
+  if (agencyId) {
+    try {
+      sqlResult = await insertSqlLead({
+        agencyId, name, email, phone, company, website, source, message, auditUrl,
+      });
+    } catch (sqlErr) {
+      console.error("[lead-intake] SQL insert failed; falling back to id-gen only:", sqlErr);
+    }
+  }
 
-    const emailNorm = email.toLowerCase().trim();
-    await db.collection("prospects").doc(prospectId).update({
-      lastContactedAt: new Date().toISOString(),
-      emailNormalized: emailNorm,
-      notes:
-        (existing.docs[0].data().notes || "") +
-        `\n[${new Date().toLocaleDateString()}] Re-engaged via ${source}: ${message || "No message"}`,
-    });
+  if (sqlResult) {
+    prospectId = sqlResult.prospectId;
+    isNew = sqlResult.isNew;
   } else {
-    const idSource = getIdSource(company, name);
-    prospectId = await generateClientId(idSource);
+    // Fallback only when DATABASE_URL is not configured (local dev without SQL).
+    prospectId = await generateClientId(getIdSource(company, name));
+    isNew = true;
+  }
 
-    const emailNorm = email.toLowerCase().trim();
+  // Transitional Firestore shim (a no-op in this repo — see lib/firebase.ts).
+  // Kept so downstream activity/notification writes remain additive until the
+  // full CRM is migrated off the shim.
+  const emailNorm = email.toLowerCase().trim();
+  if (isNew) {
     await db.collection("prospects").doc(prospectId).set({
       agencyId,
       name: name.trim(),
@@ -81,6 +83,11 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
       lastContactedAt: new Date().toISOString(),
       unsubscribed: false,
       auditReportUrl: auditUrl || null,
+    });
+  } else {
+    await db.collection("prospects").doc(prospectId).update({
+      lastContactedAt: new Date().toISOString(),
+      emailNormalized: emailNorm,
     });
   }
 
@@ -151,6 +158,40 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     } catch (e) {
       console.error("Submitter confirmation email failed:", e);
     }
+  }
+
+  // Fire the Automation Engine's `lead_created` event. Factory rules picked
+  // per vertical (agency → "email report", service_pro → "speed-to-lead SMS",
+  // restaurant → "new order ack", florist → "welcome email"). Failures are
+  // swallowed so the public lead-intake path is never broken by a misbehaving
+  // rule.
+  if (isNew && agencyId) {
+    let vertical: VerticalId | undefined;
+    try {
+      const tenant = await getTenantByOrgId(agencyId);
+      vertical = (tenant?.verticalType as VerticalId) || undefined;
+    } catch (err) {
+      console.error("[lead-intake] tenant lookup for automation failed", err);
+    }
+    await fireAutomationEvent({
+      trigger: "lead_created",
+      tenantId: agencyId,
+      prospectId,
+      vertical,
+      data: {
+        lead: {
+          name,
+          email,
+          phone,
+          company,
+          website,
+          message,
+          auditUrl,
+          marketing: marketing ?? null,
+          source,
+        },
+      },
+    });
   }
 
   return {

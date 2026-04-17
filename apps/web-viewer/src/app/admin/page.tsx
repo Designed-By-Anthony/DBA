@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Users, Mail, Clock, TrendingUp, GitBranch, AlertTriangle, ListTodo } from "lucide-react";
 import { RevenueChart } from "@/components/ui/RevenueChart";
 import type { Prospect, EmailRecord } from "@/lib/types";
+import VerticalDashboard from "@/components/vertical/VerticalDashboard";
 
 export default async function AdminPage() {
   let stats = null;
@@ -189,6 +190,9 @@ export default async function AdminPage() {
           </div>
         </div>
       )}
+
+      {/* Chameleon (Augusta) vertical-specific workspace */}
+      <VerticalDashboard />
 
       {/* Revenue Forecast Visualization */}
       <div className="glass-card p-6 animate-fade-up stagger-5 mb-6">

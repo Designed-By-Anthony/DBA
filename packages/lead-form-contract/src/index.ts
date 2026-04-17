@@ -10,21 +10,229 @@
  *   - `LEAD_WEBHOOK_CORS_ORIGINS` — comma-separated browser `Origin` values allowed for POST.
  *   - `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` — tenant when `agencyId` is omitted.
  */
+import { z } from "zod";
 
 /** CRM product tier for org_settings.planSuite and UI gating (same pipeline; different modules). */
 export type PlanSuite = "starter" | "full";
+export const planSuiteSchema = z.enum(["starter", "full"]);
 
-export type PublicLeadMarketingMeta = {
-  ctaSource?: string;
-  pageContext?: string;
-  offerType?: string;
-  leadSource?: string;
-  pageUrl?: string;
-  referrerUrl?: string;
-  pageTitle?: string;
-  sourcePage?: string;
-  gaClientId?: string;
-};
+/**
+ * Global core fields the Augusta leads table requires. These mirror the
+ * fixed (non-JSONB) columns on `leads` and let any vertical feed the same
+ * ingest endpoint.
+ */
+export const globalLeadCoreSchema = z
+  .object({
+    firstName: z.string().trim().min(1).max(120).optional(),
+    lastName: z.string().trim().min(1).max(120).optional(),
+    /** Optional; server will synthesize from first+last if omitted. */
+    name: z.string().trim().min(1).max(240).optional(),
+    email: z.string().email("Invalid email"),
+    phone: z.string().trim().min(3).max(40).optional(),
+    source: z.string().trim().min(1).max(80).optional(),
+  })
+  .refine((v) => Boolean(v.name || v.firstName || v.lastName), {
+    message: "name, firstName, or lastName is required",
+    path: ["name"],
+  });
+
+/**
+ * Body for `POST /api/leads/ingest` — the Global Ingest Engine.
+ *
+ * - Global core fields live at the top level (same shape for every vertical).
+ * - Vertical-specific fields go under `metadata` (JSONB column on `leads`).
+ * - `tenantId` (Clerk org id) identifies the owner and is usually supplied via
+ *   the `x-agency-id` / `x-tenant-id` header; the body field is a fallback.
+ * - `secret` is the shared `LEAD_WEBHOOK_SECRET` (also accepted via
+ *   `x-webhook-secret` / `x-lead-secret` headers).
+ */
+export const globalLeadIngestBodySchema = globalLeadCoreSchema
+  .innerType()
+  .extend({
+    tenantId: z.string().trim().min(1).max(120).optional(),
+    /** Honeypot — must be absent or empty. */
+    _hp: z.string().optional(),
+    /** Shared secret (body fallback; headers preferred). */
+    secret: z.string().optional(),
+    /** Everything else lands in `leads.metadata` JSONB. */
+    metadata: z.record(z.string(), z.unknown()).default({}),
+  })
+  .passthrough();
+
+export type GlobalLeadIngestBody = z.infer<typeof globalLeadIngestBodySchema>;
+
+const GLOBAL_CORE_KEYS = new Set([
+  "firstName",
+  "lastName",
+  "name",
+  "email",
+  "phone",
+  "source",
+  "tenantId",
+  "agencyId",
+  "secret",
+  "metadata",
+  "_hp",
+]);
+
+/**
+ * Parse + normalize a Global Lead Ingest payload.
+ *
+ * - Validates the global core with Zod.
+ * - Merges unknown top-level fields into `metadata` so callers can post a
+ *   flat form (e.g. `{ email, party_size: 4 }`) and still end up with the
+ *   canonical `{ email, metadata: { party_size: 4 } }` shape.
+ * - Derives `name` from `firstName + lastName` when only the split fields
+ *   are supplied.
+ */
+export function parseGlobalLeadIngestBody(input: unknown): {
+  core: {
+    firstName?: string;
+    lastName?: string;
+    name: string;
+    email: string;
+    phone?: string;
+    source?: string;
+  };
+  metadata: Record<string, unknown>;
+  tenantId?: string;
+  secret?: string;
+  _hp?: string;
+} {
+  const raw = globalLeadIngestBodySchema.parse(input) as Record<string, unknown>;
+
+  const firstName = typeof raw.firstName === "string" ? raw.firstName.trim() : undefined;
+  const lastName = typeof raw.lastName === "string" ? raw.lastName.trim() : undefined;
+  const explicitName = typeof raw.name === "string" ? raw.name.trim() : undefined;
+  const name =
+    explicitName ||
+    [firstName, lastName].filter(Boolean).join(" ").trim() ||
+    undefined;
+  if (!name) {
+    throw new z.ZodError([
+      { code: z.ZodIssueCode.custom, path: ["name"], message: "name, firstName, or lastName is required" },
+    ]);
+  }
+
+  const email = String(raw.email);
+  const phone = typeof raw.phone === "string" ? raw.phone.trim() : undefined;
+  const source = typeof raw.source === "string" ? raw.source.trim() : undefined;
+  const tenantId =
+    typeof raw.tenantId === "string"
+      ? raw.tenantId.trim()
+      : typeof raw.agencyId === "string"
+        ? (raw.agencyId as string).trim()
+        : undefined;
+  const secret = typeof raw.secret === "string" ? raw.secret : undefined;
+  const _hp = typeof raw._hp === "string" ? raw._hp : undefined;
+
+  // Seed metadata with whatever was already under `metadata`, then fold in
+  // any unknown top-level fields (so `{ email, party_size: 4 }` works).
+  const metadata: Record<string, unknown> = {
+    ...((raw.metadata as Record<string, unknown>) ?? {}),
+  };
+  for (const [k, v] of Object.entries(raw)) {
+    if (GLOBAL_CORE_KEYS.has(k)) continue;
+    if (v == null) continue;
+    metadata[k] = v;
+  }
+
+  return {
+    core: {
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+      name,
+      email,
+      phone: phone || undefined,
+      source: source || undefined,
+    },
+    metadata,
+    tenantId: tenantId || undefined,
+    secret,
+    _hp,
+  };
+}
+
+/**
+ * Constant-time string compare. Use this to verify the shared secret on
+ * the Global Ingest route so we don't leak credential shape via timing.
+ */
+export function constantTimeEqual(a: string, b: string): boolean {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let out = 0;
+  for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return out === 0;
+}
+
+export const publicLeadMarketingMetaSchema = z
+  .object({
+    ctaSource: z.string().trim().optional(),
+    pageContext: z.string().trim().optional(),
+    offerType: z.string().trim().optional(),
+    leadSource: z.string().trim().optional(),
+    pageUrl: z.string().trim().optional(),
+    referrerUrl: z.string().trim().optional(),
+    pageTitle: z.string().trim().optional(),
+    sourcePage: z.string().trim().optional(),
+    gaClientId: z.string().trim().optional(),
+  })
+  .strict();
+
+export type PublicLeadMarketingMeta = z.infer<typeof publicLeadMarketingMetaSchema>;
+
+const aliasString = z.string().optional();
+
+/**
+ * Canonical body for `POST /api/lead` (JSON).
+ *
+ * The schema is permissive about aliasing: it accepts canonical camelCase keys
+ * plus the snake_case keys emitted by the marketing AuditForm (e.g. `first_name`,
+ * `cta_source`, `cf-turnstile-response`). Use `parsePublicLeadIngestBody` to
+ * resolve to a normalized `PublicLeadIngestBody`.
+ */
+export const publicLeadIngestBodySchema = z
+  .object({
+    name: aliasString,
+    first_name: aliasString,
+    firstName: aliasString,
+    full_name: aliasString,
+    email: z.string().email("Invalid email"),
+    phone: aliasString,
+    company: aliasString,
+    website: aliasString,
+    websiteUrl: aliasString,
+    source: aliasString,
+    message: aliasString,
+    biggest_issue: aliasString,
+    projectRequirements: aliasString,
+    auditUrl: aliasString,
+    auditReportUrl: aliasString,
+    agencyId: aliasString,
+    _hp: aliasString,
+    cfTurnstileResponse: aliasString,
+    "cf-turnstile-response": aliasString,
+    turnstileToken: aliasString,
+
+    ctaSource: aliasString,
+    cta_source: aliasString,
+    pageContext: aliasString,
+    page_context: aliasString,
+    offerType: aliasString,
+    offer_type: aliasString,
+    leadSource: aliasString,
+    lead_source: aliasString,
+    pageUrl: aliasString,
+    page_url: aliasString,
+    referrerUrl: aliasString,
+    referrer_url: aliasString,
+    pageTitle: aliasString,
+    page_title: aliasString,
+    sourcePage: aliasString,
+    source_page: aliasString,
+    gaClientId: aliasString,
+    ga_client_id: aliasString,
+  })
+  .passthrough();
 
 /** Canonical body for `POST /api/lead` (JSON). Aliases are normalized server-side. */
 export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
@@ -42,6 +250,69 @@ export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
   /** Cloudflare Turnstile token (optional if CRM verifies client-side path) */
   cfTurnstileResponse?: string;
 };
+
+function firstNonEmpty(obj: Record<string, unknown>, keys: string[]): string | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (v == null) continue;
+    const s = String(v).trim();
+    if (s !== "") return s;
+  }
+  return undefined;
+}
+
+/**
+ * Zod-validated parse + normalize.
+ * Throws `ZodError` on invalid input (caller should return HTTP 400).
+ * Returns a canonical `PublicLeadIngestBody` with camelCase keys only.
+ */
+export function parsePublicLeadIngestBody(input: unknown): PublicLeadIngestBody {
+  const raw = publicLeadIngestBodySchema.parse(input) as Record<string, unknown>;
+
+  const name = firstNonEmpty(raw, ["name", "first_name", "firstName", "full_name"]);
+  const email = firstNonEmpty(raw, ["email"]);
+  if (!name) {
+    throw new z.ZodError([
+      { code: z.ZodIssueCode.custom, path: ["name"], message: "Name is required" },
+    ]);
+  }
+  if (!email) {
+    throw new z.ZodError([
+      { code: z.ZodIssueCode.custom, path: ["email"], message: "Email is required" },
+    ]);
+  }
+
+  const meta = publicLeadMarketingMetaSchema.parse({
+    ctaSource: firstNonEmpty(raw, ["ctaSource", "cta_source"]),
+    pageContext: firstNonEmpty(raw, ["pageContext", "page_context"]),
+    offerType: firstNonEmpty(raw, ["offerType", "offer_type"]),
+    leadSource: firstNonEmpty(raw, ["leadSource", "lead_source"]),
+    pageUrl: firstNonEmpty(raw, ["pageUrl", "page_url"]),
+    referrerUrl: firstNonEmpty(raw, ["referrerUrl", "referrer_url"]),
+    pageTitle: firstNonEmpty(raw, ["pageTitle", "page_title"]),
+    sourcePage: firstNonEmpty(raw, ["sourcePage", "source_page"]),
+    gaClientId: firstNonEmpty(raw, ["gaClientId", "ga_client_id"]),
+  });
+
+  return {
+    ...meta,
+    name,
+    email,
+    phone: firstNonEmpty(raw, ["phone"]),
+    company: firstNonEmpty(raw, ["company"]),
+    website: firstNonEmpty(raw, ["website", "websiteUrl"]),
+    source: firstNonEmpty(raw, ["source"]),
+    message: firstNonEmpty(raw, ["message", "biggest_issue", "projectRequirements"]),
+    auditUrl: firstNonEmpty(raw, ["auditUrl", "auditReportUrl"]),
+    agencyId: firstNonEmpty(raw, ["agencyId"]),
+    _hp: typeof raw._hp === "string" ? raw._hp : undefined,
+    cfTurnstileResponse: firstNonEmpty(raw, [
+      "cfTurnstileResponse",
+      "cf-turnstile-response",
+      "turnstileToken",
+    ]),
+  };
+}
 
 function trim(s: unknown): string {
   return s == null ? "" : String(s).trim();

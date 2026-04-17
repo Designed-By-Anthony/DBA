@@ -63,7 +63,8 @@ export function leadWebhookCorsHeaders(request: NextRequest): Record<string, str
   return {
     "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, x-webhook-secret, x-lead-secret, Authorization",
+    "Access-Control-Allow-Headers":
+      "Content-Type, x-webhook-secret, x-lead-secret, x-dba-secret, x-tenant-id, x-agency-id, Authorization",
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
