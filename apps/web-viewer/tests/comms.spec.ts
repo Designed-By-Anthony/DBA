@@ -12,19 +12,20 @@ test.describe('🗣️ Comms Tests (Client ↔ Owner)', () => {
     expect(resAuth.ok(), `Lead Webhook failed: ${await resAuth.text()}`).toBeTruthy();
     await resAuth.json();
 
-    // 2. Request Magic Link (retry: prospect row may lag behind webhook response)
+    // 2. Request Magic Link (retry: prospect row may lag behind webhook response).
+    //    The server echoes the one-time link back only when running under IS_TEST=true
+    //    (set in .env.test / Playwright env); no request-header escape hatch.
     let testModeLink: string | undefined;
     for (let attempt = 0; attempt < 15; attempt++) {
       const resMagic = await request.post('/api/portal/magic-link', {
         data: { email: mockEmail },
-        headers: { 'x-e2e-testing': 'true' },
       });
       const parsedMagic = (await resMagic.json()) as { testModeLink?: string };
       testModeLink = parsedMagic.testModeLink;
       if (testModeLink) break;
       await new Promise((r) => setTimeout(r, 400));
     }
-    expect(testModeLink, 'magic-link should return testModeLink when prospect exists').toBeTruthy();
+    expect(testModeLink, 'magic-link should return testModeLink when IS_TEST=true').toBeTruthy();
 
     // 3. Auth as client on portal
     const urlObj = new URL(testModeLink!);

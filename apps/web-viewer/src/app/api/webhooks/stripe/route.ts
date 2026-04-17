@@ -4,6 +4,7 @@ import { db } from '@/lib/firebase';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
+import { isTestMode } from '@/lib/test-mode';
 import { apiError } from '@/lib/api-error';
 import type Stripe from 'stripe';
 
@@ -28,17 +29,24 @@ export async function POST(request: NextRequest) {
 
     let event: Stripe.Event;
 
-    // Verify webhook signature in production or local dev, but skip for E2E Playwright tests
-    if (webhookSecret && process.env.NEXT_PUBLIC_IS_TEST !== 'true') {
+    // Fail closed. Historically this route would fall through to `JSON.parse(body)`
+    // when EITHER `STRIPE_WEBHOOK_SECRET` was missing OR `NEXT_PUBLIC_IS_TEST` was
+    // set, letting any internet caller forge Stripe events (fake payments, ticket
+    // writes, prospect status mutations). The only time we bypass verification is
+    // an explicit server-only test build via `isTestMode()`.
+    if (isTestMode()) {
+      event = JSON.parse(body) as Stripe.Event;
+    } else {
+      if (!webhookSecret) {
+        console.error('Stripe webhook rejected: STRIPE_WEBHOOK_SECRET not configured');
+        return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+      }
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       } catch (err) {
         console.error('Stripe signature verification failed:', err);
         return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
       }
-    } else {
-      // Dev mode: parse without verification
-      event = JSON.parse(body) as Stripe.Event;
     }
 
     switch (event.type) {

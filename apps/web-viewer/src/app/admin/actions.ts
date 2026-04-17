@@ -26,6 +26,7 @@ import { pipelineStages } from "@/lib/theme.config";
 import { recalculateLeadScore, evaluateProspectHealth } from "@/lib/intelligence";
 import { processAutomations } from "@/lib/automations";
 import { generateClientId, getIdSource } from "@/lib/client-id";
+import { isTestMode } from "@/lib/test-mode";
 
 // Base URL for tracking endpoints — uses NEXTAUTH_URL in dev, or infer from headers
 const BASE_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -1135,7 +1136,7 @@ export async function createPaymentLinkAction(params: {
     const prospect = await getProspect(params.prospectId);
     if (!prospect) return { url: null, error: "Prospect not found" };
 
-    if (process.env.NEXT_PUBLIC_IS_TEST === 'true') {
+    if (isTestMode()) {
       await addActivity(params.prospectId, "note_added", `Payment link created: $${params.amount.toLocaleString()} (${params.type})`, params.description, { stripeSessionId: 'cs_test_mock_12345' });
       return { url: 'https://checkout.stripe.com/c/pay/cs_test_mock_12345' };
     }
@@ -1228,7 +1229,7 @@ export async function generateContractAction(params: {
     const prospect = await getProspect(params.prospectId);
     if (!prospect) return { docUrl: null, error: "Prospect not found" };
 
-    if (process.env.NEXT_PUBLIC_IS_TEST === 'true') {
+    if (isTestMode()) {
       await db.collection("prospects").doc(params.prospectId).update({
         contractDocUrl: "https://docs.google.com/test-sandbox-doc",
         status: "proposal",

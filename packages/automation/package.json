@@ -15,7 +15,7 @@
   "dependencies": {
     "@dba/database": "workspace:*",
     "@dba/ui": "workspace:*",
-    "drizzle-orm": "^0.38.3",
+    "drizzle-orm": "^0.45.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {

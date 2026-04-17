@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { getDb, leads, portalTokens } from "@dba/database";
-import { sendMail, isEmailTestMode } from "@/lib/mailer";
+import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
 import { escapeHtml } from "@/lib/email-utils";
+import { isTestMode } from "@/lib/test-mode";
 import { apiError } from "@/lib/api-error";
 import { readBoundedJson } from "@/lib/body-limit";
 import { clientAddress, rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -115,7 +116,12 @@ export async function POST(request: NextRequest) {
         `,
     });
 
-    if (isEmailTestMode() || request.headers.get("x-e2e-testing") === "true") {
+    // Only echo the one-time magic link back to the caller in a genuine test build.
+    // The previous implementation trusted an `x-e2e-testing` request header, which
+    // let any unauthenticated internet caller harvest valid tokens for any real
+    // prospect email and fully take over that account. The header branch has been
+    // removed; test runners set the server-only `IS_TEST` env var instead.
+    if (isTestMode()) {
       return NextResponse.json({ success: true, testModeLink: magicLink });
     }
 
