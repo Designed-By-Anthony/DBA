@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";
 import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
+import { apiError } from "@/lib/api-error";
 
 /**
  * PATCH /api/admin/tickets/[id]
@@ -107,7 +108,6 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError("admin/tickets/[id]", error);
   }
 }

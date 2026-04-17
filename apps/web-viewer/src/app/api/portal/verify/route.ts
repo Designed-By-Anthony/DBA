@@ -3,6 +3,7 @@ import { and, eq, gt } from "drizzle-orm";
 import { getDb, portalSessions, portalTokens } from "@dba/database";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
+import { apiError } from "@/lib/api-error";
 import {
   HOST_PREFIXED_COOKIE_NAME,
   LEGACY_COOKIE_NAME,
@@ -118,8 +119,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    console.error("Token verification error:", error);
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError("portal/verify", error);
   }
 }

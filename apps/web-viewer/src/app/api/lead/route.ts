@@ -3,6 +3,7 @@ import type { PublicLeadMarketingMeta } from "@dba/lead-form-contract";
 import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
 import { executeLeadIntake } from "@/lib/execute-lead-intake";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { apiError } from "@/lib/api-error";
 import {
   checkLeadRateLimit,
   isLikelyBotSubmission,
@@ -225,9 +226,10 @@ export async function POST(request: NextRequest) {
       { headers: cors },
     );
   } catch (error: unknown) {
-    console.error("Public lead ingest error:", error);
-    const msg = error instanceof Error ? error.message : "Internal error";
-    const status = msg === "Name and email are required" ? 400 : 500;
-    return NextResponse.json({ error: msg }, { status, headers: cors });
+    const msg = error instanceof Error ? error.message : "";
+    if (msg === "Name and email are required") {
+      return NextResponse.json({ error: msg }, { status: 400, headers: cors });
+    }
+    return apiError("public-lead-ingest", error, { headers: cors });
   }
 }

@@ -3,6 +3,7 @@ import { webhookConfig } from '@/lib/theme.config';
 import { resolveLeadAgencyId } from '@/lib/lead-webhook-agency';
 import { leadWebhookCorsHeaders } from '@/lib/lead-webhook-cors';
 import { executeLeadIntake } from '@/lib/execute-lead-intake';
+import { apiError } from '@/lib/api-error';
 import { readBoundedJson } from '@/lib/body-limit';
 
 const LEAD_WEBHOOK_MAX_BYTES = 16 * 1024;
@@ -131,9 +132,12 @@ export async function POST(request: NextRequest) {
       { headers: cors },
     );
   } catch (error: unknown) {
-    console.error('Lead webhook error:', error);
-    const msg = error instanceof Error ? error.message : 'Internal error';
-    const status = msg === 'Name and email are required' ? 400 : 500;
-    return NextResponse.json({ error: msg }, { status, headers: cors });
+    // Preserve the validation message to the client; everything else goes
+    // through the generic hygiene helper so implementation detail stays in logs.
+    const msg = error instanceof Error ? error.message : '';
+    if (msg === 'Name and email are required') {
+      return NextResponse.json({ error: msg }, { status: 400, headers: cors });
+    }
+    return apiError('webhooks/lead', error, { headers: cors });
   }
 }

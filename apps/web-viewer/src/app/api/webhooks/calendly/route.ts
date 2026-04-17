@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
+import { apiError } from '@/lib/api-error';
 
 /**
  * Calendly Webhook Handler
@@ -140,9 +141,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, prospectId });
   } catch (error: unknown) {
-    console.error('Calendly webhook error:', error);
-    const msg = error instanceof Error ? error.message : 'Internal error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError('webhooks/calendly', error);
   }
 }
 

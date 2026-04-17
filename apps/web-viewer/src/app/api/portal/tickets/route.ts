@@ -4,6 +4,7 @@ import { getDb, tickets } from "@dba/database";
 import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
+import { apiError } from "@/lib/api-error";
 import { readBoundedJson } from "@/lib/body-limit";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
@@ -146,8 +147,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, ticketId: inserted[0]?.id });
   } catch (error: unknown) {
-    console.error("Ticket creation error:", error);
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError("portal/tickets", error);
   }
 }

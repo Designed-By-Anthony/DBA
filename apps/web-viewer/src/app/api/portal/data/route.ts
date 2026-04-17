@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
+import { apiError } from "@/lib/api-error";
 
 /**
  * Portal Data API.
@@ -70,8 +71,6 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error: unknown) {
-    console.error("Portal data error:", error);
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError("portal/data", error);
   }
 }

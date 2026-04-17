@@ -5,6 +5,7 @@ import { sendMail, isEmailTestMode } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
+import { apiError } from "@/lib/api-error";
 import { readBoundedJson } from "@/lib/body-limit";
 import { clientAddress, rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
@@ -119,8 +120,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    console.error("Magic link error:", error);
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return apiError("portal/magic-link", error);
   }
 }
