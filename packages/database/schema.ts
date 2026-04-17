@@ -22,6 +22,34 @@ export const tenants = pgTable("tenants", {
   verticalType: verticalTypeEnum("vertical_type").notNull().default("agency"),
   /** Feature flags, theme, vertical-specific routing (JSON). */
   crmConfig: jsonb("crm_config").$type<Record<string, unknown>>().notNull().default({}),
+
+  /**
+   * Cloudflare zone ID this tenant's hostnames live under.
+   *
+   * Nullable — tenants that aren't fronted by Cloudflare (or haven't been
+   * provisioned yet) leave this blank, and any admin DNS / custom-hostname
+   * route short-circuits to 404 for them.
+   *
+   * Non-shared — each tenant gets its own zone. The previous admin routes
+   * operated on a single shared CLOUDFLARE_ZONE_ID env var, which let any
+   * authenticated user touch every other tenant's DNS. That class of bug
+   * is structurally impossible against this column: lookups must be scoped
+   * by `clerk_org_id`, and a missing value returns null (not "pick another
+   * tenant's zone").
+   */
+  cloudflareZoneId: text("cloudflare_zone_id"),
+
+  /**
+   * Apex hostname this tenant's zone covers (e.g. "acme.example.com").
+   *
+   * Used as a trust anchor when an admin route creates or mutates a record
+   * under the tenant's zone — the target `name` must end with this suffix.
+   * This prevents a compromised admin on tenant A from writing a DNS
+   * record like "victim.tenant-B.example.com" into tenant A's own zone
+   * (which would still work at the Cloudflare API level but wouldn't
+   * resolve, defeating any mass-takeover attempt).
+   */
+  cloudflareApexHostname: text("cloudflare_apex_hostname"),
 });
 
 export const sites = pgTable("sites", {
