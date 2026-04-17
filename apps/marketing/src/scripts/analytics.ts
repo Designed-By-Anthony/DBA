@@ -4,6 +4,7 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (command: string, targetId: string, configOrField?: Record<string, unknown> | (() => void) | string, callback?: (value: unknown) => void) => void;
+    __dbaAnalyticsEnabled?: boolean;
   }
 }
 
@@ -20,16 +21,21 @@ export function appendAsyncScript(id: string, src: string): void {
 }
 
 export function pushAnalyticsEvent(event: string, payload: AnalyticsEventProperties = {}): void {
+  if (window.__dbaAnalyticsEnabled !== true) return;
   if (typeof window.gtag !== 'function') return;
   window.gtag('event', event, payload);
 }
 
 export function initDeferredThirdPartyLoader(): void {
-  // GA4 is now loaded through GTM (GTM-W2JBTH5L) in Layout.astro <head>.
+  // Layout.astro now owns the consent-gated GA4 bootstrap.
   // This function is retained for future deferred third-party scripts if needed.
 }
 
 export function requestGaClientId(): Promise<string | null> {
+  if (window.__dbaAnalyticsEnabled !== true) {
+    return Promise.resolve(null);
+  }
+
   if (typeof window.gtag !== 'function') {
     return Promise.resolve(null);
   }

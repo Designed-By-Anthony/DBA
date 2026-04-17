@@ -17,15 +17,14 @@ const currentDate = 'March 26, 2026';
   </p>
   <p>
     We show a first-party cookie banner where you can accept or decline analytics-related tags. If you accept, we update Google consent mode and load
-    <strong>Google Tag Manager</strong>, which may load <strong>Google Analytics</strong> and other tags configured in that container. Essential tools that keep forms and the site secure are not optional.
+    <strong>Google Analytics 4</strong>. Essential tools that keep forms and the site secure are not optional.
   </p>
 
   <h2>Why tools like Lighthouse may list many cookies</h2>
   <p>
     Your analytics choice is stored in <strong>local storage</strong> (key <code>dba_cookie_consent</code>), not as a first-party HTTP cookie, so it does not add to a “cookies found” count.
-    After you <strong>accept</strong> analytics, <strong>Google Tag Manager</strong> loads our configured tags: <strong>Google Analytics</strong>, <strong>Microsoft Clarity</strong>, and <strong>Crazy Egg</strong>. Each provider may set multiple
-    <strong>third-party</strong> cookies on its own domains, which is why audits can report dozens of cookies from a single session. Tools such as <strong>Cloudflare Turnstile</strong> (on forms) and
-    <strong>Sentry</strong> (error monitoring in production) add their own requests; Turnstile may set security-related cookies on Cloudflare’s domains.
+    After you <strong>accept</strong> analytics, <strong>Google Analytics 4</strong> may set first-party cookies such as <strong>_ga</strong> and <strong>_ga_*</strong> on <strong>designedbyanthony.com</strong> to measure aggregate traffic and engagement.
+    Tools such as <strong>Cloudflare Turnstile</strong> (on forms) and <strong>Sentry</strong> (error monitoring in production) add their own requests; Turnstile may set security-related cookies on Cloudflare’s domains once a protected form is engaged.
   </p>
   <p>
     For a baseline with fewer marketing cookies, use <strong>Decline</strong> on the banner or <strong>Cookie settings</strong> in the footer, then reload; for an apples-to-apples Lighthouse run, test in a
@@ -45,13 +44,10 @@ const currentDate = 'March 26, 2026';
   <h3>Analytics</h3>
   <p>These tools load only if you accept analytics in the on-site banner.</p>
   <ul>
-    <li><strong>Google Tag Manager</strong> — Loads after acceptance and runs the tags configured for this site.</li>
     <li><strong>Google Analytics 4</strong> — May set cookies such as <strong>_ga</strong> and <strong>_ga_*</strong> to measure aggregate traffic and engagement after you accept.</li>
-    <li><strong>Microsoft Clarity</strong> — Session replay and aggregate behavior insights when you accept.</li>
-    <li><strong>Crazy Egg</strong> — Heatmaps and similar session tools when you accept.</li>
   </ul>
   <p>
-    <strong>Maintaining the container:</strong> Tags are managed in the <strong>Google Tag Manager</strong> web app for container <code>GTM-W2JBTH5L</code>. Our intended set is GA4, Clarity, and Crazy Egg; anything else should be removed so it matches our privacy copy and Content-Security-Policy allowlist.
+    <strong>Maintaining analytics:</strong> The site uses the direct <strong>gtag.js</strong> loader for measurement ID <code>G-4RSTBMRHDW</code>. Do not re-add Google Tag Manager, session replay, or heatmap tags unless this policy, the privacy policy, and the Content-Security-Policy allowlist are updated together.
   </p>
 
   <h3>On-demand third-party tools</h3>

@@ -18,6 +18,7 @@ import '@dba/theme/dba-global.css';
 import { MONTHLY_LOCAL_SEO_PRICE } from '../lib/offers';
 import {
   DEFAULT_SOCIAL_IMAGE,
+  GA_MEASUREMENT_ID,
   ORGANIZATION_ID,
   WEBSITE_ID,
   buildBaseOrganizationSchema,
@@ -239,41 +240,72 @@ try {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:image:alt" content={`${pageTitle} | ${businessProfile.name}`} />
-    <!-- Google Tag Manager (loaded only after in-house cookie consent; see cookie-consent-root) -->
-    <script is:inline>
+    <!-- Google Analytics 4 (loaded only after in-house cookie consent; see cookie-consent-root) -->
+    <script is:inline define:vars={{ gaMeasurementId: GA_MEASUREMENT_ID }}>
       window.dataLayer = window.dataLayer || [];
       window.gtag = window.gtag || function () {
         window.dataLayer.push(arguments);
       };
+      window.__dbaAnalyticsEnabled = false;
       window.gtag('consent', 'default', {
         analytics_storage: 'denied',
         ad_storage: 'denied',
         ad_user_data: 'denied',
         ad_personalization: 'denied',
       });
-      var gtmLoaded = false;
+      var analyticsLoaded = false;
+      var analyticsConfigured = false;
       window.__dbaCookieConsentKey = 'dba_cookie_consent';
-      window.__dbaLoadGTM = function () {
-        if (gtmLoaded) return;
-        gtmLoaded = true;
-        (function (w, d, s, l, i) {
-          w[l] = w[l] || [];
-          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-          var f = d.getElementsByTagName(s)[0],
-            j = d.createElement(s),
-            dl = l != 'dataLayer' ? '&l=' + l : '';
-          j.async = true;
-          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-          f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-W2JBTH5L');
-        // Extra tags (e.g. Clarity, heatmaps) are configured in the GTM web UI — not in this repo.
+
+      function configureAnalytics() {
+        if (analyticsConfigured) return;
+        analyticsConfigured = true;
+        window.gtag('js', new Date());
+        window.gtag('config', gaMeasurementId, {
+          anonymize_ip: true,
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false,
+          send_page_view: true,
+        });
+      }
+
+      window.__dbaLoadAnalytics = function () {
+        if (analyticsLoaded) {
+          configureAnalytics();
+          return;
+        }
+
+        analyticsLoaded = true;
+
+        if (document.getElementById('dba-ga4-loader')) {
+          configureAnalytics();
+          return;
+        }
+
+        var script = document.createElement('script');
+        script.id = 'dba-ga4-loader';
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaMeasurementId);
+        script.onload = configureAnalytics;
+        document.head.appendChild(script);
       };
+
       window.__dbaGrantAnalyticsConsent = function () {
+        window.__dbaAnalyticsEnabled = true;
         window.gtag('consent', 'update', {
           analytics_storage: 'granted',
-          ad_storage: 'granted',
-          ad_user_data: 'granted',
-          ad_personalization: 'granted',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+        });
+      };
+      window.__dbaRevokeAnalyticsConsent = function () {
+        window.__dbaAnalyticsEnabled = false;
+        window.gtag('consent', 'update', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
         });
       };
     </script>
@@ -538,8 +570,8 @@ try {
           Cookies and analytics
         </p>
         <p id="cookie-consent-desc" class="cookie-consent__text">
-          We use essential tools to secure forms and run the site. With your permission we also load Google Tag Manager
-          and Google Analytics to understand traffic. Read the{' '}
+          We use essential tools to secure forms and run the site. With your permission we also load Google Analytics 4
+          to understand traffic. Read the{' '}
           <a href="/cookie" data-astro-prefetch>Cookie Policy</a> and <a href="/privacy" data-astro-prefetch>Privacy Policy</a>.
         </p>
         <div class="cookie-consent__actions">
@@ -575,7 +607,10 @@ try {
         }
         function grantAndLoad() {
           if (typeof window.__dbaGrantAnalyticsConsent === 'function') window.__dbaGrantAnalyticsConsent();
-          if (typeof window.__dbaLoadGTM === 'function') window.__dbaLoadGTM();
+          if (typeof window.__dbaLoadAnalytics === 'function') window.__dbaLoadAnalytics();
+        }
+        function revokeAnalytics() {
+          if (typeof window.__dbaRevokeAnalyticsConsent === 'function') window.__dbaRevokeAnalyticsConsent();
         }
         function applyStored() {
           var stored = null;
@@ -588,8 +623,10 @@ try {
             grantAndLoad();
             hide();
           } else if (stored === 'rejected') {
+            revokeAnalytics();
             hide();
           } else {
+            revokeAnalytics();
             show();
           }
         }
@@ -607,6 +644,7 @@ try {
             try {
               localStorage.setItem(key, 'rejected');
             } catch (e) {}
+            revokeAnalytics();
             hide();
           });
         }
@@ -614,6 +652,7 @@ try {
           try {
             localStorage.removeItem(key);
           } catch (e) {}
+          revokeAnalytics();
           show();
         };
         applyStored();
@@ -659,22 +698,51 @@ try {
         }
 
         var turnstileLoaded = false;
-        function loadTurnstileWhenNeeded() {
-          applyLoopbackTurnstileSiteKey();
+        var turnstileInteractionBound = false;
+
+        function injectTurnstileScript() {
           if (turnstileLoaded) return;
-          if (!document.querySelector('.cf-turnstile, [data-lh-turnstile]')) return;
           turnstileLoaded = true;
+          if (document.getElementById('dba-turnstile-loader')) return;
           var script = document.createElement('script');
+          script.id = 'dba-turnstile-loader';
           script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
           script.async = true;
           script.defer = true;
           script.setAttribute('data-astro-rerun', '');
           document.body.appendChild(script);
         }
-        document.addEventListener('DOMContentLoaded', loadTurnstileWhenNeeded, { once: true });
-        document.addEventListener('astro:page-load', loadTurnstileWhenNeeded);
+
+        function maybeLoadTurnstile(target) {
+          applyLoopbackTurnstileSiteKey();
+          if (!document.querySelector('.cf-turnstile, [data-lh-turnstile]')) return;
+          if (!target) return;
+          var host = target instanceof Element ? target.closest('[data-audit-form], [data-lh-audit]') : null;
+          if (!host) return;
+          injectTurnstileScript();
+        }
+
+        function bindTurnstileInteractions() {
+          applyLoopbackTurnstileSiteKey();
+          if (turnstileInteractionBound) return;
+          if (!document.querySelector('.cf-turnstile, [data-lh-turnstile]')) return;
+          turnstileInteractionBound = true;
+
+          document.addEventListener('focusin', function (event) {
+            maybeLoadTurnstile(event.target);
+          });
+          document.addEventListener('pointerdown', function (event) {
+            maybeLoadTurnstile(event.target);
+          });
+          document.addEventListener('input', function (event) {
+            maybeLoadTurnstile(event.target);
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', bindTurnstileInteractions, { once: true });
+        document.addEventListener('astro:page-load', bindTurnstileInteractions);
         if (document.readyState !== 'loading') {
-          loadTurnstileWhenNeeded();
+          bindTurnstileInteractions();
         }
       })();
     </script>

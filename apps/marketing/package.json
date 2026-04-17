@@ -13,7 +13,7 @@
     "dev:spotlight": "SPOTLIGHT=1 astro dev",
     "sync:firebase-csp": "node build/sync-firebase-csp.mjs",
     "prebuild": "npm run build:site-script && npm run sync:firebase-csp",
-    "build": "astro build",
+    "build": "node build/run-astro-build.mjs",
     "prepreview": "npm run build:site-script",
     "preview": "astro preview",
     "astro": "astro",

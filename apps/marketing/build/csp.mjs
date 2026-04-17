@@ -2,8 +2,7 @@
  * Single source of truth for Firebase Hosting CSP-related headers.
  * Run `npm run sync:firebase-csp` to write values into `firebase.json`.
  *
- * Third-party *tags* (after cookie consent): Google Tag Manager / Analytics, Microsoft Clarity,
- * Crazy Egg. (Configured in GTM; keep the container aligned — CSP matches that surface.)
+ * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
  * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.
  */
 
@@ -16,12 +15,12 @@ const LIGHTHOUSE_AUDIT_API_ORIGIN = 'https://lighthouse-audit--lighthouse-492701
 /** Agency OS public lead ingest (`POST /api/lead`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
 const AGENCY_OS_VIEWER_ORIGIN = 'https://admin.designedbyanthony.com';
 
-/** GTM + GA + Clarity + Crazy Egg + Turnstile loader; no data:/unsafe-eval (report-only probe). */
+/** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC =
-  "'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://www.clarity.ms https://*.clarity.ms https://*.crazyegg.com https://challenges.cloudflare.com";
+  "'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com";
 
 /**
- * Enforcing script-src: same tag surface + data:/unsafe-eval for Astro client bundles and GTM-injected scripts.
+ * Enforcing script-src: same tag surface + data:/unsafe-eval for Astro client bundles.
  */
 const SCRIPT_SRC_ENFORCING = [
   "'self'",
@@ -32,9 +31,6 @@ const SCRIPT_SRC_ENFORCING = [
   'https://*.google-analytics.com',
   'https://*.googletagmanager.com',
   'https://www.gstatic.com',
-  'https://www.clarity.ms',
-  'https://*.clarity.ms',
-  'https://*.crazyegg.com',
   'https://challenges.cloudflare.com',
 ].join(' ');
 
@@ -55,18 +51,14 @@ const DIRECTIVES = {
     'https://www.google.com',
     'https://www.gstatic.com',
     'https://*.googleapis.com',
-    'https://*.clarity.ms',
-    'https://*.crazyegg.com',
     LIGHTHOUSE_AUDIT_API_ORIGIN,
     AGENCY_OS_VIEWER_ORIGIN,
     'https://challenges.cloudflare.com',
-    'https://pagead2.googlesyndication.com',
-    'https://www.googleadservices.com',
     'https://*.ingest.us.sentry.io',
     'https://*.ingest.de.sentry.io',
   ].join(' '),
   'frame-src':
-    "'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com",
+    "'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com",
   'media-src': "'self'",
   'worker-src': "'self' blob:",
   'object-src': "'none'",
@@ -76,7 +68,7 @@ const DIRECTIVES = {
   'form-action': `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${AGENCY_OS_VIEWER_ORIGIN}`,
   /**
    * Trusted Types: mitigates DOM XSS sinks. Keep `require-trusted-types-for` enabled,
-   * but allow third-party scripts (GTM/Clarity/etc.) to register their own policies.
+   * but allow third-party scripts (GA4 / Turnstile / Sentry) to register their own policies.
    * `Layout.astro` still creates the permissive `default` policy first.
    */
   'trusted-types': "* 'allow-duplicates'",

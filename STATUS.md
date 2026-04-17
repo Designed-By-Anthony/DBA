@@ -4,6 +4,13 @@
 
 - `pnpm turbo build` completed successfully across the monorepo.
 - Notable warning surfaced from marketing build logs: Astro reported repeated `MissingSharp` messages during image optimization, but the build still completed with successful task status.
+- Marketing build entrypoint now serializes `apps/marketing` builds with a lock file because overlapping builds against the same checkout could corrupt `dist/.prerender` and throw missing chunk errors during route generation.
+
+## Marketing audit cleanup
+
+- Marketing consented analytics now load direct GA4 only; GTM, Clarity, Crazy Egg, and ad-personalization signals were removed from the in-repo bootstrap and CSP allowlist.
+- Cloudflare Turnstile now defers until a protected form is interacted with, reducing initial homepage console noise and third-party requests during passive audits.
+- Cookie/privacy copy and focused Playwright coverage were updated to reflect the narrower analytics surface and deferred Turnstile loading.
 
 ## Augusta pre-launch checklist
 
