@@ -3,7 +3,54 @@
 // ============================================
 import * as crypto from 'crypto';
 
-const TRACKING_SECRET = process.env.NEXTAUTH_SECRET || 'agency-os-secret';
+/**
+ * Secret used to HMAC-sign outbound tracking links (click + unsubscribe).
+ *
+ * Reads `EMAIL_LINK_SIGNING_SECRET` first. Falls back to `NEXTAUTH_SECRET`
+ * for backward-compat with emails already sent by older builds. There is
+ * **no** string fallback: if neither env var is set in a production build,
+ * the tracking/unsubscribe helpers throw at call time so that we never ship
+ * mail signed with a known-constant value (the previous default literal
+ * `'agency-os-secret'` made every link forgeable by anyone reading the source).
+ */
+function getEmailLinkSecret(): string {
+  const v = process.env.EMAIL_LINK_SIGNING_SECRET || process.env.NEXTAUTH_SECRET;
+  if (!v || v.length === 0) {
+    throw new Error(
+      'Email link signing secret is not configured. Set EMAIL_LINK_SIGNING_SECRET (preferred) or NEXTAUTH_SECRET.',
+    );
+  }
+  return v;
+}
+
+/**
+ * HMAC signature for a click-tracking URL, bound to both the emailId and the
+ * destination URL. First 32 hex chars are plenty for a tamper check; the full
+ * 64-hex output is retained for the unsubscribe flow to preserve backward
+ * compatibility with previously generated tokens.
+ */
+export function signClickTarget(emailId: string, targetUrl: string): string {
+  return crypto
+    .createHmac('sha256', getEmailLinkSecret())
+    .update(`${emailId}|${targetUrl}`)
+    .digest('hex')
+    .slice(0, 32);
+}
+
+/** Constant-time verification of a click-tracking signature. */
+export function verifyClickSignature(
+  emailId: string,
+  targetUrl: string,
+  sig: string,
+): boolean {
+  const expected = signClickTarget(emailId, targetUrl);
+  if (sig.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Generate a secure HMAC token for unsubscribe links.
@@ -11,7 +58,7 @@ const TRACKING_SECRET = process.env.NEXTAUTH_SECRET || 'agency-os-secret';
  */
 export function generateUnsubscribeToken(prospectId: string): string {
   return crypto
-    .createHmac('sha256', TRACKING_SECRET)
+    .createHmac('sha256', getEmailLinkSecret())
     .update(prospectId)
     .digest('hex')
     .slice(0, 32);
@@ -25,10 +72,12 @@ export function verifyUnsubscribeToken(
   token: string,
 ): boolean {
   const expected = generateUnsubscribeToken(prospectId);
-  return crypto.timingSafeEqual(
-    Buffer.from(token),
-    Buffer.from(expected),
-  );
+  if (token.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -54,7 +103,8 @@ export function wrapLinksForTracking(
       ) {
         return match;
       }
-      const trackUrl = `${baseUrl}/api/track/click/${emailId}?url=${encodeURIComponent(url)}`;
+      const sig = signClickTarget(emailId, url);
+      const trackUrl = `${baseUrl}/api/track/click/${emailId}?url=${encodeURIComponent(url)}&sig=${sig}`;
       return `${prefix}${trackUrl}${suffix}`;
     },
   );
