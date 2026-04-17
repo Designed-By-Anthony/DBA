@@ -66,6 +66,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not found" }, { status: 404, headers: cors });
   }
 
+  // Fail closed when Turnstile isn't configured. Previously the Turnstile
+  // check was only applied when TURNSTILE_SECRET_KEY was set, so a missing
+  // env var silently downgraded the route to "honeypot only" — an attacker
+  // who ignores the _hp field would be invisible to us. In production we
+  // require Turnstile; preview/dev deployments may opt out with
+  // PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE=true.
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+  const turnstileEnforced = Boolean(turnstileSecret);
+  if (!turnstileEnforced) {
+    const isProd = process.env.VERCEL_ENV === "production" ||
+      (process.env.NODE_ENV === "production" && process.env.VERCEL === "1");
+    const bypassOk = process.env.PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE === "true";
+    if (isProd && !bypassOk) {
+      console.error("[public-lead] rejected: TURNSTILE_SECRET_KEY not configured in production");
+      return NextResponse.json(
+        { error: "Bot verification not configured" },
+        { status: 503, headers: cors },
+      );
+    }
+  }
+
   try {
     const parsed = await readBoundedJson<Record<string, unknown>>(request, LEAD_INGEST_MAX_BYTES);
     if (!parsed.ok) {
@@ -89,7 +110,12 @@ export async function POST(request: NextRequest) {
     const source = pickStr(body, "source") || "contact_form";
     const message = pickStr(body, "message", "biggest_issue", "projectRequirements");
     const auditUrl = pickStr(body, "auditUrl", "auditReportUrl");
-    const agencyId = typeof body.agencyId === "string" ? body.agencyId : undefined;
+    // Deliberately IGNORE body.agencyId for the public endpoint. The browser
+    // must not be able to direct a lead into a tenant it doesn't own — that
+    // was a cross-tenant lead-stuffing path. All public submissions route
+    // through the server-resolved LEAD_WEBHOOK_DEFAULT_AGENCY_ID in
+    // executeLeadIntake(). The authenticated /api/webhooks/lead endpoint
+    // still accepts an explicit agencyId.
     const marketing = buildMarketingMeta(body);
 
     const turnstileToken = pickStr(
@@ -98,7 +124,7 @@ export async function POST(request: NextRequest) {
       "cf-turnstile-response",
       "turnstileToken",
     );
-    if (process.env.TURNSTILE_SECRET_KEY) {
+    if (turnstileEnforced) {
       const forwarded = request.headers.get("x-forwarded-for");
       const clientIp = forwarded?.split(",")[0]?.trim() || undefined;
       const tv = await verifyTurnstileToken(turnstileToken, clientIp);
@@ -126,7 +152,7 @@ export async function POST(request: NextRequest) {
       source,
       message,
       auditUrl,
-      agencyId,
+      // agencyId intentionally omitted — see comment above.
       marketing,
     });
 
