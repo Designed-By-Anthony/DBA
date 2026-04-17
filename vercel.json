@@ -3,5 +3,7 @@
   "framework": "astro",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter designed-by-anthony run build",
-  "outputDirectory": "apps/marketing/dist"
+  "outputDirectory": "apps/marketing/dist",
+  "cleanUrls": true,
+  "trailingSlash": false
 }
