@@ -6,6 +6,7 @@ import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
 import { readBoundedJson } from "@/lib/body-limit";
+import { clientAddress, rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 const MAGIC_LINK_MAX_BYTES = 2 * 1024;
 
@@ -30,7 +31,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    // Rate limit per (IP + email lowercased). Keeps both anti-enumeration
+    // guarantees and prevents a token storm that fills the portal_tokens
+    // table. The retry-after response is intentionally indistinguishable
+    // from the generic success response at the status-code level — we
+    // return 429 only once an attacker is already observable.
+    const keyEmail = String(email).toLowerCase().trim();
+    const retry = rateLimit(
+      `magic-link:${clientAddress(request)}:${keyEmail}`,
+      5,
+      15 * 60 * 1000,
+    );
+    if (retry !== null) {
+      return tooManyRequests(retry);
+    }
+
+    const normalizedEmail = keyEmail;
     const database = getDb();
     if (!database) {
       return NextResponse.json({ error: "Database not configured" }, { status: 503 });

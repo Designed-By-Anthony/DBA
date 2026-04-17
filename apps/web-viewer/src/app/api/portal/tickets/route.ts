@@ -5,6 +5,7 @@ import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 import { readBoundedJson } from "@/lib/body-limit";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 const TICKET_MAX_BYTES = 32 * 1024;
 
@@ -60,6 +61,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const session = await getPortalSessionFromRequest(request);
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
+  // Per-session burst protection. A compromised client (stolen session cookie)
+  // shouldn't be able to flood the admin inbox with ticket-creation emails.
+  const retry = rateLimit(
+    `portal-tickets:${session.tenantId}:${session.prospectId}`,
+    10,
+    60_000,
+  );
+  if (retry !== null) {
+    return tooManyRequests(retry);
+  }
 
   try {
     const parsed = await readBoundedJson<{ subject?: string; description?: string }>(
