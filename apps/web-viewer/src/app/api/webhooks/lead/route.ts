@@ -3,6 +3,9 @@ import { webhookConfig } from '@/lib/theme.config';
 import { resolveLeadAgencyId } from '@/lib/lead-webhook-agency';
 import { leadWebhookCorsHeaders } from '@/lib/lead-webhook-cors';
 import { executeLeadIntake } from '@/lib/execute-lead-intake';
+import { readBoundedJson } from '@/lib/body-limit';
+
+const LEAD_WEBHOOK_MAX_BYTES = 16 * 1024;
 
 /**
  * Authenticated lead webhook (secret in body or headers).
@@ -41,10 +44,32 @@ export async function GET(request: NextRequest) {
   );
 }
 
+type LeadWebhookBody = {
+  secret?: unknown;
+  ping?: unknown;
+  name?: unknown;
+  email?: unknown;
+  phone?: unknown;
+  company?: unknown;
+  website?: unknown;
+  websiteUrl?: unknown;
+  source?: unknown;
+  message?: unknown;
+  projectRequirements?: unknown;
+  auditUrl?: unknown;
+  auditReportUrl?: unknown;
+  agencyId?: unknown;
+};
+
 export async function POST(request: NextRequest) {
   const cors = leadWebhookCorsHeaders(request);
   try {
-    const body = await request.json();
+    const parsed = await readBoundedJson<LeadWebhookBody>(request, LEAD_WEBHOOK_MAX_BYTES);
+    if (!parsed.ok) {
+      const status = parsed.reason === 'too_large' ? 413 : 400;
+      return NextResponse.json({ error: 'Invalid request' }, { status, headers: cors });
+    }
+    const body = parsed.value;
 
     const secret =
       body.secret ||
@@ -55,7 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.ping === true || body.ping === 'true') {
-      const agencyId = await resolveLeadAgencyId(body.agencyId);
+      const agencyId = await resolveLeadAgencyId(
+        typeof body.agencyId === 'string' ? body.agencyId : undefined,
+      );
       return NextResponse.json(
         {
           ok: true,

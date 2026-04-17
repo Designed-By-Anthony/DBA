@@ -3,6 +3,9 @@ import type { PublicLeadMarketingMeta } from "@dba/lead-form-contract";
 import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
 import { executeLeadIntake } from "@/lib/execute-lead-intake";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { readBoundedJson } from "@/lib/body-limit";
+
+const LEAD_INGEST_MAX_BYTES = 8 * 1024;
 
 function pickStr(body: Record<string, unknown>, ...keys: string[]): string {
   for (const k of keys) {
@@ -64,7 +67,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const parsed = await readBoundedJson<Record<string, unknown>>(request, LEAD_INGEST_MAX_BYTES);
+    if (!parsed.ok) {
+      const status = parsed.reason === "too_large" ? 413 : 400;
+      return NextResponse.json({ error: "Invalid request" }, { status, headers: cors });
+    }
+    const body = parsed.value;
 
     // Honeypot — must be absent or empty
     if (body._hp != null && String(body._hp).trim() !== "") {

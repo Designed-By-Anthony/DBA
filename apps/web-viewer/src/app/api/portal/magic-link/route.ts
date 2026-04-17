@@ -5,6 +5,9 @@ import { sendMail, isEmailTestMode } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
+import { readBoundedJson } from "@/lib/body-limit";
+
+const MAGIC_LINK_MAX_BYTES = 2 * 1024;
 
 /**
  * Magic Link Authentication for Client Portal.
@@ -12,7 +15,15 @@ import { hashPortalToken } from "@/lib/portal-auth";
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, orgId } = (await request.json()) as { email?: string; orgId?: string };
+    const parsed = await readBoundedJson<{ email?: string; orgId?: string }>(
+      request,
+      MAGIC_LINK_MAX_BYTES,
+    );
+    if (!parsed.ok) {
+      const status = parsed.reason === "too_large" ? 413 : 400;
+      return NextResponse.json({ error: "Invalid request" }, { status });
+    }
+    const { email, orgId } = parsed.value;
 
     if (!email || !orgId) {
       // Keep response generic to avoid exposing tenant membership.

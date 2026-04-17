@@ -4,6 +4,9 @@ import { getDb, tickets } from "@dba/database";
 import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
+import { readBoundedJson } from "@/lib/body-limit";
+
+const TICKET_MAX_BYTES = 32 * 1024;
 
 /**
  * GET /api/portal/tickets
@@ -59,7 +62,15 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   try {
-    const { subject, description } = (await request.json()) as { subject?: string; description?: string };
+    const parsed = await readBoundedJson<{ subject?: string; description?: string }>(
+      request,
+      TICKET_MAX_BYTES,
+    );
+    if (!parsed.ok) {
+      const status = parsed.reason === "too_large" ? 413 : 400;
+      return NextResponse.json({ error: "Invalid request" }, { status });
+    }
+    const { subject, description } = parsed.value;
 
     if (!subject?.trim()) {
       return NextResponse.json({ error: "Subject is required" }, { status: 400 });
