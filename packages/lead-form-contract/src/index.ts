@@ -2,7 +2,7 @@
  * Single JSON contract for public leads → Agency OS `POST /api/lead`.
  *
  * Marketing (Astro):
- *   - `PUBLIC_CRM_LEAD_URL` — full URL, e.g. `https://viewer.designedbyanthony.com/api/lead`
+ *   - `PUBLIC_CRM_LEAD_URL` — full URL, e.g. `https://admin.designedbyanthony.com/api/lead`
  *   - `PUBLIC_API_URL` — Lighthouse audit API base only (LighthouseAudit, report viewer); not used for lead forms.
  *
  * Agency OS (web-viewer):

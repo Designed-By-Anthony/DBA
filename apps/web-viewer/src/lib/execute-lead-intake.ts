@@ -101,7 +101,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     createdAt: new Date().toISOString(),
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://viewer.designedbyanthony.com";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com";
 
   try {
     await sendMail({

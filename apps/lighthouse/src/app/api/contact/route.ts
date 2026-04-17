@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 /** Agency OS public lead ingest — CRM is the sole source of truth for marketing leads. */
-const DEFAULT_CRM_LEAD_URL = 'https://viewer.designedbyanthony.com/api/lead';
+const DEFAULT_CRM_LEAD_URL = 'https://admin.designedbyanthony.com/api/lead';
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });

@@ -6,7 +6,7 @@ const turnstileSiteKey = getTurnstileSiteKey();
 
 /** Public leads POST to Agency OS CRM (`POST /api/lead`). Lighthouse is only for audits/report APIs. */
 const defaultFormEndpoint =
-  import.meta.env.PUBLIC_CRM_LEAD_URL || 'https://viewer.designedbyanthony.com/api/lead';
+  import.meta.env.PUBLIC_CRM_LEAD_URL || 'https://admin.designedbyanthony.com/api/lead';
 
 export interface Props {
   ctaSource: string;

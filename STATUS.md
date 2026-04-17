@@ -82,3 +82,13 @@
   - `admin.*` / `app.*` style hostnames -> internal `/admin` routes
   - `portal.*` hostnames -> internal `/portal` routes
   - preview hostnames -> internal `/preview/[customer]` routes
+
+## Lead endpoint host fix
+
+- Swept the repo for hardcoded `viewer.designedbyanthony.com` (non-existent subdomain causing `ERR_NAME_NOT_RESOLVED` on marketing form POSTs) and replaced it with the canonical Agency OS host `admin.designedbyanthony.com` in:
+  - Marketing: `AuditForm.astro`, `src/scripts/audit-forms.ts`, `build/csp.mjs`, regenerated `firebase.json` CSP + `form-action`, Firebase Hosting workflow envs, `.env.example`.
+  - Lighthouse: `src/app/api/contact/route.ts` (`DEFAULT_CRM_LEAD_URL`).
+  - Web-viewer: webhook route doc URLs + `NEXT_PUBLIC_APP_URL` defaults in `.env.example`, `execute-lead-intake.ts`, `calendly`/`stripe` webhooks.
+  - Shared: `packages/lead-form-contract/src/index.ts` doc, `ANTHONYS_INSTRUCTIONS.txt`.
+- Rebuilt `apps/marketing/public/scripts/site.js` (esbuild) and re-synced `firebase.json` CSP via `npm run sync:firebase-csp`.
+- `pnpm build` green across all 3 apps.

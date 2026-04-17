@@ -30,7 +30,7 @@ jobs:
         run: npm run build
         env:
           PUBLIC_API_URL: "https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app"
-          PUBLIC_CRM_LEAD_URL: "https://viewer.designedbyanthony.com/api/lead"
+          PUBLIC_CRM_LEAD_URL: "https://admin.designedbyanthony.com/api/lead"
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - uses: FirebaseExtended/action-hosting-deploy@v0.10.0
         with:

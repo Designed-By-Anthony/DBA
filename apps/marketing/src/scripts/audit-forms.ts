@@ -2,7 +2,7 @@ import { buildPublicLeadPayloadFromFormData } from '@dba/lead-form-contract';
 import { pushAnalyticsEvent, requestGaClientId } from './analytics';
 
 /** Default `POST /api/lead` on Agency OS; override with `PUBLIC_CRM_LEAD_URL` at build time. */
-const DEFAULT_FORM_ENDPOINT = 'https://viewer.designedbyanthony.com/api/lead';
+const DEFAULT_FORM_ENDPOINT = 'https://admin.designedbyanthony.com/api/lead';
 
 export interface AuditFormError {
   field?: string;

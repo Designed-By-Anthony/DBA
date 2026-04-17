@@ -14,7 +14,7 @@ const DEFAULT_SENTRY_DSN =
 const LIGHTHOUSE_AUDIT_API_ORIGIN = 'https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app';
 
 /** Agency OS public lead ingest (`POST /api/lead`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
-const AGENCY_OS_VIEWER_ORIGIN = 'https://viewer.designedbyanthony.com';
+const AGENCY_OS_VIEWER_ORIGIN = 'https://admin.designedbyanthony.com';
 
 /** GTM + GA + Clarity + Crazy Egg + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC =

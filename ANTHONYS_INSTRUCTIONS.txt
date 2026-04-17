@@ -56,7 +56,7 @@ Cloud SQL + Drizzle (packages/database)
 Public leads (CRM as source of truth)
 --------------------------------------
 • Marketing audit/contact forms POST JSON to Agency OS `POST /api/lead` (not Lighthouse `/api/contact`).
-• Env (marketing build): `PUBLIC_CRM_LEAD_URL` — full URL, default `https://viewer.designedbyanthony.com/api/lead`.
+• Env (marketing build): `PUBLIC_CRM_LEAD_URL` — full URL, default `https://admin.designedbyanthony.com/api/lead`.
 • Env (marketing): `PUBLIC_API_URL` — Lighthouse base for `/api/audit` and report viewer only.
 • Shared contract & env notes: `packages/lead-form-contract/src/index.ts`.
 • Org product tier: Firestore `org_settings.planSuite` = `starter` | `full` (default full). Starter hides Automations, Sequences, Billing, Price Book in the admin sidebar.

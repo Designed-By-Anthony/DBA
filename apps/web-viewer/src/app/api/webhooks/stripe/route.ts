@@ -16,7 +16,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
  * - customer.subscription.deleted → retainer cancelled
  * 
  * Setup: In Stripe Dashboard → Developers → Webhooks → Add Endpoint
- * URL: https://viewer.designedbyanthony.com/api/webhooks/stripe
+ * URL: https://admin.designedbyanthony.com/api/webhooks/stripe
  * Events: checkout.session.completed, invoice.paid, customer.subscription.deleted
  */
 export async function POST(request: NextRequest) {

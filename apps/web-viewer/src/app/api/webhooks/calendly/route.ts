@@ -11,7 +11,7 @@ import { complianceConfig } from '@/lib/theme.config';
  * - invitee.canceled → booking cancelled
  * 
  * Setup: In Calendly → Integrations → Webhooks → Create Webhook
- * URL: https://viewer.designedbyanthony.com/api/webhooks/calendly
+ * URL: https://admin.designedbyanthony.com/api/webhooks/calendly
  * Events: invitee.created, invitee.canceled
  */
 export async function POST(request: NextRequest) {
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
               <p style="color: #ccc; margin: 0 0 8px;"><strong style="color: #fff;">${inviteeName}</strong> (${inviteeEmail})</p>
               <p style="color: #ccc; margin: 0 0 8px;">Event: ${eventName}</p>
               ${scheduledTime ? `<p style="color: #ccc; margin: 0 0 16px;">Time: ${new Date(scheduledTime).toLocaleString()}</p>` : ''}
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://viewer.designedbyanthony.com'}/admin/prospects/${prospectId}"
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://admin.designedbyanthony.com'}/admin/prospects/${prospectId}"
                 style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
                 View in Agency OS →
               </a>
