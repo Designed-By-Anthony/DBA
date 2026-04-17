@@ -1,5 +1,23 @@
 # Migration Status Report
 
+## Lead intake bot-spam hardening (current)
+
+The public `POST /api/lead` endpoint previously fired an admin "New Lead" email through Resend for every request that (a) had a name + email and (b) left the honeypot empty. Turnstile was only enforced when `TURNSTILE_SECRET_KEY` happened to be set — so any missing-env slip resulted in opportunistic bot storms landing directly in Anthony's inbox. Lighthouse `/api/contact` compounded the problem with `Access-Control-Allow-Origin: '*'`, letting attacker pages script the CRM.
+
+Follow-up fix: both Astro Turnstile widgets now wire `data-error-callback` to their resolver-aware failure handlers instead of the layout-wide UI-only handler. That closes the invisible-Turnstile hang where async Turnstile errors left the form stuck on `Verifying…` with a disabled submit button. Regression coverage was added in `apps/marketing/e2e/contact-form.spec.ts` and `apps/marketing/e2e/audit-tool.spec.ts`.
+
+Defenses added on top of the existing honeypot:
+
+1. **Per-IP sliding-window rate limit** (`apps/web-viewer/src/lib/lead-intake/spam-guard.ts`) — default 3 submissions per 60 s keyed by the first IP in `x-forwarded-for`. Returns 429 + `Retry-After`.
+2. **Required Turnstile in production (fail-closed)** — when `VERCEL_ENV=production` and `TURNSTILE_SECRET_KEY` is missing, `/api/lead` now returns 503 instead of silently accepting anonymous submissions. Escape hatch: `PUBLIC_LEAD_DISABLE_TURNSTILE=true` (documented, not recommended).
+3. **Email format + disposable-domain validator** — rejects malformed addresses and throwaway inboxes (`mailinator.com`, `yopmail.com`, etc.).
+4. **Silent bot heuristics** — URL-bomb messages, cyrillic-only names, `name == email`, names containing URLs, and garbage website fields all return 200 so scanners move on, but never create a prospect or fire an email.
+5. **Lighthouse `/api/contact` CORS** tightened to `https://*.designedbyanthony.com` + local dev; removed the permissive `Access-Control-Allow-Origin: '*'`.
+
+Coverage: `apps/web-viewer/tests/lead-spam-guard.spec.ts` (pure-logic tests for all four guard functions — validator, heuristics, rate limiter, required-Turnstile decision).
+
+**Operator follow-up still required (not a code fix):** the current Vercel deploy log shows the marketing project failing the `@dba/env/marketing` env-bleed guard — `CLERK_SECRET_KEY`, `DATABASE_URL`, `STRIPE_SECRET_KEY`, and `LEAD_WEBHOOK_SECRET` are set on the Marketing Vercel project but should only live on Agency OS / Lighthouse. Delete those four env vars from the Marketing project's Environment Variables in the Vercel dashboard (they don't belong there and the guard is correctly rejecting them). Once removed the marketing build resumes.
+
 ## Build verification
 
 - `pnpm turbo build` completed successfully across the monorepo.

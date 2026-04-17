@@ -179,8 +179,10 @@ const leadSourceLabel = leadSourceLabelForOfferType(offerType);
     class="cf-turnstile"
     data-sitekey={turnstileSiteKey}
     data-theme="dark"
-    data-size="normal"
-    data-error-callback="__dbaTurnstileError"></div>
+    data-size="invisible"
+    data-appearance="interaction-only"
+    data-callback="__dbaAuditFormTurnstileSuccess"
+    data-error-callback="__dbaAuditFormTurnstileFailure"></div>
 
   <p class="audit-form-status" data-form-error hidden></p>
 
@@ -222,6 +224,18 @@ const leadSourceLabel = leadSourceLabelForOfferType(offerType);
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Invisible Turnstile — takes no vertical space in the form.
+     Cloudflare still shows the challenge popup when a visitor is
+     flagged as suspicious; the container just has no resting layout. */
+  .audit-form .cf-turnstile {
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+  .audit-form .cf-turnstile:empty {
+    display: none;
   }
 
   .audit-form-grid {

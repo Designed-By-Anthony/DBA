@@ -2,20 +2,44 @@ import { NextResponse } from 'next/server';
 import { buildPublicLeadPayloadFromFormFields } from '@dba/lead-form-contract';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+/**
+ * CORS: only the DBA family (marketing apex, admin/accounts subdomains,
+ * local dev) may call this endpoint from a browser. The previous
+ * `Access-Control-Allow-Origin: '*'` configuration meant any attacker
+ * site could script POSTs to `/api/contact` and produce lead-email
+ * spam for the admin inbox.
+ */
+const APEX_SUBDOMAIN_PATTERN = /^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
+const LOCAL_ORIGINS = new Set<string>([
+  'http://localhost:4321',
+  'http://127.0.0.1:4321',
+  'http://localhost:3000', // pragma: allowlist secret
+  'http://127.0.0.1:3000', // pragma: allowlist secret
+  'http://localhost:3100', // pragma: allowlist secret
+  'http://127.0.0.1:3100', // pragma: allowlist secret
+]);
+
+function buildCorsHeaders(origin: string | null): Record<string, string> {
+  const isAllowed =
+    !!origin && (APEX_SUBDOMAIN_PATTERN.test(origin) || LOCAL_ORIGINS.has(origin));
+  const allow = isAllowed ? origin! : 'https://designedbyanthony.com';
+  return {
+    'Access-Control-Allow-Origin': allow,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    Vary: 'Origin',
+  };
+}
 
 /** Agency OS public lead ingest — CRM is the sole source of truth for marketing leads. */
 const DEFAULT_CRM_LEAD_URL = 'https://admin.designedbyanthony.com/api/lead';
 
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+export async function OPTIONS(request: Request) {
+  return NextResponse.json({}, { headers: buildCorsHeaders(request.headers.get('origin')) });
 }
 
 export async function POST(request: Request) {
+  const corsHeaders = buildCorsHeaders(request.headers.get('origin'));
   try {
     const formData = await request.formData().catch(() => null);
 

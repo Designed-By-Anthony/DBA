@@ -251,33 +251,28 @@ export function initFacebookOfferTracking(): void {
   }
 }
 
-async function submitAuditForm(form: HTMLFormElement): Promise<void> {
+async function finalizeAuditFormSubmission(
+  form: HTMLFormElement,
+  turnstileToken: string,
+): Promise<void> {
   const submitButton = form.querySelector<HTMLButtonElement>('[data-form-submit]');
-  const defaultLabel = submitButton?.textContent?.trim() || 'Send My Audit Request';
+  const defaultLabel = submitButton?.dataset.defaultLabel || 'Send My Audit Request';
   const endpoint = form.getAttribute('action')?.trim() || DEFAULT_FORM_ENDPOINT;
 
   if (submitButton) {
-    submitButton.dataset.defaultLabel = defaultLabel;
     submitButton.disabled = true;
     submitButton.textContent = 'Sending...';
   }
 
-  clearAuditFormErrors(form);
-  await syncGaClientId(form);
-
-  // Validate Turnstile token before sending
   const turnstileInput = form.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]');
-  if (!turnstileInput || !turnstileInput.value) {
-    showAuditFormError(form, 'Please complete the security check.');
-    restoreAuditSubmitButton(submitButton, defaultLabel);
-    return;
-  }
+  if (turnstileInput) turnstileInput.value = turnstileToken;
 
   const formData = new FormData(form);
   formData.set('source_page', window.location.pathname);
   formData.set('page_url', window.location.href);
   formData.set('referrer_url', document.referrer || 'direct');
   formData.set('page_title', document.title);
+  formData.set('cf-turnstile-response', turnstileToken);
 
   const payload = buildPublicLeadPayloadFromFormData(formData);
 
@@ -325,12 +320,103 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
     showAuditFormError(form, 'We could not submit the form right now. Please try again in a moment.');
     restoreAuditSubmitButton(submitButton, defaultLabel);
   } finally {
-    // Reset Turnstile widget for potential re-submission
     const turnstileEl = form.querySelector<HTMLElement>('.cf-turnstile');
     if (turnstileEl && typeof (window as any).turnstile !== 'undefined') {
       (window as any).turnstile.reset(turnstileEl);
     }
   }
+}
+
+/**
+ * Invisible Turnstile does not render a widget or auto-solve — you must
+ * call `turnstile.execute()` in response to a user action and then
+ * submit once the `callback` fires with a token. This function wires
+ * the current submit intent to a per-form resolver that completes when
+ * the Cloudflare callback lands.
+ */
+async function submitAuditForm(form: HTMLFormElement): Promise<void> {
+  const submitButton = form.querySelector<HTMLButtonElement>('[data-form-submit]');
+  const defaultLabel = submitButton?.textContent?.trim() || 'Send My Audit Request';
+  if (submitButton) {
+    submitButton.dataset.defaultLabel = defaultLabel;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Verifying...';
+  }
+
+  clearAuditFormErrors(form);
+  await syncGaClientId(form);
+
+  const turnstileEl = form.querySelector<HTMLElement>('.cf-turnstile');
+  const tsAny = (window as any).turnstile as
+    | {
+        execute: (el: HTMLElement) => void;
+        reset: (el: HTMLElement) => void;
+      }
+    | undefined;
+
+  if (!turnstileEl || !tsAny || typeof tsAny.execute !== 'function') {
+    showAuditFormError(form, 'Security check could not load. Please refresh the page and try again.');
+    restoreAuditSubmitButton(submitButton, defaultLabel);
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    (form as any).__dbaTurnstileResolver = (token: string | null) => {
+      (form as any).__dbaTurnstileResolver = undefined;
+      if (!token) {
+        showAuditFormError(
+          form,
+          'Security check failed. Please refresh the page and try again.',
+        );
+        restoreAuditSubmitButton(submitButton, defaultLabel);
+        try {
+          tsAny.reset(turnstileEl);
+        } catch {
+          /* ignore */
+        }
+        resolve();
+        return;
+      }
+
+      finalizeAuditFormSubmission(form, token).finally(resolve);
+    };
+
+    try {
+      tsAny.execute(turnstileEl);
+    } catch {
+      (form as any).__dbaTurnstileResolver = undefined;
+      showAuditFormError(
+        form,
+        'Security check could not start. Please refresh the page and try again.',
+      );
+      restoreAuditSubmitButton(submitButton, defaultLabel);
+      resolve();
+    }
+  });
+}
+
+type AuditFormWindow = Window & {
+  __dbaAuditFormTurnstileSuccess?: (token: string) => void;
+  __dbaAuditFormTurnstileFailure?: () => void;
+};
+
+function installAuditFormTurnstileCallbacks(): void {
+  const w = window as AuditFormWindow;
+  if (w.__dbaAuditFormTurnstileSuccess) return;
+
+  w.__dbaAuditFormTurnstileSuccess = (token: string) => {
+    document.querySelectorAll<HTMLFormElement>('[data-audit-form]').forEach((form) => {
+      const resolver = (form as any).__dbaTurnstileResolver;
+      if (typeof resolver === 'function') resolver(token);
+    });
+  };
+
+  w.__dbaAuditFormTurnstileFailure = () => {
+    document.querySelectorAll<HTMLFormElement>('[data-audit-form]').forEach((form) => {
+      const resolver = (form as any).__dbaTurnstileResolver;
+      if (typeof resolver === 'function') resolver(null);
+    });
+  };
 }
 
 function setAuditTrackingFields(form: HTMLFormElement): void {
@@ -342,6 +428,8 @@ function setAuditTrackingFields(form: HTMLFormElement): void {
 }
 
 export function initAuditForms(): { resetAllSuccessStates: (container?: ParentNode) => void } {
+  installAuditFormTurnstileCallbacks();
+
   const forms = Array.from(document.querySelectorAll<HTMLFormElement>('[data-audit-form]'));
 
   forms.forEach((form) => {

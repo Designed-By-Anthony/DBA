@@ -3,6 +3,12 @@ import type { PublicLeadMarketingMeta } from "@dba/lead-form-contract";
 import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
 import { executeLeadIntake } from "@/lib/execute-lead-intake";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import {
+  checkLeadRateLimit,
+  isLikelyBotSubmission,
+  requireTurnstileInProd,
+  validatePublicLead,
+} from "@/lib/lead-intake/spam-guard";
 import { readBoundedJson } from "@/lib/body-limit";
 
 const LEAD_INGEST_MAX_BYTES = 8 * 1024;
@@ -31,6 +37,19 @@ function buildMarketingMeta(body: Record<string, unknown>): PublicLeadMarketingM
   return hasAny ? meta : undefined;
 }
 
+function resolveClientIp(request: NextRequest): string {
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) {
+    const first = xff.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return (
+    request.headers.get("x-real-ip") ||
+    request.headers.get("cf-connecting-ip") ||
+    "unknown"
+  );
+}
+
 /**
  * Public lead ingest (no shared secret in the browser).
  * Server applies `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` / tenant resolution.
@@ -38,9 +57,17 @@ function buildMarketingMeta(body: Record<string, unknown>): PublicLeadMarketingM
  * Marketing site + personal Lighthouse app: POST JSON here from the browser.
  * Honeypot: leave `_hp` empty (hidden field); bots that fill it are ignored.
  *
- * When `TURNSTILE_SECRET_KEY` is set, `cfTurnstileResponse` (or `cf-turnstile-response`) is verified.
+ * Production bot defenses (in order):
+ *   1. Honeypot.
+ *   2. Per-IP sliding-window rate limit (default 3 submissions / 60s).
+ *   3. Required Turnstile verification when `VERCEL_ENV=production`
+ *      (fail-closed: missing `TURNSTILE_SECRET_KEY` => 503, not "accept").
+ *   4. Email format / disposable-domain validation.
+ *   5. Silent bot heuristics (URL-stuffed names, duplicate email-as-name, …).
  *
- * Set `PUBLIC_LEAD_INGEST_DISABLED=true` to turn this route off.
+ * Set `PUBLIC_LEAD_INGEST_DISABLED=true` to turn this route off, or
+ * `PUBLIC_LEAD_DISABLE_TURNSTILE=true` to run prod without Turnstile
+ * (NOT recommended — documented for staging).
  */
 export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, { status: 204, headers: leadWebhookCorsHeaders(request) });
@@ -54,6 +81,7 @@ export async function GET(request: NextRequest) {
       endpoint: "public-lead-ingest",
       post: "POST JSON: name|first_name, email, optional phone, company, website, message|biggest_issue, source, auditUrl, marketing attribution fields, _hp (empty), cfTurnstileResponse",
       honeypot: "Include _hp as empty string (hidden field) to reduce spam bots.",
+      turnstileRequired: requireTurnstileInProd(),
     },
     { headers },
   );
@@ -95,9 +123,25 @@ export async function POST(request: NextRequest) {
     }
     const body = parsed.value;
 
-    // Honeypot — must be absent or empty
+    // 1. Honeypot — must be absent or empty
     if (body._hp != null && String(body._hp).trim() !== "") {
       return NextResponse.json({ success: true }, { headers: cors });
+    }
+
+    // 2. Per-IP rate limit — trims opportunistic bot storms
+    const clientIp = resolveClientIp(request);
+    const rateLimit = checkLeadRateLimit(clientIp);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please wait a moment and try again." },
+        {
+          status: 429,
+          headers: {
+            ...cors,
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        },
+      );
     }
 
     const name =
@@ -118,15 +162,15 @@ export async function POST(request: NextRequest) {
     // still accepts an explicit agencyId.
     const marketing = buildMarketingMeta(body);
 
+    // 3. Required Turnstile in production (fail-closed; key guard handled above)
     const turnstileToken = pickStr(
       body,
       "cfTurnstileResponse",
       "cf-turnstile-response",
       "turnstileToken",
     );
+
     if (turnstileEnforced) {
-      const forwarded = request.headers.get("x-forwarded-for");
-      const clientIp = forwarded?.split(",")[0]?.trim() || undefined;
       const tv = await verifyTurnstileToken(turnstileToken, clientIp);
       if (!tv.success) {
         return NextResponse.json(
@@ -136,11 +180,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!name || !email) {
+    // 4. Format + disposable-domain validation
+    const validationIssue = validatePublicLead({ name, email, phone, company, website, message });
+    if (validationIssue) {
       return NextResponse.json(
-        { error: "Name and email are required" },
+        { error: validationIssue.message, errors: [validationIssue] },
         { status: 400, headers: cors },
       );
+    }
+
+    // 5. Silent bot heuristics — accept 200 so automated scanners move on,
+    //    but never create a prospect or fire an email.
+    if (isLikelyBotSubmission({ name, email, phone, company, website, message })) {
+      console.warn("[/api/lead] Dropped likely-bot submission", {
+        ip: clientIp,
+        email,
+        source,
+      });
+      return NextResponse.json({ success: true }, { headers: cors });
     }
 
     const result = await executeLeadIntake({

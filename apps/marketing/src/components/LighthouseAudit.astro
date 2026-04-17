@@ -97,9 +97,11 @@ const LOADING_MESSAGES = [
       class="cf-turnstile"
       data-sitekey={turnstileSiteKey}
       data-theme="dark"
-      data-size="normal"
+      data-size="invisible"
+      data-appearance="interaction-only"
       data-lh-turnstile
-      data-error-callback="__dbaTurnstileError"></div>
+      data-callback="__dbaLighthouseAuditTurnstileSuccess"
+      data-error-callback="__dbaLighthouseAuditTurnstileFailure"></div>
 
     <button type="submit" class="btn btn-primary lh-submit" data-lh-submit>
       Run Free Audit
@@ -223,32 +225,7 @@ const LOADING_MESSAGES = [
     resetTurnstile();
   }
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    var urlVal = root.querySelector('[data-lh-url]').value.trim();
-    var nameVal = root.querySelector('[data-lh-name]').value.trim();
-    var companyVal = root.querySelector('[data-lh-company]').value.trim();
-    var emailVal = root.querySelector('[data-lh-email]').value.trim();
-    var locationInput = root.querySelector('[data-lh-location]');
-    var locationVal = locationInput ? locationInput.value.trim() : '';
-
-    // Get Turnstile token
-    var turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
-    var turnstileToken = turnstileInput ? turnstileInput.value : '';
-
-    if (!urlVal || !emailVal) return;
-
-    if (!turnstileToken) {
-      showError('Please complete the security check.');
-      return;
-    }
-
-    var finalUrl = urlVal;
-    if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-      finalUrl = 'https://' + finalUrl;
-    }
-
+  async function runAuditWithToken(turnstileToken, payload) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Starting scan…';
     errorEl.hidden = true;
@@ -258,14 +235,7 @@ const LOADING_MESSAGES = [
       var res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: finalUrl,
-          email: emailVal,
-          name: nameVal,
-          company: companyVal,
-          location: locationVal,
-          turnstileToken: turnstileToken,
-        }),
+        body: JSON.stringify(Object.assign({}, payload, { turnstileToken: turnstileToken })),
       });
 
       var json = await res.json();
@@ -276,7 +246,7 @@ const LOADING_MESSAGES = [
 
       if (json.results) {
         showResults({ ...json.results, reportId: json.reportId });
-        
+
         if (json.reportId) {
           window.history.pushState({ reportId: json.reportId }, '', '/report/' + json.reportId);
         }
@@ -296,6 +266,84 @@ const LOADING_MESSAGES = [
     } finally {
       resetTurnstile();
     }
+  }
+
+  /**
+   * Invisible Turnstile doesn't render a widget or auto-solve — it waits
+   * for a `turnstile.execute()` call tied to a user action (the submit),
+   * then fires `data-callback` with the token. We bridge that async
+   * handshake into the audit POST via a per-form resolver.
+   */
+  window.__dbaLighthouseAuditTurnstileSuccess = function (token) {
+    var resolver = form.__dbaLhTurnstileResolver;
+    form.__dbaLhTurnstileResolver = null;
+    if (typeof resolver === 'function') resolver(token);
+  };
+  window.__dbaLighthouseAuditTurnstileFailure = function () {
+    var resolver = form.__dbaLhTurnstileResolver;
+    form.__dbaLhTurnstileResolver = null;
+    if (typeof resolver === 'function') resolver(null);
+  };
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    var urlVal = root.querySelector('[data-lh-url]').value.trim();
+    var nameVal = root.querySelector('[data-lh-name]').value.trim();
+    var companyVal = root.querySelector('[data-lh-company]').value.trim();
+    var emailVal = root.querySelector('[data-lh-email]').value.trim();
+    var locationInput = root.querySelector('[data-lh-location]');
+    var locationVal = locationInput ? locationInput.value.trim() : '';
+
+    if (!urlVal || !emailVal) return;
+
+    var finalUrl = urlVal;
+    if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+      finalUrl = 'https://' + finalUrl;
+    }
+
+    var payload = {
+      url: finalUrl,
+      email: emailVal,
+      name: nameVal,
+      company: companyVal,
+      location: locationVal,
+    };
+
+    if (!turnstileEl || !window.turnstile || typeof window.turnstile.execute !== 'function') {
+      showError('Security check could not load. Please refresh and try again.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verifying…';
+
+    try {
+      var token = await new Promise(function (resolve) {
+        form.__dbaLhTurnstileResolver = resolve;
+        try {
+          window.turnstile.execute(turnstileEl);
+        } catch (err) {
+          form.__dbaLhTurnstileResolver = null;
+          resolve(null);
+        }
+      });
+
+      if (!token) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Run Free Audit';
+        showError('Security check failed. Please refresh and try again.');
+        try { resetTurnstile(); } catch (_) { /* noop */ }
+        return;
+      }
+
+      await runAuditWithToken(token, payload);
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Run Free Audit';
+      showError('Security check could not start. Please refresh and try again.');
+      try { resetTurnstile(); } catch (_) { /* noop */ }
+    }
   });
 
   if (resetBtn) {
@@ -311,6 +359,16 @@ const LOADING_MESSAGES = [
   [data-lh-results-container][hidden],
   .lh-error[hidden] {
     display: none !important;
+  }
+
+  /* Invisible Turnstile — no resting layout. */
+  .lh-form .cf-turnstile {
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+  .lh-form .cf-turnstile:empty {
+    display: none;
   }
 
   .lh-audit {
