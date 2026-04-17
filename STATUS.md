@@ -99,3 +99,10 @@
   - Shared: `packages/lead-form-contract/src/index.ts` doc, `ANTHONYS_INSTRUCTIONS.txt`.
 - Rebuilt `apps/marketing/public/scripts/site.js` (esbuild) and re-synced `firebase.json` CSP via `npm run sync:firebase-csp`.
 - `pnpm build` green across all 3 apps.
+
+## Marketing — Calista audit follow-ups
+
+- Homepage hero eyebrow now leads with `Mohawk Valley Web Design Studio · Utica · Rome · Syracuse · CNY` for immediate local signal (closes the "add a Mohawk Valley Web Design header" recommendation).
+- New "Why Astro? (in plain English)" section on `/` translates JAMstack / Lighthouse / static hosting into business-owner language (closes the "simplify the tech story" gap).
+- New "Clear Pricing Tiers" section on `/services` surfaces three tiers — Founding Partner Pilot ($100/mo + complimentary build), Standard Custom Build ($999+), and Enterprise & Custom Scope (quote) — closing the "pricing clarity" gap.
+- Verified with `npx astro check` (0 errors), `npm run build`, and Playwright smoke + homepage + service-pages regression suites (22/22 passing).

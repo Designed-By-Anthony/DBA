@@ -1,8 +1,70 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PremiumPitchStrip from '../components/PremiumPitchStrip.astro';
-import { MONTHLY_LOCAL_SEO_PRICE, PUBLIC_PAYMENT_STRUCTURE_COPY, PUBLIC_PRICING_PILL } from '../lib/offers';
+import {
+  ENTERPRISE_WEBSITE_STARTING_PRICE,
+  FOUNDING_PARTNER_BUILD_SLOTS,
+  FOUNDING_PARTNER_SEO_LABEL,
+  FOUNDING_PARTNER_SEO_MONTHLY,
+  GBP_FULL_PROGRAM_MONTHLY_PRICE,
+  MONTHLY_LOCAL_SEO_PRICE,
+  PUBLIC_PAYMENT_STRUCTURE_COPY,
+  PUBLIC_PRICING_PILL,
+  STANDARD_WEBSITE_STARTING_PRICE,
+  STANDARD_WEBSITE_TYPICAL_RANGE,
+} from '../lib/offers';
 import { buildItemListSchema, buildLighthouseSoftwareApplicationSchema } from '../lib/seo';
+
+const pricingTiers = [
+  {
+    name: 'Founding Partner Pilot',
+    price: FOUNDING_PARTNER_SEO_MONTHLY,
+    cadence: '/mo',
+    tagline: `Complimentary custom build + ${FOUNDING_PARTNER_SEO_LABEL}.`,
+    bestFor: `First ${FOUNDING_PARTNER_BUILD_SLOTS} approved local partners. Limited spots — fit confirmed on a short call.`,
+    includes: [
+      'Full custom website build, no upfront cost',
+      'Managed hosting, security, and SEO care',
+      'Google Business Profile attention + review support',
+      'Direct line to Anthony — no handoffs',
+    ],
+    cta: { href: '/contact', label: 'Apply for a Pilot Spot' },
+    featured: true,
+  },
+  {
+    name: 'Standard Custom Build',
+    price: STANDARD_WEBSITE_TYPICAL_RANGE,
+    cadence: 'typical project',
+    tagline: `Most service-business rebuilds land here. Simple single-service sites start at ${STANDARD_WEBSITE_STARTING_PRICE}.`,
+    bestFor: 'Businesses that want a new website without the ongoing growth retainer.',
+    includes: [
+      'Free Lighthouse audit + scoped proposal',
+      'Custom design, content structure, on-page & technical SEO',
+      `${PUBLIC_PAYMENT_STRUCTURE_COPY}`,
+      `Optional ${MONTHLY_LOCAL_SEO_PRICE}/mo hosting + SEO or ${GBP_FULL_PROGRAM_MONTHLY_PRICE}/mo full Google Business Profile program after launch`,
+    ],
+    cta: { href: '/free-seo-audit', label: 'Start With a Free Audit' },
+    featured: false,
+  },
+  {
+    name: 'Enterprise & Custom Scope',
+    price: `From ${ENTERPRISE_WEBSITE_STARTING_PRICE}`,
+    cadence: 'scoped quote',
+    tagline: 'Multi-location, e-commerce, or integrations beyond a standard brochure site.',
+    bestFor: 'Businesses with specific technical, compliance, or scale requirements.',
+    includes: [
+      'Deeper discovery + technical scoping call',
+      'Integrations (CRM, booking, payments, etc.)',
+      'Ongoing support and roadmap tailored to the project',
+      'Priced against the actual scope — no mystery bundles',
+    ],
+    cta: {
+      href: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
+      label: 'Book a Scoping Call',
+    },
+    featured: false,
+  },
+];
 
 const serviceCards = [
   {
@@ -75,8 +137,8 @@ const servicesFooterCta = {
 ---
 
 <Layout
-  title="Web Design & Development Services — Mohawk Valley & Syracuse | Designed by Anthony"
-  description="Web development services for service businesses in the Mohawk Valley, Syracuse, and Central New York. Custom website design, local SEO, managed hosting, AI tools, and site rescue."
+  title="Web Design, Local SEO & Hosting Services — Mohawk Valley, Utica, Syracuse | Designed by Anthony"
+  description="Web design, local SEO, managed hosting, AI chatbots, and website rescue for service businesses in the Mohawk Valley, Utica, Rome, Syracuse, and Central NY. Transparent pricing from $999 — free Lighthouse audit first, no signup."
   pageType="CollectionPage"
   schema={[servicesSchema, buildLighthouseSoftwareApplicationSchema()]}
   footerCta={servicesFooterCta}
@@ -84,9 +146,9 @@ const servicesFooterCta = {
   <section class="page-hero centered">
     <div class="page-hero-inner services-hero">
       <p class="page-eyebrow">Services</p>
-      <h1>Web design and development services that help your business show up, look professional, and get more calls.</h1>
+      <h1>Web design, local SEO, and hosting services for Mohawk Valley service businesses.</h1>
       <p>
-        Every project is scoped around what your business needs right now. Clear recommendations, direct communication, and practical execution.
+        Every engagement starts with a free Lighthouse audit and scopes around what your business actually needs — a custom rebuild, a website rescue, local SEO, managed hosting, or AI-driven lead capture. Clear recommendations, direct communication, and pricing tied to real outcomes.
       </p>
       <div class="hero-meta-row">
         <span class="mini-pill">{PUBLIC_PRICING_PILL}</span>
@@ -140,6 +202,63 @@ const servicesFooterCta = {
           If speed to publish matters more than clarity, trust, or quality, a fast template option is probably the better match. Designed by Anthony is built for businesses that want something stronger.
         </p>
       </div>
+    </div>
+  </section>
+
+  <section class="section-shell pricing-tiers-shell" aria-labelledby="pricing-tiers-heading">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">Clear Pricing Tiers</p>
+        <h2 id="pricing-tiers-heading">Three simple ways to work together — no mystery bundles.</h2>
+        <p>
+          Every project starts with a free Lighthouse audit. The tier below that makes sense depends on what the audit finds and what you want the site to do for your business.
+        </p>
+      </div>
+
+      <div class="pricing-tiers-grid">
+        {pricingTiers.map((tier) => (
+          <article class={`surface-card pricing-tier-card reveal-up${tier.featured ? ' pricing-tier-card--featured' : ''}`}>
+            {tier.featured && <span class="pricing-tier-badge">Limited launch program</span>}
+            <h3 class="pricing-tier-name">{tier.name}</h3>
+            <p class="pricing-tier-price">
+              <span class="pricing-tier-amount">{tier.price}</span>
+              <span class="pricing-tier-cadence">{tier.cadence}</span>
+            </p>
+            <p class="pricing-tier-tagline">{tier.tagline}</p>
+            <p class="pricing-tier-best-for">
+              <span class="pricing-tier-label">Best for</span>
+              {tier.bestFor}
+            </p>
+            <ul class="pricing-tier-list">
+              {tier.includes.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            <a
+              href={tier.cta.href}
+              class={`btn ${tier.featured ? 'btn-primary-audit' : 'btn-outline'} pricing-tier-cta`}
+              data-calendar-link={tier.cta.href.includes('calendly.com') ? true : undefined}
+            >
+              {tier.cta.label}
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <p class="pricing-tiers-note">
+        Not sure which tier fits? Run the <a href="/free-seo-audit" class="inline-link">free audit</a> first — Anthony will point you at the smallest right next step, whether that is a rebuild, an SEO tune-up, or nothing at all.
+      </p>
+
+      <aside class="pricing-tiers-benchmark" aria-label="How our pricing compares">
+        <p class="pricing-tiers-benchmark__eyebrow">Why these numbers</p>
+        <p class="pricing-tiers-benchmark__body">
+          Benchmarked against local Mohawk Valley and Syracuse agencies (typical premium tiers land
+          at {STANDARD_WEBSITE_STARTING_PRICE}–$2,499) and national small-business custom builds
+          ($2,000–$6,000, with growing-business projects at $8,000+). Our Standard tier sits at the
+          competitive heart of that range — not discounted, not padded — because every project ships
+          with custom design, real technical SEO, and 98+ Lighthouse scores as the baseline.
+        </p>
+      </aside>
     </div>
   </section>
 
@@ -213,11 +332,204 @@ const servicesFooterCta = {
     margin: 1rem 0 0.8rem;
   }
 
+  .pricing-tiers-shell {
+    padding-top: clamp(2.5rem, 4.5vw, 3.5rem);
+  }
+
+  .pricing-tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 2.2vw, 1.35rem);
+    margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+    align-items: stretch;
+  }
+
+  .pricing-tier-card {
+    position: relative;
+    padding: clamp(1.5rem, 3vw, 1.9rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition:
+      transform 0.35s ease,
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+
+  .pricing-tier-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 0 26px 56px -34px rgba(2, 6, 23, 0.85);
+  }
+
+  .pricing-tier-card--featured {
+    border-color: rgba(96, 165, 250, 0.32);
+    background:
+      radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 42%),
+      linear-gradient(165deg, rgba(11, 17, 30, 0.94) 0%, rgba(15, 23, 42, 0.9) 100%);
+    box-shadow: 0 28px 64px -36px rgba(8, 15, 28, 0.92);
+  }
+
+  .pricing-tier-badge {
+    position: absolute;
+    top: -0.7rem;
+    left: 1.25rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #eff6ff;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9));
+    box-shadow: 0 8px 22px -12px rgba(37, 99, 235, 0.65);
+  }
+
+  .pricing-tier-name {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-cream);
+  }
+
+  .pricing-tier-price {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .pricing-tier-amount {
+    font-size: clamp(1.55rem, 3vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: var(--text-white);
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  .pricing-tier-cadence {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .pricing-tier-tagline {
+    margin: 0;
+    color: var(--text-gray);
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .pricing-tier-best-for {
+    margin: 0;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .pricing-tier-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.95);
+    margin-bottom: 0.3rem;
+  }
+
+  .pricing-tier-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+    flex: 1;
+  }
+
+  .pricing-tier-list li {
+    position: relative;
+    padding-left: 1.2rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .pricing-tier-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(147, 197, 253, 0.85);
+  }
+
+  .pricing-tier-card--featured .pricing-tier-list li::before {
+    background: rgba(134, 239, 172, 0.85);
+  }
+
+  .pricing-tier-cta {
+    margin-top: 0.35rem;
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .pricing-tiers-note {
+    max-width: 40rem;
+    margin: clamp(1.75rem, 3vw, 2.25rem) auto 0;
+    text-align: center;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .pricing-tiers-note .inline-link {
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .pricing-tiers-benchmark {
+    max-width: 44rem;
+    margin: clamp(1.25rem, 2.5vw, 1.8rem) auto 0;
+    padding: 0.95rem 1.15rem;
+    border-radius: 0.85rem;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    text-align: left;
+  }
+
+  .pricing-tiers-benchmark__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.95);
+  }
+
+  .pricing-tiers-benchmark__body {
+    margin: 0;
+    color: var(--text-gray);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
   @media (max-width: 900px) {
     .services-grid {
       grid-template-columns: repeat(2, 1fr);
     }
     .services-proof {
+      grid-template-columns: 1fr;
+    }
+    .pricing-tiers-grid {
       grid-template-columns: 1fr;
     }
   }

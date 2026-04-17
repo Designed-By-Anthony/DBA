@@ -143,6 +143,32 @@ export const showcaseItems: ShowcaseItem[] = [
     imageAlt: 'Copperline Plumbing example website by Designed by Anthony',
     featured: true,
   },
+  {
+    status: 'in-progress',
+    statusLabel: 'Design Concept',
+    industry: 'Medspa & Wellness',
+    name: 'Serenity Medspa — Concept Build',
+    description:
+      'A concept build for a modern medspa brand — the kind of editorial, premium-feeling website we would ship for a clinic offering injectables, IV therapy, and skincare in the Mohawk Valley.',
+    problem:
+      'Most medspa and wellness sites in the region are Squarespace templates that feel interchangeable. A brand charging premium prices for a premium treatment experience deserves a website that reads as calm, confident, and brand-driven — not a generic service list with a booking button.',
+    solution:
+      'Editorial layouts with generous whitespace, serif display typography for a quieter luxury feel, a service menu that frames treatments as experiences, a booking flow tuned to the provider stack, and imagery direction that matches the in-treatment aesthetic. Built to feel like an extension of the reception experience, not a template.',
+    note: 'This is a concept direction published to show visual range beyond trades. The first medspa / wellness client engagement turns this into a live case study — reach out if that would be yours.',
+  },
+  {
+    status: 'in-progress',
+    statusLabel: 'Design Concept',
+    industry: 'Multi-Location & Franchise',
+    name: 'Empire Home Services — 3-Location Concept',
+    description:
+      'A concept build for a multi-location home-service operator — the structure, local SEO, and booking integration we would ship for an HVAC, plumbing, or electrical business running two to four locations across Central New York.',
+    problem:
+      'Multi-location home-service sites often end up as one generic homepage plus a list of locations nobody clicks. The result: every market competes for the same search visibility, leads route to the wrong office, and the CRM is a mess.',
+    solution:
+      'Distinct location pages scoped to each market (with their own reviews, service areas, and local search signals), a shared lead capture flow that routes to the right dispatcher, CRM integration (ServiceTitan, Jobber, Housecall Pro, or similar), and a technician or team directory that builds trust per city. Priced in the $8,000–$15,000 range for 2–4 locations depending on integration depth.',
+    note: 'Concept build published to show the scope we can handle on the multi-location side. First franchise / multi-location engagement becomes the live case study.',
+  },
 ];
 
 export const showcaseExampleItems = showcaseItems.filter(

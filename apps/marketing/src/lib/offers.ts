@@ -1,4 +1,19 @@
 export const STANDARD_WEBSITE_STARTING_PRICE = '$999';
+/**
+ * Typical project range for a standard custom build (5–10 pages, custom design,
+ * technical SEO). Benchmarked April 2026 against local Mohawk Valley / Syracuse
+ * agencies ($2,000–$2,499 premium tiers) and the national boutique-agency /
+ * small-business custom range ($2,000–$6,000). Competitive with the top of the
+ * local pack while clearly positioned above template / DIY work.
+ */
+export const STANDARD_WEBSITE_TYPICAL_RANGE = '$2,400–$4,800';
+/**
+ * Starting price for enterprise / multi-location / integration-heavy scope.
+ * Benchmarked against the national growing-business / enterprise bracket
+ * ($8,000–$25,000) — anchored low so prospects see a concrete floor instead of
+ * an opaque "Custom" quote.
+ */
+export const ENTERPRISE_WEBSITE_STARTING_PRICE = '$6,000';
 export const FACEBOOK_PRIVATE_WEBSITE_PRICE = '$500';
 
 export const PUBLIC_SITE_SOCIAL_IMAGE = '/images/og-site-premium.png';
