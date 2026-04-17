@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import FooterCTA from '../components/FooterCTA.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import iconLogo from '../assets/IconLogo.png';
@@ -320,6 +321,7 @@ try {
     }
     <slot name="head" />
     <Analytics />
+    <SpeedInsights />
   </head>
   <body
     class:list={[bodyClass]}
