@@ -60,6 +60,29 @@ function buildUpstream(
   return new URL(`${joinedPath}${search}`, base);
 }
 
+/**
+ * In production the apex Vercel project OWNS the canonical subdomains
+ * (admin / accounts / lighthouse) via the Chameleon middleware. If an
+ * upstream env var is missing we MUST NOT fall through to `next()` —
+ * that silently serves the Astro marketing homepage from admin.* /
+ * accounts.* / lighthouse.*, which is the exact regression this guard
+ * prevents. Return a loud 502 instead so the misconfig is visible.
+ *
+ * Preview + local dev (`VERCEL_ENV !== 'production'`) keep the
+ * fallthrough so unconfigured preview URLs still render something.
+ */
+function misconfigured(hostLabel: string): Response {
+  const body = `Upstream for ${hostLabel}.${APEX_DOMAIN} is not configured. Set ${hostLabel.toUpperCase()}_UPSTREAM_URL on the apex Vercel project.`;
+  return new Response(body, {
+    status: 502,
+    headers: { 'content-type': 'text/plain; charset=utf-8' },
+  });
+}
+
+function isProduction(): boolean {
+  return process.env.VERCEL_ENV === 'production';
+}
+
 export default function middleware(request: Request, _ctx: RequestContext) {
   const host = hostnameOf(request);
   const url = new URL(request.url);
@@ -67,21 +90,21 @@ export default function middleware(request: Request, _ctx: RequestContext) {
 
   if (host === ADMIN_HOST) {
     const upstream = process.env.ADMIN_UPSTREAM_URL;
-    if (!upstream) return next();
+    if (!upstream) return isProduction() ? misconfigured('admin') : next();
     return rewrite(buildUpstream(upstream, pathname, search));
   }
 
   if (host === ACCOUNTS_HOST) {
     const upstream =
       process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
-    if (!upstream) return next();
+    if (!upstream) return isProduction() ? misconfigured('accounts') : next();
     // The web-viewer CRM exposes the accounts flow under /accounts/...
     return rewrite(buildUpstream(upstream, pathname, search, '/accounts'));
   }
 
   if (host === LIGHTHOUSE_HOST) {
     const upstream = process.env.LIGHTHOUSE_UPSTREAM_URL;
-    if (!upstream) return next();
+    if (!upstream) return isProduction() ? misconfigured('lighthouse') : next();
     return rewrite(buildUpstream(upstream, pathname, search));
   }
 
