@@ -3,6 +3,11 @@ import { and, eq, gt } from "drizzle-orm";
 import { getDb, portalSessions, portalTokens } from "@dba/database";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
+import {
+  HOST_PREFIXED_COOKIE_NAME,
+  LEGACY_COOKIE_NAME,
+  portalCookieNameToSet,
+} from "@/lib/portal-cookie";
 
 /**
  * Magic Link Token Verification.
@@ -68,13 +73,48 @@ export async function POST(request: NextRequest) {
       prospectId: tokenRow.prospectId,
     });
 
-    response.cookies.set("portal_session", sessionToken, {
+    // Cookie posture:
+    //   httpOnly: no JS read (mitigates XSS-driven exfil).
+    //   sameSite: 'strict': portal is never entered via a cross-site
+    //     navigation, so 'strict' closes CSRF without breaking legitimate
+    //     flow. Loosening to 'lax' was unnecessary.
+    //   secure: forced true when using the __Host- name (browser requires
+    //     it anyway); true on Vercel even on non-prod (previews are HTTPS).
+    //   __Host- prefix: where HTTPS is available, rename to __Host-
+    //     portal_session. The prefix pins the cookie to the exact origin
+    //     (no Domain attribute, path=/ required) so a compromised
+    //     sibling subdomain can't overwrite our session cookie.
+    //
+    // Rollout: a sibling PR is extending getPortalSessionFromRequest() to
+    // read BOTH the new and legacy cookie names. That lets us issue new
+    // cookies under the prefixed name while honoring sessions that were
+    // issued under the old name, with no user-visible logout.
+    const cookieName = portalCookieNameToSet();
+    const onVercel = process.env.VERCEL === "1";
+    const isProd = process.env.NODE_ENV === "production";
+    const mustBeSecure = cookieName === HOST_PREFIXED_COOKIE_NAME;
+
+    response.cookies.set(cookieName, sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: mustBeSecure || onVercel || isProd,
+      sameSite: "strict",
       expires: sessionExpiry,
       path: "/",
     });
+
+    // Make sure any pre-existing legacy cookie with the same token doesn't
+    // shadow the new one during the compat window. Only clear when we're
+    // issuing under the new name; otherwise we'd clear the cookie we just
+    // set on dev.
+    if (cookieName === HOST_PREFIXED_COOKIE_NAME) {
+      response.cookies.set(LEGACY_COOKIE_NAME, "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        expires: new Date(0),
+        path: "/",
+      });
+    }
 
     return response;
   } catch (error: unknown) {

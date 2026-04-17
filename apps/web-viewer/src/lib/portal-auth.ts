@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { and, eq, gt } from "drizzle-orm";
 import { getDb, portalSessions } from "@dba/database";
 import type { NextRequest } from "next/server";
+import { portalCookieNamesToRead } from "@/lib/portal-cookie";
 
 export type PortalSession = {
   tenantId: string;
@@ -20,9 +21,21 @@ export function hashPortalToken(value: string): string {
 
 /**
  * Validate current portal session from cookie and return scoped tenant identity.
+ *
+ * Reads both the `__Host-portal_session` and the legacy `portal_session` cookie
+ * name so that sessions issued before the rollout continue to work through the
+ * compat window. Prefers the `__Host-` one when both are present — only the
+ * browser can set a `__Host-` cookie with full binding guarantees.
  */
 export async function getPortalSessionFromRequest(request: NextRequest): Promise<PortalSession | null> {
-  const sessionToken = request.cookies.get("portal_session")?.value;
+  let sessionToken: string | undefined;
+  for (const name of portalCookieNamesToRead()) {
+    const v = request.cookies.get(name)?.value;
+    if (v) {
+      sessionToken = v;
+      break;
+    }
+  }
   if (!sessionToken) return null;
 
   const database = getDb();
