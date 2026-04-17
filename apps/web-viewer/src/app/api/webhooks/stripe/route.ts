@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/firebase';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
+import { escapeHtml } from '@/lib/email-utils';
 import { apiError } from '@/lib/api-error';
 import type Stripe from 'stripe';
 
@@ -110,19 +111,29 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Notify admin
+        // Notify admin. Stripe-provided strings (customer name) are escaped —
+        // the payer controls `customer_details.name` on the Checkout form, so
+        // even a signature-verified event can still carry attacker-chosen HTML.
         try {
+          const customerName = session.customer_details?.name || 'Unknown';
+          const safeCustomerName = escapeHtml(customerName);
+          const safePaymentType = escapeHtml(
+            paymentType?.replace('_', ' ') || 'Payment',
+          );
           await sendMail({
             from: `Agency OS <${complianceConfig.fromEmail}>`,
             to: [complianceConfig.adminNotificationEmail],
-            subject: `💰 Payment Received: $${amount.toLocaleString()} — ${session.customer_details?.name || 'Unknown'}`,
+            // Subject is plain text; strip CRLF for header-injection safety.
+            subject:
+              `💰 Payment Received: $${amount.toLocaleString()} — ` +
+              customerName.replace(/[\r\n]+/g, ' '),
               html: `
                 <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
                   <h2 style="color: #10b981; margin: 0 0 16px;">💰 Payment Received</h2>
                   <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td style="padding: 8px 0; color: #888;">Client</td><td style="color: #fff;">${session.customer_details?.name || 'Unknown'}</td></tr>
+                    <tr><td style="padding: 8px 0; color: #888;">Client</td><td style="color: #fff;">${safeCustomerName}</td></tr>
                     <tr><td style="padding: 8px 0; color: #888;">Amount</td><td style="color: #10b981; font-size: 1.25em; font-weight: bold;">$${amount.toLocaleString()}</td></tr>
-                    <tr><td style="padding: 8px 0; color: #888;">Type</td><td style="color: #fff;">${paymentType?.replace('_', ' ') || 'Payment'}</td></tr>
+                    <tr><td style="padding: 8px 0; color: #888;">Type</td><td style="color: #fff;">${safePaymentType}</td></tr>
                   </table>
                   <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/admin/prospects/${prospectId}"
                     style="display: inline-block; margin-top: 20px; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none;">

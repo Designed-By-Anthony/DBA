@@ -5,6 +5,7 @@ import { sendMail, isEmailTestMode } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import crypto from "crypto";
 import { hashPortalToken } from "@/lib/portal-auth";
+import { escapeHtml } from "@/lib/email-utils";
 import { apiError } from "@/lib/api-error";
 import { readBoundedJson } from "@/lib/body-limit";
 import { clientAddress, rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
               <div style="width: 56px; height: 56px; background: #2563eb; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin-bottom: 24px;">
                 D
               </div>
-              <h1 style="color: #ffffff; margin: 0 0 8px; font-size: 24px;">Welcome Back, ${(lead.name || "there").split(" ")[0]}</h1>
+              <h1 style="color: #ffffff; margin: 0 0 8px; font-size: 24px;">Welcome Back, ${escapeHtml((lead.name || "there").split(" ")[0])}</h1>
               <p style="color: #888; margin: 0 0 32px; font-size: 14px;">
                 Click the button below to access your Client Portal.
               </p>

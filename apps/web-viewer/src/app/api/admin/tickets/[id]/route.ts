@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";
 import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
+import { escapeHtml } from "@/lib/email-utils";
 import { apiError } from "@/lib/api-error";
 
 /**
@@ -77,27 +78,36 @@ export async function PATCH(
       .where(and(eq(tickets.id, ticketId), eq(tickets.tenantId, orgId)));
 
     if (ticket.prospectEmail && hasReply) {
+      const safeFirstName = escapeHtml(
+        (ticket.prospectName || "there").split(" ")[0],
+      );
+      const safeTicketSubject = escapeHtml(ticket.subject);
+      const safeReply = escapeHtml(adminReply?.trim() || "");
+      const safeStatus = escapeHtml(String(nextStatus).replace("_", " "));
+      const safeAddress = complianceConfig.physicalAddress
+        .replace(/\\n/g, ", ");
       try {
         await sendMail({
           from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
           to: [ticket.prospectEmail],
-          subject: `Re: ${ticket.subject}`,
+          // Subject is plain text; strip CRLF to prevent header injection.
+          subject: `Re: ${String(ticket.subject).replace(/[\r\n]+/g, ' ')}`,
           html: `
             <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
-              <p style="color: #fff; font-size: 18px; font-weight: 600; margin: 0 0 16px;">Hi ${(ticket.prospectName || "there").split(" ")[0]},</p>
+              <p style="color: #fff; font-size: 18px; font-weight: 600; margin: 0 0 16px;">Hi ${safeFirstName},</p>
               <p style="margin: 0 0 16px; color: #aaa;">We've replied to your support ticket:</p>
               <div style="background: #1a1a2e; border-radius: 8px; padding: 16px; margin: 0 0 16px; border-left: 3px solid #2563eb;">
-                <p style="color: #888; font-size: 12px; margin: 0 0 8px;">Your ticket: ${ticket.subject}</p>
-                <p style="color: #fff; margin: 0;">${adminReply?.trim() || ""}</p>
+                <p style="color: #888; font-size: 12px; margin: 0 0 8px;">Your ticket: ${safeTicketSubject}</p>
+                <p style="color: #fff; margin: 0; white-space: pre-wrap;">${safeReply}</p>
               </div>
               <p style="color: #888; font-size: 13px; margin: 0 0 24px;">
-                Status: <strong style="color: #fff;">${String(nextStatus).replace("_", " ")}</strong>
+                Status: <strong style="color: #fff;">${safeStatus}</strong>
               </p>
               <a href="${process.env.NEXT_PUBLIC_APP_URL || "[REDACTED]"}/portal/dashboard"
                 style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 14px;">
                 View in Your Portal →
               </a>
-              <p style="color: #555; font-size: 12px; margin: 24px 0 0;">Designed by Anthony · ${complianceConfig.physicalAddress.replace(/\\n/g, ", ")}</p>
+              <p style="color: #555; font-size: 12px; margin: 24px 0 0;">Designed by Anthony · ${escapeHtml(safeAddress)}</p>
             </div>
           `,
         });

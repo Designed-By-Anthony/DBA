@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import { sendMail } from "@/lib/mailer";
 import {
   appendComplianceFooter,
+  escapeHtml,
   injectTrackingPixel,
   mergeTemplateVars,
   wrapLinksForTracking,
@@ -37,11 +38,14 @@ export async function sendProspectEmailFromTemplate(params: {
   const emailRef = db.collection("emails").doc();
   const emailId = emailRef.id;
 
+  // Template body is authored by the agency admin (trusted), but the merged
+  // variables are attacker-controlled (lead intake). Escape before substitution
+  // so a prospect can't inject <script> / phishing <a> into outbound mail.
   let processedBody = mergeTemplateVars(params.bodyHtml, {
-    name: name.split(" ")[0],
-    company,
-    website: (data.website as string) || "",
-    email,
+    name: escapeHtml(name.split(" ")[0]),
+    company: escapeHtml(company),
+    website: escapeHtml((data.website as string) || ""),
+    email: escapeHtml(email),
   });
   processedBody = wrapLinksForTracking(processedBody, emailId, BASE_URL);
   processedBody = appendComplianceFooter(
@@ -65,9 +69,12 @@ export async function sendProspectEmailFromTemplate(params: {
 </body>
 </html>`;
 
+  // Subject is plain text — no HTML escape — but strip CRLF to prevent
+  // header injection via attacker-controlled name/company.
+  const stripCrlf = (s: string) => s.replace(/[\r\n]+/g, " ");
   const subjectLine = mergeTemplateVars(params.subject, {
-    name: name.split(" ")[0],
-    company,
+    name: stripCrlf(name.split(" ")[0]),
+    company: stripCrlf(company),
   });
 
   const result = await sendMail({

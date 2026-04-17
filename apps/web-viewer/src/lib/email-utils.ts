@@ -4,6 +4,27 @@
 import * as crypto from 'crypto';
 
 /**
+ * Escape a string for safe interpolation into HTML body/attribute text.
+ *
+ * Every outbound email template that stitches user-controlled values
+ * (prospect name, email, ticket subject, admin reply, Calendly invitee,
+ * Stripe customer name, etc.) must run those values through this helper.
+ * Otherwise an attacker who can reach any lead/ticket-creation path can
+ * send HTML/script into your admin inbox, or spoof a "Your support
+ * ticket was resolved" email where the body contains an attacker-supplied
+ * phishing link or an <a href="javascript:..."> payload.
+ */
+export function escapeHtml(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
  * Secret used to HMAC-sign outbound tracking links (click + unsubscribe).
  *
  * Reads `EMAIL_LINK_SIGNING_SECRET` first. Falls back to `NEXTAUTH_SECRET`

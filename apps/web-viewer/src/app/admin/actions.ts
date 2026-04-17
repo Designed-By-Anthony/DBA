@@ -7,6 +7,7 @@ import { sendMail } from "@/lib/mailer";
 import {
   wrapLinksForTracking,
   appendComplianceFooter,
+  escapeHtml,
   injectTrackingPixel,
   mergeTemplateVars,
 } from "@/lib/email-utils";
@@ -663,12 +664,14 @@ export async function sendEmail(params: {
     const emailRef = db.collection("emails").doc();
     const emailId = emailRef.id;
 
-    // Merge template variables
+    // Merge template variables. The template itself is admin-authored (trusted),
+    // but the prospect-derived values are attacker-controlled via lead intake,
+    // so we HTML-escape each value before substitution.
     let processedBody = mergeTemplateVars(params.bodyHtml, {
-      name: prospect.name.split(" ")[0], // First name
-      company: prospect.company || prospect.name,
-      website: prospect.website || "",
-      email: prospect.email,
+      name: escapeHtml(prospect.name.split(" ")[0]), // First name
+      company: escapeHtml(prospect.company || prospect.name),
+      website: escapeHtml(prospect.website || ""),
+      email: escapeHtml(prospect.email),
     });
 
     // Process body: wrap links, add footer, inject pixel
@@ -706,7 +709,9 @@ export async function sendEmail(params: {
         from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
         to: prospect.email,
         replyTo: params.fromEmail || complianceConfig.replyTo,
-        subject: subjectLine,
+        // Subject line is plain text (no HTML), but strip CRLF to prevent
+        // header injection via the attacker-controlled prospect name/company.
+        subject: subjectLine.replace(/[\r\n]+/g, " "),
         html: fullHtml,
         ...(params.scheduledAt ? { scheduledAt: params.scheduledAt } : {}),
       });
@@ -774,11 +779,14 @@ export async function sendTestEmail(params: {
     }
   }
 
+  // Escape the attacker-controllable prospect fields before HTML substitution.
+  // Even this admin-triggered test-send would otherwise reflect prospect HTML
+  // into the admin's own inbox.
   const processedBody = mergeTemplateVars(params.bodyHtml, {
-    name: pName,
-    company: pCompany,
-    website: pWebsite,
-    email: params.testEmailAddress,
+    name: escapeHtml(pName),
+    company: escapeHtml(pCompany),
+    website: escapeHtml(pWebsite),
+    email: escapeHtml(params.testEmailAddress),
   });
 
   const fullHtml = `
@@ -801,7 +809,10 @@ export async function sendTestEmail(params: {
     from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
     to: params.testEmailAddress,
     replyTo: params.fromEmail || complianceConfig.replyTo,
-    subject: `[TEST] ` + mergeTemplateVars(params.subject, { name: pName, company: pCompany }),
+    subject: `[TEST] ` + mergeTemplateVars(params.subject, {
+      name: pName.replace(/[\r\n]+/g, " "),
+      company: pCompany.replace(/[\r\n]+/g, " "),
+    }),
     html: fullHtml,
   });
   if (!result.ok) return { success: false, error: result.error };

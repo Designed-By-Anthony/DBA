@@ -3,11 +3,28 @@ import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { generateClientId, getIdSource } from "@/lib/client-id";
 import { resolveLeadAgencyId } from "@/lib/lead-webhook-agency";
+import { escapeHtml } from "@/lib/email-utils";
 import { insertSqlLead } from "@/lib/lead-intake/sql";
 import { fireAutomationEvent } from "@/lib/automation-runner";
 import { getTenantByOrgId } from "@/lib/tenant-db";
 import type { VerticalId } from "@dba/ui";
 import type { LeadIntakeResult, LeadIntakeSource } from "@/lib/lead-intake/types";
+
+/**
+ * Return the URL as-is if it parses as http(s), else `null`. Used to keep
+ * attacker-supplied values out of href attributes unless they're safe web URLs.
+ */
+function safeHttpUrl(raw: string): string | null {
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 
 /**
  * Creates/updates prospect, activity, admin notification, optional submitter confirmation.
@@ -111,34 +128,71 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com";
 
   try {
+    // All prospect-supplied strings are HTML-escaped. URLs are additionally
+    // validated to be http(s) before being dropped into href attributes —
+    // otherwise a lead could submit `website: "javascript:alert(1)"` and
+    // cause the admin's one click on the notification email to execute
+    // attacker-controlled JS.
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safePhone = escapeHtml(phone);
+    const safeCompany = escapeHtml(company);
+    const safeSource = escapeHtml(source || "Unknown");
+    const safeMessage = escapeHtml(message);
+    const safeCta = escapeHtml(marketing?.ctaSource);
+    const safePageContext = escapeHtml(marketing?.pageContext);
+    const safeOffer = escapeHtml(marketing?.offerType);
+
+    const websiteUrl = safeHttpUrl(website);
+    const auditUrlSafe = safeHttpUrl(auditUrl);
+    const mailtoEmail = encodeURIComponent(email);
+
     await sendMail({
       from: `Agency OS <${complianceConfig.fromEmail}>`,
       to: [complianceConfig.adminNotificationEmail],
-      subject: `🔔 New ${isNew ? "Lead" : "Activity"}: ${name} ${company ? `(${company})` : ""}`,
+      // Subject is plain text; strip CRLF so attacker-controlled name/company
+      // cannot inject additional headers.
+      subject:
+        `🔔 New ${isNew ? "Lead" : "Activity"}: ` +
+        `${name} ${company ? `(${company})` : ""}`.replace(/[\r\n]+/g, " "),
       html: `
-          <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
-            <h2 style="margin: 0 0 16px; color: #fff;">${isNew ? "🆕 New Lead" : "🔄 Returning Contact"}</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px 0; color: #888; width: 120px;">Name</td><td style="padding: 8px 0; color: #fff;">${name}</td></tr>
-              <tr><td style="padding: 8px 0; color: #888;">Email</td><td style="padding: 8px 0; color: #fff;"><a href="mailto:${email}" style="color: #2563eb;">${email}</a></td></tr>
-              ${phone ? `<tr><td style="padding: 8px 0; color: #888;">Phone</td><td style="padding: 8px 0; color: #fff;">${phone}</td></tr>` : ""}
-              ${company ? `<tr><td style="padding: 8px 0; color: #888;">Company</td><td style="padding: 8px 0; color: #fff;">${company}</td></tr>` : ""}
-              ${website ? `<tr><td style="padding: 8px 0; color: #888;">Website</td><td style="padding: 8px 0; color: #fff;"><a href="${website}" style="color: #2563eb;">${website}</a></td></tr>` : ""}
-              <tr><td style="padding: 8px 0; color: #888;">Source</td><td style="padding: 8px 0; color: #fff;">${source || "Unknown"}</td></tr>
-              ${marketing?.ctaSource ? `<tr><td style="padding: 8px 0; color: #888;">CTA</td><td style="padding: 8px 0; color: #fff;">${marketing.ctaSource}</td></tr>` : ""}
-              ${marketing?.pageContext ? `<tr><td style="padding: 8px 0; color: #888;">Page context</td><td style="padding: 8px 0; color: #fff;">${marketing.pageContext}</td></tr>` : ""}
-              ${marketing?.offerType ? `<tr><td style="padding: 8px 0; color: #888;">Offer</td><td style="padding: 8px 0; color: #fff;">${marketing.offerType}</td></tr>` : ""}
-              ${auditUrl ? `<tr><td style="padding: 8px 0; color: #888;">Audit</td><td style="padding: 8px 0; color: #fff;"><a href="${auditUrl}" style="color: #2563eb;">View Report →</a></td></tr>` : ""}
-              ${message ? `<tr><td style="padding: 8px 0; color: #888;">Message</td><td style="padding: 8px 0; color: #fff;">${message}</td></tr>` : ""}
-            </table>
-            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #222;">
-              <a href="${appUrl}/admin/prospects/${prospectId}" 
-                style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                View in Agency OS →
-              </a>
+            <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
+              <h2 style="margin: 0 0 16px; color: #fff;">${isNew ? "🆕 New Lead" : "🔄 Returning Contact"}</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; color: #888; width: 120px;">Name</td><td style="padding: 8px 0; color: #fff;">${safeName}</td></tr>
+                <tr><td style="padding: 8px 0; color: #888;">Email</td><td style="padding: 8px 0; color: #fff;"><a href="mailto:${mailtoEmail}" style="color: #2563eb;">${safeEmail}</a></td></tr>
+                ${phone ? `<tr><td style="padding: 8px 0; color: #888;">Phone</td><td style="padding: 8px 0; color: #fff;">${safePhone}</td></tr>` : ""}
+                ${company ? `<tr><td style="padding: 8px 0; color: #888;">Company</td><td style="padding: 8px 0; color: #fff;">${safeCompany}</td></tr>` : ""}
+                ${
+                  websiteUrl
+                    ? `<tr><td style="padding: 8px 0; color: #888;">Website</td><td style="padding: 8px 0; color: #fff;"><a href="${escapeHtml(
+                        websiteUrl,
+                      )}" style="color: #2563eb;">${escapeHtml(websiteUrl)}</a></td></tr>`
+                    : website
+                    ? `<tr><td style="padding: 8px 0; color: #888;">Website</td><td style="padding: 8px 0; color: #fff;">${escapeHtml(website)}</td></tr>`
+                    : ""
+                }
+                <tr><td style="padding: 8px 0; color: #888;">Source</td><td style="padding: 8px 0; color: #fff;">${safeSource}</td></tr>
+                ${marketing?.ctaSource ? `<tr><td style="padding: 8px 0; color: #888;">CTA</td><td style="padding: 8px 0; color: #fff;">${safeCta}</td></tr>` : ""}
+                ${marketing?.pageContext ? `<tr><td style="padding: 8px 0; color: #888;">Page context</td><td style="padding: 8px 0; color: #fff;">${safePageContext}</td></tr>` : ""}
+                ${marketing?.offerType ? `<tr><td style="padding: 8px 0; color: #888;">Offer</td><td style="padding: 8px 0; color: #fff;">${safeOffer}</td></tr>` : ""}
+                ${
+                  auditUrlSafe
+                    ? `<tr><td style="padding: 8px 0; color: #888;">Audit</td><td style="padding: 8px 0; color: #fff;"><a href="${escapeHtml(
+                        auditUrlSafe,
+                      )}" style="color: #2563eb;">View Report →</a></td></tr>`
+                    : ""
+                }
+                ${message ? `<tr><td style="padding: 8px 0; color: #888;">Message</td><td style="padding: 8px 0; color: #fff;">${safeMessage}</td></tr>` : ""}
+              </table>
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #222;">
+                <a href="${appUrl}/admin/prospects/${prospectId}"
+                  style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                  View in Agency OS →
+                </a>
+              </div>
             </div>
-          </div>
-        `,
+          `,
     });
   } catch (emailErr) {
     console.error("Lead notification email failed:", emailErr);
@@ -146,14 +200,15 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
 
   if (process.env.LEAD_SEND_SUBMITTER_CONFIRMATION === "true") {
     try {
+      const safeFirstName = escapeHtml(name.split(" ")[0] || "there");
       await sendMail({
         from: `${complianceConfig.companyName} <${complianceConfig.fromEmail}>`,
         to: [email],
         replyTo: complianceConfig.replyTo,
         subject: "We received your message",
-        html: `<p>Hi ${name.split(" ")[0] || "there"},</p>
+        html: `<p>Hi ${safeFirstName},</p>
 <p>Thanks for reaching out — we received your message and will get back to you soon.</p>
-<p style="color:#666;font-size:13px;">— ${complianceConfig.companyName}</p>`,
+<p style="color:#666;font-size:13px;">— ${escapeHtml(complianceConfig.companyName)}</p>`,
       });
     } catch (e) {
       console.error("Submitter confirmation email failed:", e);

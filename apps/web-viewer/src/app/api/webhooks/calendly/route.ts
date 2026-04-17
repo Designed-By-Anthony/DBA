@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
+import { escapeHtml } from '@/lib/email-utils';
 import { apiError } from '@/lib/api-error';
 
 /**
@@ -105,24 +106,29 @@ export async function POST(request: NextRequest) {
         createdAt: new Date().toISOString(),
       });
 
-      // Notify you
+      // Notify admin. Calendly invitee-supplied strings are HTML-escaped.
       try {
+        const safeInviteeName = escapeHtml(inviteeName);
+        const safeInviteeEmail = escapeHtml(inviteeEmail);
+        const safeEventName = escapeHtml(eventName);
         await sendMail({
           from: `Agency OS <${complianceConfig.fromEmail}>`,
           to: [complianceConfig.adminNotificationEmail],
-          subject: `📞 Call Booked: ${inviteeName || inviteeEmail}`,
+          subject:
+            `📞 Call Booked: ` +
+            String(inviteeName || inviteeEmail).replace(/[\r\n]+/g, ' '),
           html: `
-            <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
-              <h2 style="margin: 0 0 16px; color: #fff;">📞 New Booking</h2>
-              <p style="color: #ccc; margin: 0 0 8px;"><strong style="color: #fff;">${inviteeName}</strong> (${inviteeEmail})</p>
-              <p style="color: #ccc; margin: 0 0 8px;">Event: ${eventName}</p>
-              ${scheduledTime ? `<p style="color: #ccc; margin: 0 0 16px;">Time: ${new Date(scheduledTime).toLocaleString()}</p>` : ''}
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://admin.designedbyanthony.com'}/admin/prospects/${prospectId}"
-                style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                View in Agency OS →
-              </a>
-            </div>
-          `,
+              <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
+                <h2 style="margin: 0 0 16px; color: #fff;">📞 New Booking</h2>
+                <p style="color: #ccc; margin: 0 0 8px;"><strong style="color: #fff;">${safeInviteeName}</strong> (${safeInviteeEmail})</p>
+                <p style="color: #ccc; margin: 0 0 8px;">Event: ${safeEventName}</p>
+                ${scheduledTime ? `<p style="color: #ccc; margin: 0 0 16px;">Time: ${escapeHtml(new Date(scheduledTime).toLocaleString())}</p>` : ''}
+                <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/admin/prospects/${prospectId}"
+                  style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                  View in Agency OS →
+                </a>
+              </div>
+            `,
         });
       } catch (e) {
         console.error('Calendly notification email failed:', e);
