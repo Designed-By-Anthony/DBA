@@ -11,3 +11,7 @@ dist
 *.log
 # pnpm monorepo — npm lockfiles in workspace apps cause Vercel to use npm instead of pnpm
 apps/*/package-lock.json
+
+# Local tooling / secrets (never commit)
+cloud-sql-proxy
+dba-website-prod-*.json
