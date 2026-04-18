@@ -14,7 +14,13 @@ export default async function VerticalExperience({ children }: { children: React
     return <>{children}</>;
   }
 
-  const { ui } = await getVerticalConfig(orgId);
+  let ui: Awaited<ReturnType<typeof getVerticalConfig>>["ui"];
+  try {
+    ({ ui } = await getVerticalConfig(orgId));
+  } catch (err) {
+    console.error("[VerticalExperience] getVerticalConfig failed:", err);
+    return <>{children}</>;
+  }
 
   return (
     <>

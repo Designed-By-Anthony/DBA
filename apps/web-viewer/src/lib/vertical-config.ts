@@ -46,7 +46,12 @@ export async function getVerticalConfig(orgId: string | null | undefined): Promi
       verticalType: "agency",
     };
   }
-  const tenant = await getTenantByOrgId(orgId);
+  let tenant = null;
+  try {
+    tenant = await getTenantByOrgId(orgId);
+  } catch (err) {
+    console.error("[getVerticalConfig] tenant lookup failed:", err);
+  }
   const verticalType = (tenant?.verticalType as SharedVerticalId) || "agency";
   return {
     ui: getUiVerticalConfig(toUiVertical(tenant?.verticalType)),

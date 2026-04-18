@@ -1,9 +1,6 @@
-import { redirect } from "next/navigation";
+import { AgencySignIn } from "@/components/auth/AgencySignIn";
 
+/** Renders sign-in on the same host as `/admin` — no `redirect()` to `/sign-in`. */
 export default function AdminLogin() {
-  // Redirect directly to Clerk's hosted sign-in page.
-  // After sign-in Clerk will return the user to /admin via the
-  // NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL env var.
-  redirect("/sign-in");
-  return null;
+  return <AgencySignIn />;
 }

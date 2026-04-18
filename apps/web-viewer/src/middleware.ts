@@ -1,11 +1,11 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+/**
+ * Next.js 16 uses `src/proxy.ts` with a **named** `proxy` export (see Next.js
+ * `middleware.js` template: `mod.proxy`). Clerk’s quickstart still shows
+ * `export default clerkMiddleware()` for `middleware.ts`; this file is the
+ * App Router equivalent — do not rename to `middleware` without migrating exports.
+ */
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-
-function shouldProtectAdmin() {
-  return process.env.NODE_ENV === "production";
-}
 
 function normalizeHost(hostHeader: string | null): string {
   return (hostHeader || "").split(":")[0]?.toLowerCase() || "";
@@ -22,12 +22,20 @@ export default clerkMiddleware(async (auth, req) => {
     hostname.startsWith("app-");
 
   if (isAdminDomain) {
-    const isInboundWebhook = url.pathname.startsWith("/api/webhooks/");
-    if (!isInboundWebhook && shouldProtectAdmin()) {
-      await auth.protect();
+    // Do not call `auth.protect()` here — it triggers extra Clerk redirects (often
+    // cross-subdomain). Auth is enforced in `app/admin/layout.tsx` by rendering
+    // the sign-in UI in-place when there is no session.
+
+    // Root URL → sign-in page directly (no `/admin` hop).
+    if (url.pathname === "/" || url.pathname === "") {
+      return NextResponse.rewrite(new URL("/sign-in", req.url));
     }
 
-    if (!url.pathname.startsWith("/admin") && !url.pathname.startsWith("/api/")) {
+    if (
+      !url.pathname.startsWith("/admin") &&
+      !url.pathname.startsWith("/api/") &&
+      !url.pathname.startsWith("/sign-in")
+    ) {
       return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
     }
 
@@ -41,10 +49,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     return NextResponse.next();
-  }
-
-  if (isAdminRoute(req) && shouldProtectAdmin()) {
-    await auth.protect();
   }
 
   const isPreviewDomain =

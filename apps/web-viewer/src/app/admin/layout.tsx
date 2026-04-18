@@ -1,6 +1,9 @@
 import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
 import AdminLogin from "./AdminLogin";
+
+/** Clerk `auth()` reads headers — must not be statically prerendered. */
+export const dynamic = "force-dynamic";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";

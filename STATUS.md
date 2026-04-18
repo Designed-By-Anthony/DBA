@@ -1,5 +1,16 @@
 # Migration Status Report
 
+## Vercel Production build failure (commit 0698436) — root cause (2026-04-18)
+
+- **Error:** `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production` during `next build` when `VERCEL_ENV=production`.
+- **Cause:** Clerk keys were not set (or not set for **Production**) on the **Agency OS** Vercel project. Preview builds skip `@dba/env` production checks; **Production** deploys from `main` do not.
+- **Fix:** In Vercel → Agency OS → Environment Variables → **Production**, add `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and `DATABASE_URL` or `DATABASE_URL_UNPOOLED`. Documented in `apps/web-viewer/AGENTS.md`.
+
+## Admin auth UX — inline sign-in, no Clerk `protect()` redirects (2026-04-18)
+
+- **`src/proxy.ts`:** Removed `auth.protect()` on admin host (was sending users through Clerk’s hosted redirect chain, often `accounts.*`). Admin auth is enforced in **`app/admin/layout.tsx`** only.
+- **`admin.*` `/`:** Rewrites to **`/sign-in`** so `https://admin.designedbyanthony.com/` shows the login screen immediately (no `/admin` landing first).
+- **`AdminLogin`:** Renders the same **`AgencySignIn`** component as `/sign-in` — no `redirect("/sign-in")` hop when visiting `/admin` while signed out.
 ## Agency OS: Stripe Price Book archive + catalog webhooks (2026-04-18)
 
 - **Remove from CRM UI:** Price Book products are Stripe catalog objects — use **Archive** (sets `active: false`) or **Restore**; optional **Show archived** lists inactive products. True deletion is done in the Stripe Dashboard (products are not stored in Postgres).
