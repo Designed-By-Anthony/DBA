@@ -9,6 +9,9 @@ import { NextResponse } from "next/server";
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
+/** Clerk-hosted sign-in/up must not run `auth.protect()` — it blocks the interactive OAuth/session flow. */
+const isPublicAuthSurface = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
+
 function shouldProtectAdmin() {
   return process.env.NODE_ENV === "production";
 }
@@ -29,7 +32,8 @@ export const proxy = clerkMiddleware(async (auth, req) => {
 
   if (isAdminDomain) {
     const isInboundWebhook = url.pathname.startsWith("/api/webhooks/");
-    if (!isInboundWebhook && shouldProtectAdmin()) {
+    const needsSession = !isInboundWebhook && !isPublicAuthSurface(req);
+    if (needsSession && shouldProtectAdmin()) {
       await auth.protect();
     }
 
@@ -59,7 +63,7 @@ export const proxy = clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  if (isAdminRoute(req) && shouldProtectAdmin()) {
+  if (isAdminRoute(req) && !isPublicAuthSurface(req) && shouldProtectAdmin()) {
     await auth.protect();
   }
 

@@ -1,5 +1,10 @@
 # Migration Status Report
 
+## Agency OS auth + performance (2026-04-18)
+
+- **`src/proxy.ts`:** Stopped calling `auth.protect()` for `/sign-in` and `/sign-up` on admin domains (and for `/admin` on the default host). Protecting those routes forced redirect loops / blocked Clerk’s OAuth handshake. **`app/admin/layout.tsx`** still enforces session for `/admin/*` after sign-in.
+- **Sentry:** Production trace sampling (`tracesSampleRate`) reduced on server, edge, and client to cut edge overhead and main-thread work.
+
 ## Agency OS CSP + Serwist: `scdn.clerk.com` (2026-04-18)
 
 - Clerk’s browser bundle fetches project settings from **`https://scdn.clerk.com`**; our CSP **`connect-src`** did not allow it, so the Serwist SW reported `no-response`. **`next.config.ts`** now allows `https://scdn.clerk.com` in **`script-src`** and **`connect-src`**; **`src/app/sw.ts`** adds a **`NetworkOnly`** bypass for that origin (same pattern as other Clerk hosts).
