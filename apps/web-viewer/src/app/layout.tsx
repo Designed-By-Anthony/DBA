@@ -7,6 +7,7 @@ import "@fontsource-variable/outfit";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { PwaRoot } from "@/components/PwaRoot";
+import { clerkProxyUrlForProvider } from "@/lib/clerk-fapi-proxy";
 
 /** PWA / mobile browser chrome — dark shell + marketing primary blue (designedbyanthony.com) */
 export const viewport: Viewport = {
@@ -45,6 +46,7 @@ export default function RootLayout({
         <div className="relative z-1 min-h-dvh">
           <PwaRoot>
             <ClerkProvider
+              proxyUrl={clerkProxyUrlForProvider()}
               signInUrl="/sign-in"
               signInFallbackRedirectUrl="/admin"
             >

@@ -26,6 +26,13 @@ const webViewerSchema = z
     // Clerk — required in production; optional in dev/preview so devs can
     // boot the app without a Clerk account. Enforced via superRefine below.
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().trim().optional(),
+    /** Satellite / custom domain: without DNS for `clerk.<domain>`, set `NEXT_PUBLIC_CLERK_PROXY_URL` to your `*.clerk.accounts.dev` Frontend API so clerk-js loads. */
+    NEXT_PUBLIC_CLERK_DOMAIN: z.string().trim().optional(),
+    NEXT_PUBLIC_CLERK_PROXY_URL: z.string().trim().optional(),
+    NEXT_PUBLIC_CLERK_JS_URL: z.string().trim().optional(),
+    NEXT_PUBLIC_CLERK_UI_URL: z.string().trim().optional(),
+    /** Server-only: Frontend API origin (`https://…clerk.accounts.dev`). Enables `/clerk-fapi` rewrite + Clerk `proxyUrl` when custom `clerk.<domain>` DNS is missing. */
+    CLERK_FAPI_UPSTREAM: optionalUrl,
     CLERK_SECRET_KEY: z.string().trim().optional(),
     CLERK_WEBHOOK_SIGNING_SECRET: z.string().trim().optional(),
 

@@ -16,7 +16,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.1.0",
+    "@clerk/nextjs": "^7.2.3",
     "@dba/automation": "workspace:*",
     "@dba/database": "workspace:*",
     "@dba/env": "workspace:*",

@@ -7,11 +7,22 @@ import { validateWebViewerEnv } from "@dba/env/web-viewer";
 
 validateWebViewerEnv();
 
+const clerkFapiUpstream = process.env.CLERK_FAPI_UPSTREAM?.trim().replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
   /** Native `pg` driver — avoid bundling issues in the server graph. */
   serverExternalPackages: ['pg'],
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts', 'date-fns'],
+  },
+  async rewrites() {
+    if (!clerkFapiUpstream || !/^https:\/\//i.test(clerkFapiUpstream)) return [];
+    return [
+      {
+        source: "/clerk-fapi/:path*",
+        destination: `${clerkFapiUpstream}/:path*`,
+      },
+    ];
   },
   async headers() {
     return [
@@ -29,12 +40,12 @@ const nextConfig: NextConfig = {
               "base-uri 'self'; " +
               "object-src 'none'; " +
               "frame-ancestors 'self'; " +
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://clerk.designedbyanthony.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://*.designedbyanthony.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
               "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://clerk.designedbyanthony.com; " +
-              "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://clerk.designedbyanthony.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
-              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://clerk.designedbyanthony.com; " +
-              "worker-src 'self' blob: https://clerk.designedbyanthony.com;",
+              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.designedbyanthony.com; " +
+              "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
+              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.designedbyanthony.com; " +
+              "worker-src 'self' blob: https://*.designedbyanthony.com;",
           },
           // HSTS: pin the host to HTTPS for two years (preload-eligible once you
           // verify apex+subdomain coverage). Safe to apply on Vercel which is

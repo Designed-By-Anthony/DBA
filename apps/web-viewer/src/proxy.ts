@@ -1,3 +1,9 @@
+/**
+ * Next.js 16 uses `src/proxy.ts` with a **named** `proxy` export (see Next.js
+ * `middleware.js` template: `mod.proxy`). Clerk’s quickstart still shows
+ * `export default clerkMiddleware()` for `middleware.ts`; this file is the
+ * App Router equivalent — do not rename to `middleware` without migrating exports.
+ */
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 

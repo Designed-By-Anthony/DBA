@@ -1,8 +1,13 @@
 # Migration Status Report
 
+## Clerk quickstart alignment (2026-04-18)
+
+- **`@clerk/nextjs`** bumped to latest (`^7.2.3`). **`apps/web-viewer/AGENTS.md`** documents the official App Router checklist; **`src/proxy.ts`** uses Next.js 16’s named **`proxy`** export (not the quickstart’s `middleware.ts` default export).
+
 ## Agency OS Clerk + PWA on admin/accounts (2026-04-18)
 
-- **Serwist:** Prepended `NetworkOnly` routes for `clerk.designedbyanthony.com` and `*.clerk.accounts.dev` so Serwist’s default `.js` caching no longer intercepts Clerk FAPI scripts (fixes `no-response` / failed Clerk JS loads in production).
+- **Serwist:** Prepended `NetworkOnly` routes for `clerk.*` (any Clerk custom-domain FAPI host) and `*.clerk.accounts.dev` so Serwist’s default `.js` caching no longer intercepts Clerk FAPI scripts (fixes `no-response` / failed Clerk JS loads in production).
+- **Clerk custom domain:** If `clerk.<domain>` has no DNS, scripts fail (`ERR_NAME_NOT_RESOLVED`). Mitigations: Clerk DNS CNAME, `NEXT_PUBLIC_CLERK_PROXY_URL=https://<instance>.clerk.accounts.dev`, or **server-only** `CLERK_FAPI_UPSTREAM` with the same URL — Agency OS then sets `proxyUrl=/clerk-fapi` and rewrites to the real FAPI (see `src/lib/clerk-fapi-proxy.ts`). CSP allows `https://*.designedbyanthony.com` for Clerk assets.
 - **CSP:** Allowed Cloudflare Insights (`static.cloudflareinsights.com`, `connect-src` to `cloudflareinsights.com`) and Vercel’s hosted analytics script host (`va.vercel-scripts.com`).
 - **Vercel Web Analytics / Speed Insights:** Pointed `<Analytics />` and `<SpeedInsights />` at `https://va.vercel-scripts.com/v1/...` so scripts load on custom domains without `/_vercel/*` rewrites (removes spurious `/[hash]/script.js` 404 + MIME errors).
 
