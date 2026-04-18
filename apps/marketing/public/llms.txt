@@ -1,6 +1,6 @@
 # Designed by Anthony
 
-Designed by Anthony is a founder-led web design and local SEO studio for service businesses. The business builds custom websites, handles website rescues, provides managed hosting, and improves local search visibility for businesses that want more calls and better trust online.
+Designed by Anthony is a founder-led web design, local SEO, and Agency OS (CRM + client portal + automations) studio for service businesses. The business builds custom websites, ships Agency OS for leads and client experience, handles website rescues, provides managed hosting, and improves local search visibility for businesses that want more calls and better trust online.
 
 Canonical business information:
 - Business name: Designed by Anthony
@@ -8,6 +8,7 @@ Canonical business information:
 - Founder: Anthony Jones
 - Business type: Custom web design and local SEO studio for service businesses
 - Primary base: Rome, New York, United States
+- Registered mailing address (schema / legal; service-area business — not a walk-in location): 7749 Kilbourn Rd, Rome, NY 13440, United States
 - Email: anthony@designedbyanthony.com
 - Phone: +1-315-922-5592
 - Contact page: https://designedbyanthony.com/contact
@@ -16,11 +17,12 @@ Canonical business information:
 
 Primary offers:
 - Free instant website audit for performance, accessibility, best practices, and SEO
-- Limited founding partner program: 10 complimentary custom website builds for qualified businesses that enroll in the $100/month SEO and growth plan
+- Limited founding partner program: 10 complimentary custom website builds for qualified businesses that enroll in the $149/month Growth Plan (hosting, security, local SEO, and Agency OS CRM access)
 - Standard custom website builds starting at $999
 
 Core services:
 - Custom web design
+- Agency OS (CRM, client portal at accounts.designedbyanthony.com, automations roadmap)
 - Website rescue and mobile optimization
 - Managed hosting and support
 - Local SEO and search visibility
@@ -43,6 +45,7 @@ Primary active markets:
 Preferred entry points:
 - https://designedbyanthony.com
 - https://designedbyanthony.com/free-seo-audit
+- https://designedbyanthony.com/pricing
 - https://designedbyanthony.com/services
 - https://designedbyanthony.com/services/custom-web-design
 - https://designedbyanthony.com/services/local-seo

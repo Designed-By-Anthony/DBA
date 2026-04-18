@@ -20,7 +20,7 @@ let cards = [
     outputURL: outputDirectory.appendingPathComponent("og-site-premium.png"),
     badge: "FOUNDER OFFER",
     title: "Premium websites for service businesses.",
-    body: "10 approved brands get a complimentary custom build when they join the $100/mo growth plan.",
+    body: "10 approved brands get a complimentary custom build when they join the $149/mo growth plan.",
     pills: [
       "Google, Yelp and referral traffic",
       "10 local launch spots",
@@ -247,7 +247,7 @@ func renderCard(spec: CardSpec) throws {
     alignment: .center
   )
   drawText(
-    spec.warmAccent ? "$100/mo growth" : "Invite-only",
+    spec.warmAccent ? "$149/mo growth" : "Invite-only",
     rect: CGRect(x: 908, y: 184, width: 154, height: 36),
     font: NSFont.systemFont(ofSize: 18, weight: .medium),
     color: softWhite,

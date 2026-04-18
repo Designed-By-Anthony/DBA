@@ -5,6 +5,7 @@ const ALL_PAGES = [
   { path: '/contact', title: /Contact/ },
   { path: '/about', title: /About/ },
   { path: '/services', title: /Web Design|SEO|Business Tools/ },
+  { path: '/pricing', title: /Pricing/ },
   { path: '/portfolio', title: /Portfolio/ },
   { path: '/faq', title: /FAQ/ },
   { path: '/blog', title: /Blog/ },

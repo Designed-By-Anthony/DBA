@@ -22,6 +22,7 @@ import {
   GA_MEASUREMENT_ID,
   ORGANIZATION_ID,
   WEBSITE_ID,
+  buildAgencyOsSoftwareApplicationSchema,
   buildBaseOrganizationSchema,
   buildFounderPersonSchema,
   buildBaseWebsiteSchema,
@@ -145,6 +146,7 @@ const structuredData = [
   buildBaseOrganizationSchema(),
   buildFounderPersonSchema(),
   buildBaseWebsiteSchema(),
+  buildAgencyOsSoftwareApplicationSchema(),
   webPageSchema,
   ...(breadcrumbSchema ? [breadcrumbSchema] : []),
   ...extraSchemas,
@@ -355,6 +357,7 @@ try {
               <nav class="nav nav-desktop">
                 <a href="/ouredge" data-astro-prefetch>Our Edge</a>
                 <a href="/services" data-astro-prefetch>Services</a>
+                <a href="/pricing" data-astro-prefetch>Pricing</a>
                 <a href="/service-areas" data-astro-prefetch>Service Areas</a>
                 <a href="/portfolio" data-astro-prefetch>Portfolio</a>
                 <a href="/about" data-astro-prefetch>About</a>
@@ -384,6 +387,7 @@ try {
             <nav class="mobile-nav-links">
               <a href="/ouredge" data-astro-prefetch>Our Edge</a>
               <a href="/services" data-astro-prefetch>Services</a>
+              <a href="/pricing" data-astro-prefetch>Pricing</a>
               <a href="/service-areas" data-astro-prefetch>Service Areas</a>
               <a href="/portfolio" data-astro-prefetch>Portfolio</a>
               <a href="/about" data-astro-prefetch>About</a>

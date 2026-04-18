@@ -4,6 +4,8 @@ dist/
 .astro-indexnow-cache.json
 # generated types
 .astro/
+# IndexNow integration cache (written during `astro build`)
+.astro-indexnow-cache.json
 
 # dependencies
 node_modules/

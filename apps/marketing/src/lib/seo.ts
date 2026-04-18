@@ -58,22 +58,37 @@ interface ItemListSchemaInput {
 }
 
 import { BRAND_ASSETS } from '@dba/theme/brand';
+import {
+  AGENCY_OS_APP_URL,
+  AGENCY_OS_CAPTURE_LABEL,
+  AGENCY_OS_CAPTURE_MONTHLY,
+  AGENCY_OS_SUITE_LABEL,
+  AGENCY_OS_SUITE_MONTHLY,
+  FOUNDING_PARTNER_SEO_MONTHLY,
+  GBP_FULL_PROGRAM_MONTHLY_PRICE,
+  STANDARD_WEBSITE_STARTING_PRICE,
+  STANDARD_WEBSITE_TYPICAL_RANGE,
+} from './offers';
 
 export const SITE_URL = 'https://designedbyanthony.com';
 export const SITE_NAME = 'Designed by Anthony';
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const PERSON_ID = `${SITE_URL}/about#person`;
+/** Stable JSON-LD @id for Agency OS (CRM) — admin app origin. */
+export const AGENCY_OS_SOFTWARE_ID = `${AGENCY_OS_APP_URL}/#software`;
 export const GA_MEASUREMENT_ID = 'G-4RSTBMRHDW';
 export const GOOGLE_BUSINESS_PROFILE_URL = 'https://www.google.com/search?kgmid=/g/11z36l4fmd&q=Designed+By+Anthony';
 export const DEFAULT_SOCIAL_IMAGE = `${SITE_URL}/images/og-site-premium.png`;
 export const SITE_LICENSE_PAGE = `${SITE_URL}/image-license`;
 export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} Designed by Anthony. All rights reserved.`;
 export const FACEBOOK_PROFILE_URL = 'https://www.facebook.com/profile.php?id=61574388797744';
+export const INSTAGRAM_PROFILE_URL = 'https://www.instagram.com/dbastudio315/';
+export const YELP_BUSINESS_URL = 'https://www.yelp.com/biz/designed-by-anthony-rome-2';
 
 /** Richer org description for JSON-LD (Organization / ProfessionalService / LocalBusiness). */
 export const ORGANIZATION_SCHEMA_DESCRIPTION =
-  'Designed by Anthony specializes in building custom, high-performance websites and delivering powerful local SEO strategies for home service businesses and contractors. Most contractor websites use generic templates that fail to rank in their service area or convert visitors. We hand-craft mobile-first, high-speed websites with flawless LocalBusiness Schema and optimized content so you dominate the Google Map Pack and stop losing leads to your competitors. Whether you need a website rescue, monthly SEO, or just a faster site—let us handle the code while you focus on the jobs.';
+  'Designed by Anthony specializes in building custom, high-performance websites, Agency OS (CRM with client portal and automations), and powerful local SEO for home service businesses and contractors. Most contractor websites use generic templates that fail to rank in their service area or convert visitors. We hand-craft mobile-first, high-speed websites with LocalBusiness Schema and optimized content so you dominate the Google Map Pack and stop losing leads to your competitors. Whether you need a website rescue, monthly SEO, CRM-led follow-up, or just a faster site—let us handle the code while you focus on the jobs.';
 
 export const businessProfile = {
   name: SITE_NAME,
@@ -87,9 +102,9 @@ export const businessProfile = {
   founderName: 'Anthony Jones',
   founderJobTitle: 'Founder, Web Designer, and Developer',
   founderDescription:
-    'Marine Corps veteran and founder of Designed by Anthony, building custom websites, managed hosting, website rescues, and local SEO systems for service businesses.',
+    'Marine Corps veteran and founder of Designed by Anthony, building custom websites, Agency OS (CRM, client portal, automations), managed hosting, website rescues, and local SEO systems for service businesses.',
   description:
-    'Designed by Anthony builds custom websites, website rescues, managed hosting, and local SEO systems for service businesses.',
+    'Designed by Anthony builds custom websites, Agency OS (CRM, client portal, automations), website rescues, managed hosting, and local SEO systems for service businesses.',
   logo: `${SITE_URL}${BRAND_ASSETS.logo}`,
   /** Back-compat — existing `/images/designed-by-anthony-logo.png` is still mirrored and indexed. */
   legacyLogo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
@@ -99,6 +114,9 @@ export const businessProfile = {
   addressLocality: 'Rome',
   regionAbbr: 'NY',
   addressCountry: 'US',
+  /** Full mailing address — used in JSON-LD only (not rendered on pages); GBP remains service-area. */
+  streetAddress: '7749 Kilbourn Rd',
+  postalCode: '13440',
   /** Approximate home-base coordinates (Rome, NY area) for LocalBusiness / ProfessionalService geo. */
   geo: {
     latitude: 43.20115029999999,
@@ -124,8 +142,16 @@ export const businessProfile = {
     'Website rescues',
     'Website optimization',
     'Lead generation websites',
+    'CRM software',
+    'Client portal',
+    'Marketing automation',
   ],
-  sameAs: [GOOGLE_BUSINESS_PROFILE_URL, FACEBOOK_PROFILE_URL],
+  sameAs: [
+    GOOGLE_BUSINESS_PROFILE_URL,
+    FACEBOOK_PROFILE_URL,
+    INSTAGRAM_PROFILE_URL,
+    YELP_BUSINESS_URL,
+  ],
 };
 
 /** Opening hours aligned with Google Business Profile listing (JSON-LD). */
@@ -223,8 +249,10 @@ export function buildOwnedImageObject(url: string): SchemaValue {
 function buildPostalAddress(): SchemaValue {
   return {
     '@type': 'PostalAddress',
+    streetAddress: businessProfile.streetAddress,
     addressLocality: businessProfile.addressLocality,
     addressRegion: businessProfile.regionAbbr,
+    postalCode: businessProfile.postalCode,
     addressCountry: businessProfile.addressCountry,
   };
 }
@@ -278,6 +306,7 @@ const breadcrumbLabelMap: Record<string, string> = {
   faq: 'FAQ',
   ouredge: 'Our Edge',
   portfolio: 'Portfolio',
+  pricing: 'Pricing',
   privacy: 'Privacy Policy',
   services: 'Services',
   'service-areas': 'Service Areas',
@@ -642,6 +671,9 @@ export function buildBaseOrganizationSchema(): SchemaValue {
     hasMap: GOOGLE_BUSINESS_PROFILE_URL,
     knowsAbout: businessProfile.knowsAbout,
     sameAs: businessProfile.sameAs,
+    owns: {
+      '@id': AGENCY_OS_SOFTWARE_ID,
+    },
     hasOfferCatalog: buildCoreServiceOfferCatalog(),
   };
 }
@@ -666,6 +698,120 @@ export function buildBaseWebsiteSchema(): SchemaValue {
       '@id': ORGANIZATION_ID,
     },
     inLanguage: 'en-US',
+  };
+}
+
+/**
+ * Agency OS — CRM, client portal, and automation roadmap (Growth Plan).
+ * Distinct from the free Lighthouse audit tool; linked from global JSON-LD on every page.
+ */
+export function buildAgencyOsSoftwareApplicationSchema(): SchemaValue {
+  const monthlyNumeric = FOUNDING_PARTNER_SEO_MONTHLY.replace(/[^0-9.]/g, '');
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': ['SoftwareApplication', 'WebApplication'],
+    '@id': AGENCY_OS_SOFTWARE_ID,
+    name: 'Agency OS',
+    alternateName: 'Designed by Anthony Agency OS',
+    description:
+      'CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Admin at admin.designedbyanthony.com; client-facing tools via accounts.designedbyanthony.com.',
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'CRM',
+    operatingSystem: 'Web',
+    url: AGENCY_OS_APP_URL,
+    image: buildOwnedImageObject(DEFAULT_SOCIAL_IMAGE),
+    offers: {
+      '@type': 'Offer',
+      name: 'Growth Plan (founding partners)',
+      description:
+        'Bundled with founding-partner website builds: hosting, security, SEO, and Agency OS access.',
+      price: monthlyNumeric,
+      priceCurrency: 'USD',
+      priceValidUntil: `${new Date().getFullYear()}-12-31`,
+      availability: 'https://schema.org/InStock',
+      url: toAbsoluteUrl('/pricing'),
+    },
+    featureList: [
+      'Lead and pipeline tracking',
+      'Client portal',
+      'Magic-link sign-in',
+      'Automations (roadmap)',
+      'Paired with hosting and local SEO',
+    ],
+    creator: {
+      '@id': ORGANIZATION_ID,
+    },
+    publisher: {
+      '@id': ORGANIZATION_ID,
+    },
+    maintainer: {
+      '@id': ORGANIZATION_ID,
+    },
+    inLanguage: 'en-US',
+  };
+}
+
+/** OfferCatalog for /pricing — monthly stacks + CRM tiers (list prices). */
+export function buildPricingOfferCatalogSchema(): SchemaValue {
+  const pricingUrl = toAbsoluteUrl('/pricing');
+  const captureNum = AGENCY_OS_CAPTURE_MONTHLY.replace(/[^0-9.]/g, '');
+  const suiteNum = AGENCY_OS_SUITE_MONTHLY.replace(/[^0-9.]/g, '');
+  const growthNum = FOUNDING_PARTNER_SEO_MONTHLY.replace(/[^0-9.]/g, '');
+  const gbpNum = GBP_FULL_PROGRAM_MONTHLY_PRICE.replace(/[^0-9.]/g, '');
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    '@id': `${pricingUrl}#offercatalog`,
+    name: 'Designed by Anthony — Pricing',
+    url: pricingUrl,
+    description:
+      'Website projects, Agency OS CRM tiers, Growth Plan bundle, and Google Business Profile program.',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        name: `Custom website (typical range)`,
+        description: `Most service-business rebuilds land in the ${STANDARD_WEBSITE_TYPICAL_RANGE} range; simple sites from ${STANDARD_WEBSITE_STARTING_PRICE}.`,
+        url: pricingUrl,
+      },
+      {
+        '@type': 'Offer',
+        name: `Agency OS ${AGENCY_OS_CAPTURE_LABEL}`,
+        description: 'Website leads, scheduling, and pipeline basics — CRM software.',
+        price: captureNum,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: pricingUrl,
+      },
+      {
+        '@type': 'Offer',
+        name: `Agency OS ${AGENCY_OS_SUITE_LABEL}`,
+        description: 'Full Agency OS: client portal, automations roadmap, and full CRM scope.',
+        price: suiteNum,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: pricingUrl,
+      },
+      {
+        '@type': 'Offer',
+        name: 'Growth Plan',
+        description: 'Hosting, security, local SEO, and Agency OS Suite — bundled for website clients.',
+        price: growthNum,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: pricingUrl,
+      },
+      {
+        '@type': 'Offer',
+        name: 'Google Business Profile program',
+        description: 'Full local marketing program per location.',
+        price: gbpNum,
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: pricingUrl,
+      },
+    ],
   };
 }
 

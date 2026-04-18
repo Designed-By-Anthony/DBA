@@ -18,7 +18,7 @@ async function mockTurnstileAsyncError(page: Page): Promise<void> {
         };
       };
 
-    const win = window as BrowserWindow;
+    const win = window as unknown as BrowserWindow;
 
     try {
       win.localStorage.setItem('dba_cookie_consent', 'rejected');

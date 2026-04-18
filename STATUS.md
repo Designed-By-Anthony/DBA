@@ -1,5 +1,16 @@
 # Migration Status Report
 
+## Dedicated pricing page + CRM list tiers (2026-04-18)
+
+- **`/pricing`:** New marketing page with website tiers (founding / standard / enterprise), **Agency OS Capture $69/mo** and **Suite $179/mo** list prices, **Growth Plan $149/mo** bundle callout, GBP program **$299/mo**, FAQ + `OfferCatalog` JSON-LD (`buildPricingOfferCatalogSchema`).
+- **Nav:** Header + footer link to Pricing; SEO Playwright lists include `/pricing`.
+- **Tooling:** `pnpm exec astro check` passes — Playwright Turnstile mock init scripts cast `window` via `unknown` to satisfy strict overlap checks; IndexNow build cache `.astro-indexnow-cache.json` is gitignored and no longer tracked.
+
+## Founding Growth Plan pricing + Agency OS schema (2026-04-18)
+
+- **Growth Plan:** Raised founding monthly from **$100** to **$149** (still sharply under typical SMB CRM + hosting + SEO stacks when bundled). **10 founder spots** unchanged via `FOUNDING_PARTNER_BUILD_SLOTS`.
+- **Schema:** Full mailing address **7749 Kilbourn Rd, Rome, NY 13440** in JSON-LD `PostalAddress` only (not rendered on pages); GBP remains service-area. Added **Agency OS** `SoftwareApplication` / `WebApplication` + `Organization.owns`, expanded `sameAs` (Instagram, Yelp) and `knowsAbout` (CRM, portal, automation).
+- **Copy:** `llms.txt`, cold email, and Swift share-image script updated for $149 + Agency OS.
 ## Marketing: consumer trust stack copy (2026-04-18)
 
 - Added `ConsumerTrustStack.astro` (Neon, Vercel, Cloudflare, Next.js CRM) with outcome-first language on the homepage, `/ouredge`, and `/services/managed-hosting`.
@@ -41,7 +52,6 @@
 - **Sentry:** Removed hardcoded DSNs from Agency OS Sentry configs; init only from `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN`. Default **`sendDefaultPii: false`**; Session Replay opt-in via **`NEXT_PUBLIC_SENTRY_REPLAY=1`**. Marketing CSP helpers no longer embed a default Sentry DSN; `sync-firebase-csp` skips report-uri when `PUBLIC_SENTRY_DSN` is unset.
 - **Lead ingest:** Public ingest 503 responses no longer echo SQL/driver `Error.message` or internal DB setup hints.
 - **AGENTS.md:** Added **Compliance bar (DoD / HIPAA-oriented)** for agents (root + `apps/web-viewer/AGENTS.md`).
-
 ## Clerk quickstart alignment (2026-04-18)
 
 - **`@clerk/nextjs`** bumped to latest (`^7.2.3`). **`apps/web-viewer/AGENTS.md`** documents the official App Router checklist; **`src/proxy.ts`** uses Next.js 16’s named **`proxy`** export (not the quickstart’s `middleware.ts` default export).

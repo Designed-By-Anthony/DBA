@@ -1,0 +1,515 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {
+  ACCOUNTS_PORTAL_URL,
+  AGENCY_OS_APP_URL,
+  AGENCY_OS_CAPTURE_LABEL,
+  AGENCY_OS_CAPTURE_MONTHLY,
+  AGENCY_OS_SUITE_LABEL,
+  AGENCY_OS_SUITE_MONTHLY,
+  ENTERPRISE_WEBSITE_STARTING_PRICE,
+  FOUNDING_PARTNER_BUILD_SLOTS,
+  FOUNDING_PARTNER_SEO_LABEL,
+  FOUNDING_PARTNER_SEO_MONTHLY,
+  GBP_FULL_PROGRAM_MONTHLY_PRICE,
+  MONTHLY_LOCAL_SEO_PRICE,
+  PUBLIC_PAYMENT_STRUCTURE_COPY,
+  STANDARD_WEBSITE_STARTING_PRICE,
+  STANDARD_WEBSITE_TYPICAL_RANGE,
+} from '../lib/offers';
+import {
+  buildFaqPageSchema,
+  buildPricingOfferCatalogSchema,
+  type FaqEntry,
+} from '../lib/seo';
+
+const faqEntries: FaqEntry[] = [
+  {
+    question: 'What is the difference between Agency OS Capture and Suite?',
+    answer:
+      'Capture is for teams that need website leads, scheduling, and a clear pipeline without the full client portal yet. Suite is the full Agency OS experience: client portal (magic link), deeper CRM, and the automation roadmap we are actively shipping. Both run on the same product — Suite unlocks everything we are building.',
+  },
+  {
+    question: `Why is the Growth Plan ${FOUNDING_PARTNER_SEO_MONTHLY}/month when Suite alone is ${AGENCY_OS_SUITE_MONTHLY}/month?`,
+    answer:
+      'Growth Plan is the bundled stack for website clients: Google Cloud hosting, security hardening, ongoing local SEO care, and Agency OS Suite-level access. It is priced as an operating partnership, not software alone. If you only need CRM without our hosting and SEO, list prices for Capture and Suite apply.',
+  },
+  {
+    question: 'Are these prices the same for Upstate New York and national clients?',
+    answer:
+      'List prices are the same. Founding partner pilot spots are limited and fit is confirmed on a short call — local service businesses in Central NY and our published service areas are the primary focus.',
+  },
+];
+
+const pricingSchema = [buildPricingOfferCatalogSchema(), buildFaqPageSchema(faqEntries)];
+
+const pricingFooterCta = {
+  eyebrow: 'Not sure what to pick?',
+  title: 'Start with a free audit — then we map the smallest right next step.',
+  description:
+    'No pressure to buy a bundle. If Capture, Suite, Growth Plan, or a straight website build is the fit, you will get a clear recommendation.',
+  primaryHref: '/free-seo-audit',
+  primaryLabel: 'Run the Free Audit',
+  secondaryHref: '/contact',
+  secondaryLabel: 'Message the founder',
+};
+---
+
+<Layout
+  title="Pricing — Web Design, Agency OS CRM & Growth Plan | Designed by Anthony"
+  description={`Transparent pricing for custom websites (${STANDARD_WEBSITE_STARTING_PRICE}+), Agency OS CRM (${AGENCY_OS_CAPTURE_MONTHLY} Capture / ${AGENCY_OS_SUITE_MONTHLY} Suite), ${FOUNDING_PARTNER_SEO_MONTHLY}/mo Growth Plan, and ${GBP_FULL_PROGRAM_MONTHLY_PRICE}/mo Google Business Profile programs. Mohawk Valley & Upstate NY.`}
+  pageType="WebPage"
+  schema={pricingSchema}
+  breadcrumbLabel="Pricing"
+  footerCta={pricingFooterCta}
+>
+  <section class="page-hero centered">
+    <div class="page-hero-inner pricing-hero">
+      <p class="page-eyebrow">Pricing</p>
+      <h1>Website projects, Agency OS CRM, and ongoing growth — in one place.</h1>
+      <p>
+        Every engagement still starts with a <a href="/free-seo-audit" class="inline-link">free Lighthouse audit</a>. The numbers below are list prices; founding pilot and scoped projects may differ — confirmed on a short call.
+      </p>
+      <div class="hero-meta-row">
+        <span class="mini-pill">{FOUNDING_PARTNER_BUILD_SLOTS} founding pilot spots</span>
+        <span class="mini-pill">No hidden hosting fees in Growth Plan</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" aria-labelledby="web-pricing-heading">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">Websites</p>
+        <h2 id="web-pricing-heading">Custom web design & rebuilds</h2>
+        <p>{PUBLIC_PAYMENT_STRUCTURE_COPY} Typical scopes and tiers:</p>
+      </div>
+
+      <div class="pricing-tiers-grid pricing-tiers-grid--three">
+        <article class="surface-card pricing-tier-card reveal-up pricing-tier-card--featured">
+          <span class="pricing-tier-badge">Limited launch</span>
+          <h3 class="pricing-tier-name">Founding Partner Pilot</h3>
+          <p class="pricing-tier-price">
+            <span class="pricing-tier-amount">$0 upfront</span>
+            <span class="pricing-tier-cadence">+ {FOUNDING_PARTNER_SEO_MONTHLY}/mo</span>
+          </p>
+          <p class="pricing-tier-tagline">Complimentary custom build when you enroll in the {FOUNDING_PARTNER_SEO_LABEL}.</p>
+          <p class="pricing-tier-best-for">
+            <span class="pricing-tier-label">Best for</span>
+            First {FOUNDING_PARTNER_BUILD_SLOTS} approved partners — fit confirmed on a call.
+          </p>
+          <ul class="pricing-tier-list">
+            <li>Full custom website — no upfront project fee</li>
+            <li>Growth Plan: hosting, security, local SEO, Agency OS Suite access</li>
+            <li>Direct founder line — no account managers</li>
+          </ul>
+          <a href="/contact" class="btn btn-primary-audit pricing-tier-cta" data-astro-prefetch> Apply for a pilot spot </a>
+        </article>
+
+        <article class="surface-card pricing-tier-card reveal-up">
+          <h3 class="pricing-tier-name">Standard custom build</h3>
+          <p class="pricing-tier-price">
+            <span class="pricing-tier-amount">{STANDARD_WEBSITE_TYPICAL_RANGE}</span>
+            <span class="pricing-tier-cadence">typical</span>
+          </p>
+          <p class="pricing-tier-tagline">Most service-business rebuilds land here. Simple single-service sites from {STANDARD_WEBSITE_STARTING_PRICE}.</p>
+          <p class="pricing-tier-best-for">
+            <span class="pricing-tier-label">Best for</span>
+            A new site without committing to the monthly growth stack upfront.
+          </p>
+          <ul class="pricing-tier-list">
+            <li>Custom design + technical & on-page SEO</li>
+            <li>Optional {MONTHLY_LOCAL_SEO_PRICE}/mo SEO + hosting after launch</li>
+            <li>Optional {GBP_FULL_PROGRAM_MONTHLY_PRICE}/mo full GBP program</li>
+          </ul>
+          <a href="/free-seo-audit" class="btn btn-outline pricing-tier-cta" data-astro-prefetch> Start with the free audit </a>
+        </article>
+
+        <article class="surface-card pricing-tier-card reveal-up">
+          <h3 class="pricing-tier-name">Enterprise & custom scope</h3>
+          <p class="pricing-tier-price">
+            <span class="pricing-tier-amount">From {ENTERPRISE_WEBSITE_STARTING_PRICE}</span>
+            <span class="pricing-tier-cadence">scoped</span>
+          </p>
+          <p class="pricing-tier-tagline">Multi-location, e-commerce, or integrations beyond a standard brochure site.</p>
+          <p class="pricing-tier-best-for">
+            <span class="pricing-tier-label">Best for</span>
+            Technical discovery, compliance, or non-standard workflows.
+          </p>
+          <ul class="pricing-tier-list">
+            <li>Deep scoping call + written proposal</li>
+            <li>CRM, booking, payments, and stack integrations</li>
+            <li>Roadmap priced to real scope</li>
+          </ul>
+          <a
+            href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+            class="btn btn-outline pricing-tier-cta"
+            data-calendar-link
+          >
+            Book a scoping call
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell pricing-crm-shell" aria-labelledby="crm-pricing-heading">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">Agency OS</p>
+        <h2 id="crm-pricing-heading">CRM software — list prices</h2>
+        <p>
+          Agency OS lives at <a href={AGENCY_OS_APP_URL} class="inline-link">{AGENCY_OS_APP_URL.replace('https://', '')}</a> (admin). Client-facing portal and magic-link flows use{' '}
+          <a href={ACCOUNTS_PORTAL_URL} class="inline-link">{ACCOUNTS_PORTAL_URL.replace('https://', '')}</a>. Software-only pricing below; website clients usually bundle via Growth Plan.
+        </p>
+      </div>
+
+      <div class="pricing-crm-grid">
+        <article class="surface-card pricing-tier-card reveal-up">
+          <h3 class="pricing-tier-name">Agency OS {AGENCY_OS_CAPTURE_LABEL}</h3>
+          <p class="pricing-tier-price">
+            <span class="pricing-tier-amount">{AGENCY_OS_CAPTURE_MONTHLY}</span>
+            <span class="pricing-tier-cadence">/mo</span>
+          </p>
+          <p class="pricing-tier-tagline">Capture leads from your site, stay on top of follow-up, and let customers book time without a messy inbox.</p>
+          <ul class="pricing-tier-list">
+            <li>Lead inbox &amp; pipeline basics</li>
+            <li>Scheduling / booking handoff</li>
+            <li>Website form &amp; lead routing</li>
+            <li>Email notifications &amp; owner dashboard</li>
+          </ul>
+          <a href="/contact" class="btn btn-outline pricing-tier-cta" data-astro-prefetch> Ask about Capture </a>
+        </article>
+
+        <article class="surface-card pricing-tier-card reveal-up pricing-tier-card--featured">
+          <span class="pricing-tier-badge">Full product</span>
+          <h3 class="pricing-tier-name">Agency OS {AGENCY_OS_SUITE_LABEL}</h3>
+          <p class="pricing-tier-price">
+            <span class="pricing-tier-amount">{AGENCY_OS_SUITE_MONTHLY}</span>
+            <span class="pricing-tier-cadence">/mo</span>
+          </p>
+          <p class="pricing-tier-tagline">Everything we are building: full CRM depth, client portal, and the automation roadmap — not just lead capture.</p>
+          <ul class="pricing-tier-list">
+            <li>Everything in Capture</li>
+            <li>Client portal (magic-link access)</li>
+            <li>Deeper pipelines, projects, and reporting</li>
+            <li>Automations as they ship (roadmap)</li>
+          </ul>
+          <a href="/contact" class="btn btn-primary-audit pricing-tier-cta" data-astro-prefetch> Ask about Suite </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell pricing-growth-shell">
+    <div class="section-container">
+      <div class="surface-card growth-plan-card reveal-up">
+        <div class="growth-plan-card__copy">
+          <p class="section-eyebrow">Bundle</p>
+          <h2>Growth Plan — {FOUNDING_PARTNER_SEO_MONTHLY}/month</h2>
+          <p>
+            For clients we host and grow: <strong>{MONTHLY_LOCAL_SEO_PRICE}/mo</strong> covers managed hosting, security, ongoing local SEO, and <strong>Agency OS Suite-level</strong> access. Compared to Suite alone at <strong>{AGENCY_OS_SUITE_MONTHLY}/mo</strong> (software-only), Growth Plan is the better deal when you want the site + search + product together.
+          </p>
+          <ul class="growth-plan-card__list">
+            <li>Google Cloud hosting + SSL + CDN path</li>
+            <li>Local SEO + Google Business Profile rhythm</li>
+            <li>Agency OS Suite (portal + CRM + automations roadmap)</li>
+          </ul>
+          <a href="/contact" class="btn btn-primary-audit" data-astro-prefetch> Talk Growth Plan </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" aria-labelledby="gbp-pricing-heading">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">Local marketing</p>
+        <h2 id="gbp-pricing-heading">Google Business Profile — full program</h2>
+        <p>
+          <strong>{GBP_FULL_PROGRAM_MONTHLY_PRICE}/month per location</strong> — managed profile, reviews, citations, posts, and alignment with your site. Details on <a href="/services/google-business-profile" class="inline-link">the GBP service page</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell" aria-labelledby="pricing-faq-heading">
+    <div class="section-container">
+      <div class="section-header centered">
+        <p class="section-eyebrow">FAQ</p>
+        <h2 id="pricing-faq-heading">Common questions</h2>
+      </div>
+      <div class="pricing-faq-grid">
+        {faqEntries.map((entry) => (
+          <div class="surface-card pricing-faq-card reveal-up">
+            <h3 class="pricing-faq-q">{entry.question}</h3>
+            <p class="pricing-faq-a">{entry.answer}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .pricing-hero {
+    max-width: 820px;
+  }
+
+  .pricing-tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 2.2vw, 1.35rem);
+    margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+    align-items: stretch;
+  }
+
+  .pricing-tiers-grid--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pricing-tier-card {
+    position: relative;
+    padding: clamp(1.5rem, 3vw, 1.9rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition:
+      transform 0.35s ease,
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+
+  .pricing-tier-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 0 26px 56px -34px rgba(2, 6, 23, 0.85);
+  }
+
+  .pricing-tier-card--featured {
+    border-color: rgba(96, 165, 250, 0.32);
+    background:
+      radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 42%),
+      linear-gradient(165deg, rgba(11, 17, 30, 0.94) 0%, rgba(15, 23, 42, 0.9) 100%);
+    box-shadow: 0 28px 64px -36px rgba(8, 15, 28, 0.92);
+  }
+
+  .pricing-tier-badge {
+    position: absolute;
+    top: -0.7rem;
+    left: 1.25rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #eff6ff;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9));
+    box-shadow: 0 8px 22px -12px rgba(37, 99, 235, 0.65);
+  }
+
+  .pricing-tier-name {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-cream);
+  }
+
+  .pricing-tier-price {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .pricing-tier-amount {
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: var(--text-white);
+    line-height: 1.05;
+  }
+
+  .pricing-tier-cadence {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .pricing-tier-tagline {
+    margin: 0;
+    color: var(--text-gray);
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .pricing-tier-best-for {
+    margin: 0;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .pricing-tier-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.95);
+    margin-bottom: 0.3rem;
+  }
+
+  .pricing-tier-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .pricing-tier-list li {
+    padding-left: 1.1rem;
+    position: relative;
+  }
+
+  .pricing-tier-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+  }
+
+  .pricing-tier-cta {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  .pricing-crm-shell {
+    padding-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .pricing-crm-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2.2vw, 1.35rem);
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+    align-items: stretch;
+  }
+
+  .pricing-code {
+    font-size: 0.85em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.35rem;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .pricing-growth-shell {
+    padding-top: 0;
+  }
+
+  .growth-plan-card {
+    padding: clamp(1.75rem, 3vw, 2.25rem);
+    border-color: rgba(96, 165, 250, 0.22);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(96, 165, 250, 0.12), transparent 45%),
+      linear-gradient(165deg, rgba(11, 17, 30, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%);
+  }
+
+  .growth-plan-card h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+    letter-spacing: -0.03em;
+    margin: 0.35rem 0 0.75rem;
+    color: var(--text-cream);
+  }
+
+  .growth-plan-card p {
+    color: var(--text-gray);
+    line-height: 1.6;
+    margin: 0 0 1rem;
+  }
+
+  .growth-plan-card__list {
+    list-style: none;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .growth-plan-card__list li {
+    padding-left: 1.15rem;
+    position: relative;
+  }
+
+  .growth-plan-card__list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #86efac;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .pricing-faq-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 720px) {
+    .pricing-faq-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .pricing-faq-card {
+    padding: 1.35rem 1.5rem;
+  }
+
+  .pricing-faq-q {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--text-cream);
+    letter-spacing: -0.02em;
+  }
+
+  .pricing-faq-a {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-gray);
+  }
+
+  @media (max-width: 960px) {
+    .pricing-tiers-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .pricing-crm-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
