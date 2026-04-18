@@ -4,7 +4,7 @@
 import { Bell, CheckCircle, AlertTriangle, Mail, UserPlus, ArrowRight } from "lucide-react";
 import { UserButton, useUser, useOrganization } from "@clerk/nextjs";
 import Omnisearch from "@/components/portal/Omnisearch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminPrefix } from "@/lib/useAdminPrefix";
 import { getRecentActivities } from "@/app/admin/actions";
@@ -57,12 +57,20 @@ export default function TopBar({
   const [showNotifs, setShowNotifs] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [hasUnread, setHasUnread] = useState(false);
+  /** Subtitle after mount only — avoids React #418 (server TZ vs client TZ; Clerk user/org SSR vs hydrated). */
+  const [greetingSubtitle, setGreetingSubtitle] = useState("");
   const { user } = useUser();
   const { organization } = useOrganization();
   const firstName = user?.firstName || "there";
   const orgName = organization?.name;
   const router = useRouter();
   const stripAdmin = useAdminPrefix();
+
+  useLayoutEffect(() => {
+    setGreetingSubtitle(
+      `${getGreeting()}, ${firstName}${orgName ? ` · ${orgName}` : ""}`,
+    );
+  }, [firstName, orgName]);
 
   // Load real activity data for notifications
   useEffect(() => {
@@ -115,8 +123,8 @@ export default function TopBar({
         <h2 className="text-sm font-semibold text-white leading-tight">
           {title || "Dashboard"}
         </h2>
-        <p className="text-[11px] text-text-muted leading-tight hidden sm:block">
-          {getGreeting()}, {firstName}{orgName ? ` · ${orgName}` : ""}
+        <p className="text-[11px] text-text-muted leading-tight hidden sm:block min-h-[1.25rem]">
+          {greetingSubtitle}
         </p>
       </div>
 

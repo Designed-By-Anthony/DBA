@@ -1,5 +1,9 @@
 # Migration Status Report
 
+## Agency OS: TopBar hydration (React #418) (2026-04-18)
+
+- **`TopBar`:** Greeting line (`Good morning/afternoon/evening` + Clerk name/org) now renders **after mount** via `useLayoutEffect`, so server HTML and first client paint both use an empty subtitle — no timezone or Clerk SSR/client text mismatch. Fixes minified **React error #418** on admin chrome.
+
 ## Marketing: sticky conversion rail + WebSite actions (2026-04-18)
 
 - **Layout:** `.site-chrome-sticky` keeps pilot banner + main nav + **desktop quick-action rail** (free audit, contact, Calendly, phone) pinned together while scrolling — complements bottom **Get in touch** + optional Stream chat.
