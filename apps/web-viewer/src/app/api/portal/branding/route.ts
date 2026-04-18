@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { PlanSuite } from '@dba/lead-form-contract';
 import { getTenantByOrgId } from '@/lib/tenant-db';
-import { getVerticalTemplateFromType } from '@/lib/vertical-config';
+import { resolveUiVerticalTemplateFromTenant } from '@/lib/vertical-template-map';
 
 /**
  * Portal Branding API
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       brandName: tenant.name || 'Client Portal',
       brandColor: '#2563eb',
       brandInitial: (tenant.name?.trim()?.charAt(0)?.toUpperCase() || 'D'),
-      verticalTemplate: getVerticalTemplateFromType(tenant.verticalType),
+      verticalTemplate: resolveUiVerticalTemplateFromTenant(tenant),
       planSuite,
     });
   } catch (error) {

@@ -18,6 +18,10 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
  * - checkout.session.completed → payment received
  * - invoice.paid → recurring retainer paid
  * - customer.subscription.deleted → retainer cancelled
+ *
+ * Catalog (products/prices): the Price Book reads live from the Stripe API; add
+ * `product.updated`, `product.deleted`, and `price.updated` in the Dashboard so
+ * this endpoint stays reachable when you forward those events (no DB mirror yet).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -187,6 +191,13 @@ export async function POST(request: NextRequest) {
           }
           break;
         }
+
+        // Price Book uses Stripe as source of truth via API; acknowledge catalog events
+        // so the webhook URL can receive Dashboard-forwarded updates without 400s.
+        case 'product.updated':
+        case 'product.deleted':
+        case 'price.updated':
+          break;
       }
     });
 

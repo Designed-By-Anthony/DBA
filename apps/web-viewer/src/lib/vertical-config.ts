@@ -13,7 +13,7 @@ import {
   type VerticalId as SharedVerticalId,
 } from "@dba/ui";
 
-function toUiVertical(verticalType: string | undefined): "food" | "contractor" | "retail" | "general" {
+function toUiVertical(verticalType: string | undefined): "food" | "contractor" | "retail" | "fitness" | "general" {
   switch (verticalType) {
     case "restaurant":
       return "food";
@@ -21,6 +21,8 @@ function toUiVertical(verticalType: string | undefined): "food" | "contractor" |
       return "contractor";
     case "florist":
       return "retail";
+    case "wellness":
+      return "fitness";
     default:
       return "general";
   }

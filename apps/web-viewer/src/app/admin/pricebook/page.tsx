@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getStripeProducts, createStripeProductAction, StripeProductDetail } from "../actions/stripe";
+import {
+  getStripeProducts,
+  createStripeProductAction,
+  setStripeProductActiveAction,
+  StripeProductDetail,
+} from "../actions/stripe";
 import { formatCents, dollarsToCents } from "@/lib/currency";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
@@ -10,6 +15,9 @@ export default function PriceBookPage() {
   const [products, setProducts] = useState<StripeProductDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  /** When true, fetch active + archived; when false, active catalog only. */
+  const [showArchived, setShowArchived] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -25,7 +33,7 @@ export default function PriceBookPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getStripeProducts();
+      const res = await getStripeProducts({ includeArchived: showArchived });
       if (res.error) {
         setError(res.error);
         setProducts([]);
@@ -38,11 +46,27 @@ export default function PriceBookPage() {
       setProducts([]);
     }
     setLoading(false);
-  }, []);
+  }, [showArchived]);
 
   useEffect(() => {
     queueMicrotask(() => void loadData());
   }, [loadData]);
+
+  const handleArchiveToggle = async (productId: string, nextActive: boolean) => {
+    setBusyId(productId);
+    const res = await setStripeProductActiveAction({ productId, active: nextActive });
+    if (!res.ok) {
+      toast.error(res.error);
+    } else {
+      toast.success(
+        nextActive
+          ? "Product restored — it will appear in quotes and new checkouts again."
+          : "Product archived — hidden from new quotes and checkouts (existing subscriptions unchanged).",
+      );
+      await loadData();
+    }
+    setBusyId(null);
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +101,15 @@ export default function PriceBookPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-glass-border bg-surface-2 text-text-muted text-sm cursor-pointer select-none hover:bg-surface-3 transition-colors">
+            <input
+              type="checkbox"
+              className="rounded border-glass-border"
+              checked={showArchived}
+              onChange={(e) => setShowArchived(e.target.checked)}
+            />
+            Show archived
+          </label>
           <button
             type="button"
             onClick={() => void loadData()}
@@ -135,7 +168,7 @@ export default function PriceBookPage() {
                 <p className="text-sm text-text-muted line-clamp-2 mt-1 h-10">
                   {p.description || 'No description provided.'}
                 </p>
-                <div className="mt-4 pt-4 border-t border-glass-border flex justify-between items-end">
+                <div className="mt-4 pt-4 border-t border-glass-border flex flex-wrap justify-between items-end gap-3">
                   <div>
                     <span className="text-2xl font-black text-white">
                       {p.default_price ? formatCents(p.default_price.unit_amount) : 'N/A'}
@@ -145,6 +178,27 @@ export default function PriceBookPage() {
                         ? `/${p.default_price.recurring?.interval}` 
                         : ' One-Time'}
                     </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {p.active ? (
+                      <button
+                        type="button"
+                        disabled={busyId === p.id}
+                        onClick={() => void handleArchiveToggle(p.id, false)}
+                        className="px-3 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-medium hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+                      >
+                        {busyId === p.id ? "…" : "Archive"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busyId === p.id}
+                        onClick={() => void handleArchiveToggle(p.id, true)}
+                        className="px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-xs font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                      >
+                        {busyId === p.id ? "…" : "Restore"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

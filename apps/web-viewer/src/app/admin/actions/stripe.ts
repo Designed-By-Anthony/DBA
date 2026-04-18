@@ -1,6 +1,7 @@
 "use server";
 
 import type Stripe from "stripe";
+import * as Sentry from "@sentry/nextjs";
 import { stripe } from "@/lib/stripe";
 import { verifyAuth } from "../actions";
 
@@ -26,15 +27,18 @@ export interface StripeProductDetail {
 // Fetching Data from Stripe
 // ------------------------------------------------------------------
 
-export async function getStripeProducts(): Promise<{ products: StripeProductDetail[], error?: string }> {
+export async function getStripeProducts(options?: {
+  /** When true, list active and archived products. Default: active only. */
+  includeArchived?: boolean;
+}): Promise<{ products: StripeProductDetail[]; error?: string }> {
   try {
     // Basic auth check
     await verifyAuth();
 
     const response = await stripe.products.list({
-      expand: ['data.default_price'],
-      active: true,
+      expand: ["data.default_price"],
       limit: 100,
+      ...(options?.includeArchived ? {} : { active: true }),
     });
 
     const products = response.data.map((p): StripeProductDetail => {
@@ -67,7 +71,7 @@ export async function getStripeProducts(): Promise<{ products: StripeProductDeta
 
     return { products };
   } catch (err: unknown) {
-    console.error("[Stripe Sync Error]", err);
+    Sentry.captureException(err);
     return {
       products: [],
       error: err instanceof Error ? err.message : String(err),
@@ -142,7 +146,33 @@ export async function createStripeProductAction(params: {
       },
     };
   } catch (err: unknown) {
-    console.error("[Create Product Error]", err);
+    Sentry.captureException(err);
     return { error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Archive or restore a catalog product in Stripe (`active: false` hides it from
+ * new Checkout/quote flows; it does not delete historical invoices).
+ */
+export async function setStripeProductActiveAction(params: {
+  productId: string;
+  active: boolean;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    await verifyAuth();
+    const id = params.productId?.trim();
+    if (!id) {
+      return { ok: false, error: "Missing product id." };
+    }
+
+    await stripe.products.update(id, { active: params.active });
+    return { ok: true };
+  } catch (err: unknown) {
+    Sentry.captureException(err);
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }

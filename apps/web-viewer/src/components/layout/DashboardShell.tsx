@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useLayoutEffect, startTransition } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import QuickAddLead from "@/components/ui/QuickAddLead";
 import { VerticalProvider } from "@/lib/VerticalContext";
+
+const SIDEBAR_COLLAPSED_KEY = "sidebar-collapsed";
 
 export default function DashboardShell({
   children,
@@ -13,18 +15,28 @@ export default function DashboardShell({
   children: React.ReactNode;
   title?: string;
 }) {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("sidebar-collapsed") === "true";
-    }
-    return false;
-  });
+  /** Must match server render (false); hydrate preference after mount to avoid React #418. */
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useLayoutEffect(() => {
+    try {
+      const fromStorage = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+      startTransition(() => setCollapsed(fromStorage));
+    } catch {
+      /* private mode / no storage */
+    }
+  }, []);
 
   const handleToggle = () => {
     setCollapsed((prev) => {
-      localStorage.setItem("sidebar-collapsed", String(!prev));
-      return !prev;
+      const next = !prev;
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
     });
   };
 

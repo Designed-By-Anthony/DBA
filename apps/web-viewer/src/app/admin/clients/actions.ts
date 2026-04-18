@@ -6,6 +6,11 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { getDb, withTenantContext, tenants, leads } from "@dba/database";
 import { eq, count } from "drizzle-orm";
 import { verifyAuth } from "../actions";
+import { getVerticalConfig } from "@/lib/verticals";
+import {
+  sqlVerticalTypeToUiTemplateFallback,
+  uiVerticalTemplateToSqlVerticalType,
+} from "@/lib/vertical-template-map";
 
 // ============================================
 // Client Organization Management
@@ -53,12 +58,18 @@ export async function listClientOrgs() {
             .limit(1);
           if (tenantRows.length > 0) {
             const t = tenantRows[0];
+            const crm = (t.crmConfig as Record<string, unknown> | undefined) ?? {};
+            const templateFromCrm = crm.templateId;
+            const verticalTemplate =
+              typeof templateFromCrm === "string"
+                ? templateFromCrm
+                : sqlVerticalTypeToUiTemplateFallback(t.verticalType);
             branding = {
               brandName: t.name,
               brandColor: t.brandColor || "#2563eb",
               brandInitial: (t.name?.charAt(0) || "A").toUpperCase(),
               portalEnabled: true,
-              verticalTemplate: t.verticalType || "agency",
+              verticalTemplate,
             };
           }
         } catch {
@@ -109,16 +120,18 @@ export async function createClientOrg(
     const db = getDb();
     if (db) {
       const now = new Date().toISOString();
+      const uiTemplate = getVerticalConfig(verticalTemplate).id;
+      const sqlVerticalType = uiVerticalTemplateToSqlVerticalType(uiTemplate);
       try {
         await db.insert(tenants).values({
           clerkOrgId: org.id,
           name,
-          verticalType: verticalTemplate as "agency" | "service_pro",
+          verticalType: sqlVerticalType,
           brandColor: "#2563eb",
           pipelineStages: [],
           dealSources: ["Referral", "Inbound", "Organic"],
           notificationPrefs: {},
-          crmConfig: {},
+          crmConfig: { templateId: uiTemplate },
           createdAt: now,
           updatedAt: now,
         });
@@ -213,11 +226,17 @@ export async function getOrgBranding(orgId: string) {
   }
 
   const t = rows[0];
+  const crm = (t.crmConfig as Record<string, unknown> | undefined) ?? {};
+  const templateFromCrm = crm.templateId;
+  const verticalTemplate =
+    typeof templateFromCrm === "string"
+      ? templateFromCrm
+      : sqlVerticalTypeToUiTemplateFallback(t.verticalType);
   return {
     brandName: t.name || "Agency OS",
     brandColor: t.brandColor || "#2563eb",
     brandInitial: (t.name?.charAt(0) || "A").toUpperCase(),
     portalEnabled: true,
-    verticalTemplate: t.verticalType || "agency",
+    verticalTemplate,
   };
 }

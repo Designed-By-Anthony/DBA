@@ -135,6 +135,7 @@ When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update 
 
 - Drizzle ORM against Neon Postgres (see **Infrastructure Context**). Schema in `packages/database/schema.ts`.
 - Tenant-scoped tables include `tenants`, `sites`, `leads`, `automations`, `tickets`, plus portal token/session tables.
+- **Clerk vs CRM records:** Clerk identifies **signed-in agency users** and **org boundaries** (`tenants.clerk_org_id`). **Prospects/leads** live in `leads` only—outreach and tracking do **not** require a Clerk user per prospect; optional client portal uses magic links, not Clerk end-user accounts.
 - Tenant key in SQL is `clerk_org_id` (column) / `tenantId` (Drizzle field) / `agencyId` (guardrail wording). Every query **must** filter on it — see **Zero-Trust Multi-Tenancy**.
 - Agency OS reads `DATABASE_URL` (and optional `DATABASE_SSL=true`) from `apps/web-viewer/.env.local`.
 - Validate all API inputs and JSONB payloads with Zod — see **Strict Typing** in the purge rules.

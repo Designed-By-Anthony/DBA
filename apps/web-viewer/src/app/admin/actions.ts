@@ -34,6 +34,7 @@ import { eq, and, desc, asc, sql, count, sum, or, ilike, inArray, lte, isNotNull
 import type {
   Prospect,
   EmailRecord,
+  ClickEvent,
   DashboardStats,
   ProspectStatus,
   ProspectHealthStatus,
@@ -663,6 +664,27 @@ export async function sendTestEmail(params: {
 // Email History
 // ============================================
 
+const EMAIL_STATUSES = new Set(["draft", "scheduled", "sent", "failed"]);
+
+function normalizeEmailStatus(raw: string | null | undefined): EmailRecord["status"] {
+  if (raw && EMAIL_STATUSES.has(raw)) return raw as EmailRecord["status"];
+  return "sent";
+}
+
+function normalizeClickEvents(raw: unknown): ClickEvent[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((c): ClickEvent => {
+    if (c && typeof c === "object") {
+      const o = c as Record<string, unknown>;
+      const url = typeof o.url === "string" ? o.url : "";
+      const clickedAt = typeof o.clickedAt === "string" ? o.clickedAt : new Date().toISOString();
+      const userAgent = typeof o.userAgent === "string" ? o.userAgent : "";
+      return { url, clickedAt, userAgent };
+    }
+    return { url: "", clickedAt: new Date().toISOString(), userAgent: "" };
+  });
+}
+
 export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[]> {
   return withTenant(async (db, tenantId) => {
     try {
@@ -686,7 +708,7 @@ export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[
       }
 
       const rows = await query;
-      return rows.map((row: any) => ({
+      return rows.map((row: EmailRow) => ({
         id: row.id,
         agencyId: row.tenantId,
         prospectId: row.leadId,
@@ -694,14 +716,14 @@ export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[
         prospectName: row.leadName || "",
         subject: row.subject,
         bodyHtml: row.bodyHtml,
-        status: row.status as any,
+        status: normalizeEmailStatus(row.status),
         scheduledAt: row.scheduledAt,
         sentAt: row.sentAt,
         resendId: row.resendId,
-        opens: row.opens,
-        clicks: (row.clicks as any[]) || [],
+        opens: row.opens ?? 0,
+        clicks: normalizeClickEvents(row.clicks),
         createdAt: row.createdAt,
-      } as EmailRecord));
+      }));
     } catch (err) {
       console.error("getEmailHistory error:", err);
       return [];
