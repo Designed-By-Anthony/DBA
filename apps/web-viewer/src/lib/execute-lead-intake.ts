@@ -70,7 +70,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     prospectId = sqlResult.prospectId;
     isNew = sqlResult.isNew;
   } else {
-    prospectId = await generateClientId(getIdSource(company, name));
+    prospectId = await generateClientId(getIdSource(company, name), agencyId || null);
     isNew = true;
   }
 

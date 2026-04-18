@@ -1,5 +1,6 @@
 "use server";
 
+import "@dba/env/web-viewer-aliases";
 import { currentUser } from "@clerk/nextjs/server";
 import { verifyAuth } from "@/app/admin/actions";
 import { getStripeClient } from "@/lib/stripe";

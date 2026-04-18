@@ -7,6 +7,7 @@
  *
  * All vertical-specific data is stored in JSONB to keep the SQL schema lean.
  */
+import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
 import {
   VerticalSwitch,

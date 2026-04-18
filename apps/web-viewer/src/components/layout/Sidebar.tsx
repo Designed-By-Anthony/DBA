@@ -38,6 +38,18 @@ export default function Sidebar({
     if (normalizedHref === "/email/history") return normalizedPath === "/email/history";
     if (normalizedHref === "/automations") return normalizedPath === "/automations";
     if (normalizedHref === "/inbox") return normalizedPath === "/inbox";
+    // /settings is a prefix of /settings/business — only one nav item should be active.
+    if (normalizedHref === "/settings/business") {
+      return (
+        normalizedPath === "/settings/business" ||
+        normalizedPath.startsWith("/settings/business/")
+      );
+    }
+    if (normalizedHref === "/settings") {
+      if (normalizedPath === "/settings") return true;
+      if (!normalizedPath.startsWith("/settings/")) return false;
+      return !normalizedPath.startsWith("/settings/business");
+    }
     return normalizedPath.startsWith(normalizedHref);
   };
 

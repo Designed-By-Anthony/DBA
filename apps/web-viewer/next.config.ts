@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.designedbyanthony.com; " +
               "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://scdn.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
-              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.designedbyanthony.com; " +
+              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.designedbyanthony.com https://calendly.com https://*.calendly.com; " +
               "worker-src 'self' blob: https://*.designedbyanthony.com;",
           },
           // HSTS: pin the host to HTTPS for two years (preload-eligible once you

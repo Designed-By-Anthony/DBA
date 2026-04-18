@@ -5,6 +5,7 @@ import {
   optionalUrl,
   validateEnv,
 } from "./shared";
+import { hydrateWebViewerEnvAliases } from "./web-viewer-aliases";
 
 /**
  * Vercel's Clerk integration may prefill env vars with non-standard names:
@@ -70,17 +71,27 @@ const webViewerSchema = z
     DATABASE_URL_UNPOOLED: optionalPostgresUrl,
     DATABASE_SSL: booleanFromString,
 
-    // Tenant guardrail — the default agency for unsigned lead intake. When unset
-    // the lead route falls back to anonymous ingest (allowed in dev).
+    // Default Clerk org for lead intake + Calendly when the webhook URL has no ?tenant=.
+    // Multi-tenant: prefer /api/webhooks/calendly?tenant=<org_id> per Calendly subscription.
     LEAD_WEBHOOK_DEFAULT_AGENCY_ID: z.string().trim().optional(),
     LEAD_WEBHOOK_SECRET: z.string().trim().optional(),
     LEAD_WEBHOOK_CORS_ORIGINS: z.string().trim().optional(),
 
     // Transactional email.
     RESEND_API_KEY: z.string().trim().optional(),
+    RESEND_DOMAIN_TEST_MODE: booleanFromString,
+    RESEND_DOMAIN_TEST_VERIFIED: booleanFromString,
+    /** Svix signing secret from Resend Dashboard → Webhooks (inbound `email.received`, etc.). */
+    RESEND_WEBHOOK_SECRET: z.string().trim().optional(),
+    DISCORD_WEBHOOK_URL: optionalUrl,
+    DISCORD_TEST_MODE: booleanFromString,
+    EMAIL_TEST_MODE: booleanFromString,
+    IS_TEST: booleanFromString,
 
     // App URL used in outbound emails + Clerk redirect URLs.
     NEXT_PUBLIC_APP_URL: optionalUrl,
+    /** Optional Calendly embed URL for admin calendar (strategy: iframe + existing webhooks). */
+    NEXT_PUBLIC_CALENDLY_EMBED_URL: optionalUrl,
 
     // Turnstile (anti-bot) — optional; Agency OS degrades to "no verification".
     TURNSTILE_SECRET_KEY: z.string().trim().optional(),

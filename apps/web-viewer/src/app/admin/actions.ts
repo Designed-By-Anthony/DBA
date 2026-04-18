@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 "use server";
 
+import "@dba/env/web-viewer-aliases";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import * as Sentry from "@sentry/nextjs";
 import { sendMail } from "@/lib/mailer";
@@ -159,16 +160,21 @@ const STALE_LEAD_DAYS = 14;
 // ============================================
 
 export async function getProspects(): Promise<Prospect[]> {
-  return withTenant(async (db, tenantId) => {
-    const rows = await db
-      .select()
-      .from(leads)
-      .where(eq(leads.tenantId, tenantId))
-      .orderBy(desc(leads.createdAt))
-      .limit(200);
+  try {
+    return await withTenant(async (db, tenantId) => {
+      const rows = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.tenantId, tenantId))
+        .orderBy(desc(leads.createdAt))
+        .limit(200);
 
-    return rows.map(leadRowToProspect);
-  });
+      return rows.map(leadRowToProspect);
+    });
+  } catch (error) {
+    Sentry.captureException(error);
+    return [];
+  }
 }
 
 export async function getProspect(id: string): Promise<Prospect | null> {
@@ -221,7 +227,7 @@ export async function addProspect(data: {
 
     // Generate prospect ID
     const idSource = getIdSource(data.company, data.name);
-    const prospectId = await generateClientId(idSource);
+    const prospectId = await generateClientId(idSource, tenantId);
 
     const now = new Date().toISOString();
     await db.insert(leads).values({

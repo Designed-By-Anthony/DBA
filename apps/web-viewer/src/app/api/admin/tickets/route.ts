@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
 import { desc, eq } from "drizzle-orm";
 import { getDb, tickets } from "@dba/database";

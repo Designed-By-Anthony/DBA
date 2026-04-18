@@ -15,6 +15,7 @@ import {
   text,
   uuid,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -85,6 +86,24 @@ export const notificationChannelEnum = pgEnum("notification_channel", [
   "email",
   "in_app",
 ]);
+
+export type TenantDomainStatus =
+  | "pending"
+  | "verified"
+  | "failed"
+  | "temporary_failure"
+  | "not_started";
+
+export type TenantDomainDnsRecord = {
+  group: "verification" | "dkim" | "dmarc" | "receiving";
+  record: string;
+  name: string;
+  type: "TXT" | "CNAME" | "MX";
+  value: string;
+  ttl?: string;
+  status?: TenantDomainStatus;
+  priority?: number;
+};
 
 /**
  * ──────────────────────────────────────────────────────────────────────
@@ -322,6 +341,39 @@ export const emails = pgTable(
     index("idx_emails_tenant_id").on(table.tenantId),
     index("idx_emails_lead_id").on(table.leadId),
   ]
+);
+
+/**
+ * Tenant email domains — Resend-managed sending identities.
+ *
+ * Zero-Trust Multi-Tenancy: every query MUST filter on `tenantId`, and RLS
+ * also enforces `tenant_id = app.current_tenant_id`.
+ */
+export const tenantDomains = pgTable(
+  "tenant_domains",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    domainName: text("domain_name").notNull(),
+    resendId: text("resend_id").notNull(),
+    status: text("status").$type<TenantDomainStatus>().notNull().default("pending"),
+    records: jsonb("records")
+      .$type<TenantDomainDnsRecord[]>()
+      .notNull()
+      .default([]),
+    lastCheckedAt: text("last_checked_at"),
+    verifiedAt: text("verified_at"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uniq_tenant_domains_tenant_domain").on(table.tenantId, table.domainName),
+    uniqueIndex("uniq_tenant_domains_tenant_resend").on(table.tenantId, table.resendId),
+    index("idx_tenant_domains_tenant_status").on(table.tenantId, table.status),
+  ],
 );
 
 /**
@@ -621,6 +673,7 @@ export type TenantRow = typeof tenants.$inferSelect;
 export type LeadRow = typeof leads.$inferSelect;
 export type ActivityRow = typeof activities.$inferSelect;
 export type EmailRow = typeof emails.$inferSelect;
+export type TenantDomainRow = typeof tenantDomains.$inferSelect;
 export type EmailSequenceRow = typeof emailSequences.$inferSelect;
 export type SequenceEnrollmentRow = typeof sequenceEnrollments.$inferSelect;
 export type AutomationRow = typeof automations.$inferSelect;

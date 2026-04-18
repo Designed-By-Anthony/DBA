@@ -57,6 +57,12 @@ export default defineConfig({
           env: {
             ...process.env,
             NODE_ENV: 'test',
+            // Server actions that call `withCurrentTenant` need an org; E2E uses Clerk
+            // keyless without a real org session — same bypass as local dev.
+            ALLOW_ADMIN_AUTH_BYPASS: '1',
+            // Force the centralized mailer into test-fire mode so Playwright
+            // runs never send real email via Resend. The outbox is inspectable
+            // through GET /api/test/emails.
             EMAIL_TEST_MODE: 'true',
           },
         },

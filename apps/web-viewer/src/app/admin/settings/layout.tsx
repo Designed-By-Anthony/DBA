@@ -11,6 +11,7 @@ import {
   Users,
   ListChecks,
   Layers,
+  Globe2,
 } from "lucide-react";
 
 const sections = [
@@ -19,6 +20,7 @@ const sections = [
   { id: "pipeline", label: "Pipeline", href: "/admin/settings/pipeline", icon: GitBranch },
   { id: "sources", label: "Deal Sources", href: "/admin/settings/sources", icon: ListChecks },
   { id: "notifications", label: "Notifications", href: "/admin/settings/notifications", icon: Bell },
+  { id: "domains", label: "Domains", href: "/admin/settings/domains", icon: Globe2 },
   { id: "vertical", label: "Vertical", href: "/admin/settings/vertical", icon: Layers },
   { id: "team", label: "Team", href: "/admin/settings/team", icon: Users },
   { id: "business", label: "Business Rules", href: "/admin/settings/business", icon: Building2 },

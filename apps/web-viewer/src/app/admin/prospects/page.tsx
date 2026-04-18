@@ -44,7 +44,7 @@ export default function ProspectsPage() {
       const data = await getProspects();
       setProspects(data);
     } catch (e) {
-      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Failed to load prospects");
     }
     setLoading(false);
   }, []);

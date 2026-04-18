@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, withBypassRls, leads, activities } from '@dba/database';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
 import { getSecret, verifyCalendlySignature } from '@/lib/webhook-auth';
 import { apiError } from '@/lib/api-error';
+import { resolveCalendlyWebhookTenant } from '@/lib/lead-webhook-agency';
 
 /**
  * Calendly Webhook Handler
@@ -13,6 +14,10 @@ import { apiError } from '@/lib/api-error';
  * Receives events from Calendly:
  * - invitee.created → new booking
  * - invitee.canceled → booking cancelled
+ *
+ * Tenant routing: `resolveCalendlyWebhookTenant` — use `?tenant=<Clerk org id>` in the webhook URL
+ * for multi-tenant, or `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` for a single org. Prospect lookup is scoped
+ * to that tenant so shared emails do not attach to the wrong org’s pipeline.
  */
 export async function POST(request: NextRequest) {
   const signingKey = getSecret('CALENDLY_WEBHOOK_SIGNING_KEY');
@@ -63,6 +68,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No email in payload' }, { status: 400 });
     }
 
+    const tenantResolution = await resolveCalendlyWebhookTenant(request);
+    if (!tenantResolution.ok) {
+      return NextResponse.json(
+        { error: tenantResolution.message },
+        { status: tenantResolution.status },
+      );
+    }
+    const targetTenantId = tenantResolution.tenantId;
+
     const db = getDb();
     if (!db) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
@@ -82,23 +96,26 @@ export async function POST(request: NextRequest) {
     let prospectId: string | undefined;
 
     await withBypassRls(db, async (tx) => {
-      // Find existing prospect by email
+      // Same email may exist under different tenants — scope by tenant + email.
       const prospectRows = await tx
         .select()
         .from(leads)
-        .where(eq(leads.emailNormalized, inviteeEmail))
+        .where(
+          and(
+            eq(leads.emailNormalized, inviteeEmail),
+            eq(leads.tenantId, targetTenantId),
+          ),
+        )
         .limit(1);
 
       let tenantId: string;
 
       if (prospectRows.length === 0) {
-        // New invitee: attribute to the same default tenant as /api/lead (Clerk org id).
-        const masterTenantId = defaultAgencyId;
         const now = new Date().toISOString();
         const newProspectId = `cal_${Date.now()}`;
 
         await tx.insert(leads).values({
-          tenantId: masterTenantId,
+          tenantId: targetTenantId,
           prospectId: newProspectId,
           name: inviteeName,
           email: inviteeEmail,
@@ -115,7 +132,7 @@ export async function POST(request: NextRequest) {
         });
 
         prospectId = newProspectId;
-        tenantId = masterTenantId;
+        tenantId = targetTenantId;
       } else {
         const prospect = prospectRows[0];
         prospectId = prospect.prospectId;

@@ -3,7 +3,7 @@
  * Generates deterministic prospect IDs like "desi0001" from company/name.
  */
 import { getDb, withBypassRls, leads } from "@dba/database";
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 /**
  * Extract an ID source from company or name.
@@ -18,13 +18,15 @@ export function getIdSource(company?: string, name?: string): string {
 }
 
 /**
- * Generate a unique client ID like "desi0001".
- * Queries the leads table to find the next available number for a given prefix.
+ * Generate a unique client ID like "desi0001" **within a tenant**.
+ * Without `tenantId`, uses a random suffix (no global scan — avoids cross-tenant collisions).
  */
-export async function generateClientId(prefix: string): Promise<string> {
+export async function generateClientId(
+  prefix: string,
+  tenantId: string | null,
+): Promise<string> {
   const db = getDb();
-  if (!db) {
-    // Fallback when no DB: generate a random ID
+  if (!db || !tenantId) {
     const rand = Math.floor(Math.random() * 9999)
       .toString()
       .padStart(4, "0");
@@ -33,12 +35,16 @@ export async function generateClientId(prefix: string): Promise<string> {
 
   try {
     return await withBypassRls(db, async (tx) => {
-      // Find the highest numbered prospect ID with this prefix
       const pattern = `${prefix}%`;
       const result = await tx
         .select({ prospectId: leads.prospectId })
         .from(leads)
-        .where(sql`${leads.prospectId} LIKE ${pattern}`)
+        .where(
+          and(
+            eq(leads.tenantId, tenantId),
+            sql`${leads.prospectId} LIKE ${pattern}`,
+          ),
+        )
         .orderBy(sql`${leads.prospectId} DESC`)
         .limit(1);
 

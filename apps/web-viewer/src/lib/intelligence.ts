@@ -68,25 +68,25 @@ export async function recalculateLeadScore(
             eq(activities.tenantId, tenantId),
             eq(activities.leadId, prospectId)
           )
-        );
+      );
 
       let rawScore = 0;
-      let lastEngagementDate: Date | undefined;
+      let lastEngagementAt = 0;
 
       for (const activity of prospectActivities) {
         const type = activityType(activity.type);
         rawScore += type ? SCORE_WEIGHTS[type] : 0;
 
         const date = dateFromValue(activity.createdAt);
-        if (date && (!lastEngagementDate || date > lastEngagementDate)) {
-          lastEngagementDate = date;
+        if (date) {
+          lastEngagementAt = Math.max(lastEngagementAt, date.getTime());
         }
       }
 
       // Time decay factor: subtract 2 points for every full day of inactivity
-      if (lastEngagementDate) {
+      if (lastEngagementAt > 0) {
         const daysElapsed = Math.floor(
-          (Date.now() - lastEngagementDate.getTime()) / (1000 * 60 * 60 * 24)
+          (Date.now() - lastEngagementAt) / (1000 * 60 * 60 * 24)
         );
         const decay = Math.max(0, daysElapsed * 2);
         rawScore -= decay;

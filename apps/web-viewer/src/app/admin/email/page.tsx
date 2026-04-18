@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import DOMPurify from "isomorphic-dompurify";
 import { getProspects, sendEmail, sendTestEmail } from "../actions";
+import { sanitizeEmailPreviewHtml } from "@/lib/sanitize-email-preview-html";
 import type { Prospect } from "@/lib/types";
 import { emailTemplates } from "@/lib/theme.config";
 import { useUser } from "@clerk/nextjs";
@@ -420,7 +420,9 @@ export default function EmailComposerPage() {
                       </div>
                       <div
                         className="prose prose-invert prose-sm max-w-none min-h-[300px] bg-white/5 rounded-lg p-4 text-sm"
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(previewHtml || "<em>Nothing to preview</em>") }}
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeEmailPreviewHtml(previewHtml || "<em>Nothing to preview</em>"),
+                        }}
                       />
                     </div>
                   );

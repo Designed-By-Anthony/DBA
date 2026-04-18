@@ -1,12 +1,12 @@
+import "@dba/env/web-viewer-aliases";
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/outfit";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { PwaRoot } from "@/components/PwaRoot";
+import { VercelObservability } from "@/components/VercelObservability";
 import { clerkProxyUrlForProvider } from "@/lib/clerk-fapi-proxy";
 
 /** PWA / mobile browser chrome — dark shell + marketing primary blue (designedbyanthony.com) */
@@ -68,8 +68,7 @@ export default function RootLayout({
             </ClerkProvider>
           </PwaRoot>
         </div>
-        <Analytics scriptSrc="https://va.vercel-scripts.com/v1/script.js" />
-        <SpeedInsights scriptSrc="https://va.vercel-scripts.com/v1/speed-insights/script.js" />
+        <VercelObservability />
       </body>
     </html>
   );

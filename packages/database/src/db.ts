@@ -10,6 +10,46 @@ export type Database = NodePgDatabase<typeof schema>;
 let _db: Database | null = null;
 let _pool: pg.Pool | null = null;
 
+/** Postgres + driver codes for dropped / recycled connections (Neon suspend, PgBouncer, admin SIGTERM). */
+function isTransientConnectionError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as { code?: string; message?: string };
+  const code = e.code;
+  if (
+    code === "57P01" ||
+    code === "57P02" ||
+    code === "57P03" ||
+    code === "08006" ||
+    code === "08003" ||
+    code === "08000"
+  ) {
+    return true;
+  }
+  const msg = String(e.message ?? err);
+  return /terminating connection|connection terminated|server closed the connection|ECONNRESET|EPIPE|Connection terminated unexpectedly/i.test(
+    msg,
+  );
+}
+
+async function runWithTransientRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (first) {
+    if (!isTransientConnectionError(first)) throw first;
+    try {
+      return await fn();
+    } catch (second) {
+      if (isTransientConnectionError(second)) {
+        throw new Error(
+          `${label}: database connection dropped after retry (${(second as Error).message})`,
+          { cause: second },
+        );
+      }
+      throw second;
+    }
+  }
+}
+
 /**
  * Resolve the SSL config for the Postgres pool.
  *
@@ -77,6 +117,11 @@ export function getDb(): Database | null {
       max: 10,
       ssl: resolveSslConfig(url),
     });
+    // Required by node-postgres: idle clients killed by the server (Neon scale-down,
+    // pooler rotation, 57P01) emit `error` on the pool — unhandled, this crashes Node.
+    _pool.on("error", (err) => {
+      console.error("[@dba/database] pg Pool error (idle client):", err.message);
+    });
     _db = drizzle(_pool, { schema });
   }
   return _db;
@@ -109,10 +154,12 @@ export async function withTenantContext<T>(
   tenantId: string,
   fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
 ): Promise<T> {
-  return db.transaction(async (tx) => {
-    await tx.execute(sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`);
-    return fn(tx);
-  });
+  return runWithTransientRetry("withTenantContext", () =>
+    db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`);
+      return fn(tx);
+    }),
+  );
 }
 
 /**
@@ -123,10 +170,12 @@ export async function withBypassRls<T>(
   db: Database,
   fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
 ): Promise<T> {
-  return db.transaction(async (tx) => {
-    await tx.execute(sql`SELECT set_config('app.bypass_rls', 'on', true)`);
-    return fn(tx);
-  });
+  return runWithTransientRetry("withBypassRls", () =>
+    db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT set_config('app.bypass_rls', 'on', true)`);
+      return fn(tx);
+    }),
+  );
 }
 
 /**

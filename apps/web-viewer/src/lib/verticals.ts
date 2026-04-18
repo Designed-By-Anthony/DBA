@@ -78,7 +78,7 @@ function buildSidebar(overrides: Partial<Record<string, { label: string; icon: L
     { label: "Price Book", href: "/admin/pricebook", icon: ShoppingBag },
     { label: "Automations", href: "/admin/automations", icon: Zap },
     { label: "Inbox", href: "/admin/inbox", icon: Inbox },
-    { label: "Calendar", href: "/admin/calendar", icon: ShoppingBag }, // Re-using an icon temporarily
+    { label: "Calendar", href: "/admin/calendar", icon: CalendarDays },
     { label: "Business Rules", href: "/admin/settings/business", icon: Settings },
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ];

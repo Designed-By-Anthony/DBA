@@ -1,5 +1,6 @@
 "use server";
 
+import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
 import {
   getDb,

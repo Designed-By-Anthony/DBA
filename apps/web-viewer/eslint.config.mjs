@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "zapier-platform-example-app-github/**",
   ]),
   {
     files: ["scripts/**/*.js"],

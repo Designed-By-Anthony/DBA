@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 type Props = {
@@ -11,9 +12,19 @@ type Props = {
 };
 
 export function RevenueChart({ data }: Props) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setReady(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   return (
-    <div className="h-64 w-full">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+    <div className="h-64 min-h-64 w-full min-w-[1px]">
+      {!ready ? (
+        <div className="h-full w-full rounded-lg border border-glass-border bg-surface-2/40" />
+      ) : (
+      <ResponsiveContainer width="100%" height={256} minWidth={1}>
         <AreaChart
           data={data}
           margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -71,6 +82,7 @@ export function RevenueChart({ data }: Props) {
           />
         </AreaChart>
       </ResponsiveContainer>
+      )}
     </div>
   );
 }

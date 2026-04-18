@@ -1,6 +1,7 @@
 "use server";
 
 import type { PlanSuite } from "@dba/lead-form-contract";
+import "@dba/env/web-viewer-aliases";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getDb, withTenantContext, tenants, leads } from "@dba/database";
 import { eq, count } from "drizzle-orm";

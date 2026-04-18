@@ -15,6 +15,7 @@ import type {
   AutomationAction,
 } from "@/lib/types";
 
+
 /**
  * Maps database AutomationRow to API AutomationRule type
  */

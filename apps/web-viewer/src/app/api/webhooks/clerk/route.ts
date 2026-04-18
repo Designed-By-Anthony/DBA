@@ -1,3 +1,4 @@
+import "@dba/env/web-viewer-aliases";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import type { OrganizationJSON } from "@clerk/backend";
 import type { NextRequest } from "next/server";

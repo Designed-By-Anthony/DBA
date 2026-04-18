@@ -81,7 +81,10 @@ export async function insertSqlLead(input: SqlLeadInsertInput): Promise<SqlLeadI
     return { prospectId: existing[0].prospectId, isNew: false };
   }
 
-  const prospectId = await generateClientId(getIdSource(input.company, input.name));
+  const prospectId = await generateClientId(
+    getIdSource(input.company, input.name),
+    agencyId,
+  );
 
   await db.insert(leads).values({
     tenantId: agencyId,

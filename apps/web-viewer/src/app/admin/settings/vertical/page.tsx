@@ -2,13 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { getTenantSettings, updateTenantSettings } from "../actions";
-import { Hammer, Building2 } from "lucide-react";
-
 type VerticalOption = {
   id: "agency" | "service_pro";
   name: string;
   description: string;
-  icon: typeof Building2;
   emoji: string;
 };
 
@@ -17,14 +14,12 @@ const verticals: VerticalOption[] = [
     id: "agency",
     name: "Agency / Creative",
     description: "Web design, marketing, consulting, photography. Pipeline: Lead → Contacted → Proposal → Development → Launched",
-    icon: Building2,
     emoji: "🎯",
   },
   {
     id: "service_pro",
     name: "Service Professional",
     description: "HVAC, plumbing, electrical, landscaping, cleaning. Pipeline: Request → Estimate → Scheduled → In Progress → Completed",
-    icon: Hammer,
     emoji: "🏗️",
   },
 ];

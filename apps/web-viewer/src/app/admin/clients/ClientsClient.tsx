@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useOrganizationList } from "@clerk/nextjs";
+import { toast } from "sonner";
 import { Building2, Plus, ArrowRight, X, Palette, ExternalLink, Check } from "lucide-react";
 import { createClientOrg, updateOrgBranding } from "./actions";
 import { getAllVerticals, getVerticalConfig, type VerticalId } from "@/lib/verticals";
@@ -39,6 +40,8 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
   const [brandColor, setBrandColor] = useState("#2563eb");
   const [brandInitial, setBrandInitial] = useState("");
   const [saving, setSaving] = useState(false);
+  const [previewEmail, setPreviewEmail] = useState("");
+  const [previewLinkLoading, setPreviewLinkLoading] = useState(false);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +83,37 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
     setBrandName(b?.brandName || org.name);
     setBrandColor(b?.brandColor || "#2563eb");
     setBrandInitial(b?.brandInitial || org.name.charAt(0).toUpperCase());
+    setPreviewEmail("");
+    setPreviewLinkLoading(false);
+  };
+
+  const sendPreviewMagicLink = async () => {
+    if (!editingOrg) return;
+    const email = previewEmail.trim().toLowerCase();
+    if (!email) {
+      toast.error("Enter an email to send a login link.");
+      return;
+    }
+    setPreviewLinkLoading(true);
+    try {
+      const res = await fetch("/api/portal/magic-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, orgId: editingOrg.id }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(data.error || "Could not send login link.");
+        return;
+      }
+      toast.success(
+        "If that email belongs to a client in this org, we sent a login link.",
+      );
+    } catch {
+      toast.error("Network error. Try again.");
+    } finally {
+      setPreviewLinkLoading(false);
+    }
   };
 
   const handleSaveBranding = async () => {
@@ -232,6 +266,7 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="glass-card p-6 w-full max-w-md animate-scale-in relative">
             <button
+              type="button"
               onClick={() => setEditingOrg(null)}
               className="absolute top-4 right-4 text-text-gray hover:text-white transition-colors"
             >
@@ -261,13 +296,31 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
                 </div>
                 <p className="text-lg font-bold text-white">{brandName || "Client Portal"}</p>
                 <p className="text-xs text-text-muted">Enter your email to access your portal</p>
-                <div className="w-full bg-(--color-surface-0) border border-glass-border rounded-lg px-3 py-2 text-xs text-text-gray">you@company.com</div>
-                <div 
-                  className="w-full py-2 rounded-lg text-center text-white text-xs font-medium shadow-lg"
+                <label className="sr-only" htmlFor="portal-preview-email">
+                  Client email for test login link
+                </label>
+                <input
+                  id="portal-preview-email"
+                  type="email"
+                  autoComplete="email"
+                  value={previewEmail}
+                  onChange={(e) => setPreviewEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  className="w-full bg-(--color-surface-0) border border-glass-border rounded-lg px-3 py-2 text-xs text-white placeholder:text-text-gray outline-none focus:border-(--color-brand)"
+                />
+                <button
+                  type="button"
+                  disabled={previewLinkLoading}
+                  onClick={() => void sendPreviewMagicLink()}
+                  className="w-full py-2 rounded-lg text-center text-white text-xs font-medium shadow-lg disabled:opacity-50 disabled:pointer-events-none"
                   style={{ background: brandColor }}
                 >
-                  Send Login Link
-                </div>
+                  {previewLinkLoading ? "Sending…" : "Send Login Link"}
+                </button>
+                <p className="text-[10px] text-text-muted text-center leading-snug">
+                  Uses the same flow as the live portal. Only emails that match a
+                  prospect in this organization receive a link.
+                </p>
               </div>
             </div>
 
