@@ -1,5 +1,9 @@
 # Migration Status Report
 
+## Default Clerk org id for Calendly + lead intake (2026-04-18)
+
+- **`LEAD_WEBHOOK_DEFAULT_AGENCY_ID`** example value set to `org_3CWuIWj5aFCaZXr8dUEpwtGSiCW` (Designed by Anthony org). **`/api/webhooks/calendly`** no longer hardcodes a legacy org id; it uses the same env var as anonymous `/api/lead` routing and returns **503** if unset (fail-closed).
+
 ## HIPAA-oriented security hardening (2026-04-18)
 
 - **Sentry:** Removed hardcoded DSNs from Agency OS Sentry configs; init only from `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN`. Default **`sendDefaultPii: false`**; Session Replay opt-in via **`NEXT_PUBLIC_SENTRY_REPLAY=1`**. Marketing CSP helpers no longer embed a default Sentry DSN; `sync-firebase-csp` skips report-uri when `PUBLIC_SENTRY_DSN` is unset.

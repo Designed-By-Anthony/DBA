@@ -68,6 +68,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
     }
 
+    const defaultAgencyId = process.env.LEAD_WEBHOOK_DEFAULT_AGENCY_ID?.trim();
+    if (!defaultAgencyId) {
+      console.error(
+        '[calendly] LEAD_WEBHOOK_DEFAULT_AGENCY_ID is unset — cannot assign new bookings to a tenant',
+      );
+      return NextResponse.json(
+        { error: 'Server misconfigured: set LEAD_WEBHOOK_DEFAULT_AGENCY_ID to your Clerk org id' },
+        { status: 503 },
+      );
+    }
+
     let prospectId: string | undefined;
 
     await withBypassRls(db, async (tx) => {
@@ -81,8 +92,8 @@ export async function POST(request: NextRequest) {
       let tenantId: string;
 
       if (prospectRows.length === 0) {
-        // Create new lead under master tenant
-        const masterTenantId = 'org_3CKCZdvXprb2QAsroq4oxqH12Rl';
+        // New invitee: attribute to the same default tenant as /api/lead (Clerk org id).
+        const masterTenantId = defaultAgencyId;
         const now = new Date().toISOString();
         const newProspectId = `cal_${Date.now()}`;
 
