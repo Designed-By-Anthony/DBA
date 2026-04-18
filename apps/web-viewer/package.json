@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "dev:test": "NODE_ENV=test next dev -p 3001",
-    "build": "next build",
+    "build": "pnpm run build:lead-widget && next build",
+    "build:lead-widget": "node ./tooling/embed-widget/build-lead-widget.mjs",
     "start": "next start",
     "lint": "eslint",
     "verify:webhook": "node scripts/verify-lead-webhook.mjs",

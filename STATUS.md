@@ -1,5 +1,14 @@
 # Migration Status Report
 
+## Agency OS: embeddable lead widget + Neon-backed skin API (2026-04-18)
+
+- **Static bundle:** `apps/web-viewer/public/widgets/lead-form.js` (built from `widget-src/lead-form.ts` via `pnpm build:lead-widget`, runs before `next build`).
+- **Embed:** `<script src="https://admin…/widgets/lead-form.js?tenant=<clerk_org_id>&sig=<hmac>" async></script>` plus optional `<div id="dba-lead-form"></div>` mount point.
+- **Security:** `sig` = HMAC-SHA256 hex of `v1|${tenantId}` with **`LEAD_EMBED_WIDGET_SECRET`** (server-only). Same secret verifies `GET /api/embed/lead/skin` and `POST /api/embed/lead/submit`.
+- **Skin:** API reads `tenants.brand_color`, `brand_logo_url`, `name` from Neon. **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** + **`TURNSTILE_SECRET_KEY`** enable Turnstile in the widget (prod-aligned with other lead paths).
+- **Helper:** `node apps/web-viewer/tooling/embed-widget/print-embed-widget-signature.mjs org_xxx` prints `sig` + example tag (requires `LEAD_EMBED_WIDGET_SECRET` in env).
+- **Portal branding fix:** `GET /api/portal/branding` now returns `tenant.brandColor` instead of a hardcoded blue.
+
 ## Agency OS: TopBar hydration (React #418) (2026-04-18)
 
 - **`TopBar`:** Greeting line (`Good morning/afternoon/evening` + Clerk name/org) now renders **after mount** via `useLayoutEffect`, so server HTML and first client paint both use an empty subtitle — no timezone or Clerk SSR/client text mismatch. Fixes minified **React error #418** on admin chrome.

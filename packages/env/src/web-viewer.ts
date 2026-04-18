@@ -49,6 +49,8 @@ const webViewerSchema = z
     // Multi-tenant: prefer /api/webhooks/calendly?tenant=<org_id> per Calendly subscription.
     LEAD_WEBHOOK_DEFAULT_AGENCY_ID: z.string().trim().optional(),
     LEAD_WEBHOOK_SECRET: z.string().trim().optional(),
+    /** HMAC secret for embedded `public/widgets/lead-form.js` (?tenant=&sig=). */
+    LEAD_EMBED_WIDGET_SECRET: z.string().trim().optional(),
     LEAD_WEBHOOK_CORS_ORIGINS: z.string().trim().optional(),
 
     // Transactional email.
@@ -69,6 +71,8 @@ const webViewerSchema = z
 
     // Turnstile (anti-bot) — optional; Agency OS degrades to "no verification".
     TURNSTILE_SECRET_KEY: z.string().trim().optional(),
+    /** Site key for Turnstile (browser). Exposed to embed widget skin JSON. */
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().trim().optional(),
 
     // Stripe (Billing module — `planSuite=full`).
     STRIPE_SECRET_KEY: z.string().trim().optional(),

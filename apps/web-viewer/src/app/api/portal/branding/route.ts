@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       brandName: tenant.name || 'Client Portal',
-      brandColor: '#2563eb',
+      brandColor: tenant.brandColor?.trim() || '#2563eb',
       brandInitial: (tenant.name?.trim()?.charAt(0)?.toUpperCase() || 'D'),
       verticalTemplate: resolveUiVerticalTemplateFromTenant(tenant),
       planSuite,

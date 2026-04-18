@@ -36,6 +36,12 @@ Preview builds use `VERCEL_ENV=preview` and skip that check — a green Preview 
 - **`DATABASE_URL`** — Neon connection string (pooled URL for the app; use the direct / unpooled host for `pnpm db:push` / `drizzle-kit` when Neon requires it).
 - **`@dba/database`** — Drizzle + `pg`; `withTenantContext` sets `app.current_tenant_id` for RLS. No Firebase or Google Cloud SQL.
 
+## Embeddable lead widget (third-party sites)
+
+- **Bundle:** `public/widgets/lead-form.js` (source `widget-src/lead-form.ts`, built by `pnpm build:lead-widget` before `next build`).
+- **APIs:** `GET /api/embed/lead/skin`, `POST /api/embed/lead/submit` — require **`LEAD_EMBED_WIDGET_SECRET`** and query/body **`sig`** = HMAC-SHA256 hex of `v1|${clerkOrgId}` (see `tooling/embed-widget/print-embed-widget-signature.mjs`).
+- **Env:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` — optional but recommended for widget Turnstile (same as marketing).
+
 ## Identity: who has a Clerk user id?
 
 - **Agency staff (you / team)** — Sign into **admin** with Clerk (`userId`, `orgId`). RLS and tenant scoping use the active **Clerk organization id** as `tenant_id` / `tenants.clerk_org_id`.
