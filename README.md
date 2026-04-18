@@ -10,18 +10,18 @@ Designed by Anthony — monorepo (Agency OS, Lighthouse, marketing, packages).
 | Agency OS (CRM) | `apps/web-viewer`   | Next.js   | `admin.designedbyanthony.com`, `accounts.…` |
 | Lighthouse      | `apps/lighthouse`   | Next.js   | `lighthouse.designedbyanthony.com`          |
 
-## Host-based routing — `middleware.ts`
+## Host-based routing — Vercel Routing Middleware
 
-The root [`middleware.ts`](./middleware.ts) is a **Vercel Edge Middleware** that reads the `Host` header on the apex deployment and rewrites traffic to the correct upstream Vercel project. This is the "Chameleon" gateway — it keeps the routing rules in TypeScript so we can grow them (A/B, tenant skins, feature flags) without editing `vercel.json`.
+The root [`middleware.ts`](./middleware.ts) is **Vercel Routing Middleware** for the apex Astro project. Current Next.js apps use `proxy.ts`; this root file is different platform middleware that Vercel still expects to be named `middleware.ts`. It reads the `Host` header on the apex deployment and rewrites traffic to the correct upstream Vercel project.
 
 ```
-admin.designedbyanthony.com/*       →  $ADMIN_UPSTREAM_URL/*            (apps/web-viewer)
-accounts.designedbyanthony.com/*    →  $ACCOUNTS_UPSTREAM_URL/accounts/* (apps/web-viewer)
-lighthouse.designedbyanthony.com/*  →  $LIGHTHOUSE_UPSTREAM_URL/*       (apps/lighthouse)
+admin.designedbyanthony.com/*       →  $ADMIN_UPSTREAM_URL/admin/*       (apps/web-viewer)
+accounts.designedbyanthony.com/*    →  $ACCOUNTS_UPSTREAM_URL/portal/*   (apps/web-viewer)
+lighthouse.designedbyanthony.com/*  →  $LIGHTHOUSE_UPSTREAM_URL/*        (apps/lighthouse)
 * (everything else)                 →  apps/marketing (Astro, fallthrough)
 ```
 
-The matcher excludes `_next`, `_vercel`, `/brand`, `/images`, `/fonts`, `/scripts`, `/sitemap*`, and `/robots.txt` so asset requests never get mis-rewritten.
+The matcher only excludes `_vercel`. App subdomain assets like `/_next/static/*`, `/manifest.webmanifest`, `/serwist/*`, and `/brand/*` must pass through the gateway so they resolve from the same upstream project as the HTML.
 
 ### Required env vars on the apex Vercel project
 
@@ -33,11 +33,11 @@ Set these on the Vercel project whose **Root Directory** is the repo root (the a
 | `ACCOUNTS_UPSTREAM_URL`   | `https://agency-os.vercel.app` (reuses web-viewer)        |
 | `LIGHTHOUSE_UPSTREAM_URL` | `https://lighthouse-audit.vercel.app`                     |
 
-If an upstream URL is unset, the middleware falls through to the Astro site instead of serving a broken rewrite.
+If an upstream URL is unset in production, the middleware returns a loud `502` instead of silently serving the Astro site from an app subdomain. Preview/local builds still fall through for easier development.
 
 ### Why not `vercel.json` rewrites?
 
-`vercel.json` rewrites run **before** middleware and are static JSON. Once the rules grew past "swap these paths" (plan-suite gating, tenant skins, feature flags), Edge Middleware became the right place — it's still on the edge network but lets us express the logic in typed TypeScript. The current `vercel.json` intentionally contains only the framework/build/output config so it never conflicts with the middleware.
+`vercel.json` rewrites run **before** middleware and are static JSON. Once the rules grew past "swap these paths" (plan-suite gating, tenant skins, feature flags), Routing Middleware became the right place because it lets us express the logic in typed TypeScript. The current `vercel.json` intentionally contains only the framework/build/output config so it never conflicts with the middleware.
 
 ## Turborepo — root build fans out to all three apps
 

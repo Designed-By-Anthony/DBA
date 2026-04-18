@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { shouldRegisterServiceWorker } from "@/lib/service-worker-host";
 
 export default function NotificationOptIn() {
   const [permission, setPermission] = useState<NotificationPermission>(() => {
@@ -18,6 +19,10 @@ export default function NotificationOptIn() {
   });
 
   const handleEnable = async () => {
+    if (!shouldRegisterServiceWorker() || !("serviceWorker" in navigator)) {
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await Notification.requestPermission();

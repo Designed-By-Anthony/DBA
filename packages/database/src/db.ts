@@ -11,18 +11,18 @@ let _db: Database | null = null;
 let _pool: pg.Pool | null = null;
 
 /**
- * Resolve the SSL config for the Cloud SQL pool.
+ * Resolve the SSL config for the Postgres pool.
  *
  * Priority:
  *   1. Explicit `DATABASE_SSL=true|1` (legacy opt-in).
  *   2. Connection string `sslmode=require` / `sslmode=verify-*` (preferred —
  *      matches the Augusta Success Checklist: "Append ?sslmode=require to your
  *      connection string in Vercel").
- *   3. Production default: SSL on (Vercel ↔ Cloud SQL over the public internet
+ *   3. Production default: SSL on (Vercel ↔ Postgres over the public internet
  *      must be encrypted; see AGENTS.md > Infrastructure Context).
  *
- * `rejectUnauthorized: false` matches Cloud SQL's default public
- * endpoint (certificate not in Node's default CA store). When `sslmode`
+ * `rejectUnauthorized: false` matches hosted Postgres public endpoints where
+ * the CA is not always in Node's default trust store. When `sslmode`
  * is `verify-full` or `verify-ca`, callers MUST also set `PGSSLROOTCERT`
  * so `pg` picks up the CA.
  */
@@ -50,7 +50,7 @@ function resolveSslConfig(url: string): pg.PoolConfig["ssl"] {
     return { rejectUnauthorized: false };
   }
 
-  // Production default — Cloud SQL public IP requires SSL.
+  // Production default — public Postgres endpoints require SSL.
   if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
     return { rejectUnauthorized: false };
   }
@@ -59,10 +59,16 @@ function resolveSslConfig(url: string): pg.PoolConfig["ssl"] {
 }
 
 /**
- * Returns a Drizzle instance when `DATABASE_URL` is set; otherwise `null`.
+ * Returns a Drizzle instance when a Postgres URL is set; otherwise `null`.
+ *
+ * This package intentionally keeps a `pg`-compatible interactive transaction
+ * path because tenant isolation relies on `set_config(..., true)` inside
+ * `withTenantContext`. Neon HTTP is excellent for one-shot queries, but
+ * interactive session/transaction semantics belong on `pg` or the Neon
+ * WebSocket driver.
  */
 export function getDb(): Database | null {
-  const url = process.env.DATABASE_URL?.trim();
+  const url = (process.env.DATABASE_URL ?? process.env.DATABASE_URL_UNPOOLED)?.trim();
   if (!url) return null;
 
   if (!_db) {
@@ -132,7 +138,7 @@ export async function withBypassRls<T>(
 export function getDbForTenant(tenantId: string): Database {
   const db = getDb();
   if (!db) {
-    throw new Error("Database not initialized. DATABASE_URL must be set.");
+    throw new Error("Database not initialized. DATABASE_URL or DATABASE_URL_UNPOOLED must be set.");
   }
   return db;
 }

@@ -17,6 +17,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
         "DATABASE_SSL",
         "NEXT_PUBLIC_APP_URL",
         "NEXTAUTH_SECRET",
@@ -88,7 +89,25 @@
         "PUBLIC_API_URL",
         "PUBLIC_CRM_LEAD_URL",
         "PUBLIC_SENTRY_DSN",
-        "REPORT_PUBLIC_BASE_URL"
+        "REPORT_PUBLIC_BASE_URL",
+        "CRON_SECRET",
+        "EMAIL_LINK_SIGNING_SECRET",
+        "EMAIL_TEST_MODE",
+        "GOOGLE_API_KEY",
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "GOOGLE_CLOUD_LOCATION",
+        "GOOGLE_CLOUD_PROJECT",
+        "LEAD_SEND_SUBMITTER_CONFIRMATION",
+        "MOZ_API_TOKEN",
+        "NEXT_PUBLIC_IS_TEST",
+        "PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "UPSTASH_REDIS_REST_URL",
+        "VAPID_CONTACT_EMAIL",
+        "VAPID_PRIVATE_KEY",
+        "VAPID_PUBLIC_KEY",
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "VERCEL_BRANCH_URL"
       ]
     },
     "lint": {

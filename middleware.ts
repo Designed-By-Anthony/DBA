@@ -1,8 +1,8 @@
 /**
- * Root Vercel Edge Middleware — host-based routing for
+ * Root Vercel Routing Middleware — host-based routing for
  * Designed by Anthony ("Chameleon" multi-app gateway).
  *
- * Vercel runs this file at the edge for every request to the apex
+ * Vercel runs this file before the cache for every request to the apex
  * Vercel project (the Astro marketing deployment). Depending on the
  * Host header we either let the request fall through to the Astro site
  * or rewrite it to the upstream URL of another Vercel project.
@@ -24,9 +24,9 @@
  *   - Keeping the rules in TS also means our type-checker catches
  *     mistakes (undefined env vars, bad URL shapes).
  *
- * Reference: https://vercel.com/docs/functions/edge-middleware
+ * Reference: https://vercel.com/docs/routing-middleware
  */
-import { next, rewrite, type RequestContext } from '@vercel/edge';
+import { next, rewrite } from '@vercel/functions';
 
 const APEX_DOMAIN = 'designedbyanthony.com';
 
@@ -35,12 +35,15 @@ const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
 
 /**
- * Matcher — skip Vercel plumbing and static asset paths so we never
- * rewrite an asset request for the wrong upstream. Everything else goes
- * through host-based routing.
+ * Matcher — run the gateway for all user-facing paths, including static
+ * assets. The app subdomains render HTML from separate Vercel projects,
+ * and that HTML references root-relative files such as `/_next/static/*`,
+ * `/manifest.webmanifest`, `/serwist/*`, and `/brand/*`. If those requests
+ * bypass this gateway they hit the apex Astro project and become cached
+ * 404s, breaking hydration on admin/accounts/lighthouse.
  */
 export const config = {
-  matcher: ['/((?!_vercel|brand/|scripts/|fonts/|images/|assets/|sitemap|robots\\.txt).*)'],
+  matcher: ['/((?!_vercel).*)'],
 };
 
 function hostnameOf(request: Request): string {
@@ -58,6 +61,24 @@ function buildUpstream(
   const base = upstreamBase.replace(/\/$/, '');
   const joinedPath = `${pathPrefix}${pathname}`.replace(/\/{2,}/g, '/');
   return new URL(`${joinedPath}${search}`, base);
+}
+
+function isAppAssetPath(pathname: string): boolean {
+  if (pathname.startsWith('/_next/')) return true;
+  if (pathname.startsWith('/brand/')) return true;
+  if (pathname.startsWith('/icons/')) return true;
+  if (pathname.startsWith('/serwist/')) return true;
+  if (pathname === '/manifest.webmanifest') return true;
+  if (pathname.startsWith('/favicon.')) return true;
+  return /\.[a-z0-9]{2,8}$/i.test(pathname);
+}
+
+function isSharedAppRoute(pathname: string): boolean {
+  return (
+    pathname === '/offline' ||
+    pathname === '/sign-in' ||
+    pathname.startsWith('/sign-in/')
+  );
 }
 
 /**
@@ -99,13 +120,14 @@ function isProduction(): boolean {
 function needsAppPrefix(pathname: string, prefix: string): boolean {
   if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
   if (pathname.startsWith('/api/')) return false;
-  if (pathname.startsWith('/_next/')) return false;
-  if (pathname === '/manifest.webmanifest') return false;
-  if (pathname.startsWith('/favicon.')) return false;
+  if (isSharedAppRoute(pathname)) return false;
+  if (isAppAssetPath(pathname)) return false;
+  // Sentry tunnel MUST hit the root of the upstream Next.js app
+  if (pathname === '/monitoring') return false;
   return true;
 }
 
-export default function middleware(request: Request, _ctx: RequestContext) {
+export default function middleware(request: Request) {
   const host = hostnameOf(request);
   const url = new URL(request.url);
   const { pathname, search } = url;
@@ -149,11 +171,13 @@ export default function middleware(request: Request, _ctx: RequestContext) {
     "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
     "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
     "worker-src 'self' blob:; " +
-    "frame-ancestors 'none';"
+    "frame-ancestors 'none'; " +
+    "require-trusted-types-for 'script';"
   );
   res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.headers.set('X-Content-Type-Options', 'nosniff');
   res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()');
   

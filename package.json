@@ -39,8 +39,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "@vercel/edge": "^1.2.1",
     "turbo": "^2.9.6",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@vercel/functions": "^3.4.3"
   }
 }

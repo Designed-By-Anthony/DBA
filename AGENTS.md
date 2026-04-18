@@ -51,7 +51,7 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 
 ```
 /                    # apex Vercel project (Astro marketing) + root middleware
-├── middleware.ts    # Vercel Edge "Chameleon" host-based router (see README.md)
+├── middleware.ts    # Vercel Routing Middleware "Chameleon" host-based router (see README.md)
 ├── turbo.json       # pipeline + globalEnv/globalDependencies
 ├── apps/
 │   ├── marketing/   # Astro v6 — designedbyanthony.com (apex + www)
@@ -93,19 +93,19 @@ pnpm test:e2e:web
 
 Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter agency-os run lint`). Workspace names live in each `package.json` (`agency-os`, `lighthouse-audit`, `designed-by-anthony`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
 
-### Host-based routing — `middleware.ts`
+### Host-based routing — Vercel Routing Middleware
 
-Root `middleware.ts` is a Vercel Edge Middleware that runs on the apex (marketing) Vercel project and rewrites by `Host`:
+Root `middleware.ts` is Vercel Routing Middleware that runs on the apex (marketing) Vercel project and rewrites by `Host`. Do not rename this root file to `proxy.ts`; `proxy.ts` is the Next.js 16 convention used inside Next apps, while this root file belongs to the non-Next apex gateway.
 
 - `admin.designedbyanthony.com/*` → `$ADMIN_UPSTREAM_URL/*` (web-viewer)
-- `accounts.designedbyanthony.com/*` → `$ACCOUNTS_UPSTREAM_URL/accounts/*` (web-viewer)
+- `accounts.designedbyanthony.com/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (web-viewer)
 - `lighthouse.designedbyanthony.com/*` → `$LIGHTHOUSE_UPSTREAM_URL/*` (lighthouse)
 - everything else → Astro marketing (fallthrough via `next()`)
 
 Notes:
 
-- The matcher excludes `_next`, `_vercel`, `/brand`, `/images`, `/fonts`, `/scripts`, `/sitemap*`, `/assets`, and `/robots.txt` so static assets are never mis-rewritten.
-- If an upstream env var is unset, the middleware falls through instead of returning a broken rewrite — keep that behavior.
+- The matcher only excludes `_vercel`; app subdomain assets like `/_next/static/*`, `/manifest.webmanifest`, `/serwist/*`, and `/brand/*` must pass through the gateway so they resolve from the correct upstream project.
+- If an upstream env var is unset in production, the middleware returns a visible `502`; preview/local builds fall through for easier development.
 - `vercel.json` intentionally only holds framework/build/output config; do **not** add `rewrites` there (they run before middleware and conflict with the Chameleon rules).
 - `turbo.json` → `globalDependencies` includes `middleware.ts`, so changes invalidate every app's build cache.
 

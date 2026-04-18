@@ -18,7 +18,7 @@ This document is the source of truth for how public leads reach Cloud SQL (`lead
 
 ## Required configuration (production)
 
-1. **Vercel (web-viewer):** `DATABASE_URL`, `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` = your Clerk **org id** (same as `tenants.clerk_org_id`), `TURNSTILE_SECRET_KEY`.
+1. **Vercel (web-viewer):** `DATABASE_URL` or `DATABASE_URL_UNPOOLED`, `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` = your Clerk **org id** (same as `tenants.clerk_org_id`), `TURNSTILE_SECRET_KEY`.
 2. **Vercel (marketing build):** `PUBLIC_TENANT_ID` = same Clerk org id (so `X-Tenant-Id` matches a row in `tenants`), or rely on server-side `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` for **`/api/lead`** only (ingest **still** needs header or body tenant unless you use the fallback below).
 3. **Optional single-tenant shortcut:** `LEAD_WEBHOOK_SQL_SINGLE_TENANT_FALLBACK=true` on web-viewer uses the **first** row in Postgres `tenants` when env/Firestore legacy lookup fails. **Do not** enable on multi-tenant SaaS.
 

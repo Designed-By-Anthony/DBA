@@ -1,5 +1,30 @@
 # Migration Status Report
 
+## Marketing footer badge stability (2026-04-18)
+
+- Replaced the remote Locally Owned and Astro footer badge URLs with local `/images/*` assets so the current CSP cannot block them and the footer no longer renders broken-image placeholders.
+- Updated the Locally Owned footer link to reserve stable space, render the local badge at a readable size, and include visible text instead of relying on image alt text.
+- Verified the marketing build and captured a focused footer screenshot from the local Astro preview; the footer now renders without broken badges.
+
+## Framework docs audit and routing middleware refresh (2026-04-18)
+
+- **Docs checked:** confirmed current Next.js 16 `proxy.ts` guidance, Vercel Routing Middleware `middleware.ts` guidance for non-Next projects, Astro static/Vercel deployment guidance, and Neon serverless driver guidance.
+- **Gateway dependency refreshed:** root Chameleon gateway now imports Vercel Routing Middleware helpers from `@vercel/functions` instead of the older `@vercel/edge` package, with `runtime: 'edge'` declared explicitly.
+- **Proxy/middleware split documented:** README and AGENTS now call out that `apps/web-viewer/src/proxy.ts` is the Next.js 16 proxy, while root `middleware.ts` remains the Vercel platform gateway for the Astro apex project.
+- **Neon driver decision documented:** `@dba/database` keeps the `pg`-compatible transaction path because tenant isolation depends on interactive transactions with `set_config`; Neon HTTP remains a one-shot-query fit, not a drop-in for `withTenantContext`.
+
+## Agency OS service worker host gate (2026-04-18)
+
+- **Sentry issue 7422240265 addressed:** Agency OS no longer attempts to register `/serwist/sw.js` on random Vercel deployment URLs such as `dba-agency-*.vercel.app`, where deployment protection can return 401 for the worker script.
+- **Canonical host allowlist added:** service worker registration is limited to `admin.designedbyanthony.com`, `accounts.designedbyanthony.com`, `dba-agency-os.vercel.app`, and local dev hosts. Portal push opt-in uses the same guard before waiting on `navigator.serviceWorker.ready`.
+- **Vercel Postgres env fallback added:** Agency OS production builds and runtime database connections can now use `DATABASE_URL_UNPOOLED` when `DATABASE_URL` is absent, matching the current Vercel project env shape.
+
+## Admin portal custom-domain asset routing (2026-04-18)
+
+- **Root cause confirmed:** `https://dba-agency-os.vercel.app/manifest.webmanifest` and the reported Turbopack chunk return 200, while the same paths through `https://admin.designedbyanthony.com` return cached 404s from the apex gateway path.
+- **Gateway matcher fixed:** root `middleware.ts` now runs for all non-`_vercel` paths so app subdomain assets such as `/_next/static/*`, `/manifest.webmanifest`, `/serwist/*`, `/brand/*`, icons, CSS, and JS are rewritten to the correct upstream project instead of falling through to the apex Astro deployment. Static asset paths and shared app routes such as `/sign-in` and `/offline` remain unprefixed while app pages still receive `/admin` or `/portal`.
+- **Docs corrected:** `README.md` and `AGENTS.md` now document that `admin.*` maps to `/admin`, `accounts.*` maps to `/portal`, and static app assets intentionally pass through the Chameleon gateway.
+
 ## TypeScript Strict Type Hardening & Neon Database Stabilization (2026-04-18)
 
 - **Completed Build Error Remediation:** Successfully resolved the remaining 15 build-time TypeScript errors blocking the Vercel production deployment.
@@ -7,7 +32,6 @@
 - **Database Schema Adherence:** Reconciled property mismatches in the Portal Sessions and Tickets API where legacy properties (`leadEmail`, `leadName`, `leadId`) were invoked incorrectly instead of the expected `prospectEmail`, `prospectName`, `prospectId` and `subject` properties in the Neon tables.
 - **Mock Fallback Setup:** Configured safe fallback `stub` implementation for `sendProspectEmailFromTemplate` and `saveQuoteAction` to prevent breaking imports of absent Firestore logic.
 - **Build Verified:** `pnpm build` was run from the root of the project with a successful exit code 0. No typescript errors remain (`npx tsc --noEmit` exited clean).
-
 ## Chameleon gateway path-prefix fix (2026-04-17)
 
 Two subdomain regressions fixed in the apex gateway + web-viewer proxy:

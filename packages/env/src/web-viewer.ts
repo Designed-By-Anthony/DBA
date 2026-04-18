@@ -11,7 +11,8 @@ import {
  *
  * Required for the admin surface to function:
  *   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` (auth).
- *   - `DATABASE_URL` (Drizzle / Cloud SQL) — tenant-scoped queries depend on it.
+ *   - `DATABASE_URL` or `DATABASE_URL_UNPOOLED` (Drizzle / Postgres) —
+ *     tenant-scoped queries depend on it.
  *
  * Everything else is optional at build time but validated so that a
  * misconfigured prod deploy surfaces during build instead of producing
@@ -28,8 +29,9 @@ const webViewerSchema = z
     CLERK_SECRET_KEY: z.string().trim().optional(),
     CLERK_WEBHOOK_SIGNING_SECRET: z.string().trim().optional(),
 
-    // Cloud SQL — required in production; optional in dev so devs can boot without a DB.
+    // Postgres — required in production; optional in dev so devs can boot without a DB.
     DATABASE_URL: optionalPostgresUrl,
+    DATABASE_URL_UNPOOLED: optionalPostgresUrl,
     DATABASE_SSL: booleanFromString,
 
     // Tenant guardrail — the default agency for unsigned lead intake. When unset
@@ -65,12 +67,12 @@ const webViewerSchema = z
     // stay bootable without the full secret bundle.
     if (env.VERCEL_ENV !== "production") return;
 
-    if (!env.DATABASE_URL) {
+    if (!env.DATABASE_URL && !env.DATABASE_URL_UNPOOLED) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["DATABASE_URL"],
         message:
-          "DATABASE_URL is required in production (Postgres 18 — see AGENTS.md > Infrastructure Context).",
+          "DATABASE_URL or DATABASE_URL_UNPOOLED is required in production (Postgres 18 — see AGENTS.md > Infrastructure Context).",
       });
     }
     if (!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {

@@ -141,9 +141,14 @@ async function executeRuleAction(
       }
 
       case "create_task" as any: {
-        // Not yet implemented - just log
         const title = String(action.payload?.title || "System Task");
-        console.log(`[Automations] Create task not yet implemented: ${title}`);
+        await logAutomationActivity(
+          db,
+          agencyId,
+          prospectId,
+          ruleName,
+          `Skipped task creation: ${title}`
+        );
         break;
       }
 

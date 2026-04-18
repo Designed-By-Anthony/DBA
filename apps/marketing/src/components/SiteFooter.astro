@@ -76,7 +76,8 @@ import iconLogo from '../assets/IconLogo.png';
     </div>
 
     <a href="https://locallyownedandoperated.org/" target="_blank" rel="nofollow noopener noreferrer" class="footer-badge-link" aria-label="Locally Owned and Operated (opens in new window)">
-      <img src="https://american-operator-assets-public.s3.us-east-1.amazonaws.com/Badge.png" width="64" height="64" alt="Locally Owned" loading="lazy" />
+      <img src="/images/local-owned-badge.png" width="88" height="100" alt="" loading="lazy" />
+      <span>Locally Owned</span>
     </a>
 
     <div class="footer-bottom">
@@ -92,7 +93,7 @@ import iconLogo from '../assets/IconLogo.png';
       </button>
       <span class="footer-sep">·</span>
       <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="astro-badge" aria-label="Built with Astro (opens in new window)">
-        <img src="https://astro.badg.es/v2/built-with-astro/small.svg" alt="Built with Astro" width="100" height="16" loading="lazy" />
+        <img src="/images/built-with-astro.svg" alt="Built with Astro" width="100" height="16" loading="lazy" />
       </a>
     </div>
   </div>
@@ -196,6 +197,20 @@ import iconLogo from '../assets/IconLogo.png';
   .footer-badge-link {
     flex-shrink: 0;
     display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 116px;
+    min-height: 116px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
     transition: opacity 0.3s ease;
   }
 
@@ -204,9 +219,10 @@ import iconLogo from '../assets/IconLogo.png';
   }
 
   .footer-badge-link img {
-    width: 56px;
-    height: auto;
+    width: 76px;
+    height: 86px;
     display: block;
+    object-fit: contain;
   }
 
   .footer-bottom {
@@ -270,8 +286,17 @@ import iconLogo from '../assets/IconLogo.png';
   .astro-badge {
     opacity: 0.7;
     transition: opacity 0.3s ease;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    min-width: 100px;
+    min-height: 16px;
     line-height: 0;
+  }
+
+  .astro-badge img {
+    display: block;
+    width: 100px;
+    height: 16px;
   }
 
   .astro-badge:hover {
