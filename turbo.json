@@ -14,7 +14,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", ".vercel/output/**"],
       "env": [
         "DATABASE_URL",
         "DATABASE_URL_UNPOOLED",

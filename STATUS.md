@@ -1,9 +1,11 @@
 # Migration Status Report
 
-## Apex marketing 404 on Vercel (2026-04-18) — fixed
+## Apex marketing 404 on Vercel (2026-04-18) — recovered
 
-- **Cause:** Root `vercel.json` used `outputDirectory: dist` and copied `apps/marketing/dist` there, but `@astrojs/vercel` puts prerendered HTML under **`dist/client/`** (no `dist/index.html`). Static hosting looked for `index.html` at the wrong level → **404 on `/`**.
-- **Fix:** Point `outputDirectory` to **`apps/marketing/.vercel/output`** (Vercel Build Output API from the adapter) and drop the manual `cp` step. `buildCommand` remains `turbo run build --filter=designed-by-anthony`.
+- **Live recovery:** Rolled the apex `dbastudio-315` project back to deployment `dpl_FdQkCXMwhTE3CTeWui1a3K1MrkVx`; `www.designedbyanthony.com`, `/brand/logo.png`, and `/brand/mark.webp` returned 200 after rollback.
+- **Cause:** Commit `1aa5b4e` pointed `outputDirectory` at `apps/marketing/.vercel/output`. That folder is a Vercel Build Output API bundle, not a static web root; the actual HTML lives under `static/index.html`, so Vercel served `/` as 404.
+- **Git deploy fix:** Keep the adapter output as Build Output API by copying `apps/marketing/.vercel/output` to root `.vercel/output` after the marketing build, clear `outputDirectory`, and include `.vercel/output/**` in Turbo outputs so cached builds restore the adapter bundle.
+- **Prebuilt warning:** A manual `vercel deploy --prebuilt` of only `.vercel/output` omits the root gateway `middleware.ts` and breaks admin/accounts routing. Use the normal Git/cloud build path for this project unless middleware packaging is explicitly added to the prebuilt bundle.
 
 ## Agency OS: embeddable lead widget + Neon-backed skin API (2026-04-18)
 
