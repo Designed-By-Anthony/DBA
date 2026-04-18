@@ -84,7 +84,7 @@ export async function generateContract(params: {
 
   if (!targetFolderId) {
     throw new Error(
-      'GOOGLE_DRIVE_CONTRACTS_FOLDER_ID not set. Create a "Contracts" folder in Google Drive, share it with firebase-adminsdk-fbsvc@dba-website-prod.iam.gserviceaccount.com as Editor, then add the folder ID to .env.local'
+      'GOOGLE_DRIVE_CONTRACTS_FOLDER_ID not set. Create a "Contracts" folder in Google Drive, share it with your Google Workspace service account (see GOOGLE_SERVICE_ACCOUNT_EMAIL) as Editor, then add the folder ID to .env.local'
     );
   }
 

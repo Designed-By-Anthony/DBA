@@ -1,5 +1,20 @@
 # Migration Status Report
 
+## Lighthouse: Trusted Types + Vercel Analytics CSP (2026-04-18)
+
+- **Sentry 7423224269:** Browsers enforcing Trusted Types blocked React `innerHTML` during hydration. Added `public/trusted-types-bootstrap.js` + `beforeInteractive` script in `layout.tsx` (same pattern as marketing Layout). Extended CSP `connect-src` / `script-src` for `va.vercel-scripts.com` and `vitals.vercel-insights.com` (Analytics / Speed Insights).
+
+## Marketing + Lighthouse env audit (2026-04-18)
+
+- **Build / typecheck:** `pnpm --filter designed-by-anthony exec astro check` and `pnpm --filter lighthouse-audit build` pass from root.
+- **Docs:** `apps/marketing/AGENTS.md` and `apps/lighthouse/AGENTS.md` now document local env file placement (`apps/marketing/.env`, `apps/lighthouse/.env.local`), Vercel three-project split vs bleed keys, and split between Agency OS (Workspace/Docs/Drive for CRM) vs Lighthouse (PageSpeed, Places, Gemini, optional Sheets/Drive for audit pipeline).
+
+## Agency OS audit: smoke E2E + inbox no-DB (2026-04-18)
+
+- **Playwright:** Documented need for `pnpm exec playwright install` (Chromium) before browser E2E; smoke tests updated to use role-based locators (strict mode) and **Omnichannel Inbox** heading.
+- **`getInboxStream`:** When `DATABASE_URL` is unset, returns `[]` instead of throwing so `/admin/inbox` shell renders in keyless/dev (aligned with clients list tolerating missing DB).
+- **Copy:** Google Drive contracts error no longer references legacy Firebase service account email.
+
 ## Dedicated pricing page + CRM list tiers (2026-04-18)
 
 - **`/pricing`:** New marketing page with website tiers (founding / standard / enterprise), **Agency OS Capture $69/mo** and **Suite $179/mo** list prices, **Growth Plan $149/mo** bundle callout, GBP program **$299/mo**, FAQ + `OfferCatalog` JSON-LD (`buildPricingOfferCatalogSchema`).

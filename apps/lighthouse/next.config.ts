@@ -30,10 +30,10 @@ const nextConfig: NextConfig = {
               `frame-ancestors ${frameAncestors}; ` +
               "base-uri 'self'; " +
               "object-src 'none'; " +
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://va.vercel-scripts.com; " +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob: https://images.unsplash.com; " +
-              "connect-src 'self' https://*.designedbyanthony.com; " +
+              "connect-src 'self' https://*.designedbyanthony.com https://vitals.vercel-insights.com https://va.vercel-scripts.com; " +
               "frame-src 'self' https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
               "worker-src 'self' blob:;",
           },

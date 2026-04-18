@@ -81,3 +81,15 @@ GitHub Actions **CI** workflow runs `astro check`, `npm run test:api`, then **Pl
 - `PUBLIC_API_URL` — optional; overrides the external Lighthouse audit API URL.
 - `BASE_URL` — for Playwright; defaults to `https://designedbyanthony.com`.
 - `SPOTLIGHT` — set to `1` to load **@spotlightjs/astro** during `astro dev`. Default is **off** so the dev toolbar does not run Spotlight’s a11y checks (they can crash on `role="status"` and break **Cloudflare Turnstile** with error **110200** on `/free-seo-audit` and `/contact`). Use **`npm run dev:spotlight`** when you want Sentry Spotlight locally.
+
+### Where to put secrets locally (marketing)
+
+- **Primary file:** `apps/marketing/.env` (git-ignored). Copy from `apps/marketing/.env.example`.
+- **Optional monorepo convenience:** root `.env` is also fine for local Turbo runs; Astro still reads `process.env` at build time. The exhaustive cross-app list lives in **root** `.env.example`.
+- **Schema / bleed rules:** `packages/env/src/marketing.ts` (`validateMarketingEnv` in `astro.config.mjs`). On Vercel, if `ADMIN_UPSTREAM_URL` is set (three-project split) or `MARKETING_STRICT_ENV_BLEED=1`, the marketing project **must not** define Agency OS / Lighthouse secrets listed under **“Remove from marketing”** below.
+
+**Belongs on the marketing Vercel project (apex Astro):** `PUBLIC_*` URLs (`PUBLIC_CRM_LEAD_URL`, `PUBLIC_INGEST_URL` / `PUBLIC_TENANT_ID` if you use v1 ingest, `PUBLIC_API_URL` for Lighthouse UI), `PUBLIC_TURNSTILE_SITE_KEY`, `PUBLIC_SENTRY_DSN`, IndexNow (`INDEXNOW_*`), gateway upstreams (`ADMIN_UPSTREAM_URL`, `ACCOUNTS_UPSTREAM_URL`, `LIGHTHOUSE_UPSTREAM_URL`), optional `SENTRY_AUTH_TOKEN` for source maps. No database or Clerk.
+
+**Remove from marketing (pull into Agency OS or Lighthouse only):** `CLERK_SECRET_KEY`, `DATABASE_URL`, `STRIPE_*`, `LEAD_WEBHOOK_SECRET`, `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` — these trigger strict env-bleed failure when the three-app split is active.
+
+**Google Workspace:** Marketing does **not** host Workspace credentials. Docs/Drive/OAuth for contracts and client workflows stay on **Agency OS** (`apps/web-viewer/.env.local` — see `GOOGLE_*` / service account vars there). Lighthouse holds **audit** APIs (PageSpeed, Places, Gemini) in its own env file.

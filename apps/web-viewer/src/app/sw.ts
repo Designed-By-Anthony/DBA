@@ -22,6 +22,10 @@ const clerkCdnBypass: RuntimeCaching[] = [
     matcher: /^https:\/\/[^/]+\.clerk\.accounts\.dev\//i,
     handler: new NetworkOnly(),
   },
+  {
+    matcher: /^https:\/\/img\.clerk\.com\//i,
+    handler: new NetworkOnly(),
+  },
   // Same-origin proxy for clerk-js when using `proxyUrl=/clerk-fapi` + CLERK_FAPI_UPSTREAM
   {
     matcher: /^https?:\/\/[^/]+\/clerk-fapi\//i,

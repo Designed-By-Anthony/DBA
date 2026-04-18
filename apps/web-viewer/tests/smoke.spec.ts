@@ -17,19 +17,25 @@ test.describe('🧯 Smoke Tests (Basic Sanity)', () => {
   test('My Clients page renders without 500 error', async ({ page }) => {
     const response = await gotoPage(page, '/admin/clients');
     expect(response?.status()).not.toBe(500);
-    await expect(page.getByText('My Clients')).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole('heading', { name: 'My Clients' })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('Inbox page renders without 500 error', async ({ page }) => {
     const response = await gotoPage(page, '/admin/inbox');
     expect(response?.status()).not.toBe(500);
-    await expect(page.getByText(/unified inbox/i)).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole('heading', { name: /Omnichannel Inbox/i })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('Email History page renders without 500 error', async ({ page }) => {
     const response = await gotoPage(page, '/admin/email/history');
     expect(response?.status()).not.toBe(500);
-    await expect(page.getByText(/email history/i)).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole('heading', { name: /Email History/i })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('Branding API responds with 200', async ({ request }) => {

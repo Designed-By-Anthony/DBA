@@ -70,7 +70,7 @@ export async function getInboxStream(): Promise<InboxItem[]> {
   const db = getDb();
 
   if (!db) {
-    throw new Error("Database not configured");
+    return [];
   }
 
   try {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { Inter, Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -57,6 +58,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${outfit.variable} font-sans`}>
+        {/**
+         * Trusted Types: register a permissive default policy before React hydrates.
+         * Some browsers / org policies enforce require-trusted-types-for; without this,
+         * React’s innerHTML updates throw (Sentry #7423224269).
+         */}
+        <Script
+          id="trusted-types-bootstrap"
+          src="/trusted-types-bootstrap.js"
+          strategy="beforeInteractive"
+        />
         <header className="w-full border-b border-white/5 bg-[rgba(11,18,32,0.6)] backdrop-blur-md">
           <div className="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
             <Link
