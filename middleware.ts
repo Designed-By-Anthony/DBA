@@ -40,7 +40,7 @@ const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
  * through host-based routing.
  */
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|_vercel|favicon\\.ico|brand/|scripts/|fonts/|images/|assets/|sitemap|robots\\.txt).*)'],
+  matcher: ['/((?!_vercel|brand/|scripts/|fonts/|images/|assets/|sitemap|robots\\.txt).*)'],
 };
 
 function hostnameOf(request: Request): string {
@@ -99,6 +99,9 @@ function isProduction(): boolean {
 function needsAppPrefix(pathname: string, prefix: string): boolean {
   if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
   if (pathname.startsWith('/api/')) return false;
+  if (pathname.startsWith('/_next/')) return false;
+  if (pathname === '/manifest.webmanifest') return false;
+  if (pathname.startsWith('/favicon.')) return false;
   return true;
 }
 
@@ -140,10 +143,10 @@ export default function middleware(request: Request, _ctx: RequestContext) {
     "default-src 'self'; " +
     "base-uri 'self'; " +
     "object-src 'none'; " +
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com; " +
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://www.googletagmanager.com https://vercel.live; " +
     "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https://images.unsplash.com; " +
-    "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com; " +
+    "img-src 'self' data: blob: https://images.unsplash.com https://american-operator-assets-public.s3.us-east-1.amazonaws.com https://astro.badg.es; " +
+    "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
     "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
     "worker-src 'self' blob:; " +
     "frame-ancestors 'none';"
