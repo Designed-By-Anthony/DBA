@@ -42,8 +42,8 @@ const integrations = [
       : {}),
   }),
   sentry({
-    org: 'designed-by-anthony',
-    project: 'javascript-astro',
+    org: process.env.SENTRY_ORG ?? 'designed-by-anthony',
+    project: process.env.SENTRY_PROJECT ?? 'marketing',
     authToken: process.env.SENTRY_AUTH_TOKEN,
     // Avoid failing local/CI builds when the token is not set; enable uploads where SENTRY_AUTH_TOKEN is present.
     sourcemaps: {
@@ -52,6 +52,9 @@ const integrations = [
     /** Smaller client bundle; drops Browser Tracing + “sentry-tracing-init” user timing / long tasks. */
     bundleSizeOptimizations: {
       excludeTracing: true,
+    },
+    errorHandler: (err) => {
+      console.warn('[Sentry build plugin]', err.message);
     },
   }),
 ];

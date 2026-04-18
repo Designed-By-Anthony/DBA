@@ -61,7 +61,7 @@ const nextConfig: NextConfig = {
 export default withSentryConfig(nextConfig, {
   // Wizard defaults — override via SENTRY_ORG / SENTRY_PROJECT in CI or .env
   org: process.env.SENTRY_ORG ?? "designed-by-anthony",
-  project: process.env.SENTRY_PROJECT ?? "javascript-nextjs",
+  project: process.env.SENTRY_PROJECT ?? "lighthouse-audit",
 
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
