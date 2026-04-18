@@ -64,6 +64,8 @@ export interface Prospect {
   contractDocUrl?: string | null;
   driveFolderUrl?: string | null;
   stripeCustomerId?: string | null;
+  /** Latest Stripe subscription id (retainer checkout) — tenant-scoped via lead row. */
+  stripeSubscriptionId?: string | null;
   portalUserId?: string | null;
   onboarding?: OnboardingChecklist;
   pricingTier?: PricingTier | null;

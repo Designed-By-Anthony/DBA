@@ -175,6 +175,7 @@ function leadRowToProspect(row: LeadRow): Prospect {
     contractSigned: row.contractSigned || false,
     contractStatus: (row.contractStatus as Prospect["contractStatus"]) || undefined,
     stripeCustomerId: row.stripeCustomerId || undefined,
+    stripeSubscriptionId: row.stripeSubscriptionId || undefined,
     pricingTier: (row.pricingTier as Prospect["pricingTier"]) || undefined,
     projectNotes: row.projectNotes || undefined,
     fcmToken: row.fcmToken || undefined,
@@ -351,6 +352,8 @@ export async function updateProspect(
     if (fields.contractSigned !== undefined) payload.contractSigned = fields.contractSigned;
     if (fields.contractStatus !== undefined) payload.contractStatus = fields.contractStatus || null;
     if (fields.stripeCustomerId !== undefined) payload.stripeCustomerId = fields.stripeCustomerId || null;
+    if (fields.stripeSubscriptionId !== undefined)
+      payload.stripeSubscriptionId = fields.stripeSubscriptionId || null;
     if (fields.pricingTier !== undefined) payload.pricingTier = fields.pricingTier || null;
     if (fields.projectNotes !== undefined) payload.projectNotes = fields.projectNotes || null;
     if (fields.fcmToken !== undefined) payload.fcmToken = fields.fcmToken || null;
@@ -1193,6 +1196,7 @@ export async function createPaymentLinkAction(params: {
 
     const { createPaymentLink } = await import("@/lib/stripe");
     const result = await createPaymentLink({
+      clerkOrgId: prospect.agencyId,
       prospectId: params.prospectId,
       prospectEmail: prospect.email,
       prospectName: prospect.name,
@@ -1227,6 +1231,7 @@ export async function createSubscriptionAction(params: {
 
     const { createSubscription } = await import("@/lib/stripe");
     const result = await createSubscription({
+      clerkOrgId: prospect.agencyId,
       prospectId: params.prospectId,
       prospectEmail: prospect.email,
       prospectName: prospect.name,

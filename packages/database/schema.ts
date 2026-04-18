@@ -239,6 +239,8 @@ export const leads = pgTable(
 
     // ── PAYMENT ────────────────────────────────────────────────────
     stripeCustomerId: text("stripe_customer_id"),
+    /** Latest Stripe subscription id for this prospect (retainer / subscription checkout). */
+    stripeSubscriptionId: text("stripe_subscription_id"),
     pricingTier: text("pricing_tier"),
 
     // ── PROJECT ────────────────────────────────────────────────────

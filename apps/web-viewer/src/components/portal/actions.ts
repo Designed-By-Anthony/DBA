@@ -1,6 +1,7 @@
 "use server";
 
 import { stripe } from "@/lib/stripe";
+import { STRIPE_METADATA_CLERK_ORG } from "@/lib/stripe-tenant-metadata";
 
 export async function createBookingDepositAction(params: {
   agencyId: string;
@@ -38,6 +39,7 @@ export async function createBookingDepositAction(params: {
       metadata: {
         bookingId,
         agencyId: params.agencyId,
+        [STRIPE_METADATA_CLERK_ORG]: params.agencyId,
         type: 'revenue_protection_hold'
       }
     });

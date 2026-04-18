@@ -1,4 +1,8 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
+import {
+  STRIPE_METADATA_CLERK_ORG,
+  STRIPE_METADATA_PROSPECT_ID,
+} from "@/lib/stripe-tenant-metadata";
 
 let _stripe: Stripe | null = null;
 
@@ -6,11 +10,10 @@ export function getStripeClient(): Stripe {
   if (!_stripe) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) {
-      throw new Error('STRIPE_SECRET_KEY is not set. Add it to .env.local to enable payment features.');
+      throw new Error("STRIPE_SECRET_KEY is not set. Add it to .env.local to enable payment features.");
     }
-    _stripe = new Stripe(key, {
-      apiVersion: '2026-03-25.dahlia',
-    });
+    // API version: omit so Stripe account default applies (see integration blueprint).
+    _stripe = new Stripe(key);
   }
   return _stripe;
 }
@@ -22,39 +25,46 @@ export const stripe = new Proxy({} as Stripe, {
   },
 });
 
+function escapeStripeSearchToken(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
 /**
  * Create a Stripe Checkout session for a one-time payment
  */
 export async function createPaymentLink(params: {
+  clerkOrgId: string;
   prospectId: string;
   prospectEmail: string;
   prospectName: string;
   amount: number; // in dollars
-  type: 'down_payment' | 'completion';
+  type: "down_payment" | "completion";
   description: string;
 }) {
   const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
+    mode: "payment",
     customer_email: params.prospectEmail,
     line_items: [
       {
         price_data: {
-          currency: 'usd',
+          currency: "usd",
           unit_amount: Math.round(params.amount * 100), // Stripe uses cents
           product_data: {
             name: params.description,
-            description: `${params.type === 'down_payment' ? 'Down Payment' : 'Completion Payment'} for ${params.prospectName}`,
+            description: `${params.type === "down_payment" ? "Down Payment" : "Completion Payment"} for ${params.prospectName}`,
           },
         },
         quantity: 1,
       },
     ],
     metadata: {
+      [STRIPE_METADATA_CLERK_ORG]: params.clerkOrgId,
+      [STRIPE_METADATA_PROSPECT_ID]: params.prospectId,
       prospectId: params.prospectId,
       type: params.type,
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-cancelled`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-cancelled`,
   });
 
   return { url: session.url, sessionId: session.id };
@@ -64,29 +74,37 @@ export async function createPaymentLink(params: {
  * Create a Stripe Subscription for recurring retainer
  */
 export async function createSubscription(params: {
+  clerkOrgId: string;
   prospectId: string;
   prospectEmail: string;
   prospectName: string;
   stripePriceId: string;
 }) {
-  // First, find or create the Stripe customer
-  const customers = await stripe.customers.list({ email: params.prospectEmail, limit: 1 });
-  let customerId: string;
+  const emailQ = escapeStripeSearchToken(params.prospectEmail.trim().toLowerCase());
+  const orgQ = escapeStripeSearchToken(params.clerkOrgId);
 
-  if (customers.data.length > 0) {
-    customerId = customers.data[0].id;
+  const search = await stripe.customers.search({
+    query: `email:'${emailQ}' AND metadata['${STRIPE_METADATA_CLERK_ORG}']:'${orgQ}'`,
+    limit: 1,
+  });
+
+  let customerId: string;
+  if (search.data.length > 0) {
+    customerId = search.data[0].id;
   } else {
     const customer = await stripe.customers.create({
       email: params.prospectEmail,
       name: params.prospectName,
-      metadata: { prospectId: params.prospectId },
+      metadata: {
+        [STRIPE_METADATA_CLERK_ORG]: params.clerkOrgId,
+        [STRIPE_METADATA_PROSPECT_ID]: params.prospectId,
+      },
     });
     customerId = customer.id;
   }
 
-  // Create checkout session for the subscription
   const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
+    mode: "subscription",
     customer: customerId,
     line_items: [
       {
@@ -95,11 +113,19 @@ export async function createSubscription(params: {
       },
     ],
     metadata: {
+      [STRIPE_METADATA_CLERK_ORG]: params.clerkOrgId,
+      [STRIPE_METADATA_PROSPECT_ID]: params.prospectId,
       prospectId: params.prospectId,
-      type: 'retainer',
+      type: "retainer",
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/portal/payment-cancelled`,
+    subscription_data: {
+      metadata: {
+        [STRIPE_METADATA_CLERK_ORG]: params.clerkOrgId,
+        [STRIPE_METADATA_PROSPECT_ID]: params.prospectId,
+      },
+    },
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-cancelled`,
   });
 
   return { url: session.url, sessionId: session.id, customerId };

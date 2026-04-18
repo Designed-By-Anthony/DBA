@@ -1,5 +1,13 @@
 # Migration Status Report
 
+## Agency OS: tenant-scoped Stripe (metadata + Search) (2026-04-18)
+
+- **Model:** One Stripe account; each Clerk org is tagged on Stripe objects with metadata `clerk_org_id` (and `prospect_id` on checkout/subscription flows). Price Book uses **`stripe.products.search`** filtered by that metadata (not global `products.list`).
+- **Checkout / customers:** `createPaymentLink` and `createSubscription` set session + customer metadata; subscription checkout sets **`subscription_data.metadata`** for webhooks. Customer lookup uses **`customers.search`** (`email` + `clerk_org_id`) so the same email can exist per tenant.
+- **Webhooks:** `checkout.session.completed` rejects metadata/org mismatch vs DB lead. `invoice.paid` resolves lead via subscription/customer metadata when multiple leads share a Stripe customer id. **`customer.subscription.created`** stores `stripe_subscription_id` on the lead; **`customer.subscription.deleted`** clears it. Ack-only: `entitlements.active_entitlement_summary.updated`.
+- **Schema:** `leads.stripe_subscription_id` — migration `packages/database/drizzle/0003_lead_stripe_subscription.sql`; run `pnpm db:push` (or apply SQL on Neon).
+- **SDK:** `getStripeClient()` uses default API version (no pinned `apiVersion`).
+
 ## Vercel Production build failure (commit 0698436) — root cause (2026-04-18)
 
 - **Error:** `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production` during `next build` when `VERCEL_ENV=production`.

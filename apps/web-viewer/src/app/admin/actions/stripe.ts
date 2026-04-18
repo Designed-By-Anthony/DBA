@@ -2,7 +2,12 @@
 
 import type Stripe from "stripe";
 import * as Sentry from "@sentry/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { stripe } from "@/lib/stripe";
+import {
+  STRIPE_METADATA_CLERK_ORG,
+  productSearchQueryForTenant,
+} from "@/lib/stripe-tenant-metadata";
 import { verifyAuth } from "../actions";
 
 export interface StripeProductDetail {
@@ -32,16 +37,24 @@ export async function getStripeProducts(options?: {
   includeArchived?: boolean;
 }): Promise<{ products: StripeProductDetail[]; error?: string }> {
   try {
-    // Basic auth check
     await verifyAuth();
+    const { orgId } = await auth();
+    if (!orgId) {
+      return { products: [], error: "No organization selected." };
+    }
 
-    const response = await stripe.products.list({
+    const response = await stripe.products.search({
+      query: productSearchQueryForTenant(orgId),
       expand: ["data.default_price"],
       limit: 100,
       ...(options?.includeArchived ? {} : { active: true }),
     });
 
-    const products = response.data.map((p): StripeProductDetail => {
+    const rows = options?.includeArchived
+      ? response.data
+      : response.data.filter((p) => p.active);
+
+    const products = rows.map((p): StripeProductDetail => {
       const raw = p.default_price;
       const price: Stripe.Price | null =
         raw && typeof raw !== "string" ? raw : null;
@@ -93,12 +106,17 @@ export async function createStripeProductAction(params: {
 }): Promise<{ product?: StripeProductDetail, error?: string }> {
   try {
     await verifyAuth();
+    const { orgId } = await auth();
+    if (!orgId) {
+      return { error: "No organization selected." };
+    }
 
     // 1. Create the Product
     const newProduct = await stripe.products.create({
       name: params.name,
       description: params.description || undefined,
       metadata: {
+        [STRIPE_METADATA_CLERK_ORG]: orgId,
         created_via: 'agency_os', // Mark this for origin tracking
         inventory_managed: params.inventoryManaged ? 'true' : 'false',
         is_86ed: params.is86ed ? 'true' : 'false'
@@ -110,6 +128,9 @@ export async function createStripeProductAction(params: {
       product: newProduct.id,
       unit_amount: params.priceAmountCents,
       currency: "usd",
+      metadata: {
+        [STRIPE_METADATA_CLERK_ORG]: orgId,
+      },
     };
 
     if (params.interval && params.interval !== "one_time") {
@@ -161,9 +182,19 @@ export async function setStripeProductActiveAction(params: {
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     await verifyAuth();
+    const { orgId } = await auth();
+    if (!orgId) {
+      return { ok: false, error: "No organization selected." };
+    }
     const id = params.productId?.trim();
     if (!id) {
       return { ok: false, error: "Missing product id." };
+    }
+
+    const existing = await stripe.products.retrieve(id);
+    const owner = existing.metadata?.[STRIPE_METADATA_CLERK_ORG]?.trim();
+    if (owner !== orgId) {
+      return { ok: false, error: "This catalog item belongs to another organization." };
     }
 
     await stripe.products.update(id, { active: params.active });

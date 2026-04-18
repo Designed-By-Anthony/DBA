@@ -1,9 +1,10 @@
 "use server";
 
 import "@dba/env/web-viewer-aliases";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { verifyAuth } from "@/app/admin/actions";
 import { getStripeClient } from "@/lib/stripe";
+import { STRIPE_METADATA_CLERK_ORG } from "@/lib/stripe-tenant-metadata";
 
 /**
  * Agency Pro subscription checkout. Set STRIPE_AGENCY_PRO_PRICE_ID in production;
@@ -14,6 +15,7 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
   error?: string;
 }> {
   await verifyAuth();
+  const { orgId } = await auth();
   const user = await currentUser();
   const email = user?.emailAddresses?.[0]?.emailAddress;
   if (!email) {
@@ -21,6 +23,10 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
   }
 
   const stripe = getStripeClient();
+  const upgradeMeta: Record<string, string> = {
+    type: "agency_os_upgrade",
+    ...(orgId ? { [STRIPE_METADATA_CLERK_ORG]: orgId } : {}),
+  };
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const priceId = process.env.STRIPE_AGENCY_PRO_PRICE_ID;
 
@@ -32,7 +38,7 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${base}/admin/billing?upgraded=1`,
         cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
-        metadata: { type: "agency_os_upgrade" },
+        metadata: upgradeMeta,
       });
       return { url: session.url };
     }
@@ -53,7 +59,7 @@ export async function createAgencyUpgradeCheckoutSession(): Promise<{
       ],
       success_url: `${base}/admin/billing?upgraded=1`,
       cancel_url: `${base}/admin/billing/upgrade?cancelled=1`,
-      metadata: { type: "agency_os_upgrade" },
+      metadata: upgradeMeta,
     });
     return { url: session.url };
   } catch (e: unknown) {

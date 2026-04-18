@@ -1,15 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getDb, withBypassRls, leads, activities } from '@dba/database';
-import { eq } from 'drizzle-orm';
+import { getDb, withBypassRls, leads, activities, type Database } from '@dba/database';
+import { and, eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
 import { isTestMode } from '@/lib/test-mode';
 import { apiError } from '@/lib/api-error';
+import {
+  readClerkOrgIdFromMetadata,
+  readProspectIdFromMetadata,
+} from '@/lib/stripe-webhook-tenant';
 import type Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+type TenantTx = Parameters<Parameters<Database["transaction"]>[0]>[0];
+
+async function findLeadRowsForStripeCustomer(
+  tx: TenantTx,
+  stripeCustomerId: string,
+): Promise<(typeof leads.$inferSelect)[]> {
+  return tx
+    .select()
+    .from(leads)
+    .where(eq(leads.stripeCustomerId, stripeCustomerId));
+}
+
+function pickLeadForStripeCustomer(
+  rows: (typeof leads.$inferSelect)[],
+  tenantIdHint: string | undefined,
+  prospectIdHint: string | undefined,
+): (typeof leads.$inferSelect) | undefined {
+  if (rows.length === 0) return undefined;
+  if (prospectIdHint && tenantIdHint) {
+    const m = rows.find(
+      (r) => r.prospectId === prospectIdHint && r.tenantId === tenantIdHint,
+    );
+    if (m) return m;
+  }
+  if (prospectIdHint) {
+    const m = rows.find((r) => r.prospectId === prospectIdHint);
+    if (m) return m;
+  }
+  if (tenantIdHint) {
+    const m = rows.find((r) => r.tenantId === tenantIdHint);
+    if (m) return m;
+  }
+  if (rows.length === 1) return rows[0];
+  return undefined;
+}
 
 /**
  * Stripe Webhook Handler
@@ -19,9 +59,9 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
  * - invoice.paid → recurring retainer paid
  * - customer.subscription.deleted → retainer cancelled
  *
- * Catalog (products/prices): the Price Book reads live from the Stripe API; add
- * `product.updated`, `product.deleted`, and `price.updated` in the Dashboard so
- * this endpoint stays reachable when you forward those events (no DB mirror yet).
+ * Catalog: products/prices are scoped with metadata `clerk_org_id`; Price Book uses
+ * Stripe Search. Optional webhook events: `product.*`, `price.*`,
+ * `customer.subscription.created`, `entitlements.active_entitlement_summary.updated`.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +92,10 @@ export async function POST(request: NextRequest) {
       switch (event.type) {
         case 'checkout.session.completed': {
           const session = event.data.object as Stripe.Checkout.Session;
-          const prospectId = session.metadata?.prospectId;
+          const prospectId =
+            readProspectIdFromMetadata(session.metadata ?? undefined) ??
+            session.metadata?.prospectId;
+          const orgFromStripe = readClerkOrgIdFromMetadata(session.metadata ?? undefined);
           const paymentType = session.metadata?.type as 'down_payment' | 'completion' | 'retainer';
 
           if (!prospectId) break;
@@ -61,7 +104,7 @@ export async function POST(request: NextRequest) {
             ? (session.amount_total || 0) / 100
             : 0;
 
-          // Find prospect to get tenant_id
+          // Find prospect to get tenant_id (RLS bypass — enforce tenant via metadata + DB row)
           const prospectRows = await tx
             .select()
             .from(leads)
@@ -70,6 +113,7 @@ export async function POST(request: NextRequest) {
 
           if (prospectRows.length === 0) break;
           const prospect = prospectRows[0];
+          if (orgFromStripe && orgFromStripe !== prospect.tenantId) break;
           const tenantId = prospect.tenantId;
 
           // Log activity
@@ -104,7 +148,12 @@ export async function POST(request: NextRequest) {
             await tx
               .update(leads)
               .set(updates)
-              .where(eq(leads.prospectId, prospectId));
+              .where(
+                and(
+                  eq(leads.tenantId, tenantId),
+                  eq(leads.prospectId, prospectId),
+                ),
+              );
           }
 
           // Notify admin
@@ -147,14 +196,46 @@ export async function POST(request: NextRequest) {
           const invoiceSubscription = (invoice as unknown as Record<string, unknown>).subscription as string;
 
           if (invoiceSubscription && invoice.billing_reason === 'subscription_cycle') {
-            const customerRows = await tx
-              .select()
-              .from(leads)
-              .where(eq(leads.stripeCustomerId, String(invoice.customer)))
-              .limit(1);
+            const custId = String(invoice.customer);
+            let tenantHint = readClerkOrgIdFromMetadata(invoice.metadata ?? undefined);
+            let prospectIdHint: string | undefined;
 
-            if (customerRows.length > 0) {
-              const prospect = customerRows[0];
+            try {
+              const sub = await stripe.subscriptions.retrieve(
+                typeof invoiceSubscription === 'string'
+                  ? invoiceSubscription
+                  : String(invoiceSubscription),
+              );
+              prospectIdHint =
+                prospectIdHint ??
+                readProspectIdFromMetadata(sub.metadata ?? undefined);
+              tenantHint =
+                tenantHint ?? readClerkOrgIdFromMetadata(sub.metadata ?? undefined);
+            } catch {
+              // ignore — fall back to customer-only resolution
+            }
+
+            if (!tenantHint) {
+              try {
+                const customer = await stripe.customers.retrieve(custId);
+                if (!('deleted' in customer && customer.deleted)) {
+                  tenantHint =
+                    tenantHint ??
+                    readClerkOrgIdFromMetadata(customer.metadata ?? undefined);
+                }
+              } catch {
+                // ignore
+              }
+            }
+
+            const customerRows = await findLeadRowsForStripeCustomer(tx, custId);
+            const prospect = pickLeadForStripeCustomer(
+              customerRows,
+              tenantHint,
+              prospectIdHint,
+            );
+
+            if (prospect) {
               const amount = (invoice.amount_paid || 0) / 100;
 
               await tx.insert(activities).values({
@@ -170,16 +251,77 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        case 'customer.subscription.deleted': {
+        case 'customer.subscription.created': {
           const subscription = event.data.object as Stripe.Subscription;
-          const customerRows = await tx
+          const prospectId =
+            readProspectIdFromMetadata(subscription.metadata ?? undefined);
+          const orgFromStripe = readClerkOrgIdFromMetadata(
+            subscription.metadata ?? undefined,
+          );
+          if (!prospectId) break;
+
+          const prospectRows = await tx
             .select()
             .from(leads)
-            .where(eq(leads.stripeCustomerId, String(subscription.customer)))
+            .where(eq(leads.prospectId, prospectId))
             .limit(1);
 
-          if (customerRows.length > 0) {
-            const prospect = customerRows[0];
+          if (prospectRows.length === 0) break;
+          const prospect = prospectRows[0];
+          if (orgFromStripe && orgFromStripe !== prospect.tenantId) break;
+
+          await tx
+            .update(leads)
+            .set({
+              stripeSubscriptionId: subscription.id,
+              updatedAt: new Date().toISOString(),
+            })
+            .where(
+              and(
+                eq(leads.tenantId, prospect.tenantId),
+                eq(leads.prospectId, prospectId),
+              ),
+            );
+          break;
+        }
+
+        case 'customer.subscription.deleted': {
+          const subscription = event.data.object as Stripe.Subscription;
+          const prospectId =
+            readProspectIdFromMetadata(subscription.metadata ?? undefined);
+          const orgFromStripe = readClerkOrgIdFromMetadata(
+            subscription.metadata ?? undefined,
+          );
+
+          let prospect:
+            | (typeof leads.$inferSelect)
+            | undefined;
+
+          if (prospectId) {
+            const prospectRows = await tx
+              .select()
+              .from(leads)
+              .where(eq(leads.prospectId, prospectId))
+              .limit(1);
+            if (
+              prospectRows.length > 0 &&
+              (!orgFromStripe || prospectRows[0].tenantId === orgFromStripe)
+            ) {
+              prospect = prospectRows[0];
+            }
+          } else {
+            const customerRows = await findLeadRowsForStripeCustomer(
+              tx,
+              String(subscription.customer),
+            );
+            prospect = pickLeadForStripeCustomer(
+              customerRows,
+              orgFromStripe,
+              undefined,
+            );
+          }
+
+          if (prospect) {
             await tx.insert(activities).values({
               tenantId: prospect.tenantId,
               leadId: prospect.prospectId,
@@ -188,15 +330,30 @@ export async function POST(request: NextRequest) {
               description: 'Client\'s recurring subscription has been cancelled in Stripe',
               createdAt: new Date().toISOString(),
             });
+
+            await tx
+              .update(leads)
+              .set({
+                stripeSubscriptionId: null,
+                updatedAt: new Date().toISOString(),
+              })
+              .where(
+                and(
+                  eq(leads.tenantId, prospect.tenantId),
+                  eq(leads.prospectId, prospect.prospectId),
+                ),
+              );
           }
           break;
         }
 
-        // Price Book uses Stripe as source of truth via API; acknowledge catalog events
-        // so the webhook URL can receive Dashboard-forwarded updates without 400s.
+        // Price Book uses Stripe Search + metadata; acknowledge catalog events.
         case 'product.updated':
         case 'product.deleted':
         case 'price.updated':
+          break;
+
+        case 'entitlements.active_entitlement_summary.updated':
           break;
       }
     });
