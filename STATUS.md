@@ -1,5 +1,11 @@
 # Migration Status Report
 
+## Agency OS Clerk + PWA on admin/accounts (2026-04-18)
+
+- **Serwist:** Prepended `NetworkOnly` routes for `clerk.designedbyanthony.com` and `*.clerk.accounts.dev` so Serwist’s default `.js` caching no longer intercepts Clerk FAPI scripts (fixes `no-response` / failed Clerk JS loads in production).
+- **CSP:** Allowed Cloudflare Insights (`static.cloudflareinsights.com`, `connect-src` to `cloudflareinsights.com`) and Vercel’s hosted analytics script host (`va.vercel-scripts.com`).
+- **Vercel Web Analytics / Speed Insights:** Pointed `<Analytics />` and `<SpeedInsights />` at `https://va.vercel-scripts.com/v1/...` so scripts load on custom domains without `/_vercel/*` rewrites (removes spurious `/[hash]/script.js` 404 + MIME errors).
+
 ## Marketing footer badge stability (2026-04-18)
 
 - Replaced the remote Locally Owned and Astro footer badge URLs with local `/images/*` assets so the current CSP cannot block them and the footer no longer renders broken-image placeholders.

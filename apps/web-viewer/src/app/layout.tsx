@@ -66,8 +66,8 @@ export default function RootLayout({
             </ClerkProvider>
           </PwaRoot>
         </div>
-        <Analytics />
-        <SpeedInsights />
+        <Analytics scriptSrc="https://va.vercel-scripts.com/v1/script.js" />
+        <SpeedInsights scriptSrc="https://va.vercel-scripts.com/v1/speed-insights/script.js" />
       </body>
     </html>
   );

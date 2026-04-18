@@ -1,6 +1,23 @@
 import { defaultCache } from "@serwist/turbopack/worker";
-import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import type { PrecacheEntry, RuntimeCaching, SerwistGlobalConfig } from "serwist";
+import { NetworkOnly, Serwist } from "serwist";
+
+/**
+ * Serwist `defaultCache` treats any `.js` URL as cacheable (StaleWhileRevalidate).
+ * That includes Clerk's frontend API scripts on `clerk.*` hosts; caching + SW fetch
+ * handling was breaking Clerk JS with `no-response` / ERR_FAILED. Bypass the SW for
+ * those origins so the browser loads them directly.
+ */
+const clerkCdnBypass: RuntimeCaching[] = [
+  {
+    matcher: /^https:\/\/clerk\.designedbyanthony\.com\//i,
+    handler: new NetworkOnly(),
+  },
+  {
+    matcher: /^https:\/\/[^/]+\.clerk\.accounts\.dev\//i,
+    handler: new NetworkOnly(),
+  },
+];
 
 // Tell TypeScript about the serwist injection point
 declare global {
@@ -17,7 +34,7 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
 
-  runtimeCaching: defaultCache,
+  runtimeCaching: [...clerkCdnBypass, ...defaultCache],
 
   // Offline fallback: show /offline when any navigation request fails
   fallbacks: {
