@@ -84,6 +84,8 @@ const webViewerSchema = z
 
     // Sentry (optional — build still succeeds without it).
     NEXT_PUBLIC_SENTRY_DSN: optionalUrl,
+    /** Set to "1" to enable Session Replay sampling (HIPAA: may capture PHI in DOM). */
+    NEXT_PUBLIC_SENTRY_REPLAY: z.string().trim().optional(),
     SENTRY_DSN: optionalUrl,
     SENTRY_AUTH_TOKEN: z.string().trim().optional(),
     SENTRY_ORG: z.string().trim().optional(),

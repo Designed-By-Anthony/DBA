@@ -23,6 +23,19 @@
   - `accounts.designedbyanthony.com` -> `apps/web-viewer/accounts`
   - `designedbyanthony.com` -> `apps/marketing`
 
+## Compliance bar — DoD / HIPAA-oriented engineering
+
+Treat **regulated-data expectations** as the default for this monorepo (even when a given deploy is not under a formal BAA yet). Agents should align with **NIST 800-53 / HIPAA Security Rule** themes: confidentiality, integrity, availability, and **minimum necessary** disclosure.
+
+- **No secrets in source:** Never commit real API keys, DSNs, connection strings, webhook signing secrets, or tokens. Use env vars and `.env.example` placeholders only; client bundles must not embed operator-only credentials.
+- **PHI / PII handling:** Assume CRM, portal, and lead payloads may include **protected health information** or sensitive PII. Do not log full bodies, tokens, or session identifiers at info level; redact or omit in client-visible errors. Prefer **generic** API error messages; log details server-side only.
+- **Observability:** Error reporting (e.g. Sentry) must use **env-provided DSNs** only; keep `sendDefaultPii` off unless Legal/Security explicitly approves a BAA and scrubbing. Session Replay / full DOM capture is **opt-in** (it can capture PHI in the page).
+- **Encryption in transit:** Postgres and external APIs use TLS in production; do not weaken SSL verification to “make it work.”
+- **Tenant isolation:** Every data path remains **tenant-scoped** (`tenant_id` / `clerk_org_id`); no cross-tenant reads or “debug” shortcuts in production.
+- **Audit mindset:** Favor explicit authz checks, rate limits, and structured server logging for security-relevant events.
+
+When in doubt, choose the option that **discloses less** to clients and third parties.
+
 ## Code Quality & Purge Rules
 - **Search Before Write:** Before adding a feature, check if a legacy Firebase version exists. If it does, delete it first.
 - **Cleanup Duty:** After every feature completion, search for and remove unused imports, `console.log` statements, and any string containing "firebase".

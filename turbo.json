@@ -36,6 +36,7 @@
         "ADMIN_ALLOWED_ORG_IDS",
         "ADMIN_ALLOWED_USER_IDS",
         "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_SENTRY_REPLAY",
         "SENTRY_AUTH_TOKEN",
         "SENTRY_DSN",
         "SENTRY_ORG",

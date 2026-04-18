@@ -17,13 +17,14 @@ const firebasePath = join(root, 'firebase.json');
 
 const reportUrl = buildSentryCspReportUrl();
 if (!reportUrl) {
-  console.error('sync-firebase-csp: could not build Sentry CSP report URL from PUBLIC_SENTRY_DSN');
-  process.exit(1);
+  console.warn(
+    'sync-firebase-csp: PUBLIC_SENTRY_DSN unset — CSP will omit Sentry report-uri/report-to (set env for violation reporting).',
+  );
 }
 
 const cspEnforcing = buildContentSecurityPolicyEnforcing(reportUrl);
 const cspReportOnly = buildContentSecurityPolicyReportOnly(reportUrl);
-const reportTo = buildReportToHeader(reportUrl);
+const reportTo = reportUrl ? buildReportToHeader(reportUrl) : null;
 
 /** hstspreload.org requires this exact policy on responses (not only on static assets). */
 const HSTS_PRELOAD =
@@ -46,10 +47,7 @@ const htmlHeaders = [
     key: 'Content-Security-Policy-Report-Only',
     value: cspReportOnly,
   },
-  {
-    key: 'Report-To',
-    value: reportTo,
-  },
+  ...(reportTo ? [{ key: 'Report-To', value: reportTo }] : []),
 ];
 
 const raw = readFileSync(firebasePath, 'utf8');

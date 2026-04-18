@@ -217,20 +217,16 @@ export async function handleIngestPost(request: NextRequest): Promise<NextRespon
       metadata: cleanMetadata,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "sql_failed";
     console.error("[ingest] SQL insert failed", err);
     return NextResponse.json(
-      { error: `Database temporarily unavailable (${msg})` },
+      { error: "Database temporarily unavailable. Please try again later." },
       { status: 503, headers: cors },
     );
   }
 
   if (!sqlResult) {
     return NextResponse.json(
-      {
-        error:
-          "Database not configured for this deploy. Set DATABASE_URL (and add the runtime IP to Cloud SQL authorized-networks).",
-      },
+      { error: "Service temporarily unavailable. Please try again later." },
       { status: 503, headers: cors },
     );
   }

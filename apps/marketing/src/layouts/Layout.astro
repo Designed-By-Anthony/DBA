@@ -150,13 +150,11 @@ const structuredData = [
   ...extraSchemas,
 ];
 
-/** Preconnect when DSN is set (falls back to production default used by CSP helpers). */
-const DEFAULT_SENTRY_DSN =
-  'https://0d490516ab9f385b16ea4210a1f9622e@o4511201601912832.ingest.us.sentry.io/4511201603158016';
-const sentryDsnForOrigin = import.meta.env.PUBLIC_SENTRY_DSN ?? DEFAULT_SENTRY_DSN;
+/** Preconnect to Sentry ingest only when PUBLIC_SENTRY_DSN is set (never embed default DSNs). */
+const sentryDsnForOrigin = import.meta.env.PUBLIC_SENTRY_DSN?.trim();
 let sentryIngestOrigin: string | undefined;
 try {
-  sentryIngestOrigin = new URL(sentryDsnForOrigin).origin;
+  sentryIngestOrigin = sentryDsnForOrigin ? new URL(sentryDsnForOrigin).origin : undefined;
 } catch {
   sentryIngestOrigin = undefined;
 }

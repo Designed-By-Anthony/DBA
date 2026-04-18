@@ -6,9 +6,6 @@
  * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.
  */
 
-const DEFAULT_SENTRY_DSN =
-  'https://0d490516ab9f385b16ea4210a1f9622e@o4511201601912832.ingest.us.sentry.io/4511201603158016';
-
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
 const LIGHTHOUSE_AUDIT_API_ORIGIN = 'https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app';
 
@@ -97,8 +94,8 @@ export function parseSentryDsn(dsn) {
  * Sentry ingest security endpoint for CSP violation reports.
  * @see https://docs.sentry.io/platforms/javascript/security-policy-reporting/
  */
-export function buildSentryCspReportUrl(dsn = process.env.PUBLIC_SENTRY_DSN ?? DEFAULT_SENTRY_DSN) {
-  const parsed = parseSentryDsn(dsn);
+export function buildSentryCspReportUrl(dsn = process.env.PUBLIC_SENTRY_DSN) {
+  const parsed = parseSentryDsn(dsn ?? '');
   if (!parsed) return null;
   const url = new URL(`https://${parsed.host}/api/${parsed.projectId}/security/`);
   url.searchParams.set('sentry_key', parsed.key);
@@ -117,11 +114,13 @@ function joinDirectives(map) {
  * Enforcing CSP + reporting (report-uri for broad support, report-to for modern browsers).
  */
 export function buildContentSecurityPolicyEnforcing(reportUrl) {
-  const withReporting = {
-    ...DIRECTIVES,
-    'report-uri': reportUrl,
-    'report-to': REPORT_TO_GROUP,
-  };
+  const withReporting = reportUrl
+    ? {
+        ...DIRECTIVES,
+        'report-uri': reportUrl,
+        'report-to': REPORT_TO_GROUP,
+      }
+    : { ...DIRECTIVES };
   return joinDirectives(withReporting);
 }
 
@@ -129,12 +128,17 @@ export function buildContentSecurityPolicyEnforcing(reportUrl) {
  * Stricter policy: script-src without data: and without unsafe-eval (report-only → Sentry).
  */
 export function buildContentSecurityPolicyReportOnly(reportUrl) {
-  const withReporting = {
+  const base = {
     ...DIRECTIVES,
     'script-src': REPORT_ONLY_SCRIPT_SRC,
-    'report-uri': reportUrl,
-    'report-to': REPORT_TO_GROUP,
   };
+  const withReporting = reportUrl
+    ? {
+        ...base,
+        'report-uri': reportUrl,
+        'report-to': REPORT_TO_GROUP,
+      }
+    : base;
   return joinDirectives(withReporting);
 }
 
