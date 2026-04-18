@@ -40,18 +40,21 @@ const lighthouseSchema = z
   })
   .passthrough()
   .superRefine((env, ctx) => {
-    // Only enforce on Vercel (`VERCEL=1`) where each project has
-    // isolated env AND the three-project split is actually deployed
-    // (signalled by `ADMIN_UPSTREAM_URL` on the apex project). Skip on
-    // local/CI and single-project Turborepo builds where the whole
-    // monorepo shares one env by design.
+    // Only enforce on Vercel (`VERCEL=1`). Skip local/CI.
+    //
+    // `ADMIN_UPSTREAM_URL` is documented for the apex (marketing) project
+    // only — it is never set on the standalone lighthouse Vercel project.
+    // When it *is* present here, we are building lighthouse as part of a
+    // deployment that also ships the apex middleware (shared monorepo env with
+    // Agency OS) — skip to avoid false positives. When absent, this is an
+    // isolated lighthouse project: forbid CRM secrets (env-bleed guard).
     if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
-    const hasThreeProjectSplit =
+    const apexMiddlewareEnvPresent =
       typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
         "string" &&
       ((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
         .length > 0;
-    if (!hasThreeProjectSplit) return;
+    if (apexMiddlewareEnvPresent) return;
 
     const forbidden = [
       "CLERK_SECRET_KEY",
