@@ -4,13 +4,18 @@ import { NetworkOnly, Serwist } from "serwist";
 
 /**
  * Serwist `defaultCache` treats any `.js` URL as cacheable (StaleWhileRevalidate).
- * That includes Clerk's frontend API scripts on `clerk.*` and `*.clerk.accounts.dev`;
- * caching + SW fetch handling can surface as `no-response` / ERR_FAILED. Bypass the
- * SW for those origins so the browser loads them directly.
+ * That includes Clerk's frontend API scripts on `clerk.*`, `*.clerk.accounts.dev`,
+ * and `scdn.clerk.com` (project settings / clerk-js assets); caching + SW fetch
+ * handling can surface as `no-response` / ERR_FAILED. Bypass the SW for those
+ * origins so the browser loads them directly.
  */
 const clerkCdnBypass: RuntimeCaching[] = [
   {
     matcher: /^https:\/\/clerk\.[^/]+\//i,
+    handler: new NetworkOnly(),
+  },
+  {
+    matcher: /^https:\/\/scdn\.clerk\.com\//i,
     handler: new NetworkOnly(),
   },
   {
