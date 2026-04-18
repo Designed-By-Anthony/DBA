@@ -1,5 +1,10 @@
 # Migration Status Report
 
+## Apex marketing 404 on Vercel (2026-04-18) — fixed
+
+- **Cause:** Root `vercel.json` used `outputDirectory: dist` and copied `apps/marketing/dist` there, but `@astrojs/vercel` puts prerendered HTML under **`dist/client/`** (no `dist/index.html`). Static hosting looked for `index.html` at the wrong level → **404 on `/`**.
+- **Fix:** Point `outputDirectory` to **`apps/marketing/.vercel/output`** (Vercel Build Output API from the adapter) and drop the manual `cp` step. `buildCommand` remains `turbo run build --filter=designed-by-anthony`.
+
 ## Agency OS: embeddable lead widget + Neon-backed skin API (2026-04-18)
 
 - **Static bundle:** `apps/web-viewer/public/widgets/lead-form.js` (built from `widget-src/lead-form.ts` via `pnpm build:lead-widget`, runs before `next build`).
