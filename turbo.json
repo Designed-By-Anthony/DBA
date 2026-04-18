@@ -111,7 +111,12 @@
         "VAPID_PRIVATE_KEY",
         "VAPID_PUBLIC_KEY",
         "VERCEL_PROJECT_PRODUCTION_URL",
-        "VERCEL_BRANCH_URL"
+        "VERCEL_BRANCH_URL",
+        "PUBLIC_ENABLE_STREAM_CHAT",
+        "PUBLIC_STREAM_CHAT_API_KEY",
+        "STREAM_CHAT_SECRET",
+        "STREAM_CHAT_INBOX_USER_ID",
+        "STREAM_CHAT_INBOX_NAME"
       ]
     },
     "lint": {

@@ -53,6 +53,11 @@ const DIRECTIVES = {
     'https://challenges.cloudflare.com',
     'https://*.ingest.us.sentry.io',
     'https://*.ingest.de.sentry.io',
+    /** GetStream Chat (REST + WebSocket) — marketing live chat widget */
+    'https://chat.stream-io-api.com',
+    'https://*.stream-io-api.com',
+    'wss://chat.stream-io-api.com',
+    'wss://*.stream-io-api.com',
   ].join(' '),
   'frame-src':
     "'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com",

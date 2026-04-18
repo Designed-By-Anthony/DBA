@@ -31,8 +31,10 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
+    "@astrojs/react": "^5.0.3",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
+    "@astrojs/vercel": "^10.0.4",
     "@dba/env": "workspace:*",
     "@dba/lead-form-contract": "workspace:*",
     "@dba/theme": "workspace:*",
@@ -45,11 +47,17 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "astro": "^6.1.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "sharp": "^0.34.5",
+    "stream-chat": "^9.41.1",
+    "stream-chat-react": "^14.0.1",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "esbuild": "^0.28.0",
     "minimatch": "^10.2.5"
   },

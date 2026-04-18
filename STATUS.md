@@ -1,5 +1,18 @@
 # Migration Status Report
 
+## Marketing: sticky conversion rail + WebSite actions (2026-04-18)
+
+- **Layout:** `.site-chrome-sticky` keeps pilot banner + main nav + **desktop quick-action rail** (free audit, contact, Calendly, phone) pinned together while scrolling — complements bottom **Get in touch** + optional Stream chat.
+- **JSON-LD:** `buildBaseWebsiteSchema()` adds `potentialAction` (`ViewAction` audit, `ContactAction`, `ViewAction` Calendly) with `EntryPoint` targets for Google-aligned structured data.
+- **Mobile nav:** Secondary CTA **Free site audit** + primary **Book a free call** (replaces duplicate Contact Us).
+
+## Marketing: GetStream Chat widget (2026-04-18)
+
+- **Stack:** `@astrojs/vercel` + `@astrojs/react`, `stream-chat` + `stream-chat-react`. Floating **Chat** button (when `PUBLIC_ENABLE_STREAM_CHAT=1`) opens messaging with visitor + inbox user; tokens from **`POST /api/stream-chat-token`** (secret stays server-side).
+- **Env:** `PUBLIC_STREAM_CHAT_API_KEY`, `STREAM_CHAT_SECRET`, optional `STREAM_CHAT_INBOX_USER_ID` / `STREAM_CHAT_INBOX_NAME` (defaults: `DBAStudio315` / `Designed by Anthony`). Override `STREAM_CHAT_INBOX_USER_ID` if your Stream inbox user id differs.
+- **CSP:** `build/csp.mjs` allows `https://chat.stream-io-api.com`, `https://*.stream-io-api.com`, `wss://…` — run `pnpm run sync:static-headers` after CSP edits.
+
+
 ## Agency OS: tenant-scoped Stripe (metadata + Search) (2026-04-18)
 
 - **Model:** One Stripe account; each Clerk org is tagged on Stripe objects with metadata `clerk_org_id` (and `prospect_id` on checkout/subscription flows). Price Book uses **`stripe.products.search`** filtered by that metadata (not global `products.list`).
@@ -24,6 +37,8 @@
 - **Remove from CRM UI:** Price Book products are Stripe catalog objects — use **Archive** (sets `active: false`) or **Restore**; optional **Show archived** lists inactive products. True deletion is done in the Stripe Dashboard (products are not stored in Postgres).
 - **`setStripeProductActiveAction`:** Server action calls `stripe.products.update`. Errors go to Sentry (replaced `console.error` in `stripe.ts` actions).
 - **`POST /api/webhooks/stripe`:** No-op handlers for `product.updated`, `product.deleted`, `price.updated` so Stripe can deliver those events without failing; catalog still loads via API. Add these event types in Stripe Dashboard → Webhooks when you want delivery acknowledged.
+
+
 ## Agency OS: Email History + sidebar hydration (2026-04-18)
 
 - **React #418 / POST `/admin/email/history` 500:** `DashboardShell` read `localStorage` in `useState` initializer on the client only — server HTML did not match first client paint. Sidebar now starts `collapsed=false` and applies saved preference in `useLayoutEffect` + `startTransition`. **`/admin/email/history`** loads `getEmailHistory()` in a **Server Component** and passes data to **`EmailHistoryClient`** (no initial client POST); optional Refresh still calls the server action.

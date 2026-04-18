@@ -1,5 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import indexNowStaticPages from './build/indexnow-integration.mjs';
 
@@ -26,6 +28,7 @@ const SITEMAP_EXCLUDED_URLS = new Set([
 const indexNowKey = process.env.INDEXNOW_KEY ?? 'a503ff689a18407993ac047df017d9a8';
 
 const integrations = [
+  react(),
   sitemap({
     filter: (page) => !SITEMAP_EXCLUDED_URLS.has(page),
   }),
@@ -71,6 +74,7 @@ if (process.env.NODE_ENV === 'development' && process.env.SPOTLIGHT === '1') {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://designedbyanthony.com',
+  adapter: vercel(),
   // Opt-in prefetch via data-astro-prefetch on internal links (see Layout / FooterCTA) to avoid prefetching every link on the page.
   prefetch: {
     prefetchAll: false,

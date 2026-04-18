@@ -7,6 +7,7 @@ import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import FooterCTA from '../components/FooterCTA.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { StreamChatWidget } from '../components/StreamChatWidget';
 import iconLogo from '../assets/IconLogo.png';
 import interLatinNormalWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 
@@ -99,6 +100,8 @@ const siteScriptVersion = createHash('sha256')
   .digest('hex')
   .slice(0, 12);
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent('Website inquiry — Designed by Anthony')}`;
+
+const enableStreamChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === '1';
 
 const robotsContent = noindex
   ? 'noindex, nofollow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
@@ -333,55 +336,115 @@ try {
     {
       !minimalChrome && (
         <>
-          <div class="site-banner">
-            <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="site-banner-link" data-calendar-link>
-              <span class="site-banner-dot" aria-hidden="true"></span>
-              <span><strong>Launch pilot: 10 client spots</strong> — complimentary custom build + {MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the program is open →</span>
-            </a>
-          </div>
-          <header class="header">
-            <div class="header-container">
-              <a href="/" class="brand-lockup" data-astro-prefetch>
-                <Image
-                  src={iconLogo}
-                  alt="Designed by Anthony"
-                  widths={[36, 72]}
-                  sizes="36px"
-                  width={36}
-                  height={27}
-                  class="nav-icon"
-                  loading="eager"
-                  fetchpriority="high"
-                />
+          <div class="site-chrome-sticky">
+            <div class="site-banner">
+              <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="site-banner-link" data-calendar-link>
+                <span class="site-banner-dot" aria-hidden="true"></span>
+                <span><strong>Launch pilot: 10 client spots</strong> — complimentary custom build + {MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the program is open →</span>
               </a>
-              <nav class="nav nav-desktop">
-                <a href="/ouredge" data-astro-prefetch>Our Edge</a>
-                <a href="/services" data-astro-prefetch>Services</a>
-                <a href="/pricing" data-astro-prefetch>Pricing</a>
-                <a href="/service-areas" data-astro-prefetch>Service Areas</a>
-                <a href="/portfolio" data-astro-prefetch>Portfolio</a>
-                <a href="/about" data-astro-prefetch>About</a>
-                <a href="/faq" data-astro-prefetch>FAQ</a>
-                <a href="/blog" data-astro-prefetch>Blog</a>
-                <a href="/contact" class="nav-contact-link" data-astro-prefetch>Contact</a>
-                <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary btn-sm nav-book-btn" id="nav-book-call-btn" data-calendar-link>
-                  Book a Free Call
-                </a>
-              </nav>
-              <button
-                class="hamburger"
-                id="hamburger-btn"
-                type="button"
-                aria-label="Open navigation menu"
-                aria-controls="mobile-nav"
-                aria-expanded="false"
-              >
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-              </button>
             </div>
-          </header>
+            <header class="header">
+              <div class="header-container">
+                <a href="/" class="brand-lockup" data-astro-prefetch>
+                  <Image
+                    src={iconLogo}
+                    alt="Designed by Anthony"
+                    widths={[36, 72]}
+                    sizes="36px"
+                    width={36}
+                    height={27}
+                    class="nav-icon"
+                    loading="eager"
+                    fetchpriority="high"
+                  />
+                </a>
+                <nav class="nav nav-desktop">
+                  <a href="/ouredge" data-astro-prefetch>Our Edge</a>
+                  <a href="/services" data-astro-prefetch>Services</a>
+                  <a href="/pricing" data-astro-prefetch>Pricing</a>
+                  <a href="/service-areas" data-astro-prefetch>Service Areas</a>
+                  <a href="/portfolio" data-astro-prefetch>Portfolio</a>
+                  <a href="/about" data-astro-prefetch>About</a>
+                  <a href="/faq" data-astro-prefetch>FAQ</a>
+                  <a href="/blog" data-astro-prefetch>Blog</a>
+                  <a href="/contact" class="nav-contact-link" data-astro-prefetch>Contact</a>
+                  <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary btn-sm nav-book-btn" id="nav-book-call-btn" data-calendar-link>
+                    Book a Free Call
+                  </a>
+                </nav>
+                <button
+                  class="hamburger"
+                  id="hamburger-btn"
+                  type="button"
+                  aria-label="Open navigation menu"
+                  aria-controls="mobile-nav"
+                  aria-expanded="false"
+                >
+                  <span class="hamburger-line"></span>
+                  <span class="hamburger-line"></span>
+                  <span class="hamburger-line"></span>
+                </button>
+              </div>
+            </header>
+
+            <nav class="nav-rail" aria-label="Quick actions" data-nav-rail>
+              <div class="nav-rail-inner">
+                <a href="/free-seo-audit" class="nav-rail-link nav-rail-link--audit" data-astro-prefetch>
+                  <span class="nav-rail-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                  </span>
+                  <span class="nav-rail-text">
+                    <strong>Free site audit</strong>
+                    <span class="nav-rail-sub">Performance &amp; local SEO signals</span>
+                  </span>
+                </a>
+                <a href="/contact" class="nav-rail-link nav-rail-link--contact" data-astro-prefetch>
+                  <span class="nav-rail-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                  </span>
+                  <span class="nav-rail-text">
+                    <strong>Email the studio</strong>
+                    <span class="nav-rail-sub">Human reply, usually same day</span>
+                  </span>
+                </a>
+                <a
+                  href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+                  class="nav-rail-link nav-rail-link--book"
+                  data-calendar-link
+                >
+                  <span class="nav-rail-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </span>
+                  <span class="nav-rail-text">
+                    <strong>Book a call</strong>
+                    <span class="nav-rail-sub">15 minutes · pick a time</span>
+                  </span>
+                </a>
+                <a href={mailtoContactHref} class="nav-rail-link nav-rail-link--phone">
+                  <span class="nav-rail-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                  </span>
+                  <span class="nav-rail-text">
+                    <strong>Call now</strong>
+                    <span class="nav-rail-sub">{businessProfile.telephone.replace('+1-', '')}</span>
+                  </span>
+                </a>
+              </div>
+            </nav>
+          </div>
 
           <div class="mobile-nav-overlay" id="mobile-nav">
             <nav class="mobile-nav-links">
@@ -394,8 +457,15 @@ try {
               <a href="/faq" data-astro-prefetch>FAQ</a>
               <a href="/blog" data-astro-prefetch>Blog</a>
               <a href="/contact" data-astro-prefetch>Contact</a>
-              <a href="/contact" class="mobile-nav-cta" data-astro-prefetch>
-                Contact Us
+              <a href="/free-seo-audit" class="mobile-nav-cta mobile-nav-cta--secondary" data-astro-prefetch>
+                Free site audit
+              </a>
+              <a
+                href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+                class="mobile-nav-cta"
+                data-calendar-link
+              >
+                Book a free call
               </a>
             </nav>
           </div>
@@ -555,6 +625,8 @@ try {
               </div>
             </div>
           </div>
+
+          {enableStreamChat && <StreamChatWidget client:only="react" />}
         </>
       )
     }
@@ -850,6 +922,14 @@ try {
     border-color: rgba(255, 255, 255, 0.9);
   }
 
+  /* ── Sticky top chrome: pilot banner + main nav + conversion rail ── */
+  .site-chrome-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 8px 28px rgba(3, 7, 18, 0.35);
+  }
+
   /* ── Announcement Banner ── */
   .site-banner {
     background: linear-gradient(90deg, rgba(11, 18, 32, 0.98) 0%, rgba(15, 23, 42, 0.98) 50%, rgba(11, 18, 32, 0.98) 100%);
@@ -906,14 +986,105 @@ try {
   }
 
   .header {
-    position: sticky;
-    top: 0;
+    position: relative;
     background:
       linear-gradient(180deg, rgba(7, 13, 24, 0.94) 0%, rgba(10, 18, 32, 0.88) 100%);
     backdrop-filter: blur(18px);
-    z-index: 100;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 10px 30px rgba(3, 7, 18, 0.22);
+  }
+
+  .nav-rail {
+    display: none;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(11, 18, 32, 0.96) 100%);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.12);
+  }
+
+  .nav-rail-inner {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: 0.45rem var(--container-gutter);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.35rem 0.75rem;
+    align-items: stretch;
+  }
+
+  .nav-rail-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 0.65rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.88);
+    border: 1px solid transparent;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
+    min-height: 2.85rem;
+  }
+
+  .nav-rail-link:hover {
+    border-color: rgba(96, 165, 250, 0.35);
+    background: rgba(15, 23, 42, 0.65);
+    color: #f8fafc;
+  }
+
+  .nav-rail-link:focus-visible {
+    outline: 2px solid rgba(147, 197, 253, 0.55);
+    outline-offset: 2px;
+  }
+
+  .nav-rail-icon {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    opacity: 0.92;
+    color: #93c5fd;
+  }
+
+  .nav-rail-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    line-height: 1.2;
+    min-width: 0;
+  }
+
+  .nav-rail-text strong {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-family: var(--font-display, 'Outfit Variable', system-ui, sans-serif);
+  }
+
+  .nav-rail-sub {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: rgba(226, 232, 240, 0.72);
+    letter-spacing: 0.01em;
+  }
+
+  .nav-rail-link--audit .nav-rail-icon {
+    color: #34d399;
+  }
+
+  .nav-rail-link--book .nav-rail-text strong {
+    color: #fde68a;
+  }
+
+  @media (min-width: 900px) {
+    .nav-rail {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .nav-rail-inner {
+      gap: 0.5rem 1rem;
+      padding: 0.5rem var(--container-gutter);
+    }
   }
 
   .header-container {
@@ -1144,6 +1315,19 @@ try {
     box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45);
   }
 
+  .mobile-nav-cta--secondary {
+    margin-top: 0.5rem;
+    background: transparent !important;
+    border: 2px solid rgba(96, 165, 250, 0.55) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: none;
+  }
+
+  .mobile-nav-cta--secondary:hover {
+    border-color: rgba(147, 197, 253, 0.85) !important;
+    color: var(--text-white) !important;
+  }
+
   @media (max-width: 768px) {
     .announcement-container {
       flex-direction: column;
@@ -1179,12 +1363,15 @@ try {
   /* ── Global Print Styles ── */
   @media print {
     /* Hide ALL site chrome */
+    .site-chrome-sticky,
     .site-banner,
     .header,
+    .nav-rail,
     .mobile-nav-overlay,
     .breadcrumb-nav,
     .footer,
     .reach-out-sticky,
+    .stream-chat-widget,
     #reading-progress-bar,
     .hamburger,
     .no-print {

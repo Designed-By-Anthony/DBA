@@ -73,6 +73,13 @@ const marketingSchema = z
     ADMIN_UPSTREAM_URL: optionalUrl,
     ACCOUNTS_UPSTREAM_URL: optionalUrl,
     LIGHTHOUSE_UPSTREAM_URL: optionalUrl,
+
+    /** GetStream Chat — marketing site widget (optional; off unless PUBLIC_ENABLE_STREAM_CHAT=1) */
+    PUBLIC_ENABLE_STREAM_CHAT: z.string().trim().optional(),
+    PUBLIC_STREAM_CHAT_API_KEY: z.string().trim().optional(),
+    STREAM_CHAT_SECRET: z.string().trim().optional(),
+    STREAM_CHAT_INBOX_USER_ID: z.string().trim().optional(),
+    STREAM_CHAT_INBOX_NAME: z.string().trim().optional(),
   })
   .passthrough()
   .superRefine((env, ctx) => {

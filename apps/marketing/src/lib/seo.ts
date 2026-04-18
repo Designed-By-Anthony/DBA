@@ -679,6 +679,11 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 }
 
 export function buildBaseWebsiteSchema(): SchemaValue {
+  const contactUrl = toAbsoluteUrl('/contact');
+  const auditUrl = toAbsoluteUrl('/free-seo-audit');
+  const calendlyBook =
+    'https://calendly.com/anthony-designedbyanthony/web-design-consult';
+
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -698,6 +703,33 @@ export function buildBaseWebsiteSchema(): SchemaValue {
       '@id': ORGANIZATION_ID,
     },
     inLanguage: 'en-US',
+    /** Machine-readable primary actions — aligns with Google rich result / entity understanding. */
+    potentialAction: [
+      {
+        '@type': 'ViewAction',
+        name: 'Run free Lighthouse-style website audit',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: auditUrl,
+        },
+      },
+      {
+        '@type': 'ContactAction',
+        name: 'Contact Designed by Anthony',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: contactUrl,
+        },
+      },
+      {
+        '@type': 'ViewAction',
+        name: 'Book a free web design consultation',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: calendlyBook,
+        },
+      },
+    ],
   };
 }
 
