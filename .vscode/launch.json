@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Marketing: Astro dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm --filter designed-by-anthony dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Agency OS: Next dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm --filter agency-os dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Lighthouse: Next dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm --filter lighthouse-audit dev",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
