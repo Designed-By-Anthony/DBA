@@ -86,42 +86,65 @@ export async function listClientOrgs() {
 /**
  * Create a new client organization.
  */
-export async function createClientOrg(name: string, verticalTemplate: string = "agency") {
+export async function createClientOrg(
+  name: string,
+  verticalTemplate: string = "agency",
+): Promise<
+  | { success: true; id: string; name: string; slug: string | null }
+  | { success: false; error: string }
+> {
   const session = await verifyAuth();
   if (session.user.id === "dev") {
-    throw new Error("Sign in with Clerk to create client organizations.");
+    return { success: false, error: "Sign in with Clerk to create client organizations." };
   }
 
   const userId = session.user.id;
-  const client = await clerkClient();
-  const org = await client.organizations.createOrganization({
-    name,
-    createdBy: userId,
-  });
-
-  // Initialize tenant record in SQL
-  const db = getDb();
-  if (db) {
-    const now = new Date().toISOString();
-    await db.insert(tenants).values({
-      clerkOrgId: org.id,
+  try {
+    const client = await clerkClient();
+    const org = await client.organizations.createOrganization({
       name,
-      verticalType: verticalTemplate as "agency" | "service_pro",
-      brandColor: "#2563eb",
-      pipelineStages: [],
-      dealSources: ["Referral", "Inbound", "Organic"],
-      notificationPrefs: {},
-      crmConfig: {},
-      createdAt: now,
-      updatedAt: now,
+      createdBy: userId,
     });
-  }
 
-  return {
-    id: org.id,
-    name: org.name,
-    slug: org.slug,
-  };
+    const db = getDb();
+    if (db) {
+      const now = new Date().toISOString();
+      try {
+        await db.insert(tenants).values({
+          clerkOrgId: org.id,
+          name,
+          verticalType: verticalTemplate as "agency" | "service_pro",
+          brandColor: "#2563eb",
+          pipelineStages: [],
+          dealSources: ["Referral", "Inbound", "Organic"],
+          notificationPrefs: {},
+          crmConfig: {},
+          createdAt: now,
+          updatedAt: now,
+        });
+      } catch (dbErr) {
+        console.error("[createClientOrg] Tenant row insert failed:", dbErr);
+        return {
+          success: false,
+          error:
+            "Organization was created in Clerk, but the database could not save tenant settings. Check DATABASE_URL and try again, or contact support.",
+        };
+      }
+    }
+
+    return {
+      success: true,
+      id: org.id,
+      name: org.name,
+      slug: org.slug,
+    };
+  } catch (err) {
+    console.error("[createClientOrg] Clerk error:", err);
+    return {
+      success: false,
+      error: "Could not create organization. Verify CLERK_SECRET_KEY matches this deployment and your Clerk plan allows creating organizations.",
+    };
+  }
 }
 
 /**

@@ -1,5 +1,11 @@
 # Migration Status Report
 
+## Agency OS: tenant actions + Web Analytics opt-in (2026-04-18)
+
+- **`withTenant`:** Read-heavy paths return safe defaults when auth/DB is unavailable (avoids server-component 500s / hydration fallout). Mutations still surface errors. **`getDashboardStats`** overdue tasks now filter `due_at <= now` (ISO compare) with `due_at` not null.
+- **`createClientOrg`:** Returns `{ success, error? }` instead of throwing; Clerk failures and tenant insert failures get user-visible toasts (no silent 500 on `/admin/clients`).
+- **Vercel Web Analytics:** `VercelObservability` only mounts on `*.vercel.app` unless **`NEXT_PUBLIC_VERCEL_WEB_ANALYTICS=1`** — stops relative `/…/script.js` 404 + MIME errors on custom domains when Analytics is not enabled. Documented in `apps/web-viewer/.env.example`; `turbo.json` + `@dba/env` include the key.
+- **`@dba/env`:** Removed duplicate local `hydrateWebViewerEnvAliases` that shadowed the shared module (fixed `next build` type error); `admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is listed in `web-viewer-aliases.ts`.
 ## Lighthouse: Trusted Types + Vercel Analytics CSP (2026-04-18)
 
 - **Sentry 7423224269:** Browsers enforcing Trusted Types blocked React `innerHTML` during hydration. Added `public/trusted-types-bootstrap.js` + `beforeInteractive` script in `layout.tsx` (same pattern as marketing Layout). Extended CSP `connect-src` / `script-src` for `va.vercel-scripts.com` and `vitals.vercel-insights.com` (Analytics / Speed Insights).

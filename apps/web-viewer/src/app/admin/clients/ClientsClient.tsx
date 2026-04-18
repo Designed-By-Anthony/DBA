@@ -49,11 +49,19 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
 
     setCreating(true);
     try {
-      const newOrg = await createClientOrg(newOrgName.trim(), newOrgVertical);
+      const result = await createClientOrg(newOrgName.trim(), newOrgVertical);
+      if (!result.success) {
+        toast.error(result.error);
+        setCreating(false);
+        return;
+      }
+      const newOrg = result;
       setOrgs((prev) => [
         ...prev,
         {
-          ...newOrg,
+          id: newOrg.id,
+          name: newOrg.name,
+          slug: newOrg.slug,
           imageUrl: "",
           membersCount: 1,
           createdAt: new Date().toISOString(),
@@ -67,6 +75,7 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
       setShowCreate(false);
     } catch (err) {
       console.error("Failed to create org:", err);
+      toast.error("Something went wrong while creating the organization.");
     }
     setCreating(false);
   };

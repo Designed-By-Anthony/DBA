@@ -28,8 +28,9 @@ import {
   type ActivityRow,
   type TaskRow,
   type NotificationRow,
+  type Database,
 } from "@dba/database";
-import { eq, and, desc, asc, sql, count, sum, or, ilike, inArray } from "drizzle-orm";
+import { eq, and, desc, asc, sql, count, sum, or, ilike, inArray, lte, isNotNull } from "drizzle-orm";
 import type {
   Prospect,
   EmailRecord,
@@ -92,18 +93,46 @@ export async function verifyAuth(): Promise<DevSession> {
 // ============================================
 // Tenant Context Helper
 // ============================================
-async function withTenant<T>(fn: (tx: any, tenantId: string) => Promise<T>): Promise<T> {
-  const session = await verifyAuth();
-  const tenantId = session.user.agencyId;
-  const db = getDb();
 
+type TenantTx = Parameters<Parameters<Database["transaction"]>[0]>[0];
+
+async function withTenant<T>(
+  fn: (tx: TenantTx, tenantId: string) => Promise<T>,
+  onUnavailable?: () => T | Promise<T>,
+): Promise<T> {
+  let session: DevSession;
+  try {
+    session = await verifyAuth();
+  } catch (err) {
+    Sentry.captureException(err);
+    if (onUnavailable) return await onUnavailable();
+    throw err;
+  }
+
+  if (session.user.id === "dev") {
+    if (onUnavailable) return await onUnavailable();
+    throw new Error("Sign in with Clerk to use the CRM.");
+  }
+
+  const tenantId = session.user.agencyId;
+  if (!tenantId) {
+    if (onUnavailable) return await onUnavailable();
+    throw new Error("Missing organization context.");
+  }
+
+  const db = getDb();
   if (!db) {
+    if (onUnavailable) return await onUnavailable();
     throw new Error("Database not configured");
   }
 
-  return await withTenantContext(db, tenantId, async (tx) => {
-    return fn(tx, tenantId);
-  });
+  try {
+    return await withTenantContext(db, tenantId, async (tx) => fn(tx, tenantId));
+  } catch (err) {
+    Sentry.captureException(err);
+    if (onUnavailable) return await onUnavailable();
+    throw err;
+  }
 }
 
 // ============================================
@@ -160,8 +189,8 @@ const STALE_LEAD_DAYS = 14;
 // ============================================
 
 export async function getProspects(): Promise<Prospect[]> {
-  try {
-    return await withTenant(async (db, tenantId) => {
+  return await withTenant(
+    async (db, tenantId) => {
       const rows = await db
         .select()
         .from(leads)
@@ -170,11 +199,9 @@ export async function getProspects(): Promise<Prospect[]> {
         .limit(200);
 
       return rows.map(leadRowToProspect);
-    });
-  } catch (error) {
-    Sentry.captureException(error);
-    return [];
-  }
+    },
+    () => [],
+  );
 }
 
 export async function getProspect(id: string): Promise<Prospect | null> {
@@ -189,7 +216,7 @@ export async function getProspect(id: string): Promise<Prospect | null> {
       .limit(1);
 
     return row.length > 0 ? leadRowToProspect(row[0]) : null;
-  });
+  }, () => null);
 }
 
 export async function addProspect(data: {
@@ -433,7 +460,7 @@ export async function findDuplicateProspectByEmail(
 
     if (result.length === 0) return null;
     return { id: result[0].prospectId, name: result[0].name || "" };
-  });
+  }, () => null);
 }
 
 // ============================================
@@ -679,7 +706,7 @@ export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[
       console.error("getEmailHistory error:", err);
       return [];
     }
-  });
+  }, () => []);
 }
 
 // ============================================
@@ -689,6 +716,21 @@ export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[
 const probByStatus: Record<ProspectStatus, number> = Object.fromEntries(
   pipelineStages.map((s) => [s.id, s.probability]),
 ) as Record<ProspectStatus, number>;
+
+const EMPTY_DASHBOARD_STATS: DashboardStats = {
+  totalProspects: 0,
+  prospectsByStatus: { lead: 0, contacted: 0, proposal: 0, dev: 0, launched: 0 },
+  emailsSent: 0,
+  emailsScheduled: 0,
+  totalOpens: 0,
+  totalClicks: 0,
+  pipelineValue: 0,
+  forecastedMrr: 0,
+  weightedPipelineValue: 0,
+  staleLeadCount: 0,
+  overdueOpenTasksCount: 0,
+  pipelineVelocityDays: 0,
+};
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   return withTenant(async (db, tenantId) => {
@@ -716,15 +758,15 @@ export async function getDashboardStats(): Promise<DashboardStats> {
           eq(emails.status, "scheduled")
         ));
 
-      // Get task counts
-      const now = new Date();
+      const nowIso = new Date().toISOString();
       const overdueTaskResult = await db
         .select({ count: count() })
         .from(tasks)
         .where(and(
           eq(tasks.tenantId, tenantId),
           eq(tasks.completed, false),
-          // dueAt < now
+          isNotNull(tasks.dueAt),
+          lte(tasks.dueAt, nowIso),
         ));
 
       // Process prospects
@@ -792,22 +834,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       };
     } catch (err) {
       console.error("getDashboardStats error:", err);
-      return {
-        totalProspects: 0,
-        prospectsByStatus: { lead: 0, contacted: 0, proposal: 0, dev: 0, launched: 0 },
-        emailsSent: 0,
-        emailsScheduled: 0,
-        totalOpens: 0,
-        totalClicks: 0,
-        pipelineValue: 0,
-        forecastedMrr: 0,
-        weightedPipelineValue: 0,
-        staleLeadCount: 0,
-        overdueOpenTasksCount: 0,
-        pipelineVelocityDays: 0,
-      };
+      return { ...EMPTY_DASHBOARD_STATS };
     }
-  });
+  }, () => EMPTY_DASHBOARD_STATS);
 }
 
 // ============================================
@@ -1020,7 +1049,7 @@ export async function getActivities(prospectId: string): Promise<Activity[]> {
       console.error("getActivities error:", err);
       return [];
     }
-  });
+  }, () => []);
 }
 
 export async function createActivity(
@@ -1205,7 +1234,7 @@ export async function getInvoices(prospectId?: string): Promise<any[]> {
       console.error("getInvoices error:", err);
       return [];
     }
-  });
+  }, () => []);
 }
 
 // ============================================
@@ -1338,7 +1367,7 @@ export async function searchOmni(query: string): Promise<{
       console.error("Omnisearch error:", err);
       return [];
     }
-  });
+  }, () => []);
 }
 
 // ============================================
@@ -1366,7 +1395,7 @@ export async function getRecentActivities(limit = 10) {
       console.error("getRecentActivities error:", err);
       return [];
     }
-  });
+  }, () => []);
 }
 
 export async function saveQuoteAction(prospectId: string, data: any) {
