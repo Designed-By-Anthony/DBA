@@ -7,22 +7,30 @@ import {
 } from "./shared";
 
 /**
- * Vercel Environment Variables are sometimes prefixed per deployment target
- * (e.g. `admin_*` for the admin project). The Clerk SDK and our code read
- * `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` only — copy known
+ * Vercel's Clerk integration may prefill env vars with non-standard names:
+ * `admin_CLERK_SECRET_KEY`, `NEXT_PUBLIC_admin_CLERK_PUBLISHABLE_KEY`, or
+ * `admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`. The SDK and this repo expect
+ * `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` — copy known
  * aliases onto the canonical names before Zod runs so production builds do
  * not fail when secrets use the prefixed form.
  */
 function hydrateWebViewerEnvAliases(env: NodeJS.ProcessEnv): void {
-  const pairs: ReadonlyArray<[canonical: string, alias: string]> = [
-    ["CLERK_SECRET_KEY", "admin_CLERK_SECRET_KEY"],
-    ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+  const pairs: ReadonlyArray<[canonical: string, aliases: string[]]> = [
+    ["CLERK_SECRET_KEY", ["admin_CLERK_SECRET_KEY"]],
+    [
+      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+      ["NEXT_PUBLIC_admin_CLERK_PUBLISHABLE_KEY", "admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+    ],
   ];
-  for (const [canonical, alias] of pairs) {
-    const c = env[canonical]?.trim();
-    const a = env[alias]?.trim();
-    if (!c && a) {
-      env[canonical] = a;
+  for (const [canonical, aliases] of pairs) {
+    if (!env[canonical]?.trim()) {
+      for (const alias of aliases) {
+        const a = env[alias]?.trim();
+        if (a) {
+          env[canonical] = a;
+          break;
+        }
+      }
     }
   }
 }

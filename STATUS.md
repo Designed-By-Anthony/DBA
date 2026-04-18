@@ -1,5 +1,9 @@
 # Migration Status Report
 
+## Vercel Clerk prefill env names (2026-04-18)
+
+- Vercel's Clerk UI can create **`NEXT_PUBLIC_admin_CLERK_PUBLISHABLE_KEY`**, **`admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`**, and **`admin_CLERK_SECRET_KEY`** instead of the canonical **`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`** / **`CLERK_SECRET_KEY`**. **`validateWebViewerEnv`** now hydrates the canonical names from all known aliases; **`turbo.json`** lists them (plus Sentry OTLP/log-drain keys) so Turbo passes them into the build.
+
 ## Default Clerk org id for Calendly + lead intake (2026-04-18)
 
 - **`LEAD_WEBHOOK_DEFAULT_AGENCY_ID`** example value set to `org_3CWuIWj5aFCaZXr8dUEpwtGSiCW` (Designed by Anthony org). **`/api/webhooks/calendly`** no longer hardcodes a legacy org id; it uses the same env var as anonymous `/api/lead` routing and returns **503** if unset (fail-closed).
