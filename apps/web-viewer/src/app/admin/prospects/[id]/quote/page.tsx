@@ -5,12 +5,16 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProspectById } from "../../../actions";
 import { getStripeProducts, type StripeProductDetail } from "@/app/admin/actions/stripe";
-import type { Prospect, QuoteTier } from "@/lib/types";
+import type { Prospect, QuotePackage, QuoteTier } from "@/lib/types";
 import { formatCents } from "@/lib/currency";
 
 interface TierState {
   name: string;
   items: StripeProductDetail[];
+}
+
+function toQuoteInterval(interval: string | undefined): "month" | "year" | undefined {
+  return interval === "month" || interval === "year" ? interval : undefined;
 }
 
 export default function QuoteBuilderPage() {
@@ -93,15 +97,15 @@ export default function QuoteBuilderPage() {
     setSaving(true);
     
     // Construct Quote Payload
-    const packagesToSave = multiTier ? ['good', 'better', 'best'] : ['standard'];
-    const formattedPackages = packagesToSave.map((tierKey) => {
-      const tierData = tiers[tierKey as QuoteTier];
+    const packagesToSave: QuoteTier[] = multiTier ? ['good', 'better', 'best'] : ['standard'];
+    const formattedPackages: QuotePackage[] = packagesToSave.map((tierKey) => {
+      const tierData = tiers[tierKey];
       const items = tierData.items.map(p => ({
         stripeProductId: p.id,
         name: p.name,
         priceCents: p.default_price?.unit_amount || 0,
         type: p.default_price?.type || 'one_time',
-        interval: p.default_price?.recurring?.interval,
+        interval: toQuoteInterval(p.default_price?.recurring?.interval),
       }));
       const totals = calculateTotal(tierData.items);
       return {

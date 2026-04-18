@@ -1,5 +1,15 @@
 # Migration Status Report
 
+## Release readiness pass (2026-04-18)
+
+- **Go-green checks:** `pnpm lint`, `pnpm build`, and live marketing smoke (`BASE_URL=https://designedbyanthony.com pnpm --filter designed-by-anthony run test:smoke:live`) pass from the monorepo root after the TopBar + CRM action typing fixes below. Live smoke covered homepage CTAs, money pages, contact/calendar, audit form, and crawl files on desktop + mobile projects.
+- **CRM hardening in this pass:** removed the TopBar `no-explicit-any` suppression, removed explicit `any`s from the touched admin action paths, kept task update/delete mutations scoped by `tenant_id + lead_id + task_id`, and typed quote-package submission at the builder boundary.
+- **Production client-create fix:** live `POST /admin/pricebook` 500s were traced to Postgres missing `public.leads.stripe_subscription_id` while deployed Agency OS code inserts that column. Applied the existing additive migration (`ALTER TABLE "public"."leads" ADD COLUMN IF NOT EXISTS "stripe_subscription_id" text;`) to production and verified a rollback-only client insert probe succeeds.
+- **Live surface check:** `designedbyanthony.com`, `www.designedbyanthony.com`, `admin.designedbyanthony.com/admin`, `accounts.designedbyanthony.com/portal`, `lighthouse.designedbyanthony.com`, `/brand/logo.png`, and `/brand/mark.webp` returned 200.
+- **Blocking release item:** Agency OS production has `STRIPE_SECRET_KEY`, but Vercel is missing `STRIPE_WEBHOOK_SECRET`; `POST https://admin.designedbyanthony.com/api/webhooks/stripe` returns `503 {"error":"Webhook not configured"}`. Stripe checkout can start, but paid events/subscription events will not reconcile into CRM until the webhook is created and the signing secret is added to Agency OS env.
+- **Also fix before shipping paid CRM flows:** add `STRIPE_AGENCY_PRO_PRICE_ID` to Agency OS production/preview env so `/admin/billing/upgrade` uses the intended Stripe catalog price instead of inline fallback price data.
+- **Branch hygiene:** PR #93 (`feat/agency-os-domain-calendly-crm`) is merge-dirty and behind the current `main` production fixes. Do not merge it as-is; salvage/cherry-pick only missing changes onto current `main`.
+
 ## Apex marketing 404 on Vercel (2026-04-18) — recovered
 
 - **Live recovery:** Rolled the apex `dbastudio-315` project back to deployment `dpl_FdQkCXMwhTE3CTeWui1a3K1MrkVx`; `www.designedbyanthony.com`, `/brand/logo.png`, and `/brand/mark.webp` returned 200 after rollback.
@@ -18,7 +28,7 @@
 
 ## Agency OS: TopBar hydration (React #418) (2026-04-18)
 
-- **`TopBar`:** Greeting line (`Good morning/afternoon/evening` + Clerk name/org) now renders **after mount** via `useLayoutEffect`, so server HTML and first client paint both use an empty subtitle — no timezone or Clerk SSR/client text mismatch. Fixes minified **React error #418** on admin chrome.
+- **`TopBar`:** Greeting line (`Good morning/afternoon/evening` + Clerk name/org) now renders **after mount** via `useSyncExternalStore`, so server HTML and first client paint both use an empty subtitle — no timezone or Clerk SSR/client text mismatch. This also satisfies the React hooks lint rule that rejects synchronous `setState` inside effects.
 
 ## Marketing: sticky conversion rail + WebSite actions (2026-04-18)
 

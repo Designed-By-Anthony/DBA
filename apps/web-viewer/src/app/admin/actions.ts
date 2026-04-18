@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use server";
 
 import "@dba/env/web-viewer-aliases";
@@ -40,6 +40,7 @@ import type {
   ProspectHealthStatus,
   Activity,
   ActivityType,
+  Invoice,
   QuotePackage,
   CrmTask,
 } from "@/lib/types";
@@ -811,7 +812,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       const staleMs = STALE_LEAD_DAYS * 24 * 60 * 60 * 1000;
       let staleLeadCount = 0;
 
-      prospectRows.forEach((p: any) => {
+      prospectRows.forEach((p) => {
         const mappedStatus = (p.status || "lead") as ProspectStatus;
         if (statusCounts[mappedStatus as ProspectStatus] !== undefined) {
           statusCounts[mappedStatus as ProspectStatus]++;
@@ -975,7 +976,7 @@ export async function updateCrmTask(
       .from(tasks)
       .where(and(
         eq(tasks.tenantId, tenantId),
-        eq(tasks.id, taskId as any),
+        eq(tasks.id, taskId),
         eq(tasks.leadId, prospectId)
       ))
       .limit(1);
@@ -995,7 +996,11 @@ export async function updateCrmTask(
     await db
       .update(tasks)
       .set(payload)
-      .where(eq(tasks.id, taskId as any));
+      .where(and(
+        eq(tasks.tenantId, tenantId),
+        eq(tasks.id, taskId),
+        eq(tasks.leadId, prospectId),
+      ));
 
     return { success: true };
   });
@@ -1023,7 +1028,7 @@ export async function deleteCrmTask(prospectId: string, taskId: string): Promise
       .from(tasks)
       .where(and(
         eq(tasks.tenantId, tenantId),
-        eq(tasks.id, taskId as any),
+        eq(tasks.id, taskId),
         eq(tasks.leadId, prospectId)
       ))
       .limit(1);
@@ -1034,7 +1039,11 @@ export async function deleteCrmTask(prospectId: string, taskId: string): Promise
 
     await db
       .delete(tasks)
-      .where(eq(tasks.id, taskId as any));
+      .where(and(
+        eq(tasks.tenantId, tenantId),
+        eq(tasks.id, taskId),
+        eq(tasks.leadId, prospectId),
+      ));
 
     return { success: true };
   });
@@ -1060,7 +1069,7 @@ export async function getActivities(prospectId: string): Promise<Activity[]> {
         .orderBy(desc(activities.createdAt))
         .limit(50);
 
-      return rows.map((row: any) => ({
+      return rows.map((row) => ({
         id: row.id,
         agencyId: row.tenantId,
         prospectId: row.leadId,
@@ -1252,7 +1261,7 @@ export async function createSubscriptionAction(params: {
   }
 }
 
-export async function getInvoices(prospectId?: string): Promise<any[]> {
+export async function getInvoices(prospectId?: string): Promise<Invoice[]> {
   return withTenant(async (db, tenantId) => {
     try {
       // Placeholder — invoices table not yet implemented
@@ -1382,7 +1391,7 @@ export async function searchOmni(query: string): Promise<{
           email: row.email || "",
           company: row.company || "",
         }))
-        .filter((p: any) =>
+        .filter((p) =>
           p.name.toLowerCase().includes(q) ||
           p.email.toLowerCase().includes(q) ||
           (p.company || "").toLowerCase().includes(q)
@@ -1401,7 +1410,13 @@ export async function searchOmni(query: string): Promise<{
 // Recent Activities (Notification Feed)
 // ============================================
 
-export async function getRecentActivities(limit = 10) {
+export async function getRecentActivities(limit = 10): Promise<{
+  id: string;
+  type: string;
+  description: string;
+  prospectId: string | null;
+  createdAt: string;
+}[]> {
   return withTenant(async (db, tenantId) => {
     try {
       const rows = await db
@@ -1411,7 +1426,7 @@ export async function getRecentActivities(limit = 10) {
         .orderBy(desc(activities.createdAt))
         .limit(limit);
 
-      return rows.map((row: any) => ({
+      return rows.map((row) => ({
         id: row.id,
         type: row.type,
         description: row.title,
@@ -1425,6 +1440,9 @@ export async function getRecentActivities(limit = 10) {
   }, () => []);
 }
 
-export async function saveQuoteAction(prospectId: string, data: any) {
+export async function saveQuoteAction(
+  prospectId: string,
+  data: { packages: QuotePackage[] },
+) {
   return { ok: true, quoteId: "stub-quote-id" };
 }

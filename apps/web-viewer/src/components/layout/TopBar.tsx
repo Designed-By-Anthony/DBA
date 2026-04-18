@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Bell, CheckCircle, AlertTriangle, Mail, UserPlus, ArrowRight } from "lucide-react";
 import { UserButton, useUser, useOrganization } from "@clerk/nextjs";
 import Omnisearch from "@/components/portal/Omnisearch";
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminPrefix } from "@/lib/useAdminPrefix";
 import { getRecentActivities } from "@/app/admin/actions";
@@ -23,6 +22,18 @@ function getGreeting(): string {
   if (hour < 12) return "Good morning";
   if (hour < 17) return "Good afternoon";
   return "Good evening";
+}
+
+function subscribeClientReady() {
+  return () => undefined;
+}
+
+function getClientReadySnapshot() {
+  return true;
+}
+
+function getServerReadySnapshot() {
+  return false;
 }
 
 function timeAgo(dateStr: string): string {
@@ -57,20 +68,20 @@ export default function TopBar({
   const [showNotifs, setShowNotifs] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [hasUnread, setHasUnread] = useState(false);
-  /** Subtitle after mount only — avoids React #418 (server TZ vs client TZ; Clerk user/org SSR vs hydrated). */
-  const [greetingSubtitle, setGreetingSubtitle] = useState("");
   const { user } = useUser();
   const { organization } = useOrganization();
   const firstName = user?.firstName || "there";
   const orgName = organization?.name;
+  const clientReady = useSyncExternalStore(
+    subscribeClientReady,
+    getClientReadySnapshot,
+    getServerReadySnapshot,
+  );
+  const greetingSubtitle = clientReady
+    ? `${getGreeting()}, ${firstName}${orgName ? ` · ${orgName}` : ""}`
+    : "";
   const router = useRouter();
   const stripAdmin = useAdminPrefix();
-
-  useLayoutEffect(() => {
-    setGreetingSubtitle(
-      `${getGreeting()}, ${firstName}${orgName ? ` · ${orgName}` : ""}`,
-    );
-  }, [firstName, orgName]);
 
   // Load real activity data for notifications
   useEffect(() => {
@@ -79,15 +90,15 @@ export default function TopBar({
       try {
         const activities = await getRecentActivities(10);
         if (cancelled) return;
-        const mapped: Notification[] = activities.map((a: any) => ({
-          id: a.id,
-          type: a.type === "status_change" ? "info" as const :
-                a.type === "email_sent" || a.type === "email_opened" ? "email" as const :
-                a.type === "churn_risk" ? "alert" as const : "success" as const,
-          title: a.type.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-          body: a.description,
-          href: a.prospectId ? `/admin/prospects/${a.prospectId}` : undefined,
-          time: a.createdAt,
+        const mapped: Notification[] = activities.map((activity) => ({
+          id: activity.id,
+          type: activity.type === "status_change" ? "info" as const :
+                activity.type === "email_sent" || activity.type === "email_opened" ? "email" as const :
+                activity.type === "churn_risk" ? "alert" as const : "success" as const,
+          title: activity.type.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+          body: activity.description,
+          href: activity.prospectId ? `/admin/prospects/${activity.prospectId}` : undefined,
+          time: activity.createdAt,
         }));
         setNotifications(mapped);
         setHasUnread(mapped.length > 0);
