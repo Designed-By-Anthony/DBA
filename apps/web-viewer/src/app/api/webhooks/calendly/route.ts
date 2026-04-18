@@ -1,26 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import { getDb, leads, activities } from '@dba/database';
+import { eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
+import { getSecret, verifyCalendlySignature } from '@/lib/webhook-auth';
 import { apiError } from '@/lib/api-error';
 
 /**
  * Calendly Webhook Handler
- * 
+ *
  * Receives events from Calendly:
  * - invitee.created → new booking
  * - invitee.canceled → booking cancelled
- * 
- * Setup: In Calendly → Integrations → Webhooks → Create Webhook
- * URL: https://admin.designedbyanthony.com/api/webhooks/calendly
- * Events: invitee.created, invitee.canceled
  */
 export async function POST(request: NextRequest) {
+  const signingKey = getSecret('CALENDLY_WEBHOOK_SIGNING_KEY');
+  if (!signingKey) {
+    console.error('[calendly] webhook rejected: CALENDLY_WEBHOOK_SIGNING_KEY not configured');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+  }
+
+  const rawBody = await request.text();
+  const signatureHeader = request.headers.get('calendly-webhook-signature');
+  if (!verifyCalendlySignature(rawBody, signatureHeader, signingKey)) {
+    console.warn('[calendly] invalid signature rejected');
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
+  let body: { event?: string; payload?: Record<string, unknown> };
   try {
-    const body = await request.json();
-    const event = body.event; // "invitee.created" | "invitee.canceled"
-    const payload = body.payload;
+    body = JSON.parse(rawBody) as typeof body;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  try {
+    const event = body.event;
+    const payload = body.payload as
+      | {
+          email?: string;
+          name?: string;
+          text_reminder_number?: string;
+          event_type?: { name?: string };
+          scheduled_event?: { start_time?: string; uri?: string };
+          cancellation?: { reason?: string };
+        }
+      | undefined;
 
     if (!event || !payload) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
@@ -37,58 +63,66 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No email in payload' }, { status: 400 });
     }
 
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
+    }
+
     // Find existing prospect by email
-    const prospectQuery = await db
-      .collection('prospects')
-      .where('email', '==', inviteeEmail)
-      .limit(1)
-      .get();
+    const prospectRows = await db
+      .select()
+      .from(leads)
+      .where(eq(leads.emailNormalized, inviteeEmail))
+      .limit(1);
 
     let prospectId: string;
+    let tenantId: string;
 
-    if (prospectQuery.empty) {
-      // Create a new prospect from the booking
-      const ref = db.collection('prospects').doc();
-      prospectId = ref.id;
+    if (prospectRows.length === 0) {
+      // Create new lead under master tenant
+      const masterTenantId = 'org_3CKCZdvXprb2QAsroq4oxqH12Rl';
+      const now = new Date().toISOString();
+      const newProspectId = `cal_${Date.now()}`;
 
-      await ref.set({
+      await db.insert(leads).values({
+        tenantId: masterTenantId,
+        prospectId: newProspectId,
         name: inviteeName,
         email: inviteeEmail,
+        emailNormalized: inviteeEmail,
         phone: payload.text_reminder_number || '',
         company: '',
-        website: '',
-        targetUrl: '',
-        status: 'contacted', // They booked a call, so they're past "lead"
-        dealValue: 0,
         source: 'Calendly',
+        status: 'contacted',
         tags: ['Calendly Booking'],
         notes: `Booked: ${eventName}`,
-        assignedTo: '',
-        createdAt: new Date().toISOString(),
-        lastContactedAt: new Date().toISOString(),
-        unsubscribed: false,
-        calendlyEventUrl: eventUrl,
+        metadata: { calendlyEventUrl: eventUrl },
+        createdAt: now,
+        updatedAt: now,
       });
-    } else {
-      prospectId = prospectQuery.docs[0].id;
-      const currentStatus = prospectQuery.docs[0].data().status;
 
-      // Auto-advance to "contacted" if they're still a lead
+      prospectId = newProspectId;
+      tenantId = masterTenantId;
+    } else {
+      const prospect = prospectRows[0];
+      prospectId = prospect.prospectId;
+      tenantId = prospect.tenantId;
+
       const updates: Record<string, unknown> = {
         lastContactedAt: new Date().toISOString(),
-        calendlyEventUrl: eventUrl,
+        updatedAt: new Date().toISOString(),
       };
-      if (currentStatus === 'lead') {
+      if (prospect.status === 'new') {
         updates.status = 'contacted';
       }
 
-      await db.collection('prospects').doc(prospectId).update(updates);
+      await db.update(leads).set(updates).where(eq(leads.prospectId, prospectId));
     }
 
     if (event === 'invitee.created') {
-      // Log booking activity
-      await db.collection('activities').add({
-        prospectId,
+      await db.insert(activities).values({
+        tenantId,
+        leadId: prospectId,
         type: 'call_booked',
         title: `Booked: ${eventName}`,
         description: scheduledTime
@@ -106,7 +140,7 @@ export async function POST(request: NextRequest) {
         createdAt: new Date().toISOString(),
       });
 
-      // Notify admin. Calendly invitee-supplied strings are HTML-escaped.
+      // Notify admin
       try {
         const safeInviteeName = escapeHtml(inviteeName);
         const safeInviteeEmail = escapeHtml(inviteeEmail);
@@ -134,9 +168,9 @@ export async function POST(request: NextRequest) {
         console.error('Calendly notification email failed:', e);
       }
     } else if (event === 'invitee.canceled') {
-      // Log cancellation
-      await db.collection('activities').add({
-        prospectId,
+      await db.insert(activities).values({
+        tenantId,
+        leadId: prospectId,
         type: 'note_added',
         title: `Call cancelled: ${eventName}`,
         description: cancelReason || 'No reason provided',

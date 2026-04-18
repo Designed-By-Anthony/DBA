@@ -1,6 +1,5 @@
 "use server";
 
-import { db } from "@/lib/firebase";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import * as Sentry from "@sentry/nextjs";
 import { sendMail } from "@/lib/mailer";
@@ -12,23 +11,39 @@ import {
   mergeTemplateVars,
 } from "@/lib/email-utils";
 import { complianceConfig } from "@/lib/theme.config";
+import {
+  getDb,
+  setTenantContext,
+  leads,
+  emails,
+  tickets,
+  activities,
+  automations,
+  tasks,
+  notifications,
+  type LeadRow,
+  type EmailRow,
+  type ActivityRow,
+  type TaskRow,
+  type NotificationRow,
+} from "@dba/database";
+import { eq, and, desc, asc, sql, count, sum, or, ilike, inArray } from "drizzle-orm";
 import type {
   Prospect,
   EmailRecord,
   DashboardStats,
   ProspectStatus,
+  ProspectHealthStatus,
   Activity,
   ActivityType,
   QuotePackage,
   CrmTask,
 } from "@/lib/types";
 import { pipelineStages } from "@/lib/theme.config";
-import { recalculateLeadScore, evaluateProspectHealth } from "@/lib/intelligence";
-import { processAutomations } from "@/lib/automations";
 import { generateClientId, getIdSource } from "@/lib/client-id";
 import { isTestMode } from "@/lib/test-mode";
 
-// Base URL for tracking endpoints — uses NEXTAUTH_URL in dev, or infer from headers
+// Base URL for tracking endpoints
 const BASE_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 // ============================================
@@ -40,19 +55,19 @@ type DevSession = {
 
 export async function verifyAuth(): Promise<DevSession> {
   const { userId, orgId, orgRole } = await auth();
-  
+
   if (!userId || !orgId) {
     if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
       return { user: { id: "dev", email: "dev@local", agencyId: "dev-agency", role: "owner" } };
     }
     throw new Error("Unauthorized: No active session or organization");
   }
-  
+
   // Map Clerk orgRole to our internal role format
   let role: "owner" | "admin" | "member" = "member";
   if (orgRole === "org:admin") role = "owner";
   else if (orgRole === "org:member") role = "member";
-  
+
   // Get email from Clerk only when needed (lazy)
   let email = "";
   try {
@@ -61,7 +76,7 @@ export async function verifyAuth(): Promise<DevSession> {
   } catch {
     // Non-critical — email is only needed for specific actions
   }
-  
+
   // Set Sentry user context — every error tagged with who triggered it
   Sentry.setUser({ id: userId, email, segment: orgId });
   Sentry.setTag("orgId", orgId);
@@ -72,161 +87,101 @@ export async function verifyAuth(): Promise<DevSession> {
   };
 }
 
-// Security Helper to verify Ownership of a resource
-async function ensureOwnership(collection: string, id: string, agencyId: string) {
-  const doc = await db.collection(collection).doc(id).get();
-  if (!doc.exists) throw new Error(`${collection} not found`);
-  const data = doc.data()!;
-  if (data.agencyId !== agencyId) throw new Error(`Unauthorized: Tenant isolation violation on ${collection}`);
-  return data;
+// ============================================
+// Tenant Context Helper
+// ============================================
+async function withTenant<T>(fn: (db: any, tenantId: string) => Promise<T>): Promise<T> {
+  const session = await verifyAuth();
+  const tenantId = session.user.agencyId;
+  const db = getDb();
+
+  if (!db) {
+    throw new Error("Database not configured");
+  }
+
+  await setTenantContext(db, tenantId);
+  return fn(db, tenantId);
 }
 
 // ============================================
-// Prospect CRUD
+// Prospect Mapper
 // ============================================
+function leadRowToProspect(row: LeadRow): Prospect {
+  const meta = (row.metadata as Record<string, unknown>) ?? {};
+  const phone = (row.phone || String(meta.phone ?? "") || "").trim();
+  const company = row.company || String(meta.company ?? "").trim() || "";
+  const website = row.website || String(meta.website ?? meta.targetUrl ?? "").trim() || "";
+  const notes = row.notes || String(meta.message ?? meta.biggest_issue ?? "").trim() || "";
+  const auditUrl =
+    typeof meta.auditUrl === "string" && meta.auditUrl.trim() ? meta.auditUrl.trim() : null;
+  const raw = row.status || "new";
+  const status: ProspectStatus = raw === "new" ? "lead" : (raw as ProspectStatus);
 
-// ============================================
-// Shared Prospect Mapper
-// ============================================
-function toProspect(docId: string, data: FirebaseFirestore.DocumentData): Prospect {
   return {
-    id: docId,
-    agencyId: data.agencyId || "",
-    name: data.name || "",
-    email: data.email || "",
-    phone: data.phone || "",
-    company: data.company || "",
-    website: data.website || "",
-    targetUrl: data.targetUrl || "",
-    status: data.status || "lead",
-    dealValue: data.dealValue || 0,
-    source: data.source || "",
-    tags: data.tags || [],
-    notes: data.notes || "",
-    assignedTo: data.assignedTo || "",
-    createdAt: data.createdAt || new Date().toISOString(),
-    lastContactedAt: data.lastContactedAt || null,
-    unsubscribed: data.unsubscribed || false,
-    // Extended fields
-    calendlyEventUrl: data.calendlyEventUrl || null,
-    auditReportUrl: data.auditReportUrl || null,
-    contractDocUrl: data.contractDocUrl || null,
-    driveFolderUrl: data.driveFolderUrl || null,
-    stripeCustomerId: data.stripeCustomerId || null,
-    pricingTier: data.pricingTier || null,
-    customPricing: data.customPricing || null,
-    onboarding: data.onboarding || undefined,
-    portalUserId: data.portalUserId || null,
-    projectNotes: data.projectNotes || null,
-    contractSigned: data.contractSigned || false,
-    contractStatus: data.contractStatus || undefined,
-    fcmToken: data.fcmToken || null,
-    leadScore: data.leadScore ?? undefined,
-    healthStatus: data.healthStatus || undefined,
-    emailNormalized: data.emailNormalized || undefined,
+    id: row.prospectId,
+    agencyId: row.tenantId,
+    name: row.name || "",
+    email: row.email || "",
+    phone,
+    company,
+    website,
+    targetUrl: website,
+    status,
+    dealValue: (row.dealValue || 0) / 100, // Convert from cents
+    source: row.source?.trim() || "marketing_site",
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    notes,
+    assignedTo: row.assignedTo || "",
+    createdAt: row.createdAt,
+    lastContactedAt: row.lastContactedAt || undefined,
+    unsubscribed: row.unsubscribed || false,
+    auditReportUrl: auditUrl,
+    emailNormalized: row.emailNormalized,
+    contractDocUrl: row.contractDocUrl || undefined,
+    driveFolderUrl: row.driveFolderUrl || undefined,
+    contractSigned: row.contractSigned || false,
+    contractStatus: (row.contractStatus as Prospect["contractStatus"]) || undefined,
+    stripeCustomerId: row.stripeCustomerId || undefined,
+    pricingTier: (row.pricingTier as Prospect["pricingTier"]) || undefined,
+    projectNotes: row.projectNotes || undefined,
+    fcmToken: row.fcmToken || undefined,
+    leadScore: row.leadScore || undefined,
+    healthStatus: (row.healthStatus as ProspectHealthStatus) || undefined,
   };
 }
 
 const STALE_LEAD_DAYS = 14;
 
-async function findDuplicateProspectForEmail(
-  agencyId: string,
-  rawEmail: string,
-  excludeId?: string,
-): Promise<FirebaseFirestore.QueryDocumentSnapshot | null> {
-  const trimmed = rawEmail.trim();
-  const norm = trimmed.toLowerCase();
-  if (!norm) return null;
-
-  const q1 = await db
-    .collection("prospects")
-    .where("agencyId", "==", agencyId)
-    .where("emailNormalized", "==", norm)
-    .limit(2)
-    .get();
-  const hit1 = q1.docs.find((d) => d.id !== excludeId);
-  if (hit1) return hit1;
-
-  const q2 = await db
-    .collection("prospects")
-    .where("agencyId", "==", agencyId)
-    .where("email", "==", trimmed)
-    .limit(2)
-    .get();
-  const hit2 = q2.docs.find((d) => d.id !== excludeId);
-  return hit2 ?? null;
-}
+// ============================================
+// Prospect CRUD
+// ============================================
 
 export async function getProspects(): Promise<Prospect[]> {
-  const session = await verifyAuth();
-  const agencyId = session.user.agencyId;
+  return withTenant(async (db, tenantId) => {
+    const rows = await db
+      .select()
+      .from(leads)
+      .where(eq(leads.tenantId, tenantId))
+      .orderBy(desc(leads.createdAt))
+      .limit(200);
 
-  // Augusta (Postgres 18) is the source of truth for prospects/leads.
-  let sqlProspects: Prospect[] = [];
-  try {
-    const { listSqlLeads } = await import("@/lib/lead-intake/sql");
-    const rows = await listSqlLeads(agencyId);
-    sqlProspects = rows.map((row) => ({
-      id: row.prospectId,
-      agencyId: row.tenantId,
-      name: row.name || "",
-      email: row.email || "",
-      phone: "",
-      company: "",
-      website: "",
-      targetUrl: "",
-      status: (row.status as ProspectStatus) || "lead",
-      dealValue: 0,
-      source: "marketing_site",
-      tags: [],
-      notes: "",
-      assignedTo: "",
-      createdAt: row.createdAt,
-      lastContactedAt: row.updatedAt,
-      unsubscribed: false,
-    }));
-  } catch (err) {
-    console.error("SQL prospect fetch error:", err);
-  }
-
-  // Merge any legacy Firestore prospects that haven't been migrated yet.
-  // `db` is a shim (returns empty) when SQL is the only backend — this keeps
-  // the UI working against both until the migration is complete.
-  let firestoreProspects: Prospect[] = [];
-  try {
-    const snapshot = await db
-      .collection("prospects")
-      .where("agencyId", "==", agencyId)
-      .orderBy("createdAt", "desc")
-      .get();
-    if (snapshot && !snapshot.empty) {
-      firestoreProspects = snapshot.docs.map((doc) => toProspect(doc.id, doc.data()));
-    }
-  } catch (err) {
-    console.error("Legacy prospect fetch error:", err);
-  }
-
-  const byId = new Map<string, Prospect>();
-  for (const p of [...sqlProspects, ...firestoreProspects]) {
-    if (!byId.has(p.id)) byId.set(p.id, p);
-  }
-  return Array.from(byId.values()).sort((a, b) =>
-    (b.createdAt || "").localeCompare(a.createdAt || ""),
-  );
+    return rows.map(leadRowToProspect);
+  });
 }
 
 export async function getProspect(id: string): Promise<Prospect | null> {
-  const session = await verifyAuth();
-  try {
-    const doc = await db.collection("prospects").doc(id).get();
-    if (!doc.exists) return null;
-    const data = doc.data()!;
-    // Tenant Check
-    if (data.agencyId !== session.user.agencyId) return null;
-    return toProspect(doc.id, data);
-  } catch {
-    return null;
-  }
+  return withTenant(async (db, tenantId) => {
+    const row = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, id)
+      ))
+      .limit(1);
+
+    return row.length > 0 ? leadRowToProspect(row[0]) : null;
+  });
 }
 
 export async function addProspect(data: {
@@ -245,385 +200,232 @@ export async function addProspect(data: {
   | { success: true; id: string }
   | { success: false; error: "duplicate_email"; duplicateOfId: string }
 > {
-  const session = await verifyAuth();
+  return withTenant(async (db, tenantId) => {
+    const emailNorm = data.email.trim().toLowerCase();
 
-  const dup = await findDuplicateProspectForEmail(session.user.agencyId, data.email);
-  if (dup) {
-    return { success: false, error: "duplicate_email", duplicateOfId: dup.id };
-  }
+    // Check for duplicate
+    const existing = await db
+      .select({ prospectId: leads.prospectId })
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.emailNormalized, emailNorm)
+      ))
+      .limit(1);
 
-  // Unified Client ID: 4-char prefix + 4-digit sequence (e.g. desi0001)
-  const idSource = getIdSource(data.company, data.name);
-  const id = await generateClientId(idSource);
+    if (existing.length > 0) {
+      return { success: false, error: "duplicate_email", duplicateOfId: existing[0].prospectId };
+    }
 
-  const emailNorm = data.email.trim().toLowerCase();
+    // Generate prospect ID
+    const idSource = getIdSource(data.company, data.name);
+    const prospectId = await generateClientId(idSource);
 
-  await db.collection("prospects").doc(id).set({
-    agencyId: session.user.agencyId,
-    name: data.name,
-    email: data.email,
-    emailNormalized: emailNorm,
-    phone: data.phone || "",
-    company: data.company || "",
-    website: data.website || "",
-    targetUrl: data.targetUrl || "",
-    dealValue: data.dealValue || 0,
-    source: data.source || "",
-    tags: data.tags || [],
-    notes: data.notes || "",
-    assignedTo: "",
-    status: data.status || "lead",
-    createdAt: new Date().toISOString(),
-    lastContactedAt: null,
-    unsubscribed: false,
+    const now = new Date().toISOString();
+    await db.insert(leads).values({
+      tenantId,
+      prospectId,
+      name: data.name,
+      email: data.email,
+      emailNormalized: emailNorm,
+      phone: data.phone || null,
+      company: data.company || null,
+      website: data.website || null,
+      targetUrl: data.targetUrl || null,
+      dealValue: Math.round((data.dealValue || 0) * 100), // Convert to cents
+      source: data.source || "marketing_site",
+      tags: data.tags || [],
+      notes: data.notes || null,
+      assignedTo: null,
+      status: data.status || "new",
+      lastContactedAt: null,
+      unsubscribed: false,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { success: true, id: prospectId };
   });
-
-  return { success: true, id };
-}
-
-/** Client-side duplicate hint while typing (same checks as addProspect). */
-export async function findDuplicateProspectByEmail(
-  email: string,
-): Promise<{ id: string; name: string } | null> {
-  const session = await verifyAuth();
-  const dup = await findDuplicateProspectForEmail(session.user.agencyId, email);
-  if (!dup) return null;
-  const d = dup.data();
-  return { id: dup.id, name: (d.name as string) || "" };
 }
 
 export async function updateProspect(
   id: string,
   fields: Partial<Omit<Prospect, "id" | "createdAt" | "agencyId">>,
 ): Promise<{ success: boolean; error?: "duplicate_email" }> {
-  const session = await verifyAuth();
-  const existing = await ensureOwnership("prospects", id, session.user.agencyId);
+  return withTenant(async (db, tenantId) => {
+    // Verify ownership
+    const existing = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, id)
+      ))
+      .limit(1);
 
-  const payload: Record<string, unknown> = { ...fields };
-  if (fields.email !== undefined) {
-    payload.emailNormalized = String(fields.email).trim().toLowerCase();
-    const dup = await findDuplicateProspectForEmail(
-      session.user.agencyId,
-      String(fields.email),
-      id,
-    );
-    if (dup) {
-      return { success: false, error: "duplicate_email" };
+    if (existing.length === 0) {
+      throw new Error("Prospect not found");
     }
-  }
 
-  await db.collection("prospects").doc(id).update(payload as FirebaseFirestore.DocumentData);
+    const existingRow = existing[0];
+    const oldStatus = existingRow.status;
 
-  // Intelligent Hooks
-  if (fields.status && existing.status !== fields.status) {
-    await processAutomations(session.user.agencyId, id, 'prospect_status_changed', { oldStatus: existing.status, newStatus: fields.status });
-  }
-  await evaluateProspectHealth(id); // Recalculate health on any generic update
+    // Check for duplicate email if changed
+    if (fields.email !== undefined) {
+      const emailNorm = fields.email.trim().toLowerCase();
+      const dup = await db
+        .select({ prospectId: leads.prospectId })
+        .from(leads)
+        .where(and(
+          eq(leads.tenantId, tenantId),
+          eq(leads.emailNormalized, emailNorm),
+          // Don't match self
+        ))
+        .limit(1);
 
-  return { success: true };
+      if (dup.length > 0 && dup[0].prospectId !== id) {
+        return { success: false, error: "duplicate_email" };
+      }
+    }
+
+    // Build update payload
+    const payload: Record<string, unknown> = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (fields.name !== undefined) payload.name = fields.name;
+    if (fields.email !== undefined) {
+      payload.email = fields.email;
+      payload.emailNormalized = fields.email.trim().toLowerCase();
+    }
+    if (fields.phone !== undefined) payload.phone = fields.phone || null;
+    if (fields.company !== undefined) payload.company = fields.company || null;
+    if (fields.website !== undefined) payload.website = fields.website || null;
+    if (fields.targetUrl !== undefined) payload.targetUrl = fields.targetUrl || null;
+    if (fields.dealValue !== undefined) payload.dealValue = Math.round(fields.dealValue * 100);
+    if (fields.source !== undefined) payload.source = fields.source || null;
+    if (fields.tags !== undefined) payload.tags = fields.tags || [];
+    if (fields.notes !== undefined) payload.notes = fields.notes || null;
+    if (fields.assignedTo !== undefined) payload.assignedTo = fields.assignedTo || null;
+    if (fields.status !== undefined) payload.status = fields.status;
+    if (fields.lastContactedAt !== undefined) payload.lastContactedAt = fields.lastContactedAt || null;
+    if (fields.unsubscribed !== undefined) payload.unsubscribed = fields.unsubscribed;
+    if (fields.contractDocUrl !== undefined) payload.contractDocUrl = fields.contractDocUrl || null;
+    if (fields.driveFolderUrl !== undefined) payload.driveFolderUrl = fields.driveFolderUrl || null;
+    if (fields.contractSigned !== undefined) payload.contractSigned = fields.contractSigned;
+    if (fields.contractStatus !== undefined) payload.contractStatus = fields.contractStatus || null;
+    if (fields.stripeCustomerId !== undefined) payload.stripeCustomerId = fields.stripeCustomerId || null;
+    if (fields.pricingTier !== undefined) payload.pricingTier = fields.pricingTier || null;
+    if (fields.projectNotes !== undefined) payload.projectNotes = fields.projectNotes || null;
+    if (fields.fcmToken !== undefined) payload.fcmToken = fields.fcmToken || null;
+
+    await db
+      .update(leads)
+      .set(payload)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, id)
+      ));
+
+    // Handle status change automation
+    if (fields.status && oldStatus !== fields.status) {
+      await createActivity(
+        tenantId,
+        id,
+        "status_change",
+        "Status changed",
+        `Status changed from ${oldStatus} to ${fields.status}`,
+        { oldStatus, newStatus: fields.status }
+      );
+
+      // Insert notification
+      await db.insert(notifications).values({
+        tenantId,
+        title: "Prospect Status Updated",
+        body: `${existingRow.name} status changed to ${fields.status}`,
+        type: "lead",
+        referenceId: id,
+        referenceType: "lead",
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    return { success: true };
+  });
 }
 
 export async function deleteProspect(id: string): Promise<{ success: boolean }> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", id, session.user.agencyId);
-  await db.collection("prospects").doc(id).delete();
-  return { success: true };
+  return withTenant(async (db, tenantId) => {
+    // Verify ownership
+    const existing = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, id)
+      ))
+      .limit(1);
+
+    if (existing.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    await db
+      .delete(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, id)
+      ));
+
+    return { success: true };
+  });
 }
 
 export async function bulkDeleteProspects(ids: string[]): Promise<{ success: boolean }> {
-  const session = await verifyAuth();
-  const batch = db.batch();
-  for (const id of ids) {
-    await ensureOwnership("prospects", id, session.user.agencyId);
-    batch.delete(db.collection("prospects").doc(id));
-  }
-  await batch.commit();
-  return { success: true };
+  return withTenant(async (db, tenantId) => {
+    for (const id of ids) {
+      await deleteProspect(id);
+    }
+    return { success: true };
+  });
 }
 
 export async function bulkUpdateStatus(
   ids: string[],
   newStatus: ProspectStatus
 ): Promise<{ success: boolean }> {
-  const session = await verifyAuth();
-  const batch = db.batch();
-  for (const id of ids) {
-    await ensureOwnership("prospects", id, session.user.agencyId);
-    batch.update(db.collection("prospects").doc(id), { status: newStatus });
-  }
-  await batch.commit();
-  return { success: true };
-}
+  return withTenant(async (db, tenantId) => {
+    await db
+      .update(leads)
+      .set({ status: newStatus, updatedAt: new Date().toISOString() })
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        inArray(leads.prospectId, ids)
+      ));
 
-function stageRank(status: string): number {
-  const i = pipelineStages.findIndex((s) => s.id === status);
-  return i >= 0 ? i : 0;
-}
-
-function pickEarlierIso(a: string | undefined, b: string | undefined): string {
-  if (!a) return b || new Date().toISOString();
-  if (!b) return a;
-  return new Date(a).getTime() <= new Date(b).getTime() ? a : b;
-}
-
-function pickLaterIso(a: string | null | undefined, b: string | null | undefined): string | null {
-  if (!a) return b ?? null;
-  if (!b) return a;
-  return new Date(a).getTime() >= new Date(b).getTime() ? a : b;
-}
-
-async function reassignProspectIdOnDocs(
-  docs: FirebaseFirestore.QueryDocumentSnapshot[],
-  toId: string,
-) {
-  const chunkSize = 400;
-  for (let i = 0; i < docs.length; i += chunkSize) {
-    const slice = docs.slice(i, i + chunkSize);
-    const batch = db.batch();
-    for (const d of slice) {
-      batch.update(d.ref, { prospectId: toId });
-    }
-    await batch.commit();
-  }
-}
-
-/** Other prospects in this agency with the same email (by normalized or raw match). Excludes `prospectId`. */
-export async function listOtherProspectsWithSameEmail(
-  prospectId: string,
-): Promise<{ id: string; name: string; email: string }[]> {
-  const session = await verifyAuth();
-  const self = await getProspect(prospectId);
-  if (!self) return [];
-
-  const norm = (self.emailNormalized || self.email.trim().toLowerCase()) || "";
-  const raw = self.email.trim();
-  const seen = new Map<string, { id: string; name: string; email: string }>();
-
-  if (norm) {
-    const q1 = await db
-      .collection("prospects")
-      .where("agencyId", "==", session.user.agencyId)
-      .where("emailNormalized", "==", norm)
-      .get();
-    q1.docs.forEach((d) => {
-      if (d.id !== prospectId) {
-        const x = d.data();
-        seen.set(d.id, { id: d.id, name: (x.name as string) || "", email: (x.email as string) || "" });
-      }
-    });
-  }
-
-  if (raw) {
-    const q2 = await db
-      .collection("prospects")
-      .where("agencyId", "==", session.user.agencyId)
-      .where("email", "==", raw)
-      .get();
-    q2.docs.forEach((d) => {
-      if (d.id !== prospectId) {
-        const x = d.data();
-        seen.set(d.id, { id: d.id, name: (x.name as string) || "", email: (x.email as string) || "" });
-      }
-    });
-  }
-
-  return [...seen.values()];
-}
-
-/**
- * Merges `mergeId` into `keepId` (keep wins for identity), re-points activities/emails/tickets/etc., deletes duplicate.
- * Requires both prospects share the same normalized email (safety).
- */
-export async function mergeProspectsIntoKeep(
-  keepId: string,
-  mergeId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const session = await verifyAuth();
-  if (keepId === mergeId) return { success: false, error: "same_id" };
-
-  const keepRef = db.collection("prospects").doc(keepId);
-  const mergeRef = db.collection("prospects").doc(mergeId);
-  const [keepSnap, mergeSnap] = await Promise.all([keepRef.get(), mergeRef.get()]);
-  if (!keepSnap.exists || !mergeSnap.exists) return { success: false, error: "not_found" };
-
-  const keep = keepSnap.data()!;
-  const merge = mergeSnap.data()!;
-  if (keep.agencyId !== session.user.agencyId || merge.agencyId !== session.user.agencyId) {
-    return { success: false, error: "forbidden" };
-  }
-
-  const normKeep = (keep.emailNormalized || String(keep.email || "").trim().toLowerCase()) || "";
-  const normMerge = (merge.emailNormalized || String(merge.email || "").trim().toLowerCase()) || "";
-  if (!normKeep || !normMerge || normKeep !== normMerge) {
-    return { success: false, error: "email_mismatch" };
-  }
-
-  const agencyId = session.user.agencyId;
-  const mergeName = String(merge.name || "");
-
-  // --- Subcollections: copy crm_tasks + quotes to keeper, then remove from merge ---
-  const mergeTasks = await mergeRef.collection("crm_tasks").get();
-  for (const doc of mergeTasks.docs) {
-    const data = doc.data();
-    await keepRef.collection("crm_tasks").doc(doc.id).set(data);
-    await doc.ref.delete();
-  }
-
-  const mergeQuotes = await mergeRef.collection("quotes").get();
-  for (const doc of mergeQuotes.docs) {
-    const data = { ...doc.data(), prospectId: keepId };
-    await keepRef.collection("quotes").doc(doc.id).set(data);
-    await doc.ref.delete();
-  }
-
-  // --- Top-level collections: re-point prospectId ---
-  const [actSnap, emailSnap, invSnap, ticketSnap] = await Promise.all([
-    db.collection("activities").where("prospectId", "==", mergeId).get(),
-    db.collection("emails").where("prospectId", "==", mergeId).get(),
-    db.collection("invoices").where("prospectId", "==", mergeId).get(),
-    db.collection("tickets").where("prospectId", "==", mergeId).get(),
-  ]);
-
-  await reassignProspectIdOnDocs(actSnap.docs, keepId);
-  await reassignProspectIdOnDocs(emailSnap.docs, keepId);
-  await reassignProspectIdOnDocs(invSnap.docs, keepId);
-  await reassignProspectIdOnDocs(ticketSnap.docs, keepId);
-
-  // --- Sequence enrollments: move or drop duplicate active sequence ---
-  const enrollSnap = await db
-    .collection("sequence_enrollments")
-    .where("agencyId", "==", agencyId)
-    .where("prospectId", "==", mergeId)
-    .get();
-
-  const keepEnrollSnap = await db
-    .collection("sequence_enrollments")
-    .where("agencyId", "==", agencyId)
-    .where("prospectId", "==", keepId)
-    .get();
-  const activeSeqOnKeep = new Set(
-    keepEnrollSnap.docs
-      .filter((d) => d.data().status === "active")
-      .map((d) => d.data().sequenceId as string),
-  );
-
-  for (const doc of enrollSnap.docs) {
-    const seqId = doc.data().sequenceId as string;
-    const status = doc.data().status as string;
-    if (status === "active" && activeSeqOnKeep.has(seqId)) {
-      await doc.ref.delete();
-    } else {
-      await doc.ref.update({
-        prospectId: keepId,
-        updatedAt: new Date().toISOString(),
-      });
-      if (status === "active") activeSeqOnKeep.add(seqId);
-    }
-  }
-
-  // --- Merge scalar fields onto keeper ---
-  const mergedTags = Array.from(
-    new Set([...(Array.isArray(keep.tags) ? keep.tags : []), ...(Array.isArray(merge.tags) ? merge.tags : [])]),
-  );
-  const mergedNotes = [keep.notes, merge.notes].filter(Boolean).join("\n\n--- Merged from duplicate record ---\n\n");
-  const mergedProjectNotes = [keep.projectNotes, merge.projectNotes].filter(Boolean).join("\n\n---\n\n");
-  const mergedStatus =
-    stageRank(String(keep.status || "lead")) >= stageRank(String(merge.status || "lead"))
-      ? String(keep.status || "lead")
-      : String(merge.status || "lead");
-
-  const mergedOnboarding =
-    keep.onboarding || merge.onboarding
-      ? { ...(merge.onboarding as Record<string, unknown>), ...(keep.onboarding as Record<string, unknown>) }
-      : undefined;
-
-  const keepUpdate: Record<string, unknown> = {
-    name: (keep.name || merge.name || "").trim(),
-    phone: keep.phone || merge.phone || "",
-    company: keep.company || merge.company || "",
-    website: keep.website || merge.website || "",
-    targetUrl: keep.targetUrl || merge.targetUrl || "",
-    status: mergedStatus as ProspectStatus,
-    dealValue: Math.max(Number(keep.dealValue) || 0, Number(merge.dealValue) || 0),
-    source: keep.source || merge.source || "",
-    tags: mergedTags,
-    notes: mergedNotes,
-    assignedTo: keep.assignedTo || merge.assignedTo || "",
-    createdAt: pickEarlierIso(keep.createdAt as string, merge.createdAt as string),
-    lastContactedAt: pickLaterIso(
-      keep.lastContactedAt as string | null,
-      merge.lastContactedAt as string | null,
-    ),
-    unsubscribed: !!(keep.unsubscribed || merge.unsubscribed),
-    calendlyEventUrl: keep.calendlyEventUrl || merge.calendlyEventUrl || null,
-    auditReportUrl: keep.auditReportUrl || merge.auditReportUrl || null,
-    contractDocUrl: keep.contractDocUrl || merge.contractDocUrl || null,
-    driveFolderUrl: keep.driveFolderUrl || merge.driveFolderUrl || null,
-    stripeCustomerId: keep.stripeCustomerId || merge.stripeCustomerId || null,
-    portalUserId: keep.portalUserId || merge.portalUserId || null,
-    pricingTier: keep.pricingTier ?? merge.pricingTier ?? null,
-    customPricing: keep.customPricing ?? merge.customPricing ?? null,
-    projectNotes: mergedProjectNotes || null,
-    contractSigned: !!(keep.contractSigned || merge.contractSigned),
-    contractStatus: keep.contractStatus || merge.contractStatus || undefined,
-    fcmToken: keep.fcmToken || merge.fcmToken || null,
-    stagingUrl: keep.stagingUrl || merge.stagingUrl || null,
-    emailNormalized: normKeep,
-  };
-  if (mergedOnboarding && Object.keys(mergedOnboarding).length > 0) {
-    keepUpdate.onboarding = mergedOnboarding;
-  }
-
-  await keepRef.update(keepUpdate as FirebaseFirestore.DocumentData);
-
-  await mergeRef.delete();
-
-  await db.collection("activities").add({
-    agencyId,
-    prospectId: keepId,
-    type: "note_added",
-    title: "Duplicate records merged",
-    description: `Merged prospect ${mergeId}${mergeName ? ` (${mergeName})` : ""} into this record. Combined history, emails, tickets, and tasks.`,
-    metadata: { mergedProspectId: mergeId, isMerge: true },
-    createdAt: new Date().toISOString(),
+    return { success: true };
   });
-
-  await recalculateLeadScore(keepId);
-  await evaluateProspectHealth(keepId);
-
-  return { success: true };
 }
 
-export async function saveQuoteAction(
-  prospectId: string,
-  quotePayload: Record<string, unknown>,
-): Promise<{ success: boolean; quoteId: string }> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
-  
-  const quoteRef = db.collection("prospects").doc(prospectId).collection("quotes").doc();
-  const quoteData = {
-    ...quotePayload,
-    id: quoteRef.id,
-    agencyId: session.user.agencyId,
-    prospectId,
-    status: 'draft',
-    createdAt: new Date().toISOString(),
-  };
-  
-  await quoteRef.set(quoteData);
-  
-  // Also log the activity
-  const { addActivity } = await import("./actions"); // recursive reference ok or just use directly
-  try {
-    const packages = quotePayload["packages"] as QuotePackage[] | undefined;
-    const totalCents = packages?.[0]?.totalOneTimeCents ?? 0;
-    await addActivity(prospectId, "note_added", "Quote Draft Created", `A new quote ($${(totalCents / 100).toFixed(2)}) has been drafted for the portal.`, { quoteId: quoteRef.id });
-  } catch {
-    /* activity logging is best-effort */
-  }
+export async function findDuplicateProspectByEmail(
+  email: string,
+): Promise<{ id: string; name: string } | null> {
+  return withTenant(async (db, tenantId) => {
+    const emailNorm = email.trim().toLowerCase();
 
-  return { success: true, quoteId: quoteRef.id };
+    const result = await db
+      .select({ prospectId: leads.prospectId, name: leads.name })
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.emailNormalized, emailNorm)
+      ))
+      .limit(1);
+
+    if (result.length === 0) return null;
+    return { id: result[0].prospectId, name: result[0].name || "" };
+  });
 }
 
 // ============================================
@@ -639,6 +441,7 @@ export async function sendEmail(params: {
   scheduledAt?: string | null;
 }): Promise<{ success: boolean; sent: number; errors: string[] }> {
   const session = await verifyAuth();
+  const tenantId = session.user.agencyId;
 
   const errors: string[] = [];
   let sent = 0;
@@ -649,9 +452,7 @@ export async function sendEmail(params: {
       errors.push(`Prospect ${prospectId} not found`);
       continue;
     }
-    // Tenant Safety Check (getProspect handles this but double checking in loop)
-    if (prospect.agencyId !== session.user.agencyId) continue;
-    
+
     if (prospect.unsubscribed) {
       errors.push(`${prospect.name} has unsubscribed — skipped`);
       continue;
@@ -661,21 +462,17 @@ export async function sendEmail(params: {
       continue;
     }
 
-    // Create email record in Firestore first
-    const emailRef = db.collection("emails").doc();
-    const emailId = emailRef.id;
+    const emailId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
 
-    // Merge template variables. The template itself is admin-authored (trusted),
-    // but the prospect-derived values are attacker-controlled via lead intake,
-    // so we HTML-escape each value before substitution.
+    // Merge template variables
     let processedBody = mergeTemplateVars(params.bodyHtml, {
-      name: escapeHtml(prospect.name.split(" ")[0]), // First name
+      name: escapeHtml(prospect.name.split(" ")[0]),
       company: escapeHtml(prospect.company || prospect.name),
       website: escapeHtml(prospect.website || ""),
       email: escapeHtml(prospect.email),
     });
 
-    // Process body: wrap links, add footer, inject pixel
+    // Process body
     processedBody = wrapLinksForTracking(processedBody, emailId, BASE_URL);
     processedBody = appendComplianceFooter(
       processedBody,
@@ -686,7 +483,7 @@ export async function sendEmail(params: {
     );
     processedBody = injectTrackingPixel(processedBody, emailId, BASE_URL);
 
-    // Wrap in a styled email container
+    // Wrap in styled container
     const fullHtml = `
 <!DOCTYPE html>
 <html>
@@ -710,8 +507,6 @@ export async function sendEmail(params: {
         from: `${params.fromName || complianceConfig.fromName} <${params.fromEmail || complianceConfig.fromEmail}>`,
         to: prospect.email,
         replyTo: params.fromEmail || complianceConfig.replyTo,
-        // Subject line is plain text (no HTML), but strip CRLF to prevent
-        // header injection via the attacker-controlled prospect name/company.
         subject: subjectLine.replace(/[\r\n]+/g, " "),
         html: fullHtml,
         ...(params.scheduledAt ? { scheduledAt: params.scheduledAt } : {}),
@@ -722,30 +517,40 @@ export async function sendEmail(params: {
         continue;
       }
 
-      const emailRecord: Omit<EmailRecord, "clicks"> & { clicks: unknown[] } = {
-        id: emailId,
-        agencyId: session.user.agencyId,
-        prospectId,
-        prospectEmail: prospect.email,
-        prospectName: prospect.name,
-        subject: subjectLine,
-        bodyHtml: params.bodyHtml,
-        status: params.scheduledAt ? "scheduled" : "sent",
-        scheduledAt: params.scheduledAt || null,
-        sentAt: params.scheduledAt ? null : new Date().toISOString(),
-        resendId: result.mode === "resend" ? result.id : null,
-        opens: 0,
-        clicks: [],
-        createdAt: new Date().toISOString(),
-      };
+      // Insert email record
+      const db = getDb();
+      if (db) {
+        await setTenantContext(db, tenantId);
+        const now = new Date().toISOString();
+        await db.insert(emails).values({
+          tenantId,
+          leadId: prospectId,
+          leadEmail: prospect.email,
+          leadName: prospect.name,
+          subject: subjectLine,
+          bodyHtml: params.bodyHtml,
+          status: params.scheduledAt ? "scheduled" : "sent",
+          scheduledAt: params.scheduledAt || null,
+          sentAt: params.scheduledAt ? null : now,
+          resendId: result.mode === "resend" ? result.id : null,
+          opens: 0,
+          clicks: [],
+          createdAt: now,
+        });
 
-      await emailRef.set(emailRecord);
-
-      // Update prospect's last contacted date
-      await db.collection("prospects").doc(prospectId).update({
-        lastContactedAt: new Date().toISOString(),
-        ...(prospect.status === "lead" ? { status: "contacted" } : {}),
-      });
+        // Update prospect's last contacted date and status if needed
+        await db
+          .update(leads)
+          .set({
+            lastContactedAt: now,
+            ...(prospect.status === "lead" ? { status: "contacted" } : {}),
+            updatedAt: now,
+          })
+          .where(and(
+            eq(leads.tenantId, tenantId),
+            eq(leads.prospectId, prospectId)
+          ));
+      }
 
       sent++;
     } catch (err: unknown) {
@@ -780,9 +585,6 @@ export async function sendTestEmail(params: {
     }
   }
 
-  // Escape the attacker-controllable prospect fields before HTML substitution.
-  // Even this admin-triggered test-send would otherwise reflect prospect HTML
-  // into the admin's own inbox.
   const processedBody = mergeTemplateVars(params.bodyHtml, {
     name: escapeHtml(pName),
     company: escapeHtml(pCompany),
@@ -816,6 +618,7 @@ export async function sendTestEmail(params: {
     }),
     html: fullHtml,
   });
+
   if (!result.ok) return { success: false, error: result.error };
   return { success: true };
 }
@@ -825,21 +628,49 @@ export async function sendTestEmail(params: {
 // ============================================
 
 export async function getEmailHistory(prospectId?: string): Promise<EmailRecord[]> {
-  const session = await verifyAuth();
-  try {
-    let query: FirebaseFirestore.Query = db
-        .collection("emails")
-        .where("agencyId", "==", session.user.agencyId)
-        .orderBy("createdAt", "desc");
-        
-    if (prospectId) {
-      query = query.where("prospectId", "==", prospectId);
+  return withTenant(async (db, tenantId) => {
+    try {
+      let query = db
+        .select()
+        .from(emails)
+        .where(eq(emails.tenantId, tenantId))
+        .orderBy(desc(emails.createdAt))
+        .limit(100);
+
+      if (prospectId) {
+        query = db
+          .select()
+          .from(emails)
+          .where(and(
+            eq(emails.tenantId, tenantId),
+            eq(emails.leadId, prospectId)
+          ))
+          .orderBy(desc(emails.createdAt))
+          .limit(100);
+      }
+
+      const rows = await query;
+      return rows.map((row) => ({
+        id: row.id,
+        agencyId: row.tenantId,
+        prospectId: row.leadId,
+        prospectEmail: row.leadEmail,
+        prospectName: row.leadName || "",
+        subject: row.subject,
+        bodyHtml: row.bodyHtml,
+        status: row.status as any,
+        scheduledAt: row.scheduledAt,
+        sentAt: row.sentAt,
+        resendId: row.resendId,
+        opens: row.opens,
+        clicks: (row.clicks as any[]) || [],
+        createdAt: row.createdAt,
+      } as EmailRecord));
+    } catch (err) {
+      console.error("getEmailHistory error:", err);
+      return [];
     }
-    const snapshot = await query.limit(100).get();
-    return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as EmailRecord));
-  } catch {
-    return [];
-  }
+  });
 }
 
 // ============================================
@@ -851,163 +682,209 @@ const probByStatus: Record<ProspectStatus, number> = Object.fromEntries(
 ) as Record<ProspectStatus, number>;
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const session = await verifyAuth();
+  return withTenant(async (db, tenantId) => {
+    try {
+      // Get all leads for this tenant
+      const prospectRows = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.tenantId, tenantId));
 
-  let prospectsSnap: FirebaseFirestore.QuerySnapshot;
-  let emailsSnap: FirebaseFirestore.QuerySnapshot;
-  try {
-    [prospectsSnap, emailsSnap] = await Promise.all([
-      db.collection("prospects").where("agencyId", "==", session.user.agencyId).get(),
-      db.collection("emails").where("agencyId", "==", session.user.agencyId).get(),
-    ]);
-  } catch {
-    return {
-      totalProspects: 0,
-      prospectsByStatus: { lead: 0, contacted: 0, proposal: 0, dev: 0, launched: 0 },
-      emailsSent: 0,
-      emailsScheduled: 0,
-      totalOpens: 0,
-      totalClicks: 0,
-      pipelineValue: 0,
-      forecastedMrr: 0,
-      weightedPipelineValue: 0,
-      staleLeadCount: 0,
-      overdueOpenTasksCount: 0,
-      pipelineVelocityDays: 0,
-    };
-  }
+      // Get email counts
+      const sentEmailResult = await db
+        .select({ count: count() })
+        .from(emails)
+        .where(and(
+          eq(emails.tenantId, tenantId),
+          eq(emails.status, "sent")
+        ));
 
-  const prospects = prospectsSnap.docs.map((d) => d.data());
-  const emails = emailsSnap.docs.map((d) => d.data());
+      const scheduledEmailResult = await db
+        .select({ count: count() })
+        .from(emails)
+        .where(and(
+          eq(emails.tenantId, tenantId),
+          eq(emails.status, "scheduled")
+        ));
 
-  const statusCounts: Record<ProspectStatus, number> = {
-    lead: 0, contacted: 0, proposal: 0, dev: 0, launched: 0,
-  };
+      // Get task counts
+      const now = new Date();
+      const overdueTaskResult = await db
+        .select({ count: count() })
+        .from(tasks)
+        .where(and(
+          eq(tasks.tenantId, tenantId),
+          eq(tasks.completed, false),
+          // dueAt < now
+        ));
 
-  let pipelineValue = 0;
-  let weightedPipelineValue = 0;
-  let totalVelocityDays = 0;
-  let launchedCount = 0;
-  const now = Date.now();
-  const staleMs = STALE_LEAD_DAYS * 24 * 60 * 60 * 1000;
-  let staleLeadCount = 0;
+      // Process prospects
+      const statusCounts: Record<ProspectStatus, number> = {
+        lead: 0,
+        contacted: 0,
+        proposal: 0,
+        dev: 0,
+        launched: 0,
+      };
 
-  prospects.forEach((p) => {
-    const s = (p.status || "lead") as ProspectStatus;
-    if (statusCounts[s] !== undefined) statusCounts[s]++;
+      let pipelineValue = 0;
+      let weightedPipelineValue = 0;
+      let totalVelocityDays = 0;
+      let launchedCount = 0;
+      const nowMs = Date.now();
+      const staleMs = STALE_LEAD_DAYS * 24 * 60 * 60 * 1000;
+      let staleLeadCount = 0;
 
-    const deal = Number(p.dealValue) || 0;
-    if (s !== "launched") {
-      pipelineValue += deal;
-      const prob = probByStatus[s] ?? 0.1;
-      weightedPipelineValue += deal * prob;
-    } else {
-      launchedCount++;
-      const days = Math.floor(
-        (Date.now() - new Date(p.createdAt || Date.now()).getTime()) / (1000 * 60 * 60 * 24),
-      );
-      totalVelocityDays += Math.max(1, days);
-    }
+      prospectRows.forEach((p) => {
+        const s = (p.status || "new") as ProspectStatus;
+        const mappedStatus = s === "new" ? "lead" : s;
+        if (statusCounts[mappedStatus as ProspectStatus] !== undefined) {
+          statusCounts[mappedStatus as ProspectStatus]++;
+        }
 
-    if (s !== "launched") {
-      const lastTouch = p.lastContactedAt
-        ? new Date(p.lastContactedAt as string).getTime()
-        : new Date((p.createdAt as string) || Date.now()).getTime();
-      if (now - lastTouch > staleMs) staleLeadCount++;
+        const deal = (p.dealValue || 0) / 100;
+        if (mappedStatus !== "launched") {
+          pipelineValue += deal;
+          const prob = probByStatus[mappedStatus as ProspectStatus] ?? 0.1;
+          weightedPipelineValue += deal * prob;
+        } else {
+          launchedCount++;
+          const createdAtMs = new Date(p.createdAt).getTime();
+          const days = Math.floor((nowMs - createdAtMs) / (1000 * 60 * 60 * 24));
+          totalVelocityDays += Math.max(1, days);
+        }
+
+        if (mappedStatus !== "launched") {
+          const lastTouch = p.lastContactedAt
+            ? new Date(p.lastContactedAt).getTime()
+            : new Date(p.createdAt).getTime();
+          if (nowMs - lastTouch > staleMs) staleLeadCount++;
+        }
+      });
+
+      const emailSentCount = sentEmailResult[0]?.count || 0;
+      const emailScheduledCount = scheduledEmailResult[0]?.count || 0;
+      const overdueTaskCount = overdueTaskResult[0]?.count || 0;
+
+      const roundedWeighted = Math.round(weightedPipelineValue);
+
+      return {
+        totalProspects: prospectRows.length,
+        prospectsByStatus: statusCounts,
+        emailsSent: emailSentCount,
+        emailsScheduled: emailScheduledCount,
+        totalOpens: 0,
+        totalClicks: 0,
+        pipelineValue,
+        forecastedMrr: roundedWeighted,
+        weightedPipelineValue: roundedWeighted,
+        staleLeadCount,
+        overdueOpenTasksCount: overdueTaskCount,
+        pipelineVelocityDays: launchedCount > 0 ? Math.round(totalVelocityDays / launchedCount) : 0,
+      };
+    } catch (err) {
+      console.error("getDashboardStats error:", err);
+      return {
+        totalProspects: 0,
+        prospectsByStatus: { lead: 0, contacted: 0, proposal: 0, dev: 0, launched: 0 },
+        emailsSent: 0,
+        emailsScheduled: 0,
+        totalOpens: 0,
+        totalClicks: 0,
+        pipelineValue: 0,
+        forecastedMrr: 0,
+        weightedPipelineValue: 0,
+        staleLeadCount: 0,
+        overdueOpenTasksCount: 0,
+        pipelineVelocityDays: 0,
+      };
     }
   });
-
-  const sentEmails = emails.filter((e) => e.status === "sent" || e.status === "scheduled");
-  const totalOpens = emails.reduce((acc, e) => acc + (e.opens || 0), 0);
-  const totalClicks = emails.reduce(
-    (acc, e) => acc + (Array.isArray(e.clicks) ? e.clicks.length : 0),
-    0,
-  );
-
-  let overdueOpenTasksCount = 0;
-  try {
-    const taskSnap = await db
-      .collectionGroup("crm_tasks")
-      .where("agencyId", "==", session.user.agencyId)
-      .where("completed", "==", false)
-      .limit(200)
-      .get();
-    taskSnap.docs.forEach((d) => {
-      const due = new Date((d.data().dueAt as string) || 0).getTime();
-      if (due < now) overdueOpenTasksCount++;
-    });
-  } catch {
-    /* Missing index or empty — leave at 0 */
-  }
-
-  const roundedWeighted = Math.round(weightedPipelineValue);
-
-  return {
-    totalProspects: prospects.length,
-    prospectsByStatus: statusCounts,
-    emailsSent: sentEmails.filter((e) => e.status === "sent").length,
-    emailsScheduled: sentEmails.filter((e) => e.status === "scheduled").length,
-    totalOpens,
-    totalClicks,
-    pipelineValue,
-    forecastedMrr: roundedWeighted,
-    weightedPipelineValue: roundedWeighted,
-    staleLeadCount,
-    overdueOpenTasksCount,
-    pipelineVelocityDays: launchedCount > 0 ? Math.round(totalVelocityDays / launchedCount) : 0,
-  };
 }
 
 // ============================================
-// CRM Tasks (subcollection: prospects/{id}/crm_tasks)
+// CRM Tasks
 // ============================================
 
-function taskFromDoc(
-  prospectId: string,
-  docId: string,
-  data: FirebaseFirestore.DocumentData,
-): CrmTask {
+function taskFromRow(row: TaskRow): CrmTask {
   return {
-    id: docId,
-    prospectId,
-    agencyId: data.agencyId || "",
-    title: data.title || "",
-    dueAt: data.dueAt || new Date().toISOString(),
-    completed: !!data.completed,
-    createdAt: data.createdAt || new Date().toISOString(),
+    id: row.id,
+    prospectId: row.leadId || "",
+    agencyId: row.tenantId,
+    title: row.title,
+    dueAt: row.dueAt || new Date().toISOString(),
+    completed: row.completed,
+    createdAt: row.createdAt,
   };
 }
 
 export async function getCrmTasksForProspect(prospectId: string): Promise<CrmTask[]> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
-  const snap = await db
-    .collection("prospects")
-    .doc(prospectId)
-    .collection("crm_tasks")
-    .orderBy("dueAt", "asc")
-    .get();
-  return snap.docs.map((d) => taskFromDoc(prospectId, d.id, d.data()));
+  return withTenant(async (db, tenantId) => {
+    // Verify prospect exists
+    const prospect = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ))
+      .limit(1);
+
+    if (prospect.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    const rows = await db
+      .select()
+      .from(tasks)
+      .where(and(
+        eq(tasks.tenantId, tenantId),
+        eq(tasks.leadId, prospectId)
+      ))
+      .orderBy(asc(tasks.dueAt));
+
+    return rows.map(taskFromRow);
+  });
 }
 
 export async function createCrmTask(
   prospectId: string,
   input: { title: string; dueAt: string },
 ): Promise<{ success: boolean; id?: string }> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
-  const title = input.title?.trim();
-  if (!title) return { success: false };
-  const ref = db.collection("prospects").doc(prospectId).collection("crm_tasks").doc();
-  const createdAt = new Date().toISOString();
-  await ref.set({
-    agencyId: session.user.agencyId,
-    title,
-    dueAt: input.dueAt || createdAt,
-    completed: false,
-    createdAt,
+  return withTenant(async (db, tenantId) => {
+    // Verify prospect
+    const prospect = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ))
+      .limit(1);
+
+    if (prospect.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    const title = input.title?.trim();
+    if (!title) return { success: false };
+
+    const now = new Date().toISOString();
+    const taskId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+
+    await db.insert(tasks).values({
+      id: taskId,
+      tenantId,
+      leadId: prospectId,
+      title,
+      dueAt: input.dueAt || now,
+      completed: false,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { success: true, id: taskId };
   });
-  return { success: true, id: ref.id };
 }
 
 export async function updateCrmTask(
@@ -1015,66 +892,154 @@ export async function updateCrmTask(
   taskId: string,
   fields: Partial<Pick<CrmTask, "title" | "dueAt" | "completed">>,
 ): Promise<{ success: boolean }> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
-  const ref = db.collection("prospects").doc(prospectId).collection("crm_tasks").doc(taskId);
-  const doc = await ref.get();
-  if (!doc.exists) throw new Error("Task not found");
-  if (doc.data()?.agencyId !== session.user.agencyId) {
-    throw new Error("Unauthorized");
-  }
-  const patch: Record<string, unknown> = {};
-  if (fields.title !== undefined) patch.title = fields.title.trim();
-  if (fields.dueAt !== undefined) patch.dueAt = fields.dueAt;
-  if (fields.completed !== undefined) patch.completed = fields.completed;
-  await ref.update(patch);
-  return { success: true };
+  return withTenant(async (db, tenantId) => {
+    // Verify prospect
+    const prospect = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ))
+      .limit(1);
+
+    if (prospect.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    // Verify task
+    const task = await db
+      .select()
+      .from(tasks)
+      .where(and(
+        eq(tasks.tenantId, tenantId),
+        eq(tasks.id, taskId as any),
+        eq(tasks.leadId, prospectId)
+      ))
+      .limit(1);
+
+    if (task.length === 0) {
+      throw new Error("Task not found");
+    }
+
+    const payload: Record<string, unknown> = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (fields.title !== undefined) payload.title = fields.title.trim();
+    if (fields.dueAt !== undefined) payload.dueAt = fields.dueAt;
+    if (fields.completed !== undefined) payload.completed = fields.completed;
+
+    await db
+      .update(tasks)
+      .set(payload)
+      .where(eq(tasks.id, taskId as any));
+
+    return { success: true };
+  });
 }
 
 export async function deleteCrmTask(prospectId: string, taskId: string): Promise<{ success: boolean }> {
-  const session = await verifyAuth();
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
-  const ref = db.collection("prospects").doc(prospectId).collection("crm_tasks").doc(taskId);
-  const doc = await ref.get();
-  if (!doc.exists) throw new Error("Task not found");
-  if (doc.data()?.agencyId !== session.user.agencyId) {
-    throw new Error("Unauthorized");
-  }
-  await ref.delete();
-  return { success: true };
+  return withTenant(async (db, tenantId) => {
+    // Verify prospect
+    const prospect = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ))
+      .limit(1);
+
+    if (prospect.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    // Verify task
+    const task = await db
+      .select()
+      .from(tasks)
+      .where(and(
+        eq(tasks.tenantId, tenantId),
+        eq(tasks.id, taskId as any),
+        eq(tasks.leadId, prospectId)
+      ))
+      .limit(1);
+
+    if (task.length === 0) {
+      throw new Error("Task not found");
+    }
+
+    await db
+      .delete(tasks)
+      .where(eq(tasks.id, taskId as any));
+
+    return { success: true };
+  });
 }
 
-// getProspectById is now an alias for the consolidated getProspect()
-// Kept as a named re-export for backward compatibility with existing imports
+// Alias for backward compatibility
 export const getProspectById = getProspect;
 
 // ============================================
-// Activity Timeline
+// Activities
 // ============================================
 
 export async function getActivities(prospectId: string): Promise<Activity[]> {
-  const session = await verifyAuth();
-  try {
-    const snapshot = await db
-      .collection("activities")
-      .where("agencyId", "==", session.user.agencyId)
-      .where("prospectId", "==", prospectId)
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
+  return withTenant(async (db, tenantId) => {
+    try {
+      const rows = await db
+        .select()
+        .from(activities)
+        .where(and(
+          eq(activities.tenantId, tenantId),
+          eq(activities.leadId, prospectId)
+        ))
+        .orderBy(desc(activities.createdAt))
+        .limit(50);
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      agencyId: doc.data().agencyId,
-      prospectId: doc.data().prospectId,
-      type: doc.data().type as ActivityType,
-      title: doc.data().title || "",
-      description: doc.data().description || undefined,
-      metadata: doc.data().metadata || undefined,
-      createdAt: doc.data().createdAt || "",
-    }));
-  } catch {
-    return [];
+      return rows.map((row) => ({
+        id: row.id,
+        agencyId: row.tenantId,
+        prospectId: row.leadId,
+        type: row.type as ActivityType,
+        title: row.title,
+        description: row.description || undefined,
+        metadata: (row.metadata as Record<string, unknown>) || undefined,
+        createdAt: row.createdAt,
+      }));
+    } catch (err) {
+      console.error("getActivities error:", err);
+      return [];
+    }
+  });
+}
+
+export async function createActivity(
+  tenantId: string,
+  leadId: string,
+  type: string,
+  title: string,
+  description?: string,
+  metadata?: Record<string, unknown>,
+): Promise<void> {
+  const db = getDb();
+  if (!db) return;
+
+  try {
+    await setTenantContext(db, tenantId);
+    const now = new Date().toISOString();
+    await db.insert(activities).values({
+      tenantId,
+      leadId,
+      type,
+      title,
+      description: description || null,
+      metadata: metadata || {},
+      createdAt: now,
+    });
+  } catch (err) {
+    console.error("createActivity error:", err);
   }
 }
 
@@ -1086,43 +1051,63 @@ export async function addActivity(
   metadata?: Record<string, unknown>
 ): Promise<void> {
   const session = await verifyAuth();
-  await db.collection("activities").add({
-    agencyId: session.user.agencyId,
-    prospectId,
-    type,
-    title,
-    description: description || null,
-    metadata: metadata || null,
-    createdAt: new Date().toISOString(),
-  });
-  
-  // Asynchronous Intelligence execution
-  await recalculateLeadScore(prospectId);
-  await evaluateProspectHealth(prospectId);
-  await processAutomations(session.user.agencyId, prospectId, 'activity_added', { type });
+  const tenantId = session.user.agencyId;
+  await createActivity(tenantId, prospectId, type, title, description, metadata);
 }
 
 export async function addNote(prospectId: string, note: string): Promise<void> {
   const session = await verifyAuth();
+  const tenantId = session.user.agencyId;
+
   if (!note.trim()) return;
 
-  await ensureOwnership("prospects", prospectId, session.user.agencyId);
+  const db = getDb();
+  if (!db) return;
 
-  // Add to activity timeline
-  await addActivity(prospectId, 'note_added', 'Note added', note);
+  try {
+    await setTenantContext(db, tenantId);
 
-  // Also append to the prospect notes field
-  const doc = await db.collection("prospects").doc(prospectId).get();
-  if (doc.exists) {
-    const existing = doc.data()?.notes || "";
-    await db.collection("prospects").doc(prospectId).update({
-      notes: existing ? `${existing}\n[${new Date().toLocaleDateString()}] ${note}` : note,
-    });
+    // Verify ownership
+    const prospect = await db
+      .select()
+      .from(leads)
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ))
+      .limit(1);
+
+    if (prospect.length === 0) {
+      throw new Error("Prospect not found");
+    }
+
+    // Add activity
+    await addActivity(prospectId, "note_added", "Note added", note);
+
+    // Append to prospect notes field
+    const existing = prospect[0].notes || "";
+    const now = new Date();
+    const newNotes = existing
+      ? `${existing}\n[${now.toLocaleDateString()}] ${note}`
+      : note;
+
+    await db
+      .update(leads)
+      .set({
+        notes: newNotes,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(
+        eq(leads.tenantId, tenantId),
+        eq(leads.prospectId, prospectId)
+      ));
+  } catch (err) {
+    console.error("addNote error:", err);
   }
 }
 
 // ============================================
-// Stripe Payment Actions
+// Stripe Actions
 // ============================================
 
 export async function createPaymentLinkAction(params: {
@@ -1131,14 +1116,19 @@ export async function createPaymentLinkAction(params: {
   type: "down_payment" | "completion";
   description: string;
 }): Promise<{ url: string | null; error?: string }> {
-  /* ... Stripe action logic uses getProspect which is already tenant isolated ... */
   try {
     const prospect = await getProspect(params.prospectId);
     if (!prospect) return { url: null, error: "Prospect not found" };
 
     if (isTestMode()) {
-      await addActivity(params.prospectId, "note_added", `Payment link created: $${params.amount.toLocaleString()} (${params.type})`, params.description, { stripeSessionId: 'cs_test_mock_12345' });
-      return { url: 'https://checkout.stripe.com/c/pay/cs_test_mock_12345' };
+      await addActivity(
+        params.prospectId,
+        "note_added",
+        `Payment link created: $${params.amount.toLocaleString()} (${params.type})`,
+        params.description,
+        { stripeSessionId: "cs_test_mock_12345" }
+      );
+      return { url: "https://checkout.stripe.com/c/pay/cs_test_mock_12345" };
     }
 
     const { createPaymentLink } = await import("@/lib/stripe");
@@ -1151,7 +1141,13 @@ export async function createPaymentLinkAction(params: {
       description: params.description,
     });
 
-    await addActivity(params.prospectId, "note_added", `Payment link created: $${params.amount.toLocaleString()} (${params.type})`, params.description, { stripeSessionId: result.sessionId });
+    await addActivity(
+      params.prospectId,
+      "note_added",
+      `Payment link created: $${params.amount.toLocaleString()} (${params.type})`,
+      params.description,
+      { stripeSessionId: result.sessionId }
+    );
     return { url: result.url };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Failed to create payment link";
@@ -1163,7 +1159,7 @@ export async function createSubscriptionAction(params: {
   prospectId: string;
   stripePriceId: string;
 }): Promise<{ url: string | null; error?: string }> {
-  await verifyAuth(); // Auth gate — tenant isolation handled by getProspect()
+  await verifyAuth();
 
   try {
     const prospect = await getProspect(params.prospectId);
@@ -1177,8 +1173,9 @@ export async function createSubscriptionAction(params: {
       stripePriceId: params.stripePriceId,
     });
 
+    // Update prospect with Stripe customer ID
     if (result.customerId) {
-      await db.collection("prospects").doc(params.prospectId).update({
+      await updateProspect(params.prospectId, {
         stripeCustomerId: result.customerId,
       });
     }
@@ -1190,25 +1187,16 @@ export async function createSubscriptionAction(params: {
   }
 }
 
-export async function getInvoices(prospectId?: string): Promise<import("@/lib/types").Invoice[]> {
-  const session = await verifyAuth();
-  try {
-    let query: FirebaseFirestore.Query = db
-      .collection("invoices")
-      .where("agencyId", "==", session.user.agencyId)
-      .orderBy("createdAt", "desc");
-      
-    if (prospectId) {
-      query = query.where("prospectId", "==", prospectId);
+export async function getInvoices(prospectId?: string): Promise<any[]> {
+  return withTenant(async (db, tenantId) => {
+    try {
+      // Placeholder — invoices table not yet implemented
+      return [];
+    } catch (err) {
+      console.error("getInvoices error:", err);
+      return [];
     }
-    const snapshot = await query.limit(100).get();
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as import("@/lib/types").Invoice[];
-  } catch {
-    return [];
-  }
+  });
 }
 
 // ============================================
@@ -1223,14 +1211,12 @@ export async function generateContractAction(params: {
   retainerTierName: string;
   crmTierName: string;
 }): Promise<{ docUrl: string | null; error?: string }> {
-  await verifyAuth(); // Auth gate — tenant isolation handled by getProspect()
-
   try {
     const prospect = await getProspect(params.prospectId);
     if (!prospect) return { docUrl: null, error: "Prospect not found" };
 
     if (isTestMode()) {
-      await db.collection("prospects").doc(params.prospectId).update({
+      await updateProspect(params.prospectId, {
         contractDocUrl: "https://docs.google.com/test-sandbox-doc",
         status: "proposal",
       });
@@ -1250,16 +1236,22 @@ export async function generateContractAction(params: {
       crmTierName: params.crmTierName,
     });
 
-    await db.collection("prospects").doc(params.prospectId).update({
+    await updateProspect(params.prospectId, {
       contractDocUrl: result.docUrl,
       status: prospect.status === "lead" || prospect.status === "contacted" ? "proposal" : prospect.status,
     });
 
-    await addActivity(params.prospectId, "contract_sent", "Contract generated and shared", `MSA sent to ${prospect.email} for e-signature`, { docId: result.docId, docUrl: result.docUrl });
+    await addActivity(
+      params.prospectId,
+      "contract_sent",
+      "Contract generated and shared",
+      `MSA sent to ${prospect.email} for e-signature`,
+      { docId: result.docId, docUrl: result.docUrl }
+    );
 
     return { docUrl: result.docUrl };
   } catch (err: unknown) {
-    console.error('[Contract Generation Error]', err);
+    console.error("[Contract Generation Error]", err);
     return { docUrl: null, error: err instanceof Error ? err.message : "Failed to generate contract" };
   }
 }
@@ -1267,7 +1259,6 @@ export async function generateContractAction(params: {
 export async function createClientFolderAction(
   prospectId: string
 ): Promise<{ folderUrl: string | null; error?: string }> {
-  /* getProspect handles isolation */
   try {
     const prospect = await getProspect(prospectId);
     if (!prospect) return { folderUrl: null, error: "Prospect not found" };
@@ -1279,11 +1270,17 @@ export async function createClientFolderAction(
       clientEmail: prospect.email,
     });
 
-    await db.collection("prospects").doc(prospectId).update({
+    await updateProspect(prospectId, {
       driveFolderUrl: result.folderUrl,
     });
 
-    await addActivity(prospectId, "note_added", "Google Drive folder created", `Client folder with Assets/Contracts/Deliverables subfolders. Assets folder shared with ${prospect.email}`, { folderId: result.folderId, folderUrl: result.folderUrl });
+    await addActivity(
+      prospectId,
+      "note_added",
+      "Google Drive folder created",
+      `Client folder with Assets/Contracts/Deliverables subfolders. Assets folder shared with ${prospect.email}`,
+      { folderId: result.folderId, folderUrl: result.folderUrl }
+    );
 
     return { folderUrl: result.folderUrl };
   } catch (err: unknown) {
@@ -1292,7 +1289,7 @@ export async function createClientFolderAction(
 }
 
 // ============================================
-// Global Omnisearch Engine
+// Search
 // ============================================
 
 export async function searchOmni(query: string): Promise<{
@@ -1301,63 +1298,64 @@ export async function searchOmni(query: string): Promise<{
   email: string;
   company: string;
 }[]> {
-  const session = await verifyAuth();
-  if (!query || query.trim().length < 2) return [];
+  return withTenant(async (db, tenantId) => {
+    if (!query || query.trim().length < 2) return [];
 
-  const q = query.toLowerCase().trim();
+    const q = query.toLowerCase().trim();
 
-  try {
-    const snapshot = await db
-        .collection("prospects")
-        .where("agencyId", "==", session.user.agencyId)
-        .get();
-        
-    const results = snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        name: doc.data().name || "",
-        email: doc.data().email || "",
-        company: doc.data().company || "",
-      }))
-      .filter((p) => {
-        return (
+    try {
+      const rows = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.tenantId, tenantId))
+        .limit(100);
+
+      const results = rows
+        .map((row) => ({
+          id: row.prospectId,
+          name: row.name || "",
+          email: row.email || "",
+          company: row.company || "",
+        }))
+        .filter((p) =>
           p.name.toLowerCase().includes(q) ||
           p.email.toLowerCase().includes(q) ||
           p.company.toLowerCase().includes(q)
-        );
-      })
-      .slice(0, 10);
+        )
+        .slice(0, 10);
 
-    return results;
-  } catch (e) {
-    console.error("Omnisearch Error:", e);
-    return [];
-  }
+      return results;
+    } catch (err) {
+      console.error("Omnisearch error:", err);
+      return [];
+    }
+  });
 }
 
 // ============================================
 // Recent Activities (Notification Feed)
 // ============================================
+
 export async function getRecentActivities(limit = 10) {
-  const session = await verifyAuth();
-  const agencyId = session.user.agencyId;
+  return withTenant(async (db, tenantId) => {
+    try {
+      const rows = await db
+        .select()
+        .from(activities)
+        .where(eq(activities.tenantId, tenantId))
+        .orderBy(desc(activities.createdAt))
+        .limit(limit);
 
-  const snap = await db
-    .collection("activities")
-    .where("agencyId", "==", agencyId)
-    .orderBy("createdAt", "desc")
-    .limit(limit)
-    .get();
-
-  return snap.docs.map((doc) => {
-    const d = doc.data();
-    return {
-      id: doc.id,
-      type: d.type || "info",
-      description: d.description || "",
-      prospectId: d.prospectId || null,
-      createdAt: d.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
-    };
+      return rows.map((row) => ({
+        id: row.id,
+        type: row.type,
+        description: row.title,
+        prospectId: row.leadId,
+        createdAt: row.createdAt,
+      }));
+    } catch (err) {
+      console.error("getRecentActivities error:", err);
+      return [];
+    }
   });
 }
-

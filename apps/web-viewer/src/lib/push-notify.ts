@@ -1,8 +1,15 @@
 /**
- * Web Push (VAPID) — matches NotificationOptIn which stores PushSubscription JSON in prospects.fcmToken.
+ * Web Push (VAPID) — pure Drizzle, no Firebase.
+ * Reads push subscriptions from the `push_subscriptions` table.
  */
 import webpush from "web-push";
-import { db } from "@/lib/firebase";
+import {
+  getDb,
+  setTenantContext,
+  pushSubscriptions,
+  leads,
+} from "@dba/database";
+import { eq, and } from "drizzle-orm";
 
 let vapidConfigured = false;
 
@@ -19,20 +26,77 @@ function ensureVapid(): boolean {
   return true;
 }
 
+/**
+ * Send Web Push to all subscriptions for a given user within a tenant.
+ */
+export async function sendWebPushToUser(
+  tenantId: string,
+  userId: string,
+  payload: { title: string; body: string; url?: string },
+): Promise<void> {
+  if (!ensureVapid()) return;
+
+  const db = getDb();
+  if (!db) return;
+
+  await setTenantContext(db, tenantId);
+  const subs = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(
+      and(
+        eq(pushSubscriptions.tenantId, tenantId),
+        eq(pushSubscriptions.userId, userId),
+      ),
+    );
+
+  const body = JSON.stringify({
+    title: payload.title,
+    body: payload.body,
+    url:
+      payload.url ||
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin`,
+  });
+
+  for (const sub of subs) {
+    const subscription: webpush.PushSubscription = {
+      endpoint: sub.endpoint,
+      keys: { p256dh: sub.p256dh, auth: sub.auth },
+    };
+
+    try {
+      await webpush.sendNotification(subscription, body);
+    } catch (e: unknown) {
+      const err = e as { statusCode?: number };
+      if (err.statusCode === 404 || err.statusCode === 410) {
+        await db
+          .delete(pushSubscriptions)
+          .where(eq(pushSubscriptions.id, sub.id));
+      }
+    }
+  }
+}
+
+/**
+ * Send Web Push to a prospect (from their fcmToken field — legacy PushSubscription JSON).
+ */
 export async function sendWebPushToProspect(
   prospectId: string,
   payload: { title: string; body: string; url?: string },
 ): Promise<void> {
-  if (!ensureVapid()) {
-    return;
-  }
+  if (!ensureVapid()) return;
 
-  const doc = await db.collection("prospects").doc(prospectId).get();
-  if (!doc.exists) return;
-  const data = doc.data()!;
-  if (!data.notifyByPush) return;
-  const raw = data.fcmToken as string | undefined;
-  if (!raw) return;
+  const db = getDb();
+  if (!db) return;
+
+  const rows = await db
+    .select({ fcmToken: leads.fcmToken, tenantId: leads.tenantId })
+    .from(leads)
+    .where(eq(leads.prospectId, prospectId))
+    .limit(1);
+
+  if (rows.length === 0 || !rows[0].fcmToken) return;
+  const raw = rows[0].fcmToken;
 
   let subscription: webpush.PushSubscription;
   try {
@@ -54,11 +118,10 @@ export async function sendWebPushToProspect(
   } catch (e: unknown) {
     const err = e as { statusCode?: number };
     if (err.statusCode === 404 || err.statusCode === 410) {
-      await db.collection("prospects").doc(prospectId).update({
-        fcmToken: null,
-        notifyByPush: false,
-      });
+      await db
+        .update(leads)
+        .set({ fcmToken: null })
+        .where(eq(leads.prospectId, prospectId));
     }
-    console.error("[push] send failed:", e);
   }
 }

@@ -3,6 +3,7 @@ import { webhookConfig } from '@/lib/theme.config';
 import { resolveLeadAgencyId } from '@/lib/lead-webhook-agency';
 import { leadWebhookCorsHeaders } from '@/lib/lead-webhook-cors';
 import { executeLeadIntake } from '@/lib/execute-lead-intake';
+import { timingSafeEqualStr } from '@/lib/webhook-auth';
 import { apiError } from '@/lib/api-error';
 import { readBoundedJson } from '@/lib/body-limit';
 
@@ -17,10 +18,12 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const secret =
+  const provided =
     request.headers.get('x-webhook-secret') ||
-    request.headers.get('x-lead-secret');
-  const secretOk = secret === webhookConfig.leadWebhookSecret;
+    request.headers.get('x-lead-secret') ||
+    '';
+  const expected = webhookConfig.leadWebhookSecret || '';
+  const secretOk = expected.length > 0 && timingSafeEqualStr(provided, expected);
   let resolvedAgencyId: string | undefined;
   if (secretOk) {
     resolvedAgencyId = await resolveLeadAgencyId();
@@ -72,11 +75,14 @@ export async function POST(request: NextRequest) {
     }
     const body = parsed.value;
 
-    const secret =
+    const provided = String(
       body.secret ||
-      request.headers.get('x-webhook-secret') ||
-      request.headers.get('x-lead-secret');
-    if (secret !== webhookConfig.leadWebhookSecret) {
+        request.headers.get('x-webhook-secret') ||
+        request.headers.get('x-lead-secret') ||
+        '',
+    );
+    const expected = webhookConfig.leadWebhookSecret || '';
+    if (expected.length === 0 || !timingSafeEqualStr(provided, expected)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: cors });
     }
 

@@ -256,7 +256,7 @@ export async function createProjectSheet(data: ProjectSheetData): Promise<string
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Project sheet created: ${sheetTitle} → ${spreadsheetUrl}`);
+      console.info(`Project sheet created: ${sheetTitle} → ${spreadsheetUrl}`);
     }
     return spreadsheetUrl;
   } catch (err) {

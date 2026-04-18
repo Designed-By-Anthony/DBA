@@ -31,7 +31,8 @@ Copy `.env.example` to `.env.local` and fill in Clerk, Firebase, Resend, Stripe,
 
 **Lead intake**
 
-- **Browser / marketing / personal tools (no secret in client):** `POST /api/lead`
+- **Marketing (primary):** `POST /api/v1/ingest` — Turnstile or shared secret; set `X-Tenant-Id` from `PUBLIC_TENANT_ID` on the Astro build.
+- **Legacy browser JSON:** `POST /api/lead` — tenant from `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` (body `agencyId` ignored).
 - **Server-side / webhook with secret:** `POST /api/webhooks/lead`
 
-See `src/lib/execute-lead-intake.ts` for the shared pipeline.
+See **`docs/CRM_LEAD_ROUTING.md`** for the full matrix and `src/lib/execute-lead-intake.ts` for the shared pipeline.

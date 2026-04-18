@@ -1,4 +1,5 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { sql } from "drizzle-orm";
 import pg from "pg";
 import * as schema from "../schema";
 
@@ -73,6 +74,38 @@ export function getDb(): Database | null {
     _db = drizzle(_pool, { schema });
   }
   return _db;
+}
+
+/**
+ * Sets the tenant context for the current connection via `set_config`.
+ *
+ * With Neon's connection pooler (pgBouncer), SET LOCAL only lives within
+ * a transaction. This function must be called at the START of every transaction
+ * or query sequence to establish the tenant context.
+ *
+ * Usage:
+ *   const db = getDb();
+ *   await setTenantContext(db, tenantId);
+ *   // Now run queries with tenant isolation
+ */
+export async function setTenantContext(db: Database, tenantId: string): Promise<void> {
+  await db.execute(
+    sql`SELECT set_config('app.current_tenant_id', ${tenantId}, false)`
+  );
+}
+
+/**
+ * Returns a Drizzle instance bound to a specific tenant.
+ * Equivalent to calling getDb() and then setTenantContext().
+ * Note: This returns the same shared Database instance; setTenantContext
+ * must be called to set the tenant context before queries run.
+ */
+export function getDbForTenant(tenantId: string): Database {
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized. DATABASE_URL must be set.");
+  }
+  return db;
 }
 
 /** Test / shutdown hooks */

@@ -324,6 +324,7 @@ function trim(s: unknown): string {
 export function buildPublicLeadPayloadFromFormFields(fields: {
   first_name?: string;
   email?: string;
+  company?: string;
   website?: string;
   biggest_issue?: string;
   phone?: string;
@@ -344,6 +345,7 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
   const website = trim(fields.website);
   const message = trim(fields.biggest_issue);
   const phone = trim(fields.phone);
+  const company = trim(fields.company);
   const turnstile = trim(fields["cf-turnstile-response"]);
 
   const meta: PublicLeadMarketingMeta = {
@@ -374,7 +376,7 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
     website,
     message,
     phone: phone || undefined,
-    company: trim(fields.source_page) || undefined,
+    company: company || undefined,
     source,
     _hp: trim(fields._hp),
     cfTurnstileResponse: turnstile || undefined,
@@ -387,6 +389,7 @@ export function buildPublicLeadPayloadFromFormData(fd: FormData): PublicLeadInge
   return buildPublicLeadPayloadFromFormFields({
     first_name: get("first_name"),
     email: get("email"),
+    company: get("company"),
     website: get("website"),
     biggest_issue: get("biggest_issue"),
     phone: get("phone"),

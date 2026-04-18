@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { dismissCookieConsentIfPresent } from './helpers';
 
 const SERVICE_PAGES = [
   { path: '/services/custom-web-design', h1: /Custom Website/i },
@@ -20,7 +21,9 @@ test.describe('Service Pages', () => {
 
   test('FAQ accordion works on custom-web-design', async ({ page }) => {
     await page.goto('/services/custom-web-design');
+    await dismissCookieConsentIfPresent(page);
     const trigger = page.locator('.faq-trigger').first();
+    await trigger.scrollIntoViewIfNeeded();
     await trigger.click();
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
 
@@ -30,11 +33,13 @@ test.describe('Service Pages', () => {
 
   test('AI automation page has pricing section', async ({ page }) => {
     await page.goto('/services/ai-automation');
+    await dismissCookieConsentIfPresent(page);
     await expect(page.locator('.service-pricing-card').first()).toBeVisible();
   });
 
   test('Workspace setup page has pricing section', async ({ page }) => {
     await page.goto('/services/workspace-setup');
+    await dismissCookieConsentIfPresent(page);
     await expect(page.locator('.service-pricing-card').first()).toBeVisible();
   });
 });

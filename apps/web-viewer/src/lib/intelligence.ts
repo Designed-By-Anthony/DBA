@@ -1,5 +1,12 @@
-import { db } from "@/lib/firebase";
-import type { ActivityType, Prospect, ProspectHealthStatus, SupportTicket } from "./types";
+import {
+  getDb,
+  setTenantContext,
+  leads,
+  activities,
+  tickets,
+} from "@dba/database";
+import { eq, and, desc, inArray } from "drizzle-orm";
+import type { ActivityType, ProspectHealthStatus } from "./types";
 
 const SCORE_WEIGHTS: Record<ActivityType, number> = {
   form_submission: 10,
@@ -15,99 +22,195 @@ const SCORE_WEIGHTS: Record<ActivityType, number> = {
   contract_signed: 50,
   payment_received: 50,
   file_uploaded: 15,
-  ticket_created: 5, // Seeking support implies engagement
+  ticket_created: 5,
   ticket_replied: 2,
   milestone_shared: 5,
 };
 
+function activityType(value: unknown): ActivityType | null {
+  return typeof value === "string" && value in SCORE_WEIGHTS
+    ? (value as ActivityType)
+    : null;
+}
+
+function dateFromValue(value: unknown): Date | null {
+  if (value instanceof Date) return value;
+  if (typeof value === "string" || typeof value === "number") {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  if (value && typeof value === "object" && "toDate" in value) {
+    const toDate = (value as { toDate?: () => Date }).toDate;
+    const date = toDate?.();
+    return date instanceof Date && !Number.isNaN(date.getTime()) ? date : null;
+  }
+  return null;
+}
+
 /**
- * Recalculates the algorithmic Lead Score (0-100) based on historical activity and time decay.
+ * Recalculates the Lead Score (0-100) based on historical activity and time decay
  */
-export async function recalculateLeadScore(prospectId: string): Promise<void> {
+export async function recalculateLeadScore(
+  tenantId: string,
+  prospectId: string
+): Promise<void> {
   try {
-    const activitiesSnap = await db.collection("activities").where("prospectId", "==", prospectId).get();
-    
+    const db = getDb();
+    if (!db) return;
+
+    await setTenantContext(db, tenantId);
+
+    // Fetch all activities for this prospect
+    const prospectActivities = await db
+      .select()
+      .from(activities)
+      .where(
+        and(
+          eq(activities.tenantId, tenantId),
+          eq(activities.leadId, prospectId)
+        )
+      );
+
     let rawScore = 0;
     let lastEngagementDate: Date | null = null;
-    
-    activitiesSnap.docs.forEach((doc) => {
-      const data = doc.data();
-      const type = data.type as ActivityType;
-      rawScore += SCORE_WEIGHTS[type] || 0;
-      
-      const date = new Date(data.createdAt);
-      if (!lastEngagementDate || date > lastEngagementDate) {
+
+    prospectActivities.forEach((activity) => {
+      const type = activityType(activity.type);
+      rawScore += type ? SCORE_WEIGHTS[type] : 0;
+
+      const date = dateFromValue(activity.createdAt);
+      if (date && (!lastEngagementDate || date > lastEngagementDate)) {
         lastEngagementDate = date;
       }
     });
-    
+
     // Time decay factor: subtract 2 points for every full day of inactivity
     if (lastEngagementDate) {
-      const lastDate = lastEngagementDate as Date;
-      const daysElapsed = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysElapsed = Math.floor(
+        (Date.now() - lastEngagementDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
       const decay = Math.max(0, daysElapsed * 2);
       rawScore -= decay;
     }
-    
+
     // Normalize to 0-100 ceiling/floor
     const finalScore = Math.max(0, Math.min(100, Math.floor(rawScore)));
-    
-    await db.collection("prospects").doc(prospectId).update({ leadScore: finalScore });
+
+    // Update the lead's score
+    await db
+      .update(leads)
+      .set({
+        leadScore: finalScore,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(
+        and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+      );
   } catch (error) {
-    console.error(`[Intelligence] Failed to calculate lead score for ${prospectId}:`, error);
+    console.error(
+      `[Intelligence] Failed to calculate lead score for ${prospectId}:`,
+      error
+    );
   }
 }
 
 /**
- * Predicts the Churn/Health Status of a prospect based on engagement gaps and unresolved friction (tickets).
+ * Evaluates and updates the health status of a prospect based on engagement gaps and open tickets
  */
-export async function evaluateProspectHealth(prospectId: string): Promise<void> {
+export async function evaluateProspectHealth(
+  tenantId: string,
+  prospectId: string
+): Promise<void> {
   try {
-    const doc = await db.collection("prospects").doc(prospectId).get();
-    if (!doc.exists) return;
-    
-    const prospect = doc.data() as Prospect;
-    
-    // Exclude leads and fully launched clients from intense churn monitoring for the moment, unless desired.
-    // For now, we apply to everything except 'lead' where we just want them to score high
-    if (prospect.status === 'lead') {
-      if (prospect.healthStatus !== 'healthy') {
-        await db.collection("prospects").doc(prospectId).update({ healthStatus: 'healthy' });
+    const db = getDb();
+    if (!db) return;
+
+    await setTenantContext(db, tenantId);
+
+    // Fetch the lead
+    const leadRows = await db
+      .select()
+      .from(leads)
+      .where(
+        and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+      )
+      .limit(1);
+
+    if (leadRows.length === 0) return;
+
+    const lead = leadRows[0];
+
+    // For 'new' status leads, always mark as healthy
+    if (lead.status === "new") {
+      if (lead.healthStatus !== "healthy") {
+        await db
+          .update(leads)
+          .set({
+            healthStatus: "healthy",
+            updatedAt: new Date().toISOString(),
+          })
+          .where(
+            and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+          );
       }
       return;
     }
 
-    let health: ProspectHealthStatus = 'healthy';
-    
+    let health: ProspectHealthStatus = "healthy";
+
     // 1. Inactivity assessment
-    const daysSinceContact = prospect.lastContactedAt 
-      ? Math.floor((Date.now() - new Date(prospect.lastContactedAt as string).getTime()) / (1000 * 60 * 60 * 24))
+    const lastContactedAt = dateFromValue(lead.lastContactedAt);
+    const daysSinceContact = lastContactedAt
+      ? Math.floor(
+          (Date.now() - lastContactedAt.getTime()) / (1000 * 60 * 60 * 24)
+        )
       : 0;
-        
+
     // 2. Open friction (tickets)
-    const ticketsSnap = await db.collection("tickets")
-      .where("prospectId", "==", prospectId)
-      .where("status", "in", ["open", "in_progress"])
-      .get();
-    
+    const openTickets = await db
+      .select()
+      .from(tickets)
+      .where(
+        and(
+          eq(tickets.tenantId, tenantId),
+          eq(tickets.leadId, prospectId),
+          inArray(tickets.status, ["open", "in_progress"])
+        )
+      );
+
     let oldestTicketDays = 0;
-    ticketsSnap.docs.forEach((t) => {
-      const ticketData = t.data() as SupportTicket;
-      const age = Math.floor((Date.now() - new Date(ticketData.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+    openTickets.forEach((ticket) => {
+      const ticketDate = dateFromValue(ticket.createdAt);
+      if (!ticketDate) return;
+      const age = Math.floor(
+        (Date.now() - ticketDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
       if (age > oldestTicketDays) oldestTicketDays = age;
     });
-    
-    // 3. Proactive Thresholds
+
+    // 3. Determine health status based on thresholds
     if (oldestTicketDays >= 5 || daysSinceContact >= 14) {
-      health = 'churn_risk';
+      health = "churn_risk";
     } else if (oldestTicketDays >= 2 || daysSinceContact >= 7) {
-      health = 'at_risk';
+      health = "at_risk";
     }
-    
-    if (prospect.healthStatus !== health) {
-      await db.collection("prospects").doc(prospectId).update({ healthStatus: health });
+
+    // Update health status if changed
+    if (lead.healthStatus !== health) {
+      await db
+        .update(leads)
+        .set({
+          healthStatus: health,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(
+          and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+        );
     }
   } catch (error) {
-    console.error(`[Intelligence] Failed to evaluate health for ${prospectId}:`, error);
+    console.error(
+      `[Intelligence] Failed to evaluate health for ${prospectId}:`,
+      error
+    );
   }
 }

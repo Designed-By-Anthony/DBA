@@ -1,11 +1,19 @@
 "use server";
 
-import { db } from "@/lib/firebase";
+import {
+  getDb,
+  setTenantContext,
+  emails,
+  tickets,
+  type EmailRow,
+  type TicketRow,
+} from "@dba/database";
+import { eq, desc } from "drizzle-orm";
 import { verifyAuth } from "@/app/admin/actions";
 
 export interface InboxItem {
   id: string;
-  type: 'email' | 'ticket' | 'whatsapp' | 'sms';
+  type: "email" | "ticket" | "whatsapp" | "sms";
   subject: string;
   preview: string;
   sender: string;
@@ -16,55 +24,90 @@ export interface InboxItem {
 }
 
 /**
- * Omnichannel Unified Inbox Fetcher
- * Aggregates distinct communication protocols into a single feed.
+ * Maps database EmailRow to InboxItem
+ */
+function emailToInboxItem(row: EmailRow): InboxItem {
+  const bodyText = row.bodyHtml || "";
+  return {
+    id: row.id,
+    type: "email",
+    subject: row.subject || "No Subject",
+    preview: bodyText.substring(0, 100) || "No preview",
+    sender: row.leadEmail || "Unknown",
+    prospectId: row.leadId,
+    createdAt: row.createdAt,
+    status: row.status || "sent",
+    isRead: true, // Simplified - no tracking column
+  };
+}
+
+/**
+ * Maps database TicketRow to InboxItem
+ */
+function ticketToInboxItem(row: TicketRow): InboxItem {
+  const description = row.description || "";
+  const status = row.status || "open";
+  return {
+    id: row.id,
+    type: "ticket",
+    subject: `Support Ticket`,
+    preview: description.substring(0, 100) || "No details",
+    sender: row.leadName || "Portal Client",
+    prospectId: row.leadId,
+    createdAt: row.createdAt,
+    status,
+    isRead: status !== "open",
+  };
+}
+
+/**
+ * Fetches aggregated inbox stream combining emails and tickets
+ * Returns last 30 of each, sorted by createdAt DESC
  */
 export async function getInboxStream(): Promise<InboxItem[]> {
   const session = await verifyAuth();
-  const agencyId = session.user.agencyId;
-  
+  const tenantId = session.user.agencyId;
+  const db = getDb();
+
+  if (!db) {
+    throw new Error("Database not configured");
+  }
+
   try {
-    // 1. Parallel fetch disparate collections
-    const [emailsSnap, ticketsSnap] = await Promise.all([
-      db.collection("emails").where("agencyId", "==", agencyId).orderBy("createdAt", "desc").limit(30).get(),
-      db.collection("tickets").where("agencyId", "==", agencyId).orderBy("createdAt", "desc").limit(30).get()
+    await setTenantContext(db, tenantId);
+
+    // Fetch emails and tickets in parallel
+    const [emailRows, ticketRows] = await Promise.all([
+      db
+        .select()
+        .from(emails)
+        .where(eq(emails.tenantId, tenantId))
+        .orderBy(desc(emails.createdAt))
+        .limit(30),
+      db
+        .select()
+        .from(tickets)
+        .where(eq(tickets.tenantId, tenantId))
+        .orderBy(desc(tickets.createdAt))
+        .limit(30),
     ]);
-    
+
+    // Map to InboxItem format
     const items: InboxItem[] = [];
-    
-    // 2. Normalize Schema
-    emailsSnap.docs.forEach(d => {
-      const data = d.data();
-      items.push({
-        id: d.id,
-        type: 'email',
-        subject: data.subject || "No Subject",
-        preview: data.bodyText?.substring(0, 100) || "No preview",
-        sender: data.toEmail || "Unknown",
-        prospectId: data.prospectId,
-        createdAt: data.createdAt,
-        status: data.status,
-        isRead: true, // Simplified
-      });
+
+    emailRows.forEach((row) => {
+      items.push(emailToInboxItem(row));
     });
-    
-    ticketsSnap.docs.forEach(d => {
-      const data = d.data();
-      items.push({
-        id: d.id,
-        type: 'ticket',
-        subject: `Support Ticket`,
-        preview: data.description?.substring(0, 100) || "No details",
-        sender: "Portal Client",
-        prospectId: data.prospectId,
-        createdAt: data.createdAt,
-        status: data.status,
-        isRead: data.status !== 'open',
-      });
+
+    ticketRows.forEach((row) => {
+      items.push(ticketToInboxItem(row));
     });
-    
-    // 3. Chronological Sort
-    return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Sort combined array by createdAt DESC
+    return items.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   } catch (err) {
     console.error("[Inbox Fetch] Error:", err);
     return [];

@@ -11,7 +11,7 @@ function normalizeHost(hostHeader: string | null): string {
   return (hostHeader || "").split(":")[0]?.toLowerCase() || "";
 }
 
-export default clerkMiddleware(async (auth, req) => {
+export const proxy = clerkMiddleware(async (auth, req) => {
   const url = req.nextUrl;
   const hostname = normalizeHost(req.headers.get("host"));
 
@@ -34,7 +34,17 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  const isPortalDomain = hostname.startsWith("portal.") || hostname.startsWith("portal-");
+  // `accounts.*` is the public-facing client-portal subdomain and shares
+  // the same /portal surface; local dev (e.g. `accounts.localhost:3001`)
+  // relies on this prefix rewrite to match production parity. In prod the
+  // apex middleware.ts rewrites the path before it reaches here, so the
+  // upstream host is `dba-agency-os.vercel.app` — these branches are the
+  // local-dev safety net.
+  const isPortalDomain =
+    hostname.startsWith("portal.") ||
+    hostname.startsWith("portal-") ||
+    hostname.startsWith("accounts.") ||
+    hostname.startsWith("accounts-");
   if (isPortalDomain) {
     if (!url.pathname.startsWith("/portal") && !url.pathname.startsWith("/api/")) {
       return NextResponse.rewrite(new URL(`/portal${url.pathname}`, req.url));

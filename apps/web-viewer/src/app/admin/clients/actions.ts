@@ -2,7 +2,8 @@
 
 import type { PlanSuite } from "@dba/lead-form-contract";
 import { clerkClient } from "@clerk/nextjs/server";
-import { db } from "@/lib/firebase";
+import { getDb, setTenantContext, tenants, leads } from "@dba/database";
+import { eq, and, count } from "drizzle-orm";
 import { verifyAuth } from "../actions";
 
 // ============================================
@@ -11,45 +12,55 @@ import { verifyAuth } from "../actions";
 
 /**
  * List all organizations the current user belongs to,
- * enriched with prospect count from Firestore.
+ * enriched with prospect count from SQL.
  */
 export async function listClientOrgs() {
   const session = await verifyAuth();
-  // Same dev/test bypass as the rest of admin — no Clerk session → empty list, not a thrown 500
-  if (session.user.id === "dev") {
-    return [];
-  }
+  if (session.user.id === "dev") return [];
 
   const userId = session.user.id;
   const client = await clerkClient();
   const memberships = await client.users.getOrganizationMembershipList({ userId });
 
+  const db = getDb();
+
   const orgs = await Promise.all(
     memberships.data.map(async (m) => {
       const org = m.organization;
 
-      // Count prospects for this org
       let prospectCount = 0;
-      try {
-        const snap = await db
-          .collection("prospects")
-          .where("agencyId", "==", org.id)
-          .count()
-          .get();
-        prospectCount = snap.data().count;
-      } catch {
-        // Firestore count may fail on empty collections
-      }
-
-      // Get branding config if exists
       let branding = null;
-      try {
-        const brandDoc = await db.collection("org_settings").doc(org.id).get();
-        if (brandDoc.exists) {
-          branding = brandDoc.data();
+
+      if (db) {
+        try {
+          const countResult = await db
+            .select({ count: count() })
+            .from(leads)
+            .where(eq(leads.tenantId, org.id));
+          prospectCount = countResult[0]?.count || 0;
+        } catch {
+          // Count may fail
         }
-      } catch {
-        // Non-critical
+
+        try {
+          const tenantRows = await db
+            .select()
+            .from(tenants)
+            .where(eq(tenants.clerkOrgId, org.id))
+            .limit(1);
+          if (tenantRows.length > 0) {
+            const t = tenantRows[0];
+            branding = {
+              brandName: t.name,
+              brandColor: t.brandColor || "#2563eb",
+              brandInitial: (t.name?.charAt(0) || "A").toUpperCase(),
+              portalEnabled: true,
+              verticalTemplate: t.verticalType || "agency",
+            };
+          }
+        } catch {
+          // Non-critical
+        }
       }
 
       return {
@@ -71,9 +82,8 @@ export async function listClientOrgs() {
 
 /**
  * Create a new client organization.
- * The current user becomes the admin automatically.
  */
-export async function createClientOrg(name: string, verticalTemplate: string = "general") {
+export async function createClientOrg(name: string, verticalTemplate: string = "agency") {
   const session = await verifyAuth();
   if (session.user.id === "dev") {
     throw new Error("Sign in with Clerk to create client organizations.");
@@ -86,16 +96,23 @@ export async function createClientOrg(name: string, verticalTemplate: string = "
     createdBy: userId,
   });
 
-  // Initialize branding + vertical defaults in Firestore
-  await db.collection("org_settings").doc(org.id).set({
-    brandName: name,
-    brandColor: "#2563eb",
-    brandInitial: name.charAt(0).toUpperCase(),
-    portalEnabled: true,
-    // Vertical template — determines CRM layout per industry
-    verticalTemplate,
-    createdAt: new Date().toISOString(),
-  });
+  // Initialize tenant record in SQL
+  const db = getDb();
+  if (db) {
+    const now = new Date().toISOString();
+    await db.insert(tenants).values({
+      clerkOrgId: org.id,
+      name,
+      verticalType: verticalTemplate as "agency" | "service_pro",
+      brandColor: "#2563eb",
+      pipelineStages: [],
+      dealSources: ["Referral", "Inbound", "Organic"],
+      notificationPrefs: {},
+      crmConfig: {},
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
   return {
     id: org.id,
@@ -105,14 +122,13 @@ export async function createClientOrg(name: string, verticalTemplate: string = "
 }
 
 /**
- * Update org branding settings (stored in Firestore).
+ * Update org branding settings (stored in SQL tenants table).
  */
 export async function updateOrgBranding(orgId: string, settings: {
   brandName?: string;
   brandColor?: string;
   brandInitial?: string;
   portalEnabled?: boolean;
-  /** Product tier: same pipeline; `starter` hides advanced modules in the sidebar. */
   planSuite?: PlanSuite;
 }) {
   const session = await verifyAuth();
@@ -121,27 +137,32 @@ export async function updateOrgBranding(orgId: string, settings: {
   }
 
   const userId = session.user.id;
-  // Verify the user has access to the target org
-  // (they must be a member of it)
   const client = await clerkClient();
   const memberships = await client.users.getOrganizationMembershipList({ userId });
   const isMember = memberships.data.some((m) => m.organization.id === orgId);
   if (!isMember) throw new Error("Unauthorized: Not a member of this organization");
 
-  await db.collection("org_settings").doc(orgId).set(
-    { ...settings, updatedAt: new Date().toISOString() },
-    { merge: true }
-  );
+  const db = getDb();
+  if (db) {
+    const payload: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+    if (settings.brandName) payload.name = settings.brandName;
+    if (settings.brandColor) payload.brandColor = settings.brandColor;
+
+    await db
+      .update(tenants)
+      .set(payload)
+      .where(eq(tenants.clerkOrgId, orgId));
+  }
 
   return { success: true };
 }
 
 /**
- * Get branding settings for an org (used by portal).
+ * Get branding settings for an org.
  */
 export async function getOrgBranding(orgId: string) {
-  const doc = await db.collection("org_settings").doc(orgId).get();
-  if (!doc.exists) {
+  const db = getDb();
+  if (!db) {
     return {
       brandName: "Agency OS",
       brandColor: "#2563eb",
@@ -149,5 +170,28 @@ export async function getOrgBranding(orgId: string) {
       portalEnabled: true,
     };
   }
-  return doc.data();
+
+  const rows = await db
+    .select()
+    .from(tenants)
+    .where(eq(tenants.clerkOrgId, orgId))
+    .limit(1);
+
+  if (rows.length === 0) {
+    return {
+      brandName: "Agency OS",
+      brandColor: "#2563eb",
+      brandInitial: "A",
+      portalEnabled: true,
+    };
+  }
+
+  const t = rows[0];
+  return {
+    brandName: t.name || "Agency OS",
+    brandColor: t.brandColor || "#2563eb",
+    brandInitial: (t.name?.charAt(0) || "A").toUpperCase(),
+    portalEnabled: true,
+    verticalTemplate: t.verticalType || "agency",
+  };
 }

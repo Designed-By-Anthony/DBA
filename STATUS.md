@@ -1,5 +1,52 @@
 # Migration Status Report
 
+## Chameleon gateway path-prefix fix (2026-04-17)
+
+Two subdomain regressions fixed in the apex gateway + web-viewer proxy:
+
+1. `admin.designedbyanthony.com/` was serving the public root `LandingPage` component from `apps/web-viewer/src/app/page.tsx` instead of the `/admin` dashboard. Root cause: apex `middleware.ts` rewrote `admin.*` to `$ADMIN_UPSTREAM_URL/<pathname>` with no prefix. Since cross-project Vercel rewrites present the upstream project's hostname to the downstream app (`host: dba-agency-os.vercel.app`, not `admin.*`), the web-viewer `proxy.ts` host-based `/admin` prefix never fired in production — it only runs on `*.localhost` during local dev. Apex gateway now pre-prefixes `/admin` for non-`/api` paths on `admin.*`.
+2. `accounts.designedbyanthony.com/` returned 404. Root cause: apex middleware rewrote to `/accounts/*` but web-viewer has no `/accounts` route; the client-portal surface lives at `/portal`. Apex gateway now pre-prefixes `/portal` for non-`/api` paths on `accounts.*`. `/api/*` stays pass-through so `accounts.*/api/portal/branding` still resolves.
+
+Also added `accounts.`/`accounts-` host-prefix handling to `apps/web-viewer/src/proxy.ts` so `accounts.localhost:3001` dev parity matches production and `apps/web-viewer/tests/subdomains.spec.ts` continues to pass.
+
+Verification: `tsc --noEmit` passes on root `middleware.ts` and `apps/web-viewer` after the edits.
+
+## Next.js proxy migration (2026-04-17)
+
+`apps/web-viewer/src/middleware.ts` was migrated to the Next.js 16 `proxy.ts` convention. The Clerk routing/protection handler now exports a named `proxy`, matching the installed Next docs and removing the Next build deprecation warning for the Agency OS app. The root `middleware.ts` intentionally remains in place because it is Vercel Routing Middleware for the Astro/apex gateway; Vercel's generic routing middleware docs still use `middleware.ts` for that non-Next gateway path.
+
+The Agency OS lint cleanup also removed the remaining `any`/namespace lint errors from the transitional Firebase shim by replacing the global `FirebaseFirestore.*` namespace with exported shim types.
+
+Verification pass:
+- Vercel CLI 51.5.0 is installed and authenticated as `anthony-9364`.
+- `pnpm --filter agency-os lint` passed.
+- `pnpm --filter agency-os exec tsc --noEmit` passed.
+- `pnpm --filter agency-os build` passed and reports `ƒ Proxy (Middleware)`.
+- Root `pnpm build` passed across marketing, lighthouse, and Agency OS. The command exited 0, but Turbo emitted a final low-disk warning: `No space left on device (os error 28)`.
+- Brand asset mirrors were present for all three apps and `packages/dba-theme`: `/brand/logo.png` and `/brand/mark.webp`.
+
+## Vercel/Turborepo project audit (2026-04-17)
+
+The Vercel team is now reset to the intended three-project Turborepo layout:
+
+- `dbastudio-315` (`prj_v9IdDn8DT9xEbmyZZ0dSHzBLIGJH`) remains the apex marketing/gateway project for `designedbyanthony.com` and `www.designedbyanthony.com`.
+- `dba-agency-os` (`prj_wQTfns0ZSz5WKsEiLFot80r7eqp9`) was created for `apps/web-viewer` with `framework=nextjs`, `rootDirectory=apps/web-viewer`, and `turbo run build --filter=agency-os`.
+- `dba-lighthouse-audit` (`prj_DE2b3J5IYsgJMyiRFRiIe7EW6EcL`) was created for `apps/lighthouse` with `framework=nextjs`, `rootDirectory=apps/lighthouse`, and `turbo run build --filter=lighthouse-audit`.
+
+Vercel environment variables were split by app: Agency OS received the Clerk, SQL, lead, Stripe, Resend, and Google admin/runtime values from `apps/web-viewer/.env.local`; Lighthouse received the audit/API/Sentry/Turnstile values from `apps/lighthouse/.env.local`; the apex marketing project was cleaned so app-only secrets no longer trip the marketing env-bleed guard. The apex project now points upstream routing at the stable aliases `https://dba-agency-os.vercel.app` and `https://dba-lighthouse-audit.vercel.app`.
+
+Production deploys succeeded for all three projects:
+
+- `dba-agency-os` -> `https://dba-agency-os.vercel.app` (`dpl_62dMoJU2JqQRVgzr99FEAmuaR6os`)
+- `dba-lighthouse-audit` -> `https://dba-lighthouse-audit.vercel.app` (`dpl_E2jTaUurmuT8hv5bx2sP6s6RjpNL`)
+- `dbastudio-315` -> `https://www.designedbyanthony.com` (`dpl_5R4Nqnp28WzNQb6G4pQPP8sqggaL`)
+
+Repo deploy hygiene was added with root `.vercelignore`, app-local `apps/web-viewer/vercel.json` and `apps/lighthouse/vercel.json`, and Turbo env/global dependency updates so app Vercel configs and `MARKETING_STRICT_ENV_BLEED` are tracked.
+
+Verification after the reset: Vercel MCP and CLI project inspection both show the three projects with the expected root directories, frameworks, Node 24, and filtered Turbo build commands. `pnpm build` passed from the repo root after the Turbo update; Turbo still emitted the local low-disk warning `No space left on device (os error 28)` after successful tasks.
+
+Remaining operator follow-up: `lighthouse.designedbyanthony.com` is not live yet because DNS does not resolve and Vercel requires ownership verification before the hostname can be used. Add `CNAME lighthouse -> cname.vercel-dns.com` and add a TXT record at `_vercel.designedbyanthony.com` with value `vc-domain-verify=lighthouse.designedbyanthony.com,d07d33df9b94aadd4007`, then verify/attach the domain to `dbastudio-315` in Vercel. `_vercel.designedbyanthony.com` already has other TXT values, so add this as an additional TXT value instead of replacing the existing records.
+
 ## Lead intake bot-spam hardening (current)
 
 The public `POST /api/lead` endpoint previously fired an admin "New Lead" email through Resend for every request that (a) had a name + email and (b) left the honeypot empty. Turnstile was only enforced when `TURNSTILE_SECRET_KEY` happened to be set — so any missing-env slip resulted in opportunistic bot storms landing directly in Anthony's inbox. Lighthouse `/api/contact` compounded the problem with `Access-Control-Allow-Origin: '*'`, letting attacker pages script the CRM.

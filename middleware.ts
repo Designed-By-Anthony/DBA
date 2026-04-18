@@ -83,6 +83,25 @@ function isProduction(): boolean {
   return process.env.VERCEL_ENV === 'production';
 }
 
+/**
+ * Cross-project Vercel rewrites present the upstream deployment's own
+ * hostname to the downstream app (the origin `admin.` / `accounts.` host
+ * is only visible via `x-forwarded-host`). So the web-viewer `proxy.ts`
+ * host-based `/admin` + `/portal` prefixing does NOT fire in production
+ * — it only runs on `*.localhost` during local dev. The apex gateway
+ * therefore has to pre-prefix the path itself, otherwise:
+ *   - `admin.<apex>/`     → serves the public root landing (wrong page)
+ *   - `accounts.<apex>/`  → 404 (no `/accounts` route exists)
+ *
+ * `/api/...` paths are pass-through because the web-viewer API routes
+ * live at `/api/*` (not `/admin/api/*` or `/portal/api/*`).
+ */
+function needsAppPrefix(pathname: string, prefix: string): boolean {
+  if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
+  if (pathname.startsWith('/api/')) return false;
+  return true;
+}
+
 export default function middleware(request: Request, _ctx: RequestContext) {
   const host = hostnameOf(request);
   const url = new URL(request.url);
@@ -91,15 +110,20 @@ export default function middleware(request: Request, _ctx: RequestContext) {
   if (host === ADMIN_HOST) {
     const upstream = process.env.ADMIN_UPSTREAM_URL;
     if (!upstream) return isProduction() ? misconfigured('admin') : next();
-    return rewrite(buildUpstream(upstream, pathname, search));
+    // Admin dashboard lives under /admin in web-viewer; /api/* is a sibling.
+    const prefix = needsAppPrefix(pathname, '/admin') ? '/admin' : '';
+    return rewrite(buildUpstream(upstream, pathname, search, prefix));
   }
 
   if (host === ACCOUNTS_HOST) {
     const upstream =
       process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
     if (!upstream) return isProduction() ? misconfigured('accounts') : next();
-    // The web-viewer CRM exposes the accounts flow under /accounts/...
-    return rewrite(buildUpstream(upstream, pathname, search, '/accounts'));
+    // The "accounts" subdomain is the client portal surface of web-viewer,
+    // which is implemented under /portal. Keep /api/* un-prefixed so
+    // `accounts.designedbyanthony.com/api/portal/branding` still resolves.
+    const prefix = needsAppPrefix(pathname, '/portal') ? '/portal' : '';
+    return rewrite(buildUpstream(upstream, pathname, search, prefix));
   }
 
   if (host === LIGHTHOUSE_HOST) {

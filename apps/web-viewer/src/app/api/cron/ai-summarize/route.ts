@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     // summarization loop is commented out pending LLM-provider wiring.
     // Keeping the handler so the Vercel cron entry remains valid but
     // documenting that nothing happens yet.
-    console.log("[AI Cron] Summarization loop executed successfully.");
+    console.info("[AI Cron] Summarization loop executed successfully.");
     return NextResponse.json({ success: true, processedCount: 0 });
   } catch (error) {
     console.error("[AI Cron Error]", error);

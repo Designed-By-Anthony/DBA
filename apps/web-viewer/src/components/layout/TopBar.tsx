@@ -70,7 +70,7 @@ export default function TopBar({
       try {
         const activities = await getRecentActivities(10);
         if (cancelled) return;
-        const mapped: Notification[] = activities.map((a: { id: string; type: string; description: string; prospectId?: string; createdAt: string }) => ({
+        const mapped: Notification[] = activities.map((a) => ({
           id: a.id,
           type: a.type === "status_change" ? "info" as const :
                 a.type === "email_sent" || a.type === "email_opened" ? "email" as const :

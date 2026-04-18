@@ -1,2 +1,2 @@
 export * from "../schema";
-export { getDb, closeDbPool, type Database } from "./db";
+export { getDb, getDbForTenant, setTenantContext, closeDbPool, type Database } from "./db";

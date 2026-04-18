@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
 import { verifyUnsubscribeToken } from "@/lib/email-utils";
+import { getDb, leads } from "@dba/database";
+import { eq } from "drizzle-orm";
 
 // GET /api/unsubscribe?id=prospect-id&token=verification-token
-// CAN-SPAM compliant: one-click, no login required, no personal info collected
+// CAN-SPAM compliant: one-click, no login required
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id");
   const token = request.nextUrl.searchParams.get("token");
@@ -15,7 +16,6 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Verify HMAC token
   try {
     const isValid = verifyUnsubscribeToken(id, token);
     if (!isValid) {
@@ -31,12 +31,14 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Set unsubscribed flag
+  // Set unsubscribed flag in SQL
   try {
-    const docRef = db.collection("prospects").doc(id);
-    const doc = await docRef.get();
-    if (doc.exists) {
-      await docRef.update({ unsubscribed: true });
+    const db = getDb();
+    if (db) {
+      await db
+        .update(leads)
+        .set({ unsubscribed: true, updatedAt: new Date().toISOString() })
+        .where(eq(leads.prospectId, id));
     }
   } catch (err) {
     console.error("Unsubscribe error:", err);

@@ -1,13 +1,25 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { getDb, leads, activities } from "@dba/database";
+import { eq } from "drizzle-orm";
 import { evaluateProspectHealth, recalculateLeadScore } from "@/lib/intelligence";
+import { getSecret, verifySharedSecret } from "@/lib/webhook-auth";
 
 /**
  * Next-Gen Agentic AI Ingestion Hook (Mock LLM Evaluator)
- * This endpoint simulates an MCP/LLM integration parsing unstructured inbound data
- * and autonomously updating the CRM data structures without human data entry.
+ *
+ * Mutates prospects (dealValue, status, healthStatus) on behalf of an upstream
+ * agent. Requires AGENTIC_WEBHOOK_SECRET.
  */
 export async function POST(req: Request) {
+  const secret = getSecret("AGENTIC_WEBHOOK_SECRET");
+  if (!secret) {
+    console.error("[agentic] webhook rejected: AGENTIC_WEBHOOK_SECRET not configured");
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+  }
+  if (!verifySharedSecret(req.headers, secret)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     let body: Record<string, unknown>;
     try {
@@ -16,8 +28,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    // Example Payload:
-    // { "agencyId": "...", "prospectId": "...", "rawMessage": "..." }
     const { agencyId, prospectId, rawMessage } = body;
 
     if (
@@ -31,50 +41,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required Agentic context parameters" }, { status: 400 });
     }
 
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
+
     // --- simulated LLM EVALUATION ---
     let inferredStatusUpdate = null;
     let inferredDealValue = null;
     let intentFlag = "neutral";
     const extractedTags: string[] = [];
-    
+
     const msg = rawMessage.toLowerCase();
-    
+
     if (msg.includes("budget") && msg.includes("$")) {
-      // Mock regex extraction of budget
       const match = rawMessage.match(/\$([0-9,]+(k|m)?)/i);
       if (match) {
-        // Very basic parsing for simulation
         const rawNum = match[1].replace(/,/g, '').replace(/k/i, '000').replace(/m/i, '000000');
         inferredDealValue = parseInt(rawNum, 10);
       }
     }
-    
+
     if (msg.includes("cancel") || msg.includes("slash") || msg.includes("too expensive")) {
       intentFlag = "churn_risk";
       extractedTags.push("AI_Churn_Flag");
     }
-    
+
     if (msg.includes("ready to start") || msg.includes("send the contract") || msg.includes("let's do it")) {
       intentFlag = "buying_signal";
       inferredStatusUpdate = "proposal";
     }
 
     // --- AUTONOMOUS DATABASE UPDATES ---
-    const prospectRef = db.collection("prospects").doc(prospectId);
-    
     const updatePayload: Record<string, string | number> = {};
     if (inferredDealValue) updatePayload.dealValue = inferredDealValue;
     if (inferredStatusUpdate) updatePayload.status = inferredStatusUpdate;
     if (intentFlag === "churn_risk") updatePayload.healthStatus = "churn_risk";
 
     if (Object.keys(updatePayload).length > 0) {
-      await prospectRef.update(updatePayload);
+      await db
+        .update(leads)
+        .set({ ...updatePayload, updatedAt: new Date().toISOString() })
+        .where(eq(leads.prospectId, prospectId));
     }
-    
-    // Log independent Agent action
-    await db.collection("activities").add({
-      agencyId,
-      prospectId,
+
+    // Log agent action
+    await db.insert(activities).values({
+      tenantId: agencyId,
+      leadId: prospectId,
       type: "note_added",
       title: `🤖 AI Extracted Insights`,
       description: `Autonomously parsed incoming context: Intent detected as '${intentFlag}'. ${inferredDealValue ? `Updated Deal Value: $${inferredDealValue}.` : ''}`,
@@ -83,11 +97,11 @@ export async function POST(req: Request) {
     });
 
     // Fire generic lifecycle hooks
-    await recalculateLeadScore(prospectId);
-    await evaluateProspectHealth(prospectId);
+    await recalculateLeadScore(agencyId, prospectId);
+    await evaluateProspectHealth(agencyId, prospectId);
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       appliedActions: {
         fieldsUpdated: Object.keys(updatePayload),
         intent: intentFlag

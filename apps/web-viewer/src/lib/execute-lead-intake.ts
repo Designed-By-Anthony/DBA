@@ -1,4 +1,3 @@
-import { db } from "@/lib/firebase";
 import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { generateClientId, getIdSource } from "@/lib/client-id";
@@ -7,12 +6,12 @@ import { escapeHtml } from "@/lib/email-utils";
 import { insertSqlLead } from "@/lib/lead-intake/sql";
 import { fireAutomationEvent } from "@/lib/automation-runner";
 import { getTenantByOrgId } from "@/lib/tenant-db";
+import { getDb, setTenantContext, activities } from "@dba/database";
 import type { VerticalId } from "@dba/ui";
 import type { LeadIntakeResult, LeadIntakeSource } from "@/lib/lead-intake/types";
 
 /**
- * Return the URL as-is if it parses as http(s), else `null`. Used to keep
- * attacker-supplied values out of href attributes unless they're safe web URLs.
+ * Return the URL as-is if it parses as http(s), else `null`.
  */
 function safeHttpUrl(raw: string): string | null {
   if (!raw) return null;
@@ -25,10 +24,10 @@ function safeHttpUrl(raw: string): string | null {
   }
 }
 
-
 /**
  * Creates/updates prospect, activity, admin notification, optional submitter confirmation.
  * Used by /api/webhooks/lead and /api/lead.
+ * Pure SQL — no Firestore.
  */
 export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadIntakeResult> {
   const agencyId = await resolveLeadAgencyId(fields.agencyId);
@@ -55,7 +54,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
   let prospectId: string;
   let isNew = true;
 
-  // SQL (Postgres 18 — Augusta) is the source of truth for prospects/leads.
+  // SQL (Neon Postgres 17) is the sole source of truth.
   let sqlResult: { prospectId: string; isNew: boolean } | null = null;
   if (agencyId) {
     try {
@@ -71,68 +70,41 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     prospectId = sqlResult.prospectId;
     isNew = sqlResult.isNew;
   } else {
-    // Fallback only when DATABASE_URL is not configured (local dev without SQL).
     prospectId = await generateClientId(getIdSource(company, name));
     isNew = true;
   }
 
-  // Transitional Firestore shim (a no-op in this repo — see lib/firebase.ts).
-  // Kept so downstream activity/notification writes remain additive until the
-  // full CRM is migrated off the shim.
-  const emailNorm = email.toLowerCase().trim();
-  if (isNew) {
-    await db.collection("prospects").doc(prospectId).set({
-      agencyId,
-      name: name.trim(),
-      email: emailNorm,
-      emailNormalized: emailNorm,
-      phone: phone?.trim() || "",
-      company: company?.trim() || "",
-      website: website?.trim() || "",
-      targetUrl: website?.trim() || "",
-      status: "lead",
-      dealValue: 0,
-      source: source || "Website Form",
-      tags: auditUrl ? ["Audit Completed"] : [],
-      notes: message || "",
-      assignedTo: "",
-      createdAt: new Date().toISOString(),
-      lastContactedAt: new Date().toISOString(),
-      unsubscribed: false,
-      auditReportUrl: auditUrl || null,
-    });
-  } else {
-    await db.collection("prospects").doc(prospectId).update({
-      lastContactedAt: new Date().toISOString(),
-      emailNormalized: emailNorm,
-    });
+  // Write activity to SQL
+  if (agencyId) {
+    const db = getDb();
+    if (db) {
+      try {
+        await setTenantContext(db, agencyId);
+        await db.insert(activities).values({
+          tenantId: agencyId,
+          leadId: prospectId,
+          type: auditUrl ? "audit_completed" : "form_submission",
+          title: auditUrl
+            ? `Completed a Lighthouse audit via ${source}`
+            : `Submitted ${source || "website form"}`,
+          description: message || null,
+          metadata: {
+            source,
+            auditUrl: auditUrl || null,
+            isNewLead: isNew,
+            marketing: marketing ?? null,
+          },
+          createdAt: new Date().toISOString(),
+        });
+      } catch (actErr) {
+        console.error("[lead-intake] activity insert failed:", actErr);
+      }
+    }
   }
-
-  await db.collection("activities").add({
-    agencyId,
-    prospectId,
-    type: auditUrl ? "audit_completed" : "form_submission",
-    title: auditUrl
-      ? `Completed a Lighthouse audit via ${source}`
-      : `Submitted ${source || "website form"}`,
-    description: message || "",
-    metadata: {
-      source,
-      auditUrl: auditUrl || null,
-      isNewLead: isNew,
-      marketing: marketing || null,
-    },
-    createdAt: new Date().toISOString(),
-  });
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com";
 
   try {
-    // All prospect-supplied strings are HTML-escaped. URLs are additionally
-    // validated to be http(s) before being dropped into href attributes —
-    // otherwise a lead could submit `website: "javascript:alert(1)"` and
-    // cause the admin's one click on the notification email to execute
-    // attacker-controlled JS.
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safePhone = escapeHtml(phone);
@@ -150,8 +122,6 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     await sendMail({
       from: `Agency OS <${complianceConfig.fromEmail}>`,
       to: [complianceConfig.adminNotificationEmail],
-      // Subject is plain text; strip CRLF so attacker-controlled name/company
-      // cannot inject additional headers.
       subject:
         `🔔 New ${isNew ? "Lead" : "Activity"}: ` +
         `${name} ${company ? `(${company})` : ""}`.replace(/[\r\n]+/g, " "),
@@ -215,11 +185,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     }
   }
 
-  // Fire the Automation Engine's `lead_created` event. Factory rules picked
-  // per vertical (agency → "email report", service_pro → "speed-to-lead SMS",
-  // restaurant → "new order ack", florist → "welcome email"). Failures are
-  // swallowed so the public lead-intake path is never broken by a misbehaving
-  // rule.
+  // Fire the Automation Engine's `lead_created` event.
   if (isNew && agencyId) {
     let vertical: VerticalId | undefined;
     try {

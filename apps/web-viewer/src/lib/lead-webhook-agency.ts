@@ -1,34 +1,35 @@
-import { db } from "@/lib/firebase";
+/**
+ * Lead webhook agency resolver — pure Drizzle, no Firestore.
+ */
+import { getDb, tenants } from "@dba/database";
+import { eq } from "drizzle-orm";
 
 /**
- * Resolves which Firestore tenant (must match Clerk `organization.id` for CRM visibility)
- * for inbound lead webhooks.
- *
- * Priority:
- * 1. `bodyAgencyId` from the form payload (multi-tenant / explicit routing)
- * 2. `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` (Vercel env — set to your Clerk org id, e.g. org_...)
- * 3. First document in `agencies` (legacy / single-tenant)
- * 4. Local dev fallback: `dev-agency` (matches verifyAuth dev session)
+ * Resolve the agency (tenant) ID from an optional incoming agencyId.
+ * Falls back to LEAD_WEBHOOK_DEFAULT_AGENCY_ID env var.
  */
-export async function resolveLeadAgencyId(bodyAgencyId?: string): Promise<string> {
-  const trimmed = bodyAgencyId?.trim();
-  if (trimmed) return trimmed;
+export async function resolveLeadAgencyId(
+  incomingAgencyId?: string | null,
+): Promise<string> {
+  // If an agency ID was provided, verify it exists
+  if (incomingAgencyId) {
+    const db = getDb();
+    if (db) {
+      const rows = await db
+        .select({ clerkOrgId: tenants.clerkOrgId })
+        .from(tenants)
+        .where(eq(tenants.clerkOrgId, incomingAgencyId))
+        .limit(1);
 
-  const fromEnv = process.env.LEAD_WEBHOOK_DEFAULT_AGENCY_ID?.trim();
-  if (fromEnv) return fromEnv;
-
-  try {
-    const agencySnap = await db.collection("agencies").limit(1).get();
-    if (!agencySnap.empty) {
-      return agencySnap.docs[0].id;
+      if (rows.length > 0) return incomingAgencyId;
+    } else {
+      return incomingAgencyId;
     }
-  } catch {
-    /* collection missing or rules */
   }
 
-  if (process.env.NODE_ENV === "development") {
-    return "dev-agency";
-  }
+  // Fall back to the default agency ID
+  const defaultId = process.env.LEAD_WEBHOOK_DEFAULT_AGENCY_ID;
+  if (defaultId) return defaultId;
 
   return "";
 }

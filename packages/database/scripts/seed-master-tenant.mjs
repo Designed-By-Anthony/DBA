@@ -35,7 +35,7 @@ try {
        crm_config = EXCLUDED.crm_config`,
     ["agency_master", "Designed By Anthony", JSON.stringify(crmConfig)],
   );
-  console.log("Seeded tenants row: agency_master — Designed By Anthony");
+  console.info("Seeded tenants row: agency_master — Designed By Anthony");
 } catch (e) {
   console.error(e);
   process.exit(1);

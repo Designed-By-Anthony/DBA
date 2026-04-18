@@ -1,103 +1,161 @@
-import { db } from "@/lib/firebase";
-import { sendProspectEmailFromTemplate } from "@/lib/prospect-email";
-import type { EmailSequenceDefinition, SequenceEnrollment } from "@/lib/types";
+/**
+ * Email sequence processor — pure Drizzle, no Firestore.
+ * Processes active email sequence enrollments and sends the next step.
+ */
+import {
+  getDb,
+  setTenantContext,
+  emailSequences,
+  sequenceEnrollments,
+  leads,
+  emails,
+} from "@dba/database";
+import { eq, and, lte } from "drizzle-orm";
+import { sendMail } from "@/lib/mailer";
+import { complianceConfig } from "@/lib/theme.config";
 
-function toEnrollment(id: string, data: FirebaseFirestore.DocumentData): SequenceEnrollment {
-  return {
-    id,
-    agencyId: data.agencyId,
-    prospectId: data.prospectId,
-    sequenceId: data.sequenceId,
-    stepIndex: data.stepIndex ?? 0,
-    nextRunAt: data.nextRunAt,
-    status: data.status,
-    enrolledAt: data.enrolledAt,
-  };
-}
+/**
+ * Process all due sequence enrollments.
+ * Called by the cron endpoint.
+ */
+export async function processEmailSequences(): Promise<{
+  processed: number;
+  sent: number;
+  errors: string[];
+}> {
+  const db = getDb();
+  if (!db) return { processed: 0, sent: 0, errors: ["Database not configured"] };
 
-export async function processDueSequenceEnrollments(
-  maxBatch: number = 50,
-): Promise<{ processed: number; errors: string[] }> {
-  const nowIso = new Date().toISOString();
-  const errors: string[] = [];
   let processed = 0;
+  let sent = 0;
+  const errors: string[] = [];
 
-  const snap = await db
-    .collection("sequence_enrollments")
-    .where("status", "==", "active")
-    .where("nextRunAt", "<=", nowIso)
-    .limit(maxBatch)
-    .get();
+  try {
+    const now = new Date().toISOString();
 
-  for (const doc of snap.docs) {
-    const en = toEnrollment(doc.id, doc.data());
-    try {
-      const seqRef = await db.collection("email_sequences").doc(en.sequenceId).get();
-      if (!seqRef.exists) {
-        await doc.ref.update({ status: "cancelled", updatedAt: new Date().toISOString() });
-        continue;
-      }
-      const seq = seqRef.data() as EmailSequenceDefinition;
-      if (!seq.isActive || seq.agencyId !== en.agencyId) {
-        await doc.ref.update({ status: "cancelled", updatedAt: new Date().toISOString() });
-        continue;
-      }
+    // Find all active enrollments that are due
+    const dueEnrollments = await db
+      .select()
+      .from(sequenceEnrollments)
+      .where(
+        and(
+          eq(sequenceEnrollments.status, "active"),
+          lte(sequenceEnrollments.nextRunAt, now),
+        ),
+      )
+      .limit(100);
 
-      const steps = seq.steps || [];
-      if (en.stepIndex >= steps.length) {
-        await doc.ref.update({
-          status: "completed",
-          completedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-        continue;
-      }
-
-      const step = steps[en.stepIndex];
-      const send = await sendProspectEmailFromTemplate({
-        agencyId: en.agencyId,
-        prospectId: en.prospectId,
-        subject: step.subject,
-        bodyHtml: step.bodyHtml,
-      });
-
-      if (!send.ok) {
-        errors.push(`${doc.id}: ${send.error || "send failed"}`);
-        continue;
-      }
-
+    for (const enrollment of dueEnrollments) {
       processed++;
 
-      const nextIndex = en.stepIndex + 1;
-      if (nextIndex >= steps.length) {
-        await doc.ref.update({
-          status: "completed",
-          completedAt: new Date().toISOString(),
-          stepIndex: nextIndex,
-          updatedAt: new Date().toISOString(),
+      try {
+        await setTenantContext(db, enrollment.tenantId);
+
+        // Get the sequence
+        const seqRows = await db
+          .select()
+          .from(emailSequences)
+          .where(eq(emailSequences.id, enrollment.sequenceId))
+          .limit(1);
+
+        if (seqRows.length === 0 || !seqRows[0].isActive) {
+          await db
+            .update(sequenceEnrollments)
+            .set({ status: "completed", updatedAt: now })
+            .where(eq(sequenceEnrollments.id, enrollment.id));
+          continue;
+        }
+
+        const sequence = seqRows[0];
+        const steps = (sequence.steps as Array<{
+          delayDays: number;
+          subject: string;
+          bodyHtml: string;
+        }>) || [];
+
+        if (enrollment.stepIndex >= steps.length) {
+          await db
+            .update(sequenceEnrollments)
+            .set({ status: "completed", updatedAt: now })
+            .where(eq(sequenceEnrollments.id, enrollment.id));
+          continue;
+        }
+
+        const step = steps[enrollment.stepIndex];
+
+        // Get the lead
+        if (!enrollment.leadId) continue;
+        const leadRows = await db
+          .select()
+          .from(leads)
+          .where(
+            and(
+              eq(leads.tenantId, enrollment.tenantId),
+              eq(leads.prospectId, enrollment.leadId),
+            ),
+          )
+          .limit(1);
+
+        if (leadRows.length === 0) continue;
+        const lead = leadRows[0];
+
+        if (lead.unsubscribed || !lead.email) continue;
+
+        // Send the email
+        const result = await sendMail({
+          from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
+          to: lead.email,
+          replyTo: complianceConfig.replyTo,
+          subject: step.subject.replace(/\{\{name\}\}/g, lead.name.split(" ")[0]),
+          html: step.bodyHtml.replace(/\{\{name\}\}/g, lead.name.split(" ")[0]),
         });
-      } else {
-        const delayH = steps[nextIndex]?.delayHours ?? 0;
-        const nextRun = new Date(Date.now() + delayH * 60 * 60 * 1000).toISOString();
-        await doc.ref.update({
-          stepIndex: nextIndex,
-          nextRunAt: nextRun,
-          lastSentAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+
+        if (result.ok) {
+          sent++;
+
+          // Record the email
+          await db.insert(emails).values({
+            tenantId: enrollment.tenantId,
+            leadId: enrollment.leadId,
+            leadEmail: lead.email,
+            leadName: lead.name,
+            subject: step.subject,
+            bodyHtml: step.bodyHtml,
+            status: "sent",
+            sentAt: now,
+            createdAt: now,
+          });
+        }
+
+        // Advance to next step
+        const nextStepIndex = enrollment.stepIndex + 1;
+        if (nextStepIndex >= steps.length) {
+          await db
+            .update(sequenceEnrollments)
+            .set({ status: "completed", stepIndex: nextStepIndex, updatedAt: now })
+            .where(eq(sequenceEnrollments.id, enrollment.id));
+        } else {
+          const nextStep = steps[nextStepIndex];
+          const nextRunDate = new Date();
+          nextRunDate.setDate(nextRunDate.getDate() + (nextStep.delayDays || 1));
+          await db
+            .update(sequenceEnrollments)
+            .set({
+              stepIndex: nextStepIndex,
+              nextRunAt: nextRunDate.toISOString(),
+              updatedAt: now,
+            })
+            .where(eq(sequenceEnrollments.id, enrollment.id));
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        errors.push(`Enrollment ${enrollment.id}: ${msg}`);
       }
-    } catch (e: unknown) {
-      errors.push(`${doc.id}: ${e instanceof Error ? e.message : String(e)}`);
     }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    errors.push(`processEmailSequences: ${msg}`);
   }
 
-  return { processed, errors };
-}
-
-/** First step uses steps[0].delayHours as delay before that email; enrollment nextRunAt already set at enroll time. */
-export function computeInitialNextRunAt(
-  steps: EmailSequenceDefinition["steps"],
-): string {
-  const h = steps[0]?.delayHours ?? 0;
-  return new Date(Date.now() + h * 60 * 60 * 1000).toISOString();
+  return { processed, sent, errors };
 }

@@ -46,7 +46,14 @@ export async function insertSqlLead(input: SqlLeadInsertInput): Promise<SqlLeadI
 
   const emailNormalized = input.email.trim().toLowerCase();
   const nowIso = new Date().toISOString();
-  const incomingMetadata = input.metadata ?? {};
+  /** Fold top-level CRM fields into JSONB so `/api/lead` and webhooks persist full context. */
+  const incomingMetadata: Record<string, unknown> = {
+    ...(input.metadata ?? {}),
+    ...(input.company?.trim() ? { company: input.company.trim() } : {}),
+    ...(input.website?.trim() ? { website: input.website.trim() } : {}),
+    ...(input.message?.trim() ? { message: input.message.trim() } : {}),
+    ...(input.auditUrl?.trim() ? { auditUrl: input.auditUrl.trim() } : {}),
+  };
 
   const existing: LeadRow[] = await db
     .select()
@@ -109,4 +116,24 @@ export async function listSqlLeads(agencyId: string, limit = 200): Promise<LeadR
     .where(eq(leads.tenantId, tenantId))
     .orderBy(desc(leads.createdAt))
     .limit(limit);
+}
+
+/**
+ * Fetch a single lead by public `prospectId` (e.g. desi0001), tenant-scoped.
+ */
+export async function getSqlLeadByProspectId(
+  agencyId: string,
+  prospectId: string,
+): Promise<LeadRow | null> {
+  const db = getDb();
+  if (!db) return null;
+  const tenantId = agencyId.trim();
+  const pid = prospectId.trim();
+  if (!tenantId || !pid) return null;
+  const rows = await db
+    .select()
+    .from(leads)
+    .where(and(eq(leads.tenantId, tenantId), eq(leads.prospectId, pid)))
+    .limit(1);
+  return rows[0] ?? null;
 }

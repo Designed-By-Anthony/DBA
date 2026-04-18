@@ -1,117 +1,51 @@
 /**
- * Single-recipient transactional / automation emails (sequences, automations).
- * Mirrors the core pipeline in sendEmail but callable from cron and automations.
+ * Prospect email utilities — pure Drizzle, no Firestore.
  */
-import { db } from "@/lib/firebase";
-import { sendMail } from "@/lib/mailer";
-import {
-  appendComplianceFooter,
-  escapeHtml,
-  injectTrackingPixel,
-  mergeTemplateVars,
-  wrapLinksForTracking,
-} from "@/lib/email-utils";
-import { complianceConfig } from "@/lib/theme.config";
-import type { EmailRecord } from "@/lib/types";
+import { getDb, setTenantContext, leads } from "@dba/database";
+import { eq, and } from "drizzle-orm";
 
-const BASE_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+/**
+ * Get prospect's email preferences.
+ */
+export async function getProspectEmailPrefs(
+  tenantId: string,
+  prospectId: string,
+): Promise<{ email: string; unsubscribed: boolean; name: string } | null> {
+  const db = getDb();
+  if (!db) return null;
 
-export async function sendProspectEmailFromTemplate(params: {
-  agencyId: string;
-  prospectId: string;
-  subject: string;
-  bodyHtml: string;
-}): Promise<{ ok: boolean; error?: string }> {
-  const doc = await db.collection("prospects").doc(params.prospectId).get();
-  if (!doc.exists) return { ok: false, error: "Prospect not found" };
-  const data = doc.data()!;
-  if (data.agencyId !== params.agencyId) {
-    return { ok: false, error: "Tenant mismatch" };
+  await setTenantContext(db, tenantId);
+  const rows = await db
+    .select({
+      email: leads.email,
+      unsubscribed: leads.unsubscribed,
+      name: leads.name,
+    })
+    .from(leads)
+    .where(
+      and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId)),
+    )
+    .limit(1);
+
+  return rows[0] ?? null;
+}
+
+/**
+ * Mark a prospect as unsubscribed.
+ */
+export async function unsubscribeProspect(
+  prospectId: string,
+): Promise<boolean> {
+  const db = getDb();
+  if (!db) return false;
+
+  try {
+    await db
+      .update(leads)
+      .set({ unsubscribed: true, updatedAt: new Date().toISOString() })
+      .where(eq(leads.prospectId, prospectId));
+    return true;
+  } catch {
+    return false;
   }
-  if (data.unsubscribed) return { ok: false, error: "Prospect unsubscribed" };
-  const email = data.email as string;
-  if (!email?.trim()) return { ok: false, error: "No email" };
-
-  const name = (data.name as string) || "there";
-  const company = (data.company as string) || name;
-
-  const emailRef = db.collection("emails").doc();
-  const emailId = emailRef.id;
-
-  // Template body is authored by the agency admin (trusted), but the merged
-  // variables are attacker-controlled (lead intake). Escape before substitution
-  // so a prospect can't inject <script> / phishing <a> into outbound mail.
-  let processedBody = mergeTemplateVars(params.bodyHtml, {
-    name: escapeHtml(name.split(" ")[0]),
-    company: escapeHtml(company),
-    website: escapeHtml((data.website as string) || ""),
-    email: escapeHtml(email),
-  });
-  processedBody = wrapLinksForTracking(processedBody, emailId, BASE_URL);
-  processedBody = appendComplianceFooter(
-    processedBody,
-    params.prospectId,
-    BASE_URL,
-    complianceConfig.companyName,
-    complianceConfig.physicalAddress,
-  );
-  processedBody = injectTrackingPixel(processedBody, emailId, BASE_URL);
-
-  const fullHtml = `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <div style="max-width:600px;margin:0 auto;padding:40px 24px;">
-    <div style="background:#ffffff;border-radius:8px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-      ${processedBody}
-    </div>
-  </div>
-</body>
-</html>`;
-
-  // Subject is plain text — no HTML escape — but strip CRLF to prevent
-  // header injection via attacker-controlled name/company.
-  const stripCrlf = (s: string) => s.replace(/[\r\n]+/g, " ");
-  const subjectLine = mergeTemplateVars(params.subject, {
-    name: stripCrlf(name.split(" ")[0]),
-    company: stripCrlf(company),
-  });
-
-  const result = await sendMail({
-    from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
-    to: email,
-    replyTo: complianceConfig.replyTo,
-    subject: subjectLine,
-    html: fullHtml,
-  });
-
-  if (!result.ok) {
-    return { ok: false, error: result.error };
-  }
-
-  const emailRecord: Omit<EmailRecord, "clicks"> & { clicks: unknown[] } = {
-    id: emailId,
-    agencyId: params.agencyId,
-    prospectId: params.prospectId,
-    prospectEmail: email,
-    prospectName: name,
-    subject: subjectLine,
-    bodyHtml: params.bodyHtml,
-    status: "sent",
-    scheduledAt: null,
-    sentAt: new Date().toISOString(),
-    resendId: result.mode === "resend" ? result.id : null,
-    opens: 0,
-    clicks: [],
-    createdAt: new Date().toISOString(),
-  };
-
-  await emailRef.set(emailRecord as Record<string, unknown>);
-
-  await db.collection("prospects").doc(params.prospectId).update({
-    lastContactedAt: new Date().toISOString(),
-    ...(data.status === "lead" ? { status: "contacted" } : {}),
-  });
-
-  return { ok: true };
 }

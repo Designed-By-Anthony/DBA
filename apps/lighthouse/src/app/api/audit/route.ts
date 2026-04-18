@@ -584,7 +584,7 @@ export async function POST(request: Request) {
           const sendPromise = sendViaGmail(email, subject, emailHtml)
             .then(() => {
               if (process.env.NODE_ENV === 'development') {
-                console.log(`Email receipt dispatched for ${reportId}`);
+                console.info(`Email receipt dispatched for ${reportId}`);
               }
             })
             .catch((err) => console.error(`Failed to dispatch email for ${reportId}:`, err));

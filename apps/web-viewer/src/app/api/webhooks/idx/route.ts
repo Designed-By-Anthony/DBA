@@ -1,19 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { getDb, leads } from "@dba/database";
+import { eq } from "drizzle-orm";
+import { getSecret, verifySharedSecret } from "@/lib/webhook-auth";
 
-// Example payload from an IDX provider (e.g. Ylopo, Showcase IDX, Sierra Interactive)
-// {
-//   "leadId": "prospect_abc",
-//   "event": "property_view",
-//   "data": {
-//     "mlsNumber": "12345678",
-//     "price": 450000,
-//     "address": "123 Main St",
-//     "viewCount": 3
-//   }
-// }
-
+/**
+ * IDX Webhook — property view / saved-search telemetry.
+ * Auth: Bearer <IDX_WEBHOOK_SECRET> or x-webhook-secret header.
+ */
 export async function POST(req: NextRequest) {
+  const secret = getSecret("IDX_WEBHOOK_SECRET");
+  if (!secret) {
+    console.error("[idx] webhook rejected: IDX_WEBHOOK_SECRET not configured");
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+  }
+  if (!verifySharedSecret(req.headers, secret)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const payload = await req.json();
     const leadIdRaw = payload.leadId;
@@ -25,16 +28,24 @@ export async function POST(req: NextRequest) {
     }
 
     const leadId = String(leadIdRaw).trim();
+    const db = getDb();
+    if (!db) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 503 });
+    }
 
-    const prospectRef = db.collection("prospects").doc(leadId);
-    const prospectDoc = await prospectRef.get();
+    const prospectRows = await db
+      .select()
+      .from(leads)
+      .where(eq(leads.prospectId, leadId))
+      .limit(1);
 
-    if (!prospectDoc.exists) {
-       // Auto-create lead or ignore depending on agency rules
+    if (prospectRows.length === 0) {
        return NextResponse.json({ error: "Prospect not found" }, { status: 404 });
     }
 
-    // Append behavioral telemetry to the Prospect's timeline/notes
+    const prospect = prospectRows[0];
+
+    // Build interaction note
     let interactionNote = "";
     if (event === "property_view") {
        interactionNote = `[IDX Telemetry] Viewed MLS #${data.mlsNumber} (${data.address}) listed at $${data.price}. Total views: ${data.viewCount}`;
@@ -44,16 +55,17 @@ export async function POST(req: NextRequest) {
        interactionNote = `[IDX Telemetry] Unknown event: ${event}`;
     }
 
-    // In a real app we'd push to a subcollection like `prospects/{id}/timeline`
-    // For this boilerplate we prepend to notes and update lastContacted.
-    const currentNotes = prospectDoc.data()?.notes || "";
+    const currentNotes = prospect.notes || "";
     const updatedNotes = `${new Date().toISOString()} - ${interactionNote}\n\n${currentNotes}`;
 
-    await prospectRef.update({
-      notes: updatedNotes,
-      lastContactedAt: new Date().toISOString(),
-      // AI could trigger here to bump pipeline priority based on intent.
-    });
+    await db
+      .update(leads)
+      .set({
+        notes: updatedNotes,
+        lastContactedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(leads.prospectId, leadId));
 
     return NextResponse.json({ success: true, recorded: true });
 

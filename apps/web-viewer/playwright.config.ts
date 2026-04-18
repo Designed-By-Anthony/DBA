@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 
@@ -5,20 +6,53 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env.test', override: true });
 
+const FIRESTORE_EMULATOR_PORT = 9350;
+
+/** If something already listens on the Firestore emulator port, skip nested `emulators:exec` (avoids bind conflicts). */
+function firestorePortAlreadyInUse(): boolean {
+  if (process.platform === 'win32') return false;
+  try {
+    execSync(`lsof -i :${FIRESTORE_EMULATOR_PORT} -sTCP:LISTEN`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * pnpm forwards config keys that make nested `npm` / `npx` warn on npm 10+.
+ */
+function shWebServerCommand(inner: string): string {
+  if (process.platform === 'win32') return inner;
+  const unset = [
+    'npm_config_recursive',
+    'npm_config_verify_deps_before_run',
+    'npm_config_manage_package_manager_versions',
+    'npm_config__jsr_registry',
+    'pnpm_config_verify_deps_before_run',
+  ]
+    .map((k) => `-u ${k}`)
+    .join(' ');
+  return `env ${unset} sh -c '${inner.replace(/'/g, "'\\''")}'`;
+}
+
 /**
  * Agency OS — Playwright E2E Test Configuration
  *
- * Canonical full-suite (CI/local green): `npm test` — Firestore via `firebase emulators:exec` + Next on :3001.
- * If Firestore port (see firebase.json) is already in use, `npm test` fails to start — stop the other emulator or use `npm run test:pw` with Firestore already running on that port.
- * Alternative: `npm run test:pw` (Next only) with Firestore emulator already running (port in firebase.json / .env.test).
+ * Full suite: Firestore via `firebase emulators:exec` + Next on :3001.
+ * If a Firestore emulator is already bound to the port in `firebase.json`, only Next is started.
  *
- * Or set SKIP_WEBSERVER=1 and run emulator + `npm run dev -- -p 3001` yourself.
- * If the emulator cannot bind its port, use E2E_NO_FIRESTORE_EMULATOR=1 and run `firebase emulators:start --only firestore` separately (same port as firebase.json / .env.test).
+ * Or set SKIP_WEBSERVER=1 and run emulator + `pnpm run dev -- -p 3001` yourself.
+ * Force Next-only: E2E_NO_FIRESTORE_EMULATOR=1 (expects emulator reachable via .env.test).
  */
-const webServerCommand =
-  process.env.E2E_NO_FIRESTORE_EMULATOR === '1'
-    ? 'npm run dev -- -p 3001'
-    : 'npx firebase emulators:exec --only firestore --project dba-website-prod "npm run dev -- -p 3001"';
+const skipNestedFirestoreEmu =
+  process.env.E2E_NO_FIRESTORE_EMULATOR === '1' || firestorePortAlreadyInUse();
+
+const webServerInner = skipNestedFirestoreEmu
+  ? 'pnpm exec next dev -p 3001'
+  : 'pnpm exec firebase emulators:exec --only firestore --project dba-website-prod "pnpm exec next dev -p 3001"';
+
+const webServerCommand = shWebServerCommand(webServerInner);
 
 export default defineConfig({
   testDir: './tests',

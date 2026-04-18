@@ -11,7 +11,30 @@ function toTimestamp(value: Date | string | number): TimestampLike {
   };
 }
 
-type StoredReport = any;
+type StoredReport = Record<string, unknown> & {
+  id?: string;
+  createdAt?: TimestampLike | null;
+  lead?: {
+    name?: string;
+    email?: string;
+    company?: string;
+    url?: string;
+    location?: string;
+  };
+  scores?: Record<string, unknown>;
+  metrics?: Record<string, unknown>;
+  diagnostics?: Record<string, unknown>;
+  aiInsight?: Record<string, unknown>;
+  htmlSignals?: Record<string, unknown>;
+  sitewide?: Record<string, unknown>;
+  backlinks?: Record<string, unknown>;
+  indexCoverage?: Record<string, unknown>;
+  places?: Record<string, unknown>;
+  competitors?: unknown[];
+  emailSentCount?: number;
+  emailLastSentAt?: TimestampLike | null;
+  emailSendLockUntil?: TimestampLike | null;
+};
 const REPORTS = new Map<string, StoredReport>();
 
 export const Timestamp = {
@@ -79,7 +102,8 @@ function makeDocRef(id: string) {
 }
 
 export const db = {
-  collection(_name: string) {
+  collection(name: string) {
+    void name;
     return {
       doc(id: string) {
         return makeDocRef(id);

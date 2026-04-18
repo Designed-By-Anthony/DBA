@@ -1,21 +1,39 @@
 "use server";
 
-import { db } from "@/lib/firebase";
-import { getProspect, verifyAuth } from "@/app/admin/actions";
-import { computeInitialNextRunAt, processDueSequenceEnrollments } from "@/lib/email-sequence-processor";
+import {
+  getDb,
+  setTenantContext,
+  emailSequences,
+  sequenceEnrollments,
+  leads,
+} from "@dba/database";
+import { eq, and } from "drizzle-orm";
+import { verifyAuth, getProspect } from "@/app/admin/actions";
+import { processEmailSequences } from "@/lib/email-sequence-processor";
 import type { EmailSequenceDefinition, EmailSequenceStep } from "@/lib/types";
 
 export async function listEmailSequences(): Promise<EmailSequenceDefinition[]> {
   const session = await verifyAuth();
-  const snap = await db
-    .collection("email_sequences")
-    .where("agencyId", "==", session.user.agencyId)
-    .get();
-  const rows = snap.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() as Omit<EmailSequenceDefinition, "id">),
-  }));
-  return rows.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const db = getDb();
+  if (!db) return [];
+
+  await setTenantContext(db, session.user.agencyId);
+  const rows = await db
+    .select()
+    .from(emailSequences)
+    .where(eq(emailSequences.tenantId, session.user.agencyId));
+
+  return rows
+    .map((r) => ({
+      id: r.id,
+      agencyId: r.tenantId,
+      name: r.name,
+      isActive: r.isActive ?? true,
+      steps: (r.steps as EmailSequenceStep[]) || [],
+      createdAt: r.createdAt || "",
+      updatedAt: r.updatedAt || "",
+    }))
+    .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
 }
 
 export async function createEmailSequence(input: {
@@ -27,16 +45,26 @@ export async function createEmailSequence(input: {
   if (!name || !input.steps?.length) {
     return { success: false, error: "Name and at least one step are required" };
   }
+
+  const db = getDb();
+  if (!db) return { success: false, error: "Database not configured" };
+
+  await setTenantContext(db, session.user.agencyId);
   const now = new Date().toISOString();
-  const ref = await db.collection("email_sequences").add({
-    agencyId: session.user.agencyId,
-    name,
-    isActive: true,
-    steps: input.steps,
-    createdAt: now,
-    updatedAt: now,
-  });
-  return { success: true, id: ref.id };
+
+  const result = await db
+    .insert(emailSequences)
+    .values({
+      tenantId: session.user.agencyId,
+      name,
+      isActive: true,
+      steps: input.steps,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning({ id: emailSequences.id });
+
+  return { success: true, id: result[0]?.id };
 }
 
 export async function updateEmailSequence(
@@ -44,24 +72,52 @@ export async function updateEmailSequence(
   fields: Partial<Pick<EmailSequenceDefinition, "name" | "isActive" | "steps">>,
 ): Promise<{ success: boolean }> {
   const session = await verifyAuth();
-  const doc = await db.collection("email_sequences").doc(id).get();
-  if (!doc.exists || doc.data()?.agencyId !== session.user.agencyId) {
-    throw new Error("Not found");
-  }
-  await db.collection("email_sequences").doc(id).update({
-    ...fields,
-    updatedAt: new Date().toISOString(),
-  });
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+
+  await setTenantContext(db, session.user.agencyId);
+
+  const existing = await db
+    .select()
+    .from(emailSequences)
+    .where(
+      and(
+        eq(emailSequences.id, id),
+        eq(emailSequences.tenantId, session.user.agencyId),
+      ),
+    )
+    .limit(1);
+
+  if (existing.length === 0) throw new Error("Not found");
+
+  const payload: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+  if (fields.name !== undefined) payload.name = fields.name;
+  if (fields.isActive !== undefined) payload.isActive = fields.isActive;
+  if (fields.steps !== undefined) payload.steps = fields.steps;
+
+  await db
+    .update(emailSequences)
+    .set(payload)
+    .where(eq(emailSequences.id, id));
+
   return { success: true };
 }
 
 export async function deleteEmailSequence(id: string): Promise<{ success: boolean }> {
   const session = await verifyAuth();
-  const doc = await db.collection("email_sequences").doc(id).get();
-  if (!doc.exists || doc.data()?.agencyId !== session.user.agencyId) {
-    throw new Error("Not found");
-  }
-  await db.collection("email_sequences").doc(id).delete();
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+
+  await setTenantContext(db, session.user.agencyId);
+  await db
+    .delete(emailSequences)
+    .where(
+      and(
+        eq(emailSequences.id, id),
+        eq(emailSequences.tenantId, session.user.agencyId),
+      ),
+    );
+
   return { success: true };
 }
 
@@ -70,47 +126,69 @@ export async function enrollProspectInSequence(
   sequenceId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const session = await verifyAuth();
-  const p = await getProspect(prospectId);
-  if (!p || p.agencyId !== session.user.agencyId) {
-    return { success: false, error: "Prospect not found" };
-  }
-  const seqDoc = await db.collection("email_sequences").doc(sequenceId).get();
-  if (!seqDoc.exists || seqDoc.data()?.agencyId !== session.user.agencyId) {
-    return { success: false, error: "Sequence not found" };
-  }
-  const steps = (seqDoc.data()?.steps || []) as EmailSequenceStep[];
+  const db = getDb();
+  if (!db) return { success: false, error: "Database not configured" };
+
+  await setTenantContext(db, session.user.agencyId);
+
+  // Verify sequence exists
+  const seqRows = await db
+    .select()
+    .from(emailSequences)
+    .where(
+      and(
+        eq(emailSequences.id, sequenceId),
+        eq(emailSequences.tenantId, session.user.agencyId),
+      ),
+    )
+    .limit(1);
+
+  if (seqRows.length === 0) return { success: false, error: "Sequence not found" };
+  const seq = seqRows[0];
+  const steps = (seq.steps as EmailSequenceStep[]) || [];
   if (!steps.length) return { success: false, error: "Sequence has no steps" };
 
-  const existingSnap = await db
-    .collection("sequence_enrollments")
-    .where("agencyId", "==", session.user.agencyId)
-    .where("prospectId", "==", prospectId)
-    .get();
-  const already = existingSnap.docs.some(
-    (d) => d.data().sequenceId === sequenceId && d.data().status === "active",
-  );
-  if (already) {
+  // Check for existing active enrollment
+  const existing = await db
+    .select()
+    .from(sequenceEnrollments)
+    .where(
+      and(
+        eq(sequenceEnrollments.tenantId, session.user.agencyId),
+        eq(sequenceEnrollments.leadId, prospectId),
+        eq(sequenceEnrollments.sequenceId, sequenceId),
+        eq(sequenceEnrollments.status, "active"),
+      ),
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
     return { success: false, error: "Already enrolled in this sequence" };
   }
 
-  const nextRunAt = computeInitialNextRunAt(steps);
-  await db.collection("sequence_enrollments").add({
-    agencyId: session.user.agencyId,
-    prospectId,
+  const now = new Date();
+  const firstDelay = steps[0].delayDays || 1;
+  const nextRunAt = new Date(now.getTime() + firstDelay * 86400000);
+
+  await db.insert(sequenceEnrollments).values({
+    tenantId: session.user.agencyId,
+    leadId: prospectId,
     sequenceId,
     stepIndex: 0,
-    nextRunAt,
+    nextRunAt: nextRunAt.toISOString(),
     status: "active",
-    enrolledAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
   });
+
   return { success: true };
 }
 
 export async function runDueSequenceEmails(): Promise<{
   processed: number;
+  sent: number;
   errors: string[];
 }> {
   await verifyAuth();
-  return processDueSequenceEnrollments(80);
+  return processEmailSequences();
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { db } from '@/lib/firebase';
+import { getDb, leads, activities } from '@dba/database';
+import { eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
@@ -12,15 +13,11 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
 /**
  * Stripe Webhook Handler
- * 
+ *
  * Handles:
  * - checkout.session.completed → payment received
  * - invoice.paid → recurring retainer paid
  * - customer.subscription.deleted → retainer cancelled
- * 
- * Setup: In Stripe Dashboard → Developers → Webhooks → Add Endpoint
- * URL: https://admin.designedbyanthony.com/api/webhooks/stripe
- * Events: checkout.session.completed, invoice.paid, customer.subscription.deleted
  */
 export async function POST(request: NextRequest) {
   try {
@@ -29,11 +26,6 @@ export async function POST(request: NextRequest) {
 
     let event: Stripe.Event;
 
-    // Fail closed. Historically this route would fall through to `JSON.parse(body)`
-    // when EITHER `STRIPE_WEBHOOK_SECRET` was missing OR `NEXT_PUBLIC_IS_TEST` was
-    // set, letting any internet caller forge Stripe events (fake payments, ticket
-    // writes, prospect status mutations). The only time we bypass verification is
-    // an explicit server-only test build via `isTestMode()`.
     if (isTestMode()) {
       event = JSON.parse(body) as Stripe.Event;
     } else {
@@ -49,36 +41,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const db = getDb();
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const prospectId = session.metadata?.prospectId;
         const paymentType = session.metadata?.type as 'down_payment' | 'completion' | 'retainer';
 
-        if (!prospectId) break;
+        if (!prospectId || !db) break;
 
         const amount = session.mode === 'payment'
           ? (session.amount_total || 0) / 100
-          : 0; // Subscription amount is in invoice.paid
+          : 0;
 
-        // Create invoice record
-        await db.collection('invoices').add({
-          prospectId,
-          prospectName: session.customer_details?.name || '',
-          type: paymentType || 'down_payment',
-          amount,
-          status: 'paid',
-          stripePaymentIntentId: session.payment_intent || null,
-          stripeInvoiceId: null,
-          stripePaymentUrl: null,
-          dueDate: null,
-          paidAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-        });
+        // Find prospect to get tenant_id
+        const prospectRows = await db
+          .select()
+          .from(leads)
+          .where(eq(leads.prospectId, prospectId))
+          .limit(1);
+
+        if (prospectRows.length === 0) break;
+        const prospect = prospectRows[0];
+        const tenantId = prospect.tenantId;
 
         // Log activity
-        await db.collection('activities').add({
-          prospectId,
+        await db.insert(activities).values({
+          tenantId,
+          leadId: prospectId,
           type: 'payment_received',
           title: `Payment received: $${amount.toLocaleString()}`,
           description: `${paymentType?.replace('_', ' ')} via Stripe`,
@@ -91,37 +82,26 @@ export async function POST(request: NextRequest) {
           createdAt: new Date().toISOString(),
         });
 
-        // Update prospect onboarding
-        const prospectDoc = await db.collection('prospects').doc(prospectId).get();
-        if (prospectDoc.exists) {
-          const updates: Record<string, unknown> = {};
-
-          if (paymentType === 'down_payment') {
-            updates['onboarding.downPaymentReceived'] = true;
-          } else if (paymentType === 'completion') {
-            updates['onboarding.completionPaid'] = true;
-          }
-
-          if (session.customer) {
-            updates.stripeCustomerId = session.customer;
-          }
-
-          if (Object.keys(updates).length > 0) {
-            await db.collection('prospects').doc(prospectId).update(updates);
-          }
+        // Update prospect
+        const updates: Record<string, unknown> = {};
+        if (session.customer) {
+          updates.stripeCustomerId = String(session.customer);
         }
 
-        // Auto-advance pipeline: down payment → move to "dev"
-        if (paymentType === 'down_payment') {
-          const prospect = await db.collection('prospects').doc(prospectId).get();
-          if (prospect.exists && prospect.data()?.status === 'proposal') {
-            await db.collection('prospects').doc(prospectId).update({ status: 'dev' });
-          }
+        // Auto-advance pipeline: down payment → move to dev
+        if (paymentType === 'down_payment' && prospect.status === 'proposal') {
+          updates.status = 'active';
         }
 
-        // Notify admin. Stripe-provided strings (customer name) are escaped —
-        // the payer controls `customer_details.name` on the Checkout form, so
-        // even a signature-verified event can still carry attacker-chosen HTML.
+        if (Object.keys(updates).length > 0) {
+          updates.updatedAt = new Date().toISOString();
+          await db
+            .update(leads)
+            .set(updates)
+            .where(eq(leads.prospectId, prospectId));
+        }
+
+        // Notify admin
         try {
           const customerName = session.customer_details?.name || 'Unknown';
           const safeCustomerName = escapeHtml(customerName);
@@ -131,7 +111,6 @@ export async function POST(request: NextRequest) {
           await sendMail({
             from: `Agency OS <${complianceConfig.fromEmail}>`,
             to: [complianceConfig.adminNotificationEmail],
-            // Subject is plain text; strip CRLF for header-injection safety.
             subject:
               `💰 Payment Received: $${amount.toLocaleString()} — ` +
               customerName.replace(/[\r\n]+/g, ' '),
@@ -160,32 +139,21 @@ export async function POST(request: NextRequest) {
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
         const invoiceSubscription = (invoice as unknown as Record<string, unknown>).subscription as string;
-        
-        if (invoiceSubscription && invoice.billing_reason === 'subscription_cycle') {
-          // Recurring retainer payment — find prospect by Stripe customer ID
-          const customerRef = await db
-            .collection('prospects')
-            .where('stripeCustomerId', '==', invoice.customer)
-            .limit(1)
-            .get();
 
-          if (!customerRef.empty) {
-            const prospectId = customerRef.docs[0].id;
+        if (invoiceSubscription && invoice.billing_reason === 'subscription_cycle' && db) {
+          const customerRows = await db
+            .select()
+            .from(leads)
+            .where(eq(leads.stripeCustomerId, String(invoice.customer)))
+            .limit(1);
+
+          if (customerRows.length > 0) {
+            const prospect = customerRows[0];
             const amount = (invoice.amount_paid || 0) / 100;
 
-            await db.collection('invoices').add({
-              prospectId,
-              prospectName: customerRef.docs[0].data().name,
-              type: 'retainer',
-              amount,
-              status: 'paid',
-              stripeInvoiceId: invoice.id,
-              paidAt: new Date().toISOString(),
-              createdAt: new Date().toISOString(),
-            });
-
-            await db.collection('activities').add({
-              prospectId,
+            await db.insert(activities).values({
+              tenantId: prospect.tenantId,
+              leadId: prospect.prospectId,
               type: 'payment_received',
               title: `Retainer payment: $${amount.toLocaleString()}/mo`,
               description: 'Recurring subscription payment',
@@ -198,21 +166,24 @@ export async function POST(request: NextRequest) {
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-        const customerRef = await db
-          .collection('prospects')
-          .where('stripeCustomerId', '==', subscription.customer)
-          .limit(1)
-          .get();
+        if (db) {
+          const customerRows = await db
+            .select()
+            .from(leads)
+            .where(eq(leads.stripeCustomerId, String(subscription.customer)))
+            .limit(1);
 
-        if (!customerRef.empty) {
-          const prospectId = customerRef.docs[0].id;
-          await db.collection('activities').add({
-            prospectId,
-            type: 'note_added',
-            title: 'Retainer subscription cancelled',
-            description: 'Client\'s recurring subscription has been cancelled in Stripe',
-            createdAt: new Date().toISOString(),
-          });
+          if (customerRows.length > 0) {
+            const prospect = customerRows[0];
+            await db.insert(activities).values({
+              tenantId: prospect.tenantId,
+              leadId: prospect.prospectId,
+              type: 'note_added',
+              title: 'Retainer subscription cancelled',
+              description: 'Client\'s recurring subscription has been cancelled in Stripe',
+              createdAt: new Date().toISOString(),
+            });
+          }
         }
         break;
       }

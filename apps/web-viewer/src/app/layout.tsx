@@ -44,7 +44,10 @@ export default function RootLayout({
       <body>
         <div className="relative z-1 min-h-dvh">
           <PwaRoot>
-            <ClerkProvider>
+            <ClerkProvider
+              signInUrl="/sign-in"
+              signInFallbackRedirectUrl="/admin"
+            >
               {children}
               <Toaster
                 theme="dark"

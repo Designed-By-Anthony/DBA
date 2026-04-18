@@ -1,10 +1,12 @@
-type AnyRecord = any;
+export type DocumentData = Record<string, unknown>;
+
+type StoredDocumentData = Record<string, unknown>;
 
 type QuerySnapshotShim = {
   empty: boolean;
   docs: Array<{
     id: string;
-    data: () => AnyRecord;
+    data: () => DocumentData;
     ref: DocRefShim;
   }>;
 };
@@ -12,15 +14,15 @@ type QuerySnapshotShim = {
 type DocSnapshotShim = {
   id: string;
   exists: boolean;
-  data: () => AnyRecord | undefined;
+  data: () => DocumentData | undefined;
   ref: DocRefShim;
 };
 
 type DocRefShim = {
   id: string;
   get: () => Promise<DocSnapshotShim>;
-  set: (data: AnyRecord, _options?: AnyRecord) => Promise<void>;
-  update: (data: AnyRecord) => Promise<void>;
+  set: (data: StoredDocumentData, _options?: StoredDocumentData) => Promise<void>;
+  update: (data: StoredDocumentData) => Promise<void>;
   delete: () => Promise<void>;
   collection: (name: string) => CollectionRefShim;
 };
@@ -37,13 +39,36 @@ type CollectionRefShim = {
     }>;
   };
   get: () => Promise<QuerySnapshotShim>;
-  add: (data: AnyRecord) => Promise<{ id: string }>;
+  add: (data: StoredDocumentData) => Promise<{ id: string }>;
 };
 
 type WriteBatchShim = {
   delete: (_ref: { id: string }) => void;
-  update: (_ref: { id: string }, _data: AnyRecord) => void;
+  update: (_ref: { id: string }, _data: StoredDocumentData) => void;
   commit: () => Promise<void>;
+};
+
+export type Query = {
+  where: (field: string, op: string, value: unknown) => Query;
+  orderBy: (field: string, direction?: "asc" | "desc") => Query;
+  limit: (count: number) => Query;
+  select: (...fields: string[]) => Query;
+  get: () => Promise<QuerySnapshot>;
+};
+
+export type QueryDocumentSnapshot = {
+  id: string;
+  data: () => DocumentData;
+  ref: {
+    id: string;
+    update: (data: Record<string, unknown>) => Promise<void>;
+    delete: () => Promise<void>;
+  };
+};
+
+export type QuerySnapshot = {
+  empty: boolean;
+  docs: QueryDocumentSnapshot[];
 };
 
 function buildDocRef(path: string): DocRefShim {
@@ -126,32 +151,3 @@ export const db = {
     };
   },
 };
-
-declare global {
-  namespace FirebaseFirestore {
-    type DocumentData = any;
-
-    type Query = {
-      where: (field: string, op: string, value: unknown) => Query;
-      orderBy: (field: string, direction?: "asc" | "desc") => Query;
-      limit: (count: number) => Query;
-      select: (...fields: string[]) => Query;
-      get: () => Promise<QuerySnapshot>;
-    };
-
-    type QueryDocumentSnapshot = {
-      id: string;
-      data: () => DocumentData;
-      ref: {
-        id: string;
-        update: (data: Record<string, unknown>) => Promise<void>;
-        delete: () => Promise<void>;
-      };
-    };
-
-    type QuerySnapshot = {
-      empty: boolean;
-      docs: QueryDocumentSnapshot[];
-    };
-  }
-}

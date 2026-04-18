@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /**
- * On the app/admin subdomain, the middleware rewrites "/" → "/admin"
+ * On the app/admin subdomain, the proxy rewrites "/" → "/admin"
  * transparently. This hook detects whether we're on the admin subdomain
  * so that internal links can drop the /admin prefix.
  *

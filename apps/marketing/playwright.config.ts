@@ -60,6 +60,24 @@ const startAstroPreview =
   (!explicitBaseURL || explicitBaseURL === defaultBaseURL);
 
 /**
+ * pnpm sets npm_config_* / pnpm_config_*; nested `npm` in the webServer then warns (npm 10+).
+ * `env -u` clears them for the shell that runs build + preview (Unix only).
+ */
+function shWebServerCommand(inner: string): string {
+  if (process.platform === 'win32') return inner;
+  const unset = [
+    'npm_config_recursive',
+    'npm_config_verify_deps_before_run',
+    'npm_config_manage_package_manager_versions',
+    'npm_config__jsr_registry',
+    'pnpm_config_verify_deps_before_run',
+  ]
+    .map((k) => `-u ${k}`)
+    .join(' ');
+  return `env ${unset} sh -c '${inner.replace(/'/g, "'\\''")}'`;
+}
+
+/**
  * Default: build + `astro preview`, then test at 127.0.0.1:4321.
  *
  * Production-parity headers (CSP, Trusted Types, HSTS):
@@ -73,7 +91,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.PLAYWRIGHT_WORKERS
+    ? Number(process.env.PLAYWRIGHT_WORKERS)
+    : 1,
   reporter: 'html',
   timeout: 30_000,
 
@@ -86,8 +106,9 @@ export default defineConfig({
   ...(startFirebaseHostingEmulator
     ? {
         webServer: {
-          command:
+          command: shWebServerCommand(
             'npm run build && npx firebase emulators:start --only hosting --project dba-website-prod',
+          ),
           url: firebaseHostingEmulatorURL,
           timeout: 300_000,
           reuseExistingServer: false,
@@ -96,7 +117,9 @@ export default defineConfig({
     : startAstroPreview
       ? {
           webServer: {
-            command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4321',
+            command: shWebServerCommand(
+              'npm run build && npm run preview -- --host 127.0.0.1 --port 4321',
+            ),
             url: defaultBaseURL,
             timeout: 240_000,
             reuseExistingServer: false,

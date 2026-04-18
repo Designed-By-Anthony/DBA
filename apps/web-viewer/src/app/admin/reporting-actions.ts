@@ -1,6 +1,7 @@
 "use server";
 
-import { db } from "@/lib/firebase";
+import { getDb, setTenantContext, leads, tickets } from "@dba/database";
+import { eq, and, count, sql } from "drizzle-orm";
 import { verifyAuth, getProspects, getDashboardStats } from "@/app/admin/actions";
 import { getTicketSlaState } from "@/lib/ticket-sla";
 import type { Prospect } from "@/lib/types";
@@ -17,72 +18,67 @@ export type ReportingSnapshot = {
 };
 
 export async function getReportingSnapshot(): Promise<ReportingSnapshot> {
-  await verifyAuth();
+  const session = await verifyAuth();
   const [dashboard, prospects] = await Promise.all([
     getDashboardStats(),
     getProspects(),
   ]);
-  const idSet = new Set(prospects.map((p) => p.id));
 
-  const snap = await db
-    .collection("tickets")
-    .orderBy("createdAt", "desc")
-    .limit(400)
-    .get();
+  const db = getDb();
+  let ticketStats = {
+    total: 0,
+    open: 0,
+    slaMet: 0,
+    slaBreachedOrLate: 0,
+    awaitingFirstResponse: 0,
+  };
 
-  let total = 0;
-  let open = 0;
-  let slaMet = 0;
-  let slaBreachedOrLate = 0;
-  let awaitingFirstResponse = 0;
+  if (db) {
+    try {
+      await setTenantContext(db, session.user.agencyId);
+      const ticketRows = await db
+        .select()
+        .from(tickets)
+        .where(eq(tickets.tenantId, session.user.agencyId))
+        .limit(400);
 
-  for (const doc of snap.docs) {
-    const t = doc.data();
-    const pid = t.prospectId as string;
-    if (!idSet.has(pid)) continue;
-    total++;
-    const st = t.status as string;
-    if (st === "open" || st === "in_progress") open++;
+      const idSet = new Set(prospects.map((p) => p.id));
 
-    const createdAt = t.createdAt as string;
-    const priority = (t.priority as string) || "medium";
-    const firstResponseAt = t.firstResponseAt as string | undefined;
-
-    if (firstResponseAt) {
-      slaMet++;
-      continue;
-    }
-    if (st === "resolved" || st === "closed") {
-      continue;
-    }
-    const sla = getTicketSlaState(createdAt, priority, undefined);
-    if (sla.kind === "breach") {
-      slaBreachedOrLate++;
-    } else {
-      awaitingFirstResponse++;
+      for (const t of ticketRows) {
+        if (!idSet.has(t.leadId || "")) continue;
+        ticketStats.total++;
+        if (t.status === "open" || t.status === "in_progress") ticketStats.open++;
+        if (t.firstResponseAt) {
+          ticketStats.slaMet++;
+          continue;
+        }
+        if (t.status === "resolved" || t.status === "closed") continue;
+        const sla = getTicketSlaState(t.createdAt || "", t.priority || "medium", undefined);
+        if (sla.kind === "breach") {
+          ticketStats.slaBreachedOrLate++;
+        } else {
+          ticketStats.awaitingFirstResponse++;
+        }
+      }
+    } catch (err) {
+      console.error("Ticket stats error:", err);
     }
   }
 
-  return {
-    dashboard,
-    tickets: {
-      total,
-      open,
-      slaMet,
-      slaBreachedOrLate,
-      awaitingFirstResponse,
-    },
-  };
+  return { dashboard, tickets: ticketStats };
 }
 
 export async function exportProspectsCsv(): Promise<{ csv: string; error?: string }> {
   const session = await verifyAuth();
+  const db = getDb();
+  if (!db) return { csv: "", error: "Database not configured" };
+
   try {
-    const snapshot = await db
-      .collection("prospects")
-      .where("agencyId", "==", session.user.agencyId)
-      .get();
-    const rows = snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
+    await setTenantContext(db, session.user.agencyId);
+    const rows = await db
+      .select()
+      .from(leads)
+      .where(eq(leads.tenantId, session.user.agencyId));
 
     const headers = [
       "id",
@@ -97,18 +93,17 @@ export async function exportProspectsCsv(): Promise<{ csv: string; error?: strin
     ];
     const lines = [headers.join(",")];
     for (const r of rows) {
-      const p = r as Prospect & { id: string };
       lines.push(
         [
-          csvEscape(p.id),
-          csvEscape(p.name),
-          csvEscape(p.email),
-          csvEscape(p.company),
-          csvEscape(p.status),
-          String(p.dealValue ?? ""),
-          csvEscape(p.source),
-          csvEscape(p.createdAt),
-          csvEscape(p.lastContactedAt ?? ""),
+          csvEscape(r.prospectId),
+          csvEscape(r.name),
+          csvEscape(r.email),
+          csvEscape(r.company),
+          csvEscape(r.status),
+          String(r.dealValue ?? ""),
+          csvEscape(r.source),
+          csvEscape(r.createdAt),
+          csvEscape(r.lastContactedAt),
         ].join(","),
       );
     }

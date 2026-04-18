@@ -7,7 +7,7 @@
  * honeypot-exempt payload produces inbox noise.
  *
  * This module is intentionally dependency-free so it can be unit-tested
- * without pulling in the DB / Firebase / Resend stack.
+ * without pulling in the DB / Resend stack.
  *
  * Defenses:
  *   - `validatePublicLead()`         — format + payload sanity checks.

@@ -1,27 +1,35 @@
 import PreviewShell from "@/components/PreviewShell";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/firebase";
+import { getDb, leads } from "@dba/database";
+import { eq } from "drizzle-orm";
 
 export default async function CustomerPreviewPage({ params }: { params: Promise<{ customer: string }> }) {
   const { customer } = await params;
   const customerSlug = customer.toLowerCase();
-  
-  // Attempt to fetch the client configuration from Firebase Firestore
-  let clientData = null;
-  try {
-    const docRef = db.collection('clients').doc(customerSlug);
-    const docSnap = await docRef.get();
 
-    if (docSnap.exists) {
-      // Expecting Firestore document to have at least { name: "Nike", targetUrl: "https://..." }
-      clientData = docSnap.data() as { name: string; targetUrl: string };
+  // Try to find a lead / client record by prospectId slug
+  let clientData = null;
+  const db = getDb();
+  if (db) {
+    try {
+      const rows = await db
+        .select({ name: leads.name, targetUrl: leads.targetUrl })
+        .from(leads)
+        .where(eq(leads.prospectId, customerSlug))
+        .limit(1);
+
+      if (rows.length > 0 && rows[0].targetUrl) {
+        clientData = {
+          name: rows[0].name,
+          targetUrl: rows[0].targetUrl,
+        };
+      }
+    } catch (error) {
+      console.warn("Database fetch failed. Using fallback.", error);
     }
-  } catch (error) {
-    // If the database fails or keys aren't set yet, we could trigger a Sentry report automatically here
-    console.warn("Firestore fetch failed. Using fallback.", error);
   }
 
-  // Graceful fallback for demo testing while you set up Firebase connection manually
+  // Graceful fallback for demo testing
   if (!clientData && customerSlug === 'demo') {
     clientData = {
       name: "Acme Corp (Fallback)",
@@ -29,7 +37,6 @@ export default async function CustomerPreviewPage({ params }: { params: Promise<
     };
   }
 
-  // If client doesn't exist in Firestore and isn't the demo slug, throw Next.js 404
   if (!clientData) {
     return notFound();
   }

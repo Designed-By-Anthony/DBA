@@ -124,7 +124,7 @@ export async function sendViaGmail(to: string, subject: string, html: string): P
     requestBody: { raw },
   });
   if (process.env.NODE_ENV === 'development') {
-    console.log(`Email sent to ${recipient} via Gmail API`);
+    console.info(`Email sent to ${recipient} via Gmail API`);
   }
 }
 

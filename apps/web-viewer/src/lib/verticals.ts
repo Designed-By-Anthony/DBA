@@ -104,7 +104,7 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       tickets: "Tickets",
       email: "Email",
       addProspect: "Add Prospect",
-      emptyProspect: "No prospects yet. Add your first prospect to get started.",
+      emptyProspect: "No prospects yet — add someone you are already talking to, or import from a lead.",
     },
     pipelineStages: [
       { id: "lead", label: "New Lead", color: "#3b82f6", probability: 0.1 },
