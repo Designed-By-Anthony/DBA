@@ -5,7 +5,6 @@
 - **Remove from CRM UI:** Price Book products are Stripe catalog objects — use **Archive** (sets `active: false`) or **Restore**; optional **Show archived** lists inactive products. True deletion is done in the Stripe Dashboard (products are not stored in Postgres).
 - **`setStripeProductActiveAction`:** Server action calls `stripe.products.update`. Errors go to Sentry (replaced `console.error` in `stripe.ts` actions).
 - **`POST /api/webhooks/stripe`:** No-op handlers for `product.updated`, `product.deleted`, `price.updated` so Stripe can deliver those events without failing; catalog still loads via API. Add these event types in Stripe Dashboard → Webhooks when you want delivery acknowledged.
-
 ## Agency OS: Email History + sidebar hydration (2026-04-18)
 
 - **React #418 / POST `/admin/email/history` 500:** `DashboardShell` read `localStorage` in `useState` initializer on the client only — server HTML did not match first client paint. Sidebar now starts `collapsed=false` and applies saved preference in `useLayoutEffect` + `startTransition`. **`/admin/email/history`** loads `getEmailHistory()` in a **Server Component** and passes data to **`EmailHistoryClient`** (no initial client POST); optional Refresh still calls the server action.
@@ -14,6 +13,7 @@
 ## Agency OS: UI vertical → Postgres enum (2026-04-18)
 
 - **Sentry 7423284268:** `createClientOrg` passed UI template ids (`creative`, `general`, …) into `tenants.vertical_type`, but Postgres only allows `agency` | `service_pro` | `restaurant` | `wellness`. Added `vertical-template-map.ts`: maps UI → SQL enum, stores the picked template in `crm_config.templateId`, and reads it back in `listClientOrgs` / `getOrgBranding` / `GET /api/portal/branding`. `vertical-config.ts` maps `wellness` → `fitness` UI.
+
 ## Agency OS: tenant actions + Web Analytics opt-in (2026-04-18)
 
 - **`withTenant`:** Read-heavy paths return safe defaults when auth/DB is unavailable (avoids server-component 500s / hydration fallout). Mutations still surface errors. **`getDashboardStats`** overdue tasks now filter `due_at <= now` (ISO compare) with `due_at` not null.
