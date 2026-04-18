@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
     const { email, orgId } = parsed.value;
 
-    if (!email || !orgId) {
+    if (!email) {
       // Keep response generic to avoid exposing tenant membership.
       return NextResponse.json({ success: true });
     }
@@ -50,18 +50,23 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = keyEmail;
+    const normalizedOrgId = typeof orgId === "string" ? orgId.trim() : "";
     const database = getDb();
     if (!database) {
       return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     }
 
     // Anti-enumeration: same response even if no matching lead.
+    // Fallback to email-only lookup when org is missing (e.g. bookmarked /portal URL).
     const lead = (
       await database
         .select()
         .from(leads)
-        // magic-link lookup must be tenant-scoped to avoid cross-org disclosure
-        .where(and(eq(leads.tenantId, orgId), eq(leads.emailNormalized, normalizedEmail)))
+        .where(
+          normalizedOrgId
+            ? and(eq(leads.tenantId, normalizedOrgId), eq(leads.emailNormalized, normalizedEmail))
+            : eq(leads.emailNormalized, normalizedEmail),
+        )
         .limit(1)
     )[0];
 
