@@ -4,6 +4,11 @@
 
 - **`@clerk/nextjs`** bumped to latest (`^7.2.3`). **`apps/web-viewer/AGENTS.md`** documents the official App Router checklist; **`src/proxy.ts`** uses Next.js 16’s named **`proxy`** export (not the quickstart’s `middleware.ts` default export).
 
+## Vercel Agency OS build: Clerk env aliases + Turbo pass-through (2026-04-18)
+
+- **Root cause:** Vercel sometimes stores Clerk keys under prefixed names (e.g. `admin_CLERK_SECRET_KEY`) while `@dba/env` and `@clerk/nextjs` expect `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`. Turbo also omitted Sentry OTLP / log-drain vars from the task hash, triggering warnings and risking missing env at build time.
+- **Fix:** `validateWebViewerEnv()` hydrates canonical names from `admin_*` aliases when the canonical key is empty; `turbo.json` build `env` lists the alias keys plus `SENTRY_PUBLIC_KEY`, `SENTRY_OTLP_TRACES_URL`, and `SENTRY_VERCEL_LOG_DRAIN_URL`.
+
 ## Agency OS Clerk + PWA on admin/accounts (2026-04-18)
 
 - **Serwist:** Prepended `NetworkOnly` routes for `clerk.*` (any Clerk custom-domain FAPI host) and `*.clerk.accounts.dev` so Serwist’s default `.js` caching no longer intercepts Clerk FAPI scripts (fixes `no-response` / failed Clerk JS loads in production).

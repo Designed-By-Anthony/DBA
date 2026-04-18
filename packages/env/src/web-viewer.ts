@@ -7,6 +7,27 @@ import {
 } from "./shared";
 
 /**
+ * Vercel Environment Variables are sometimes prefixed per deployment target
+ * (e.g. `admin_*` for the admin project). The Clerk SDK and our code read
+ * `CLERK_SECRET_KEY` / `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` only — copy known
+ * aliases onto the canonical names before Zod runs so production builds do
+ * not fail when secrets use the prefixed form.
+ */
+function hydrateWebViewerEnvAliases(env: NodeJS.ProcessEnv): void {
+  const pairs: ReadonlyArray<[canonical: string, alias: string]> = [
+    ["CLERK_SECRET_KEY", "admin_CLERK_SECRET_KEY"],
+    ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "admin_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+  ];
+  for (const [canonical, alias] of pairs) {
+    const c = env[canonical]?.trim();
+    const a = env[alias]?.trim();
+    if (!c && a) {
+      env[canonical] = a;
+    }
+  }
+}
+
+/**
  * Agency OS (`apps/web-viewer`) — admin.* + accounts.* (Next.js 16).
  *
  * Required for the admin surface to function:
@@ -103,6 +124,7 @@ const webViewerSchema = z
 export type WebViewerEnv = z.infer<typeof webViewerSchema>;
 
 export function validateWebViewerEnv(env: NodeJS.ProcessEnv = process.env): WebViewerEnv {
+  hydrateWebViewerEnvAliases(env);
   return validateEnv("web-viewer (Agency OS)", webViewerSchema, env);
 }
 
