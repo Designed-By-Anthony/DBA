@@ -15,6 +15,7 @@ Verification checklist ([Clerk Next.js quickstart](https://clerk.com/docs/nextjs
 
 Use **`<Show when="signed-in">`** / **`<Show when="signed-out">`** for new UI instead of legacy signed-in/out wrappers.
 
+
 ## Data layer (Neon Postgres)
 
 - **`DATABASE_URL`** — Neon connection string (pooled URL for the app; use the direct / unpooled host for `pnpm db:push` / `drizzle-kit` when Neon requires it).
@@ -24,7 +25,7 @@ Use **`<Show when="signed-in">`** / **`<Show when="signed-out">`** for new UI in
 
 - **Agency staff (you / team)** — Sign into **admin** with Clerk (`userId`, `orgId`). RLS and tenant scoping use the active **Clerk organization id** as `tenant_id` / `tenants.clerk_org_id`.
 - **Prospects / leads** — Stored only in Postgres **`leads`** (name, email, pipeline, notes, etc.). They **do not** need and **should not** be modeled as Clerk users for outreach and tracking. Optional **client portal** access uses **magic links** tied to `leads.email_normalized` + org (`/api/portal/magic-link`), not Clerk.
-- **“My Clients” orgs** — Clerk **organizations** you create for customers who get their **own** CRM tenant; still distinct from individual prospects used for cold outreach.
+- **"My Clients" orgs** — Clerk **organizations** you create for customers who get their **own** CRM tenant; still distinct from individual prospects used for cold outreach.
 
 Do not assume every CRM row maps to a Clerk `user_id`; only enforce Clerk auth on **admin** and **portal** routes that require it.
 ## Compliance (DoD / HIPAA-oriented)

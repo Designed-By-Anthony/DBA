@@ -88,6 +88,7 @@
 - **Sentry:** Removed hardcoded DSNs from Agency OS Sentry configs; init only from `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN`. Default **`sendDefaultPii: false`**; Session Replay opt-in via **`NEXT_PUBLIC_SENTRY_REPLAY=1`**. Marketing CSP helpers no longer embed a default Sentry DSN; `sync-firebase-csp` skips report-uri when `PUBLIC_SENTRY_DSN` is unset.
 - **Lead ingest:** Public ingest 503 responses no longer echo SQL/driver `Error.message` or internal DB setup hints.
 - **AGENTS.md:** Added **Compliance bar (DoD / HIPAA-oriented)** for agents (root + `apps/web-viewer/AGENTS.md`).
+
 ## Clerk quickstart alignment (2026-04-18)
 
 - **`@clerk/nextjs`** bumped to latest (`^7.2.3`). **`apps/web-viewer/AGENTS.md`** documents the official App Router checklist; **`src/proxy.ts`** uses Next.js 16’s named **`proxy`** export (not the quickstart’s `middleware.ts` default export).
