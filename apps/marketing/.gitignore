@@ -1,5 +1,7 @@
 # build output
 dist/
+# IndexNow URL hash cache (written during astro build; machine-local)
+.astro-indexnow-cache.json
 # generated types
 .astro/
 
