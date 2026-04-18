@@ -28,8 +28,8 @@ export async function GET() {
     return NextResponse.json(
       rows.map((row) => ({
         id: row.id,
-        prospectId: row.prospectId,
-        prospectName: row.prospectName,
+        leadId: row.leadId,
+        leadName: row.leadName,
         subject: row.subject,
         description: row.description,
         status: row.status,

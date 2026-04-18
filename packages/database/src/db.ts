@@ -95,6 +95,35 @@ export async function setTenantContext(db: Database, tenantId: string): Promise<
 }
 
 /**
+ * Executes a callback within a transaction where the tenant context is guaranteed.
+ * This is safe for connection pools and prevents cross-tenant data leaks.
+ */
+export async function withTenantContext<T>(
+  db: Database,
+  tenantId: string,
+  fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
+): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`);
+    return fn(tx);
+  });
+}
+
+/**
+ * Executes a callback within a transaction where RLS is bypassed.
+ * Use this EXTREMELY CAREFULLY, primarily for webhooks or system jobs.
+ */
+export async function withBypassRls<T>(
+  db: Database,
+  fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
+): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT set_config('app.bypass_rls', 'on', true)`);
+    return fn(tx);
+  });
+}
+
+/**
  * Returns a Drizzle instance bound to a specific tenant.
  * Equivalent to calling getDb() and then setTenantContext().
  * Note: This returns the same shared Database instance; setTenantContext

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { processDueSequenceEnrollments } from "@/lib/email-sequence-processor";
+import { processEmailSequences } from "@/lib/email-sequence-processor";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
 /**
@@ -19,6 +19,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
 
-  const result = await processDueSequenceEnrollments(100);
+  const result = await processEmailSequences();
   return NextResponse.json({ ok: true, ...result });
 }

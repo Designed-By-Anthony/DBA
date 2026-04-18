@@ -1,6 +1,6 @@
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
   leads,
   activities,
   tickets,
@@ -58,54 +58,54 @@ export async function recalculateLeadScore(
     const db = getDb();
     if (!db) return;
 
-    await setTenantContext(db, tenantId);
+    await withTenantContext(db, tenantId, async (tx) => {
+      // Fetch all activities for this prospect
+      const prospectActivities = await tx
+        .select()
+        .from(activities)
+        .where(
+          and(
+            eq(activities.tenantId, tenantId),
+            eq(activities.leadId, prospectId)
+          )
+        );
 
-    // Fetch all activities for this prospect
-    const prospectActivities = await db
-      .select()
-      .from(activities)
-      .where(
-        and(
-          eq(activities.tenantId, tenantId),
-          eq(activities.leadId, prospectId)
-        )
-      );
+      let rawScore = 0;
+      let lastEngagementDate: any = null;
 
-    let rawScore = 0;
-    let lastEngagementDate: Date | null = null;
+      prospectActivities.forEach((activity) => {
+        const type = activityType(activity.type);
+        rawScore += type ? SCORE_WEIGHTS[type] : 0;
 
-    prospectActivities.forEach((activity) => {
-      const type = activityType(activity.type);
-      rawScore += type ? SCORE_WEIGHTS[type] : 0;
+        const date = dateFromValue(activity.createdAt);
+        if (date && (!lastEngagementDate || date > lastEngagementDate)) {
+          lastEngagementDate = date;
+        }
+      });
 
-      const date = dateFromValue(activity.createdAt);
-      if (date && (!lastEngagementDate || date > lastEngagementDate)) {
-        lastEngagementDate = date;
+      // Time decay factor: subtract 2 points for every full day of inactivity
+      if (lastEngagementDate) {
+        const daysElapsed = Math.floor(
+          (Date.now() - lastEngagementDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        const decay = Math.max(0, daysElapsed * 2);
+        rawScore -= decay;
       }
+
+      // Normalize to 0-100 ceiling/floor
+      const finalScore = Math.max(0, Math.min(100, Math.floor(rawScore)));
+
+      // Update the lead's score
+      await tx
+        .update(leads)
+        .set({
+          leadScore: finalScore,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(
+          and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+        );
     });
-
-    // Time decay factor: subtract 2 points for every full day of inactivity
-    if (lastEngagementDate) {
-      const daysElapsed = Math.floor(
-        (Date.now() - lastEngagementDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      const decay = Math.max(0, daysElapsed * 2);
-      rawScore -= decay;
-    }
-
-    // Normalize to 0-100 ceiling/floor
-    const finalScore = Math.max(0, Math.min(100, Math.floor(rawScore)));
-
-    // Update the lead's score
-    await db
-      .update(leads)
-      .set({
-        leadScore: finalScore,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(
-        and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
-      );
   } catch (error) {
     console.error(
       `[Intelligence] Failed to calculate lead score for ${prospectId}:`,
@@ -125,88 +125,88 @@ export async function evaluateProspectHealth(
     const db = getDb();
     if (!db) return;
 
-    await setTenantContext(db, tenantId);
+    await withTenantContext(db, tenantId, async (tx) => {
+      // Fetch the lead
+      const leadRows = await tx
+        .select()
+        .from(leads)
+        .where(
+          and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+        )
+        .limit(1);
 
-    // Fetch the lead
-    const leadRows = await db
-      .select()
-      .from(leads)
-      .where(
-        and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
-      )
-      .limit(1);
+      if (leadRows.length === 0) return;
 
-    if (leadRows.length === 0) return;
+      const lead = leadRows[0];
 
-    const lead = leadRows[0];
+      // For 'new' status leads, always mark as healthy
+      if (lead.status === "new") {
+        if (lead.healthStatus !== "healthy") {
+          await tx
+            .update(leads)
+            .set({
+              healthStatus: "healthy",
+              updatedAt: new Date().toISOString(),
+            })
+            .where(
+              and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
+            );
+        }
+        return;
+      }
 
-    // For 'new' status leads, always mark as healthy
-    if (lead.status === "new") {
-      if (lead.healthStatus !== "healthy") {
-        await db
+      let health: ProspectHealthStatus = "healthy";
+
+      // 1. Inactivity assessment
+      const lastContactedAt = dateFromValue(lead.lastContactedAt);
+      const daysSinceContact = lastContactedAt
+        ? Math.floor(
+            (Date.now() - lastContactedAt.getTime()) / (1000 * 60 * 60 * 24)
+          )
+        : 0;
+
+      // 2. Open friction (tickets)
+      const openTickets = await tx
+        .select()
+        .from(tickets)
+        .where(
+          and(
+            eq(tickets.tenantId, tenantId),
+            eq(tickets.leadId, prospectId),
+            inArray(tickets.status, ["open", "in_progress"])
+          )
+        );
+
+      let oldestTicketDays = 0;
+      openTickets.forEach((ticket) => {
+        const ticketDate = dateFromValue(ticket.createdAt);
+        if (!ticketDate) return;
+        const age = Math.floor(
+          (Date.now() - ticketDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (age > oldestTicketDays) oldestTicketDays = age;
+      });
+
+      // 3. Determine health status based on thresholds
+      if (oldestTicketDays >= 5 || daysSinceContact >= 14) {
+        health = "churn_risk";
+      } else if (oldestTicketDays >= 2 || daysSinceContact >= 7) {
+        health = "at_risk";
+      }
+
+      // Update health status if changed
+      if (lead.healthStatus !== health) {
+        await tx
           .update(leads)
           .set({
-            healthStatus: "healthy",
+            healthStatus: health,
             updatedAt: new Date().toISOString(),
           })
           .where(
             and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
           );
       }
-      return;
-    }
-
-    let health: ProspectHealthStatus = "healthy";
-
-    // 1. Inactivity assessment
-    const lastContactedAt = dateFromValue(lead.lastContactedAt);
-    const daysSinceContact = lastContactedAt
-      ? Math.floor(
-          (Date.now() - lastContactedAt.getTime()) / (1000 * 60 * 60 * 24)
-        )
-      : 0;
-
-    // 2. Open friction (tickets)
-    const openTickets = await db
-      .select()
-      .from(tickets)
-      .where(
-        and(
-          eq(tickets.tenantId, tenantId),
-          eq(tickets.leadId, prospectId),
-          inArray(tickets.status, ["open", "in_progress"])
-        )
-      );
-
-    let oldestTicketDays = 0;
-    openTickets.forEach((ticket) => {
-      const ticketDate = dateFromValue(ticket.createdAt);
-      if (!ticketDate) return;
-      const age = Math.floor(
-        (Date.now() - ticketDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (age > oldestTicketDays) oldestTicketDays = age;
     });
-
-    // 3. Determine health status based on thresholds
-    if (oldestTicketDays >= 5 || daysSinceContact >= 14) {
-      health = "churn_risk";
-    } else if (oldestTicketDays >= 2 || daysSinceContact >= 7) {
-      health = "at_risk";
-    }
-
-    // Update health status if changed
-    if (lead.healthStatus !== health) {
-      await db
-        .update(leads)
-        .set({
-          healthStatus: health,
-          updatedAt: new Date().toISOString(),
-        })
-        .where(
-          and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId))
-        );
-    }
   } catch (error) {
     console.error(
       `[Intelligence] Failed to evaluate health for ${prospectId}:`,

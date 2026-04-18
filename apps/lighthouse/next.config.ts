@@ -26,7 +26,16 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              `frame-ancestors ${frameAncestors}; base-uri 'self'; object-src 'none';`,
+              "default-src 'self'; " +
+              `frame-ancestors ${frameAncestors}; ` +
+              "base-uri 'self'; " +
+              "object-src 'none'; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com; " +
+              "style-src 'self' 'unsafe-inline'; " +
+              "img-src 'self' data: blob: https://images.unsplash.com; " +
+              "connect-src 'self' https://*.designedbyanthony.com; " +
+              "frame-src 'self' https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
+              "worker-src 'self' blob:;",
           },
           {
             key: "Strict-Transport-Security",

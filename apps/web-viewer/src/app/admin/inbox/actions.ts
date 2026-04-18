@@ -2,7 +2,7 @@
 
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
   emails,
   tickets,
   type EmailRow,
@@ -74,23 +74,23 @@ export async function getInboxStream(): Promise<InboxItem[]> {
   }
 
   try {
-    await setTenantContext(db, tenantId);
-
     // Fetch emails and tickets in parallel
-    const [emailRows, ticketRows] = await Promise.all([
-      db
-        .select()
-        .from(emails)
-        .where(eq(emails.tenantId, tenantId))
-        .orderBy(desc(emails.createdAt))
-        .limit(30),
-      db
-        .select()
-        .from(tickets)
-        .where(eq(tickets.tenantId, tenantId))
-        .orderBy(desc(tickets.createdAt))
-        .limit(30),
-    ]);
+    const [emailRows, ticketRows] = await withTenantContext(db, tenantId, async (tx) => {
+      return Promise.all([
+        tx
+          .select()
+          .from(emails)
+          .where(eq(emails.tenantId, tenantId))
+          .orderBy(desc(emails.createdAt))
+          .limit(30),
+        tx
+          .select()
+          .from(tickets)
+          .where(eq(tickets.tenantId, tenantId))
+          .orderBy(desc(tickets.createdAt))
+          .limit(30),
+      ]);
+    });
 
     // Map to InboxItem format
     const items: InboxItem[] = [];

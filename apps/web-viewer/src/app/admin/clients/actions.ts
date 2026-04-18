@@ -2,7 +2,7 @@
 
 import type { PlanSuite } from "@dba/lead-form-contract";
 import { clerkClient } from "@clerk/nextjs/server";
-import { getDb, setTenantContext, tenants, leads } from "@dba/database";
+import { getDb, withTenantContext, tenants, leads } from "@dba/database";
 import { eq, and, count } from "drizzle-orm";
 import { verifyAuth } from "../actions";
 
@@ -33,11 +33,13 @@ export async function listClientOrgs() {
 
       if (db) {
         try {
-          const countResult = await db
-            .select({ count: count() })
-            .from(leads)
-            .where(eq(leads.tenantId, org.id));
-          prospectCount = countResult[0]?.count || 0;
+          await withTenantContext(db, org.id, async (tx) => {
+            const countResult = await tx
+              .select({ count: count() })
+              .from(leads)
+              .where(eq(leads.tenantId, org.id));
+            prospectCount = countResult[0]?.count || 0;
+          });
         } catch {
           // Count may fail
         }

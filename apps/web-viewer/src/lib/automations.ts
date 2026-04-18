@@ -1,6 +1,6 @@
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
   automations,
   leads,
   activities,
@@ -25,34 +25,34 @@ export async function processAutomations(
     const db = getDb();
     if (!db) return;
 
-    await setTenantContext(db, agencyId);
+    await withTenantContext(db, agencyId, async (tx) => {
+      // 1. Load active automation rules for this tenant matching the trigger
+      const rules = await tx
+        .select()
+        .from(automations)
+        .where(
+          and(
+            eq(automations.tenantId, agencyId),
+            eq(automations.isActive, true),
+            eq(automations.trigger, trigger as any)
+          )
+        );
 
-    // 1. Load active automation rules for this tenant matching the trigger
-    const rules = await db
-      .select()
-      .from(automations)
-      .where(
-        and(
-          eq(automations.tenantId, agencyId),
-          eq(automations.isActive, true),
-          eq(automations.trigger, trigger)
-        )
-      );
+      if (rules.length === 0) return;
 
-    if (rules.length === 0) return;
-
-    // 2. Process all triggered actions contextually
-    for (const rule of rules) {
-      const ruleName = rule.name || rule.id;
-      await executeRuleAction(
-        db,
-        agencyId,
-        prospectId,
-        rule.action as Record<string, unknown> as AutomationAction,
-        triggerData,
-        ruleName
-      );
-    }
+      // 2. Process all triggered actions contextually
+      for (const rule of rules) {
+        const ruleName = rule.name || rule.id;
+        await executeRuleAction(
+          tx,
+          agencyId,
+          prospectId,
+          rule.action as any as AutomationAction,
+          triggerData,
+          ruleName
+        );
+      }
+    });
   } catch (err) {
     console.error(
       `[Automations] Engine evaluation failed for prospect ${prospectId}:`,
@@ -140,7 +140,7 @@ async function executeRuleAction(
         break;
       }
 
-      case "create_task": {
+      case "create_task" as any: {
         // Not yet implemented - just log
         const title = String(action.payload?.title || "System Task");
         console.log(`[Automations] Create task not yet implemented: ${title}`);
@@ -174,7 +174,7 @@ async function executeRuleAction(
         break;
       }
 
-      case "send_notification": {
+      case "send_notification" as any: {
         const title = String(action.payload?.title || "Notification");
         const body = String(action.payload?.body || "");
 

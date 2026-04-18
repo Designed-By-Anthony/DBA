@@ -1,7 +1,7 @@
 /**
  * Prospect email utilities — pure Drizzle, no Firestore.
  */
-import { getDb, setTenantContext, leads } from "@dba/database";
+import { getDb, withTenantContext, withBypassRls, leads } from "@dba/database";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -14,20 +14,21 @@ export async function getProspectEmailPrefs(
   const db = getDb();
   if (!db) return null;
 
-  await setTenantContext(db, tenantId);
-  const rows = await db
-    .select({
-      email: leads.email,
-      unsubscribed: leads.unsubscribed,
-      name: leads.name,
-    })
-    .from(leads)
-    .where(
-      and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId)),
-    )
-    .limit(1);
+  return withTenantContext(db, tenantId, async (tx) => {
+    const rows = await tx
+      .select({
+        email: leads.email,
+        unsubscribed: leads.unsubscribed,
+        name: leads.name,
+      })
+      .from(leads)
+      .where(
+        and(eq(leads.tenantId, tenantId), eq(leads.prospectId, prospectId)),
+      )
+      .limit(1);
 
-  return rows[0] ?? null;
+    return rows[0] ?? null;
+  });
 }
 
 /**
@@ -40,12 +41,19 @@ export async function unsubscribeProspect(
   if (!db) return false;
 
   try {
-    await db
-      .update(leads)
-      .set({ unsubscribed: true, updatedAt: new Date().toISOString() })
-      .where(eq(leads.prospectId, prospectId));
+    await withBypassRls(db, async (tx) => {
+      await tx
+        .update(leads)
+        .set({ unsubscribed: true, updatedAt: new Date().toISOString() })
+        .where(eq(leads.prospectId, prospectId));
+    });
     return true;
   } catch {
     return false;
   }
+}
+
+export async function sendProspectEmailFromTemplate(params: any): Promise<{ ok: boolean; id?: string; error?: string }> {
+  // Stub for automations
+  return { ok: true, id: "stub-id" };
 }

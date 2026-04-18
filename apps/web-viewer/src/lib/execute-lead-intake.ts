@@ -6,7 +6,7 @@ import { escapeHtml } from "@/lib/email-utils";
 import { insertSqlLead } from "@/lib/lead-intake/sql";
 import { fireAutomationEvent } from "@/lib/automation-runner";
 import { getTenantByOrgId } from "@/lib/tenant-db";
-import { getDb, setTenantContext, activities } from "@dba/database";
+import { getDb, withTenantContext, activities } from "@dba/database";
 import type { VerticalId } from "@dba/ui";
 import type { LeadIntakeResult, LeadIntakeSource } from "@/lib/lead-intake/types";
 
@@ -79,22 +79,23 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
     const db = getDb();
     if (db) {
       try {
-        await setTenantContext(db, agencyId);
-        await db.insert(activities).values({
-          tenantId: agencyId,
-          leadId: prospectId,
-          type: auditUrl ? "audit_completed" : "form_submission",
-          title: auditUrl
-            ? `Completed a Lighthouse audit via ${source}`
-            : `Submitted ${source || "website form"}`,
-          description: message || null,
-          metadata: {
-            source,
-            auditUrl: auditUrl || null,
-            isNewLead: isNew,
-            marketing: marketing ?? null,
-          },
-          createdAt: new Date().toISOString(),
+        await withTenantContext(db, agencyId, async (tx) => {
+          await tx.insert(activities).values({
+            tenantId: agencyId,
+            leadId: prospectId,
+            type: auditUrl ? "audit_completed" : "form_submission",
+            title: auditUrl
+              ? `Completed a Lighthouse audit via ${source}`
+              : `Submitted ${source || "website form"}`,
+            description: message || null,
+            metadata: {
+              source,
+              auditUrl: auditUrl || null,
+              isNewLead: isNew,
+              marketing: marketing ?? null,
+            },
+            createdAt: new Date().toISOString(),
+          });
         });
       } catch (actErr) {
         console.error("[lead-intake] activity insert failed:", actErr);

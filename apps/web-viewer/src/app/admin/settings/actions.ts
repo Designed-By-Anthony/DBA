@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
   tenants,
   notifications,
   pushSubscriptions,
@@ -14,12 +14,11 @@ import { eq, and, desc } from "drizzle-orm";
 // ============================================
 // Auth helper
 // ============================================
-async function requireTenant(): Promise<{ db: ReturnType<typeof getDb>; tenantId: string }> {
+async function requireTenant(): Promise<{ db: NonNullable<ReturnType<typeof getDb>>; tenantId: string }> {
   const { orgId } = await auth();
   if (!orgId) throw new Error("No active organization");
   const db = getDb();
   if (!db) throw new Error("Database not configured");
-  await setTenantContext(db, orgId);
   return { db, tenantId: orgId };
 }
 
@@ -29,8 +28,10 @@ async function requireTenant(): Promise<{ db: ReturnType<typeof getDb>; tenantId
 
 export async function getTenantSettings(): Promise<TenantRow | null> {
   const { db, tenantId } = await requireTenant();
-  const rows = await db!.select().from(tenants).where(eq(tenants.clerkOrgId, tenantId)).limit(1);
-  return rows[0] ?? null;
+  return await withTenantContext(db, tenantId, async (tx) => {
+    const rows = await tx.select().from(tenants).where(eq(tenants.clerkOrgId, tenantId)).limit(1);
+    return rows[0] ?? null;
+  });
 }
 
 export async function updateTenantSettings(
@@ -74,10 +75,12 @@ export async function updateTenantSettings(
   if (fields.notificationPrefs !== undefined) payload.notificationPrefs = fields.notificationPrefs;
   if (fields.crmConfig !== undefined) payload.crmConfig = fields.crmConfig;
 
-  await db!
-    .update(tenants)
-    .set(payload)
-    .where(eq(tenants.clerkOrgId, tenantId));
+  await withTenantContext(db, tenantId, async (tx) => {
+    await tx
+      .update(tenants)
+      .set(payload)
+      .where(eq(tenants.clerkOrgId, tenantId));
+  });
 
   return { success: true };
 }
@@ -89,46 +92,48 @@ export async function updateTenantSettings(
 export async function ensureTenantExists(name: string): Promise<TenantRow> {
   const { db, tenantId } = await requireTenant();
 
-  const existing = await db!
-    .select()
-    .from(tenants)
-    .where(eq(tenants.clerkOrgId, tenantId))
-    .limit(1);
+  return await withTenantContext(db, tenantId, async (tx) => {
+    const existing = await tx
+      .select()
+      .from(tenants)
+      .where(eq(tenants.clerkOrgId, tenantId))
+      .limit(1);
 
-  if (existing.length > 0) return existing[0];
+    if (existing.length > 0) return existing[0];
 
-  const now = new Date().toISOString();
-  const newTenant = {
-    clerkOrgId: tenantId,
-    name,
-    verticalType: "agency" as const,
-    brandColor: "#2563eb",
-    pipelineStages: [
-      { id: "lead", label: "New Lead", color: "#3b82f6", probability: 0.1, order: 0 },
-      { id: "contacted", label: "Contacted", color: "#3b82f6", probability: 0.25, order: 1 },
-      { id: "proposal", label: "Proposal Sent", color: "#f59e0b", probability: 0.5, order: 2 },
-      { id: "dev", label: "In Development", color: "#10b981", probability: 0.8, order: 3 },
-      { id: "launched", label: "Launched", color: "#06d6a0", probability: 1.0, order: 4 },
-    ],
-    dealSources: ["Lighthouse Audit", "Referral", "Cold Outbound", "Inbound", "Organic", "Social Media"],
-    notificationPrefs: {
-      emailOnNewLead: true,
-      emailOnStageChange: true,
-      emailOnTicket: true,
-      emailDailyDigest: false,
-      pushEnabled: false,
-      pushOnNewLead: true,
-      pushOnStageChange: false,
-    },
-    crmConfig: {},
-    createdAt: now,
-    updatedAt: now,
-  };
+    const now = new Date().toISOString();
+    const newTenant = {
+      clerkOrgId: tenantId,
+      name,
+      verticalType: "agency" as const,
+      brandColor: "#2563eb",
+      pipelineStages: [
+        { id: "lead", label: "New Lead", color: "#3b82f6", probability: 0.1, order: 0 },
+        { id: "contacted", label: "Contacted", color: "#3b82f6", probability: 0.25, order: 1 },
+        { id: "proposal", label: "Proposal Sent", color: "#f59e0b", probability: 0.5, order: 2 },
+        { id: "dev", label: "In Development", color: "#10b981", probability: 0.8, order: 3 },
+        { id: "launched", label: "Launched", color: "#06d6a0", probability: 1.0, order: 4 },
+      ],
+      dealSources: ["Lighthouse Audit", "Referral", "Cold Outbound", "Inbound", "Organic", "Social Media"],
+      notificationPrefs: {
+        emailOnNewLead: true,
+        emailOnStageChange: true,
+        emailOnTicket: true,
+        emailDailyDigest: false,
+        pushEnabled: false,
+        pushOnNewLead: true,
+        pushOnStageChange: false,
+      },
+      crmConfig: {},
+      createdAt: now,
+      updatedAt: now,
+    };
 
-  await db!.insert(tenants).values(newTenant);
+    await tx.insert(tenants).values(newTenant);
 
-  const rows = await db!.select().from(tenants).where(eq(tenants.clerkOrgId, tenantId)).limit(1);
-  return rows[0];
+    const rows = await tx.select().from(tenants).where(eq(tenants.clerkOrgId, tenantId)).limit(1);
+    return rows[0];
+  });
 }
 
 // ============================================
@@ -146,40 +151,46 @@ export async function getNotifications(limit = 20): Promise<Array<{
   createdAt: string;
 }>> {
   const { db, tenantId } = await requireTenant();
-  const rows = await db!
-    .select()
-    .from(notifications)
-    .where(eq(notifications.tenantId, tenantId))
-    .orderBy(desc(notifications.createdAt))
-    .limit(limit);
-  return rows;
+  return await withTenantContext(db, tenantId, async (tx) => {
+    const rows = await tx
+      .select()
+      .from(notifications)
+      .where(eq(notifications.tenantId, tenantId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(limit);
+    return rows;
+  });
 }
 
 export async function markNotificationRead(notificationId: string): Promise<{ success: boolean }> {
   const { db, tenantId } = await requireTenant();
-  await db!
-    .update(notifications)
-    .set({ isRead: true })
-    .where(
-      and(
-        eq(notifications.tenantId, tenantId),
-        eq(notifications.id, notificationId),
-      ),
-    );
+  await withTenantContext(db, tenantId, async (tx) => {
+    await tx
+      .update(notifications)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(notifications.tenantId, tenantId),
+          eq(notifications.id, notificationId),
+        ),
+      );
+  });
   return { success: true };
 }
 
 export async function markAllNotificationsRead(): Promise<{ success: boolean }> {
   const { db, tenantId } = await requireTenant();
-  await db!
-    .update(notifications)
-    .set({ isRead: true })
-    .where(
-      and(
-        eq(notifications.tenantId, tenantId),
-        eq(notifications.isRead, false),
-      ),
-    );
+  await withTenantContext(db, tenantId, async (tx) => {
+    await tx
+      .update(notifications)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(notifications.tenantId, tenantId),
+          eq(notifications.isRead, false),
+        ),
+      );
+  });
   return { success: true };
 }
 
@@ -194,41 +205,45 @@ export async function registerPushSubscription(
   if (!userId) throw new Error("Not authenticated");
   const { db, tenantId } = await requireTenant();
 
-  // Check if already registered
-  const existing = await db!
-    .select()
-    .from(pushSubscriptions)
-    .where(
-      and(
-        eq(pushSubscriptions.tenantId, tenantId),
-        eq(pushSubscriptions.endpoint, subscription.endpoint),
-      ),
-    )
-    .limit(1);
+  return await withTenantContext(db, tenantId, async (tx) => {
+    // Check if already registered
+    const existing = await tx
+      .select()
+      .from(pushSubscriptions)
+      .where(
+        and(
+          eq(pushSubscriptions.tenantId, tenantId),
+          eq(pushSubscriptions.endpoint, subscription.endpoint),
+        ),
+      )
+      .limit(1);
 
-  if (existing.length > 0) return { success: true };
+    if (existing.length > 0) return { success: true };
 
-  await db!.insert(pushSubscriptions).values({
-    tenantId,
-    userId,
-    endpoint: subscription.endpoint,
-    p256dh: subscription.keys.p256dh,
-    auth: subscription.keys.auth,
-    createdAt: new Date().toISOString(),
+    await tx.insert(pushSubscriptions).values({
+      tenantId,
+      userId,
+      endpoint: subscription.endpoint,
+      p256dh: subscription.keys.p256dh,
+      auth: subscription.keys.auth,
+      createdAt: new Date().toISOString(),
+    });
+
+    return { success: true };
   });
-
-  return { success: true };
 }
 
 export async function removePushSubscription(endpoint: string): Promise<{ success: boolean }> {
   const { db, tenantId } = await requireTenant();
-  await db!
-    .delete(pushSubscriptions)
-    .where(
-      and(
-        eq(pushSubscriptions.tenantId, tenantId),
-        eq(pushSubscriptions.endpoint, endpoint),
-      ),
-    );
+  await withTenantContext(db, tenantId, async (tx) => {
+    await tx
+      .delete(pushSubscriptions)
+      .where(
+        and(
+          eq(pushSubscriptions.tenantId, tenantId),
+          eq(pushSubscriptions.endpoint, endpoint),
+        ),
+      );
+  });
   return { success: true };
 }

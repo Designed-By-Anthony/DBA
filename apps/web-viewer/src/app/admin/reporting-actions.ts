@@ -1,6 +1,6 @@
 "use server";
 
-import { getDb, setTenantContext, leads, tickets } from "@dba/database";
+import { getDb, withTenantContext, leads, tickets } from "@dba/database";
 import { eq, and, count, sql } from "drizzle-orm";
 import { verifyAuth, getProspects, getDashboardStats } from "@/app/admin/actions";
 import { getTicketSlaState } from "@/lib/ticket-sla";
@@ -35,31 +35,32 @@ export async function getReportingSnapshot(): Promise<ReportingSnapshot> {
 
   if (db) {
     try {
-      await setTenantContext(db, session.user.agencyId);
-      const ticketRows = await db
-        .select()
-        .from(tickets)
-        .where(eq(tickets.tenantId, session.user.agencyId))
-        .limit(400);
+      await withTenantContext(db, session.user.agencyId, async (tx) => {
+        const ticketRows = await tx
+          .select()
+          .from(tickets)
+          .where(eq(tickets.tenantId, session.user.agencyId))
+          .limit(400);
 
-      const idSet = new Set(prospects.map((p) => p.id));
+        const idSet = new Set(prospects.map((p) => p.id));
 
-      for (const t of ticketRows) {
-        if (!idSet.has(t.leadId || "")) continue;
-        ticketStats.total++;
-        if (t.status === "open" || t.status === "in_progress") ticketStats.open++;
-        if (t.firstResponseAt) {
-          ticketStats.slaMet++;
-          continue;
+        for (const t of ticketRows) {
+          if (!idSet.has(t.leadId || "")) continue;
+          ticketStats.total++;
+          if (t.status === "open" || t.status === "in_progress") ticketStats.open++;
+          if (t.firstResponseAt) {
+            ticketStats.slaMet++;
+            continue;
+          }
+          if (t.status === "resolved" || t.status === "closed") continue;
+          const sla = getTicketSlaState(t.createdAt || "", t.priority || "medium", undefined);
+          if (sla.kind === "breach") {
+            ticketStats.slaBreachedOrLate++;
+          } else {
+            ticketStats.awaitingFirstResponse++;
+          }
         }
-        if (t.status === "resolved" || t.status === "closed") continue;
-        const sla = getTicketSlaState(t.createdAt || "", t.priority || "medium", undefined);
-        if (sla.kind === "breach") {
-          ticketStats.slaBreachedOrLate++;
-        } else {
-          ticketStats.awaitingFirstResponse++;
-        }
-      }
+      });
     } catch (err) {
       console.error("Ticket stats error:", err);
     }
@@ -74,11 +75,12 @@ export async function exportProspectsCsv(): Promise<{ csv: string; error?: strin
   if (!db) return { csv: "", error: "Database not configured" };
 
   try {
-    await setTenantContext(db, session.user.agencyId);
-    const rows = await db
-      .select()
-      .from(leads)
-      .where(eq(leads.tenantId, session.user.agencyId));
+    const rows = await withTenantContext(db, session.user.agencyId, async (tx) => {
+      return await tx
+        .select()
+        .from(leads)
+        .where(eq(leads.tenantId, session.user.agencyId));
+    });
 
     const headers = [
       "id",

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(tickets.tenantId, session.tenantId),
-          eq(tickets.prospectId, session.prospectId),
+          eq(tickets.leadId, session.prospectId),
         ),
       )
       .orderBy(desc(tickets.createdAt));
@@ -107,9 +107,9 @@ export async function POST(request: NextRequest) {
       .insert(tickets)
       .values({
         tenantId: session.tenantId,
-        prospectId: session.prospectId,
-        prospectEmail: session.prospectEmail,
-        prospectName: session.prospectName,
+        leadId: session.prospectId,
+        leadEmail: session.prospectEmail,
+        leadName: session.prospectName,
         subject: subject.trim(),
         description: description?.trim() || "",
         status: "open",

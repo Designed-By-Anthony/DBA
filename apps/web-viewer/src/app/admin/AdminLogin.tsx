@@ -5,4 +5,5 @@ export default function AdminLogin() {
   // After sign-in Clerk will return the user to /admin via the
   // NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL env var.
   redirect("/sign-in");
+  return null;
 }

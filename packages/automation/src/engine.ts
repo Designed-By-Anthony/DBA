@@ -66,7 +66,7 @@ export async function loadActiveRules(
       and(
         eq(automations.tenantId, tenantId),
         eq(automations.isActive, true),
-        eq(automations.trigger, trigger),
+        eq(automations.trigger, trigger as any),
       ),
     );
 

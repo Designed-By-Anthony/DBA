@@ -2,7 +2,7 @@
 
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
   automations,
   type AutomationRow,
 } from "@dba/database";
@@ -23,7 +23,7 @@ function rowToRule(row: AutomationRow): AutomationRule {
     agencyId: row.tenantId,
     name: row.name,
     trigger: row.trigger as AutomationTrigger,
-    action: (row.action as Record<string, unknown>) as AutomationAction,
+    action: row.action as unknown as AutomationAction,
     isActive: row.isActive,
     metadata: (row.metadata as Record<string, unknown>) || {},
     createdAt: row.createdAt,
@@ -42,15 +42,15 @@ export async function getAutomations(): Promise<AutomationRule[]> {
     throw new Error("Database not configured");
   }
 
-  await setTenantContext(db, tenantId);
+  return await withTenantContext(db, tenantId, async (tx) => {
+    const rows = await tx
+      .select()
+      .from(automations)
+      .where(eq(automations.tenantId, tenantId))
+      .orderBy(desc(automations.createdAt));
 
-  const rows = await db
-    .select()
-    .from(automations)
-    .where(eq(automations.tenantId, tenantId))
-    .orderBy(desc(automations.createdAt));
-
-  return rows.map(rowToRule);
+    return rows.map(rowToRule);
+  });
 }
 
 /**
@@ -68,25 +68,25 @@ export async function toggleAutomation(
     throw new Error("Database not configured");
   }
 
-  await setTenantContext(db, tenantId);
+  await withTenantContext(db, tenantId, async (tx) => {
+    // Verify ownership before update
+    const existing = await tx
+      .select()
+      .from(automations)
+      .where(
+        and(eq(automations.tenantId, tenantId), eq(automations.id, id))
+      )
+      .limit(1);
 
-  // Verify ownership before update
-  const existing = await db
-    .select()
-    .from(automations)
-    .where(
-      and(eq(automations.tenantId, tenantId), eq(automations.id, id))
-    )
-    .limit(1);
+    if (existing.length === 0) {
+      throw new Error("Automation not found or not authorized");
+    }
 
-  if (existing.length === 0) {
-    throw new Error("Automation not found or not authorized");
-  }
-
-  await db
-    .update(automations)
-    .set({ isActive, updatedAt: new Date().toISOString() })
-    .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+    await tx
+      .update(automations)
+      .set({ isActive, updatedAt: new Date().toISOString() })
+      .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+  });
 }
 
 /**
@@ -105,27 +105,27 @@ export async function createAutomation(
     throw new Error("Database not configured");
   }
 
-  await setTenantContext(db, tenantId);
+  return await withTenantContext(db, tenantId, async (tx) => {
+    const now = new Date().toISOString();
+    const automationId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2, 15);
 
-  const now = new Date().toISOString();
-  const automationId = crypto.randomUUID
-    ? crypto.randomUUID()
-    : Math.random().toString(36).substring(2, 15);
+    await tx.insert(automations).values({
+      id: automationId,
+      tenantId,
+      name,
+      trigger: trigger as any,
+      action: action as any,
+      condition: {},
+      metadata: {},
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
 
-  await db.insert(automations).values({
-    id: automationId,
-    tenantId,
-    name,
-    trigger,
-    action: action as Record<string, unknown>,
-    condition: {},
-    metadata: {},
-    isActive: true,
-    createdAt: now,
-    updatedAt: now,
+    return automationId;
   });
-
-  return automationId;
 }
 
 /**
@@ -140,24 +140,24 @@ export async function deleteAutomation(id: string): Promise<void> {
     throw new Error("Database not configured");
   }
 
-  await setTenantContext(db, tenantId);
+  await withTenantContext(db, tenantId, async (tx) => {
+    // Verify ownership before delete
+    const existing = await tx
+      .select()
+      .from(automations)
+      .where(
+        and(eq(automations.tenantId, tenantId), eq(automations.id, id))
+      )
+      .limit(1);
 
-  // Verify ownership before delete
-  const existing = await db
-    .select()
-    .from(automations)
-    .where(
-      and(eq(automations.tenantId, tenantId), eq(automations.id, id))
-    )
-    .limit(1);
+    if (existing.length === 0) {
+      throw new Error("Automation not found or not authorized");
+    }
 
-  if (existing.length === 0) {
-    throw new Error("Automation not found or not authorized");
-  }
-
-  await db
-    .delete(automations)
-    .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+    await tx
+      .delete(automations)
+      .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+  });
 }
 
 /**
@@ -180,33 +180,33 @@ export async function updateAutomation(
     throw new Error("Database not configured");
   }
 
-  await setTenantContext(db, tenantId);
+  await withTenantContext(db, tenantId, async (tx) => {
+    // Verify ownership before update
+    const existing = await tx
+      .select()
+      .from(automations)
+      .where(
+        and(eq(automations.tenantId, tenantId), eq(automations.id, id))
+      )
+      .limit(1);
 
-  // Verify ownership before update
-  const existing = await db
-    .select()
-    .from(automations)
-    .where(
-      and(eq(automations.tenantId, tenantId), eq(automations.id, id))
-    )
-    .limit(1);
+    if (existing.length === 0) {
+      throw new Error("Automation not found or not authorized");
+    }
 
-  if (existing.length === 0) {
-    throw new Error("Automation not found or not authorized");
-  }
+    const payload: Record<string, unknown> = {
+      updatedAt: new Date().toISOString(),
+    };
 
-  const payload: Record<string, unknown> = {
-    updatedAt: new Date().toISOString(),
-  };
+    if (fields.name !== undefined) payload.name = fields.name;
+    if (fields.trigger !== undefined) payload.trigger = fields.trigger;
+    if (fields.action !== undefined)
+      payload.action = fields.action as any;
+    if (fields.condition !== undefined) payload.condition = fields.condition;
 
-  if (fields.name !== undefined) payload.name = fields.name;
-  if (fields.trigger !== undefined) payload.trigger = fields.trigger;
-  if (fields.action !== undefined)
-    payload.action = fields.action as Record<string, unknown>;
-  if (fields.condition !== undefined) payload.condition = fields.condition;
-
-  await db
-    .update(automations)
-    .set(payload)
-    .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+    await tx
+      .update(automations)
+      .set(payload)
+      .where(and(eq(automations.tenantId, tenantId), eq(automations.id, id)));
+  });
 }

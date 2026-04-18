@@ -24,7 +24,7 @@
   "https://designedbyanthony.com/ouredge": "sha256:38f0319e3b1400b70d871fa6c9cf53c1756c477c9fa0b2c120ced132378a218b",
   "https://designedbyanthony.com/portfolio": "sha256:973683714b43cfee7aa4d4be0dbe86c80a0fe01390e17eefd94637da79df1e95",
   "https://designedbyanthony.com/portfolio/the-long-beach-handyman": "sha256:e143b93b165f2fc740334694cc6a730522529a5081097f00e7d37dd0db85ba23",
-  "https://designedbyanthony.com/privacy": "sha256:febbe453854552dbebb9ca42ae6ad2f3ad69927be024ad0daf83bf9a0e9f24f6",
+  "https://designedbyanthony.com/privacy": "sha256:77a64952637bc0d47aa2ccd396044dae2923e3148dcd88a30e24bd2964966d22",
   "https://designedbyanthony.com/service-areas": "sha256:42a60f1e1b3ea5215b8978f7de2d565e92c4b1c422b43dba9a92b940fc042ffb",
   "https://designedbyanthony.com/service-areas/clinton": "sha256:d1b3d50e941150b56115f9df1a9824b28a2b75c14e32e705b919af4c5dd10f49",
   "https://designedbyanthony.com/service-areas/columbus": "sha256:bbccaef94f60d0fa914666575e24bd3eb8ce73460009312d8e6d187a91a279a1",
@@ -45,5 +45,5 @@
   "https://designedbyanthony.com/services/managed-hosting": "sha256:adec4cdf1759b37a20bea3b668cfdeef77652f41afe8aad69cc033393361e547",
   "https://designedbyanthony.com/services/website-rescue": "sha256:33182867ed858cbfab895cf5a6a5c276306e93176c38fadccfcc0e4ec777b9f1",
   "https://designedbyanthony.com/services/workspace-setup": "sha256:2a0798862b1eb9defe822de4fc64fa20b97a3c7ee3abd8ea097a72b7c1e591f2",
-  "https://designedbyanthony.com/terms": "sha256:502de360245f643f7f071069617cc1f7fd0a9d485cd9c5da4e33e2443845d928"
+  "https://designedbyanthony.com/terms": "sha256:64d93a5db872c5a5f97264a0e271b1ba8a2e3c60ed847e42442b30f9facc1e60"
 }

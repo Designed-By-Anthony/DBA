@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Bell, CheckCircle, AlertTriangle, Mail, UserPlus, ArrowRight } from "lucide-react";
@@ -70,7 +71,7 @@ export default function TopBar({
       try {
         const activities = await getRecentActivities(10);
         if (cancelled) return;
-        const mapped: Notification[] = activities.map((a) => ({
+        const mapped: Notification[] = activities.map((a: any) => ({
           id: a.id,
           type: a.type === "status_change" ? "info" as const :
                 a.type === "email_sent" || a.type === "email_opened" ? "email" as const :

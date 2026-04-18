@@ -4,7 +4,8 @@
  */
 import {
   getDb,
-  setTenantContext,
+  withTenantContext,
+  withBypassRls,
   emailSequences,
   sequenceEnrollments,
   leads,
@@ -34,36 +35,38 @@ export async function processEmailSequences(): Promise<{
     const now = new Date().toISOString();
 
     // Find all active enrollments that are due
-    const dueEnrollments = await db
-      .select()
-      .from(sequenceEnrollments)
-      .where(
-        and(
-          eq(sequenceEnrollments.status, "active"),
-          lte(sequenceEnrollments.nextRunAt, now),
-        ),
-      )
-      .limit(100);
+    const dueEnrollments = await withBypassRls(db, async (tx) => {
+      return tx
+        .select()
+        .from(sequenceEnrollments)
+        .where(
+          and(
+            eq(sequenceEnrollments.status, "active"),
+            lte(sequenceEnrollments.nextRunAt, now),
+          ),
+        )
+        .limit(100);
+    });
 
     for (const enrollment of dueEnrollments) {
       processed++;
 
       try {
-        await setTenantContext(db, enrollment.tenantId);
+        await withTenantContext(db, enrollment.tenantId, async (tx) => {
 
         // Get the sequence
-        const seqRows = await db
+        const seqRows = await tx
           .select()
           .from(emailSequences)
           .where(eq(emailSequences.id, enrollment.sequenceId))
           .limit(1);
 
         if (seqRows.length === 0 || !seqRows[0].isActive) {
-          await db
+          await tx
             .update(sequenceEnrollments)
             .set({ status: "completed", updatedAt: now })
             .where(eq(sequenceEnrollments.id, enrollment.id));
-          continue;
+          return;
         }
 
         const sequence = seqRows[0];
@@ -74,18 +77,18 @@ export async function processEmailSequences(): Promise<{
         }>) || [];
 
         if (enrollment.stepIndex >= steps.length) {
-          await db
+          await tx
             .update(sequenceEnrollments)
             .set({ status: "completed", updatedAt: now })
             .where(eq(sequenceEnrollments.id, enrollment.id));
-          continue;
+          return;
         }
 
         const step = steps[enrollment.stepIndex];
 
         // Get the lead
-        if (!enrollment.leadId) continue;
-        const leadRows = await db
+        if (!enrollment.leadId) return;
+        const leadRows = await tx
           .select()
           .from(leads)
           .where(
@@ -96,10 +99,10 @@ export async function processEmailSequences(): Promise<{
           )
           .limit(1);
 
-        if (leadRows.length === 0) continue;
+        if (leadRows.length === 0) return;
         const lead = leadRows[0];
 
-        if (lead.unsubscribed || !lead.email) continue;
+        if (lead.unsubscribed || !lead.email) return;
 
         // Send the email
         const result = await sendMail({
@@ -114,7 +117,7 @@ export async function processEmailSequences(): Promise<{
           sent++;
 
           // Record the email
-          await db.insert(emails).values({
+          await tx.insert(emails).values({
             tenantId: enrollment.tenantId,
             leadId: enrollment.leadId,
             leadEmail: lead.email,
@@ -130,7 +133,7 @@ export async function processEmailSequences(): Promise<{
         // Advance to next step
         const nextStepIndex = enrollment.stepIndex + 1;
         if (nextStepIndex >= steps.length) {
-          await db
+          await tx
             .update(sequenceEnrollments)
             .set({ status: "completed", stepIndex: nextStepIndex, updatedAt: now })
             .where(eq(sequenceEnrollments.id, enrollment.id));
@@ -138,7 +141,7 @@ export async function processEmailSequences(): Promise<{
           const nextStep = steps[nextStepIndex];
           const nextRunDate = new Date();
           nextRunDate.setDate(nextRunDate.getDate() + (nextStep.delayDays || 1));
-          await db
+          await tx
             .update(sequenceEnrollments)
             .set({
               stepIndex: nextStepIndex,
@@ -147,6 +150,7 @@ export async function processEmailSequences(): Promise<{
             })
             .where(eq(sequenceEnrollments.id, enrollment.id));
         }
+      });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errors.push(`Enrollment ${enrollment.id}: ${msg}`);

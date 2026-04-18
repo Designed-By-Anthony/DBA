@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, leads, activities } from '@dba/database';
+import { getDb, withBypassRls, leads, activities } from '@dba/database';
 import { eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
@@ -68,116 +68,119 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
     }
 
-    // Find existing prospect by email
-    const prospectRows = await db
-      .select()
-      .from(leads)
-      .where(eq(leads.emailNormalized, inviteeEmail))
-      .limit(1);
+    let prospectId: string | undefined;
 
-    let prospectId: string;
-    let tenantId: string;
+    await withBypassRls(db, async (tx) => {
+      // Find existing prospect by email
+      const prospectRows = await tx
+        .select()
+        .from(leads)
+        .where(eq(leads.emailNormalized, inviteeEmail))
+        .limit(1);
 
-    if (prospectRows.length === 0) {
-      // Create new lead under master tenant
-      const masterTenantId = 'org_3CKCZdvXprb2QAsroq4oxqH12Rl';
-      const now = new Date().toISOString();
-      const newProspectId = `cal_${Date.now()}`;
+      let tenantId: string;
 
-      await db.insert(leads).values({
-        tenantId: masterTenantId,
-        prospectId: newProspectId,
-        name: inviteeName,
-        email: inviteeEmail,
-        emailNormalized: inviteeEmail,
-        phone: payload.text_reminder_number || '',
-        company: '',
-        source: 'Calendly',
-        status: 'contacted',
-        tags: ['Calendly Booking'],
-        notes: `Booked: ${eventName}`,
-        metadata: { calendlyEventUrl: eventUrl },
-        createdAt: now,
-        updatedAt: now,
-      });
+      if (prospectRows.length === 0) {
+        // Create new lead under master tenant
+        const masterTenantId = 'org_3CKCZdvXprb2QAsroq4oxqH12Rl';
+        const now = new Date().toISOString();
+        const newProspectId = `cal_${Date.now()}`;
 
-      prospectId = newProspectId;
-      tenantId = masterTenantId;
-    } else {
-      const prospect = prospectRows[0];
-      prospectId = prospect.prospectId;
-      tenantId = prospect.tenantId;
-
-      const updates: Record<string, unknown> = {
-        lastContactedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      if (prospect.status === 'new') {
-        updates.status = 'contacted';
-      }
-
-      await db.update(leads).set(updates).where(eq(leads.prospectId, prospectId));
-    }
-
-    if (event === 'invitee.created') {
-      await db.insert(activities).values({
-        tenantId,
-        leadId: prospectId,
-        type: 'call_booked',
-        title: `Booked: ${eventName}`,
-        description: scheduledTime
-          ? `Scheduled for ${new Date(scheduledTime).toLocaleString('en-US', {
-              weekday: 'long', month: 'short', day: 'numeric',
-              hour: 'numeric', minute: '2-digit',
-            })}`
-          : 'Call scheduled',
-        metadata: {
-          eventName,
-          scheduledTime,
-          eventUrl,
-          inviteeEmail,
-        },
-        createdAt: new Date().toISOString(),
-      });
-
-      // Notify admin
-      try {
-        const safeInviteeName = escapeHtml(inviteeName);
-        const safeInviteeEmail = escapeHtml(inviteeEmail);
-        const safeEventName = escapeHtml(eventName);
-        await sendMail({
-          from: `Agency OS <${complianceConfig.fromEmail}>`,
-          to: [complianceConfig.adminNotificationEmail],
-          subject:
-            `📞 Call Booked: ` +
-            String(inviteeName || inviteeEmail).replace(/[\r\n]+/g, ' '),
-          html: `
-              <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
-                <h2 style="margin: 0 0 16px; color: #fff;">📞 New Booking</h2>
-                <p style="color: #ccc; margin: 0 0 8px;"><strong style="color: #fff;">${safeInviteeName}</strong> (${safeInviteeEmail})</p>
-                <p style="color: #ccc; margin: 0 0 8px;">Event: ${safeEventName}</p>
-                ${scheduledTime ? `<p style="color: #ccc; margin: 0 0 16px;">Time: ${escapeHtml(new Date(scheduledTime).toLocaleString())}</p>` : ''}
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/admin/prospects/${prospectId}"
-                  style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                  View in Agency OS →
-                </a>
-              </div>
-            `,
+        await tx.insert(leads).values({
+          tenantId: masterTenantId,
+          prospectId: newProspectId,
+          name: inviteeName,
+          email: inviteeEmail,
+          emailNormalized: inviteeEmail,
+          phone: payload.text_reminder_number || '',
+          company: '',
+          source: 'Calendly',
+          status: 'contacted',
+          tags: ['Calendly Booking'],
+          notes: `Booked: ${eventName}`,
+          metadata: { calendlyEventUrl: eventUrl },
+          createdAt: now,
+          updatedAt: now,
         });
-      } catch (e) {
-        console.error('Calendly notification email failed:', e);
+
+        prospectId = newProspectId;
+        tenantId = masterTenantId;
+      } else {
+        const prospect = prospectRows[0];
+        prospectId = prospect.prospectId;
+        tenantId = prospect.tenantId;
+
+        const updates: Record<string, unknown> = {
+          lastContactedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        if (prospect.status === 'new') {
+          updates.status = 'contacted';
+        }
+
+        await tx.update(leads).set(updates).where(eq(leads.prospectId, prospectId));
       }
-    } else if (event === 'invitee.canceled') {
-      await db.insert(activities).values({
-        tenantId,
-        leadId: prospectId,
-        type: 'note_added',
-        title: `Call cancelled: ${eventName}`,
-        description: cancelReason || 'No reason provided',
-        metadata: { eventName, cancelReason },
-        createdAt: new Date().toISOString(),
-      });
-    }
+
+      if (event === 'invitee.created') {
+        await tx.insert(activities).values({
+          tenantId,
+          leadId: prospectId,
+          type: 'call_booked',
+          title: `Booked: ${eventName}`,
+          description: scheduledTime
+            ? `Scheduled for ${new Date(scheduledTime).toLocaleString('en-US', {
+                weekday: 'long', month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit',
+              })}`
+            : 'Call scheduled',
+          metadata: {
+            eventName,
+            scheduledTime,
+            eventUrl,
+            inviteeEmail,
+          },
+          createdAt: new Date().toISOString(),
+        });
+
+        // Notify admin
+        try {
+          const safeInviteeName = escapeHtml(inviteeName);
+          const safeInviteeEmail = escapeHtml(inviteeEmail);
+          const safeEventName = escapeHtml(eventName);
+          await sendMail({
+            from: `Agency OS <${complianceConfig.fromEmail}>`,
+            to: [complianceConfig.adminNotificationEmail],
+            subject:
+              `📞 Call Booked: ` +
+              String(inviteeName || inviteeEmail).replace(/[\r\n]+/g, ' '),
+            html: `
+                <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #0a0a0f; color: #e0e0e0; border-radius: 12px;">
+                  <h2 style="margin: 0 0 16px; color: #fff;">📞 New Booking</h2>
+                  <p style="color: #ccc; margin: 0 0 8px;"><strong style="color: #fff;">${safeInviteeName}</strong> (${safeInviteeEmail})</p>
+                  <p style="color: #ccc; margin: 0 0 8px;">Event: ${safeEventName}</p>
+                  ${scheduledTime ? `<p style="color: #ccc; margin: 0 0 16px;">Time: ${escapeHtml(new Date(scheduledTime).toLocaleString())}</p>` : ''}
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/admin/prospects/${prospectId}"
+                    style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                    View in Agency OS →
+                  </a>
+                </div>
+              `,
+          });
+        } catch (e) {
+          console.error('Calendly notification email failed:', e);
+        }
+      } else if (event === 'invitee.canceled') {
+        await tx.insert(activities).values({
+          tenantId,
+          leadId: prospectId,
+          type: 'note_added',
+          title: `Call cancelled: ${eventName}`,
+          description: cancelReason || 'No reason provided',
+          metadata: { eventName, cancelReason },
+          createdAt: new Date().toISOString(),
+        });
+      }
+    });
 
     return NextResponse.json({ success: true, prospectId });
   } catch (error: unknown) {

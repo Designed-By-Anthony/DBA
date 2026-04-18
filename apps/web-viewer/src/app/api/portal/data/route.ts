@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(tickets.tenantId, session.tenantId),
-          eq(tickets.prospectId, session.prospectId),
+          eq(tickets.leadId, session.prospectId),
         ),
       )
       .orderBy(desc(tickets.createdAt))

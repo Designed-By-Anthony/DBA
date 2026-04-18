@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   getProspectById,
@@ -16,8 +16,6 @@ import {
   createCrmTask,
   updateCrmTask,
   deleteCrmTask,
-  listOtherProspectsWithSameEmail,
-  mergeProspectsIntoKeep,
 } from "../../actions";
 import { toast } from "sonner";
 import type { Prospect, Activity, EmailRecord, ProspectStatus, CrmTask } from "@/lib/types";
@@ -239,7 +237,6 @@ const activityIcons: Record<string, string> = {
 
 export default function ProspectDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const prospectId = params.id as string;
 
   const [prospect, setProspect] = useState<Prospect | null>(null);
@@ -251,10 +248,6 @@ export default function ProspectDetailPage() {
   const [savingNote, setSavingNote] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [sameEmailOthers, setSameEmailOthers] = useState<
-    { id: string; name: string; email: string }[]
-  >([]);
-  const [mergeBusy, setMergeBusy] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -283,44 +276,6 @@ export default function ProspectDetailPage() {
   useEffect(() => {
     queueMicrotask(() => void loadData());
   }, [loadData]);
-
-  useEffect(() => {
-    if (!prospectId) return;
-    void listOtherProspectsWithSameEmail(prospectId).then(setSameEmailOthers);
-  }, [prospectId, prospect?.email]);
-
-  const handleMergePair = async (keepId: string, mergeId: string) => {
-    if (
-      !confirm(
-        "Merge these records? History (emails, tickets, activities, tasks) will combine into the kept profile and the duplicate will be removed.",
-      )
-    ) {
-      return;
-    }
-    setMergeBusy(true);
-    try {
-      const res = await mergeProspectsIntoKeep(keepId, mergeId);
-      if (!res.success) {
-        toast.error(
-          res.error === "email_mismatch"
-            ? "Emails must match to merge."
-            : res.error === "forbidden"
-              ? "Not allowed."
-              : "Merge failed.",
-        );
-        return;
-      }
-      toast.success("Records merged.");
-      setSameEmailOthers([]);
-      if (keepId === prospectId) {
-        await loadData();
-      } else {
-        router.push(`/admin/prospects/${keepId}`);
-      }
-    } finally {
-      setMergeBusy(false);
-    }
-  };
 
   const handleStatusChange = async (newStatus: ProspectStatus) => {
     if (!prospect) return;
@@ -497,50 +452,6 @@ export default function ProspectDetailPage() {
           </select>
         </div>
       </div>
-
-      {sameEmailOthers.length > 0 && (
-        <div className="rounded-xl border border-amber-500/35 bg-amber-500/[0.07] px-4 py-3 text-sm">
-          <p className="text-amber-100 font-medium mb-2">
-            Same email as another record{sameEmailOthers.length > 1 ? "s" : ""}
-          </p>
-          <ul className="space-y-2">
-            {sameEmailOthers.map((d) => (
-              <li
-                key={d.id}
-                className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 text-text-muted"
-              >
-                <span className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/admin/prospects/${d.id}`}
-                    className="text-white font-medium hover:text-(--color-brand)"
-                  >
-                    {d.name || d.id}
-                  </Link>
-                  <span className="text-xs opacity-80">{d.email}</span>
-                </span>
-                <span className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={mergeBusy}
-                    onClick={() => void handleMergePair(prospectId, d.id)}
-                    className="text-xs px-2.5 py-1 rounded-lg bg-amber-500/25 text-amber-100 hover:bg-amber-500/35 disabled:opacity-50"
-                  >
-                    Merge into this record
-                  </button>
-                  <button
-                    type="button"
-                    disabled={mergeBusy}
-                    onClick={() => void handleMergePair(d.id, prospectId)}
-                    className="text-xs px-2.5 py-1 rounded-lg bg-surface-3 text-white hover:bg-surface-2 border border-glass-border disabled:opacity-50"
-                  >
-                    Keep theirs instead
-                  </button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Profile + Details */}

@@ -51,6 +51,8 @@ export async function POST(request: NextRequest) {
           name: data.name,
           verticalType: vertical,
           crmConfig,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         })
         .onConflictDoUpdate({
           target: tenants.clerkOrgId,
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
             name: data.name,
             verticalType: vertical,
             crmConfig,
+            updatedAt: new Date().toISOString(),
           },
         });
 

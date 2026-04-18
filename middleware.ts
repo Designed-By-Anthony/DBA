@@ -133,5 +133,26 @@ export default function middleware(request: Request, _ctx: RequestContext) {
   }
 
   // Apex + www + previews → fall through to Astro marketing site.
-  return next();
+  const res = next();
+  
+  // Apply security headers for the marketing site
+  res.headers.set('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "base-uri 'self'; " +
+    "object-src 'none'; " +
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: blob: https://images.unsplash.com; " +
+    "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com; " +
+    "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
+    "worker-src 'self' blob:; " +
+    "frame-ancestors 'none';"
+  );
+  res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()');
+  
+  return res;
 }

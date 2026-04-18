@@ -28,7 +28,7 @@ export async function PATCH(
     }
 
     const { id: ticketId } = await params;
-    const { adminReply, status } = (await request.json()) as { adminReply?: string; status?: string };
+    const { adminReply, status } = (await request.json()) as { adminReply?: string; status?: "open" | "in_progress" | "resolved" | "closed" };
 
     const currentRows = await database
       .select()
@@ -77,9 +77,9 @@ export async function PATCH(
       })
       .where(and(eq(tickets.id, ticketId), eq(tickets.tenantId, orgId)));
 
-    if (ticket.prospectEmail && hasReply) {
+    if (ticket.leadEmail && hasReply) {
       const safeFirstName = escapeHtml(
-        (ticket.prospectName || "there").split(" ")[0],
+        (ticket.leadName || "there").split(" ")[0],
       );
       const safeTicketSubject = escapeHtml(ticket.subject);
       const safeReply = escapeHtml(adminReply?.trim() || "");
@@ -89,7 +89,7 @@ export async function PATCH(
       try {
         await sendMail({
           from: `${complianceConfig.fromName} <${complianceConfig.fromEmail}>`,
-          to: [ticket.prospectEmail],
+          to: [ticket.leadEmail],
           // Subject is plain text; strip CRLF to prevent header injection.
           subject: `Re: ${String(ticket.subject).replace(/[\r\n]+/g, ' ')}`,
           html: `

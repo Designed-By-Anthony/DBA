@@ -1,6 +1,6 @@
 import type { VerticalId } from "@dba/database";
 
-const VERTICALS: VerticalId[] = ["restaurant", "service_pro", "florist", "agency"];
+const VERTICALS: VerticalId[] = ["restaurant", "service_pro", "wellness", "agency"];
 
 function isVertical(v: string): v is VerticalId {
   return (VERTICALS as string[]).includes(v);

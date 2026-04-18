@@ -2,7 +2,7 @@
  * Client ID generator — pure Drizzle, no Firestore.
  * Generates deterministic prospect IDs like "desi0001" from company/name.
  */
-import { getDb, setTenantContext, leads } from "@dba/database";
+import { getDb, withBypassRls, leads } from "@dba/database";
 import { eq, and, sql } from "drizzle-orm";
 
 /**
@@ -32,26 +32,28 @@ export async function generateClientId(prefix: string): Promise<string> {
   }
 
   try {
-    // Find the highest numbered prospect ID with this prefix
-    const pattern = `${prefix}%`;
-    const result = await db
-      .select({ prospectId: leads.prospectId })
-      .from(leads)
-      .where(sql`${leads.prospectId} LIKE ${pattern}`)
-      .orderBy(sql`${leads.prospectId} DESC`)
-      .limit(1);
+    return await withBypassRls(db, async (tx) => {
+      // Find the highest numbered prospect ID with this prefix
+      const pattern = `${prefix}%`;
+      const result = await tx
+        .select({ prospectId: leads.prospectId })
+        .from(leads)
+        .where(sql`${leads.prospectId} LIKE ${pattern}`)
+        .orderBy(sql`${leads.prospectId} DESC`)
+        .limit(1);
 
-    let nextNum = 1;
-    if (result.length > 0) {
-      const existing = result[0].prospectId;
-      const numPart = existing.substring(prefix.length);
-      const parsed = parseInt(numPart, 10);
-      if (!isNaN(parsed)) {
-        nextNum = parsed + 1;
+      let nextNum = 1;
+      if (result.length > 0) {
+        const existing = result[0].prospectId;
+        const numPart = existing.substring(prefix.length);
+        const parsed = parseInt(numPart, 10);
+        if (!isNaN(parsed)) {
+          nextNum = parsed + 1;
+        }
       }
-    }
 
-    return `${prefix}${nextNum.toString().padStart(4, "0")}`;
+      return `${prefix}${nextNum.toString().padStart(4, "0")}`;
+    });
   } catch {
     // Fallback on error
     const rand = Math.floor(Math.random() * 9999)
