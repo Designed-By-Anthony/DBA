@@ -1,0 +1,130 @@
+{
+  "hosting": {
+    "public": "dist",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "ignore": [
+      "static-headers.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/bingsiteauth.xml",
+        "destination": "/BingSiteAuth.xml",
+        "type": 301
+      },
+      {
+        "source": "/service-areas/central-ny",
+        "destination": "/service-areas/rome",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/report/**",
+        "destination": "/report.html"
+      }
+    ],
+    "headers": [
+      {
+        "regex": "^/(thank-you|facebook-offer|404)$",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
+      },
+      {
+        "regex": "^/report(?:/.*)?$",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(css|js|webp|png|jpg|jpeg|svg|woff2)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "regex": "^/$",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=63072000; includeSubDomains; preload"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' data: 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob: https://s3.amazonaws.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://designedbyanthony.com https://www.google.com https://www.gstatic.com https://*.googleapis.com https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com https://challenges.cloudflare.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com; trusted-types * 'allow-duplicates'; require-trusted-types-for 'script'"
+          },
+          {
+            "key": "Content-Security-Policy-Report-Only",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob: https://s3.amazonaws.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://designedbyanthony.com https://www.google.com https://www.gstatic.com https://*.googleapis.com https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com https://challenges.cloudflare.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com; trusted-types * 'allow-duplicates'; require-trusted-types-for 'script'"
+          }
+        ]
+      },
+      {
+        "regex": "^/[^/.]+(?:/[^/.]+)*$",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=63072000; includeSubDomains; preload"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' data: 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob: https://s3.amazonaws.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://designedbyanthony.com https://www.google.com https://www.gstatic.com https://*.googleapis.com https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com https://challenges.cloudflare.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com; trusted-types * 'allow-duplicates'; require-trusted-types-for 'script'"
+          },
+          {
+            "key": "Content-Security-Policy-Report-Only",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob: https://s3.amazonaws.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://designedbyanthony.com https://www.google.com https://www.gstatic.com https://*.googleapis.com https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com https://challenges.cloudflare.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src 'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com; media-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app https://admin.designedbyanthony.com; trusted-types * 'allow-duplicates'; require-trusted-types-for 'script'"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "SAMEORIGIN"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=63072000; includeSubDomains; preload"
+          },
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin-allow-popups"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=(), xr-spatial-tracking=()"
+          }
+        ]
+      }
+    ]
+  }
+}

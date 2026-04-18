@@ -6,7 +6,7 @@
 - NEVER create redundant sub-folders for logic that belongs in /packages.
 
 ## 2. The "Augusta" Security Protocol
-- DATABASE: Postgres 18 (34.172.29.180).
+- DATABASE: Neon Postgres (`DATABASE_URL`).
 - TENANT LOCK: Every query in /apps must filter by 'agencyId'. 
 - Cross-tenant data leakage is a critical failure.
 

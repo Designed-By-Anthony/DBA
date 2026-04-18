@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { gotoPage } from './helpers/navigation';
 
-// Skip these tests until we mock Firebase/Stripe/Google instances or use a dedicated staging sandbox
+// Skip these tests until we mock Stripe/Google instances or use a dedicated staging sandbox
 test.describe('🔥 Fire Tests (Critical Paths)', () => {
   
   test('Lead Intake Pipeline: Form submit populates Kanban', async ({ request, page }) => {

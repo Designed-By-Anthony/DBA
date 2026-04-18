@@ -34,29 +34,27 @@ const specs = {
 
 const defaultBaseURL = 'http://127.0.0.1:4321';
 /**
- * Firebase Hosting emulator (applies `firebase.json` headers: CSP, HSTS, etc.).
- * Port must match `firebase.json` → `emulators.hosting.port`. Default 5500 avoids macOS
- * AirPlay Receiver / other apps that bind :5000.
+ * Static parity server (applies `static-headers.json` headers: CSP, HSTS, etc.).
+ * Port 5500 avoids macOS AirPlay Receiver / other apps that bind :5000.
  */
-/** Keep in sync with `firebase.json` → `emulators.hosting.port`. */
-const HOSTING_EMULATOR_PORT = '5500';
-const firebaseHostingEmulatorURL = `http://127.0.0.1:${HOSTING_EMULATOR_PORT}`;
+const PARITY_PORT = '5500';
+const parityServerURL = `http://127.0.0.1:${PARITY_PORT}`;
 
-const useFirebaseHostingEmulator = process.env.PLAYWRIGHT_USE_FIREBASE_EMULATOR === '1';
+const useParityStaticServer = process.env.PLAYWRIGHT_USE_STATIC_PARITY_SERVER === '1';
 const explicitBaseURL = process.env.BASE_URL;
 const baseURL =
-  explicitBaseURL ?? (useFirebaseHostingEmulator ? firebaseHostingEmulatorURL : defaultBaseURL);
+  explicitBaseURL ?? (useParityStaticServer ? parityServerURL : defaultBaseURL);
 
 const skipWebServer = !!process.env.PLAYWRIGHT_SKIP_WEBSERVER;
 
-const startFirebaseHostingEmulator =
+const startParityStaticServer =
   !skipWebServer &&
-  useFirebaseHostingEmulator &&
-  (!explicitBaseURL || explicitBaseURL === firebaseHostingEmulatorURL);
+  useParityStaticServer &&
+  (!explicitBaseURL || explicitBaseURL === parityServerURL);
 
 const startAstroPreview =
   !skipWebServer &&
-  !useFirebaseHostingEmulator &&
+  !useParityStaticServer &&
   (!explicitBaseURL || explicitBaseURL === defaultBaseURL);
 
 /**
@@ -81,8 +79,8 @@ function shWebServerCommand(inner: string): string {
  * Default: build + `astro preview`, then test at 127.0.0.1:4321.
  *
  * Production-parity headers (CSP, Trusted Types, HSTS):
- *   PLAYWRIGHT_USE_FIREBASE_EMULATOR=1 npm run test:e2e
- *   → build + `firebase emulators:start --only hosting` at 127.0.0.1:5500 (see `firebase.json` emulators)
+ *   PLAYWRIGHT_USE_STATIC_PARITY_SERVER=1 npm run test:e2e
+ *   → build + `node scripts/static-parity-server.mjs` at 127.0.0.1:5500 (see static-headers.json)
  *
  * Live site: BASE_URL=https://designedbyanthony.com PLAYWRIGHT_SKIP_WEBSERVER=1
  */
@@ -103,13 +101,13 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
-  ...(startFirebaseHostingEmulator
+  ...(startParityStaticServer
     ? {
         webServer: {
           command: shWebServerCommand(
-            'npm run build && npx firebase emulators:start --only hosting --project dba-website-prod',
+            'npm run build && node scripts/static-parity-server.mjs',
           ),
-          url: firebaseHostingEmulatorURL,
+          url: parityServerURL,
           timeout: 300_000,
           reuseExistingServer: false,
         },

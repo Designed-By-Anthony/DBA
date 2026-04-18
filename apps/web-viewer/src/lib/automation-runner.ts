@@ -82,7 +82,7 @@ const handlers: ActionHandlers = {
   },
 
   add_tag: async (action, { event }) => {
-    // Tag writes land on the legacy Firestore shim for now; real SQL tag
+    // Tag writes: extend here when SQL-backed tags are wired through the pipeline.
     // column lands with the Kanban SQL migration. We still log it so the
     // audit trail is accurate.
     return { ok: true, detail: `tagged ${event.prospectId ?? ""} with "${action.payload.tag}"` };

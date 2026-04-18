@@ -11,8 +11,8 @@
     "predev": "pnpm run build:site-script",
     "dev": "astro dev",
     "dev:spotlight": "SPOTLIGHT=1 astro dev",
-    "sync:firebase-csp": "node build/sync-firebase-csp.mjs",
-    "prebuild": "pnpm run build:site-script && pnpm run sync:firebase-csp",
+    "sync:static-headers": "node build/sync-static-headers.mjs",
+    "prebuild": "pnpm run build:site-script && pnpm run sync:static-headers",
     "build": "node build/run-astro-build.mjs",
     "prepreview": "pnpm run build:site-script",
     "preview": "astro preview",
@@ -51,7 +51,7 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "esbuild": "^0.28.0",
-    "firebase-tools": "^15.14.0"
+    "minimatch": "^10.2.5"
   },
   "overrides": {
     "yaml-language-server": {

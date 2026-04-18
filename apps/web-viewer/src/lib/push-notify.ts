@@ -1,5 +1,5 @@
 /**
- * Web Push (VAPID) — pure Drizzle, no Firebase.
+ * Web Push (VAPID) — pure Drizzle + Postgres.
  * Reads push subscriptions from the `push_subscriptions` table.
  */
 import webpush from "web-push";

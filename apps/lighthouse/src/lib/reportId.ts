@@ -45,7 +45,7 @@ export function randomSuffix(): string {
   return out;
 }
 
-/** Full report ID. Caller is responsible for collision-checking against Firestore. */
+/** Full report ID. Caller is responsible for collision-checking against the report store. */
 export function buildReportId(company: string, url: string): string {
   return `DBA-${buildPrefix(company, url)}${randomSuffix()}`;
 }

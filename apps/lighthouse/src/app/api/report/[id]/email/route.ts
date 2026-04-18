@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db, Timestamp, FieldValue, REPORTS_COLLECTION } from '@/lib/firestore';
+import { db, Timestamp, FieldValue, REPORTS_COLLECTION } from '@/lib/report-store';
 import { isValidReportId } from '@/lib/reportId';
 import { buildReceiptEmail, isGmailConfigured, sendViaGmail } from '@/lib/gmail';
 import { buildCorsHeaders } from '@/lib/http';

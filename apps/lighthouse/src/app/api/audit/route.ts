@@ -1,5 +1,5 @@
 import { after, NextResponse } from 'next/server';
-import { db, Timestamp, REPORTS_COLLECTION } from '@/lib/firestore';
+import { db, Timestamp, REPORTS_COLLECTION } from '@/lib/report-store';
 import { buildReportId, buildPrefix, randomSuffix } from '@/lib/reportId';
 import { pushLeadRow, createProjectSheet } from '@/lib/sheetsSync';
 import { generateAiInsight, buildFallbackInsight } from '@/lib/ai';
@@ -30,7 +30,7 @@ async function readPageSpeedErrorMessage(response: Response): Promise<string | u
 }
 
 /**
- * Writes the report to Firestore with collision-safe ID generation.
+ * Writes the report to the in-memory store with collision-safe ID generation.
  * Uses `doc.create()` which fails if the doc already exists, and retries
  * up to 3 times with a fresh random suffix if there's a collision.
  */
@@ -540,7 +540,7 @@ export async function POST(request: Request) {
     try {
       reportId = await createReportWithUniqueId(prefix, payload);
     } catch (fsErr) {
-      console.error('Firestore write failed:', fsErr instanceof Error ? fsErr.message : fsErr);
+      console.error('Report store write failed:', fsErr instanceof Error ? fsErr.message : fsErr);
       reportId = buildReportId(company, url);
       reportPersisted = false;
     }

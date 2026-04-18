@@ -9,7 +9,7 @@ import type { TenantRow } from "@dba/database";
 
 export default function SettingsPage() {
   const { organization } = useOrganization();
-  const [tenant, setTenant] = useState<TenantRow | null>(null);
+  const [, setTenant] = useState<TenantRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);

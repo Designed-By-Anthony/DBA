@@ -2,7 +2,7 @@
  * Seed the platform master tenant (Designed By Anthony).
  * Usage (from repo root or packages/database):
  *   DATABASE_URL="postgresql://..." node scripts/seed-master-tenant.mjs
- * Optional: DATABASE_SSL=true for Cloud SQL TLS.
+ * Optional: DATABASE_SSL=true when your host requires explicit TLS flags.
  */
 import pg from "pg";
 

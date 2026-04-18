@@ -1,0 +1,144 @@
+---
+/**
+ * Consumer-friendly trust strip: where the site and CRM run (Neon, Vercel, Cloudflare, Next.js).
+ * Outcome-first copy; brand names support credibility without a spec sheet.
+ */
+interface Props {
+  variant?: 'default' | 'compact';
+}
+
+const { variant = 'default' } = Astro.props;
+
+const items = [
+  {
+    brand: 'Neon',
+    headline: 'Data you can count on',
+    body: 'Your leads and records sit in reliable cloud Postgres — built to stay fast, consistent, and ready when you need them.',
+  },
+  {
+    brand: 'Vercel',
+    headline: 'Speed everywhere',
+    body: 'Your marketing site is delivered worldwide on a modern edge network so first impressions feel instant — especially on phones.',
+  },
+  {
+    brand: 'Cloudflare',
+    headline: 'Protection in front of your business',
+    body: 'Extra shielding against bots, spam, and abuse — so junk stops before it floods your inbox or your forms.',
+  },
+  {
+    brand: 'Next.js CRM',
+    headline: 'Pipeline clarity',
+    body: 'When it is time to track follow-ups and client work, the experience is a polished Next.js app — quick, responsive, and built for real teams.',
+  },
+];
+---
+
+<section
+  class:list={['consumer-trust-stack', variant === 'compact' && 'consumer-trust-stack--compact']}
+  aria-labelledby="consumer-trust-heading"
+>
+  <div class="section-container">
+    <div class="consumer-trust-stack__header">
+      <p class="section-eyebrow">Peace of mind</p>
+      <h2 id="consumer-trust-heading" class="consumer-trust-stack__title">
+        {variant === 'compact'
+          ? 'Modern foundations visitors never have to think about'
+          : 'Built on tools customers trust — for speed, safety, and follow-up'}
+      </h2>
+      <p class="consumer-trust-stack__lede">
+        You should not need a glossary to feel confident. Here is the plain-English version of what runs under the hood when we host your site and power your CRM.
+      </p>
+    </div>
+    <ul class="consumer-trust-stack__grid">
+      {
+        items.map((item) => (
+          <li class="surface-card consumer-trust-stack__card reveal-up">
+            <span class="consumer-trust-stack__brand">{item.brand}</span>
+            <h3 class="consumer-trust-stack__headline">{item.headline}</h3>
+            <p class="consumer-trust-stack__body">{item.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .consumer-trust-stack {
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .consumer-trust-stack__header {
+    max-width: 46rem;
+    margin-inline: auto;
+    text-align: center;
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  .consumer-trust-stack__title {
+    font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+    line-height: 1.25;
+    margin: 0.35rem 0 0.75rem;
+  }
+
+  .consumer-trust-stack__lede {
+    margin: 0;
+    color: var(--color-text-muted, inherit);
+    line-height: 1.6;
+    font-size: 1.02rem;
+  }
+
+  .consumer-trust-stack__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .consumer-trust-stack__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .consumer-trust-stack__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .consumer-trust-stack__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 1.25rem 1.35rem;
+  }
+
+  .consumer-trust-stack__brand {
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-accent, #5b9cf8);
+  }
+
+  .consumer-trust-stack__headline {
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .consumer-trust-stack__body {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-text-muted, inherit);
+  }
+
+  .consumer-trust-stack--compact .consumer-trust-stack__lede {
+    font-size: 0.98rem;
+  }
+</style>

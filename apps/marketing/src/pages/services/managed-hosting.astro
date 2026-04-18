@@ -1,4 +1,5 @@
 ---
+import ConsumerTrustStack from '../../components/ConsumerTrustStack.astro';
 import ServiceDetailPage from '../../components/ServiceDetailPage.astro';
 import { evidenceLinks } from '../../data/evidence';
 import { MONTHLY_LOCAL_SEO_PRICE } from '../../lib/offers';
@@ -220,4 +221,8 @@ const relatedArticles = [
   pricingSection={pricingSection}
   ctaTitle="Never worry about your website again."
   ctaDescription="Start with the free audit and we will tell you whether you need hosting, SEO maintenance, or both."
-/>
+>
+  <div slot="mid-content" class="section-shell section-shell--wash">
+    <ConsumerTrustStack variant="compact" />
+  </div>
+</ServiceDetailPage>

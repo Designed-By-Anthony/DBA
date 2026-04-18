@@ -4,7 +4,7 @@ import { gotoPage } from './helpers/navigation';
 /**
  * API Health Check Tests
  * Verifies key API routes respond correctly.
- * Does NOT test actual business logic (Firestore/Stripe/Google).
+ * Does NOT test actual business logic (Postgres/Stripe/Google).
  */
 test.describe('API Health Checks', () => {
 

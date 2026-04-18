@@ -15,6 +15,10 @@ Verification checklist ([Clerk Next.js quickstart](https://clerk.com/docs/nextjs
 
 Use **`<Show when="signed-in">`** / **`<Show when="signed-out">`** for new UI instead of legacy signed-in/out wrappers.
 
+## Data layer (Neon Postgres)
+
+- **`DATABASE_URL`** — Neon connection string (pooled URL for the app; use the direct / unpooled host for `pnpm db:push` / `drizzle-kit` when Neon requires it).
+- **`@dba/database`** — Drizzle + `pg`; `withTenantContext` sets `app.current_tenant_id` for RLS. No Firebase or Google Cloud SQL.
 ## Compliance (DoD / HIPAA-oriented)
 
 See root `AGENTS.md` → **Compliance bar**. For Agency OS specifically:

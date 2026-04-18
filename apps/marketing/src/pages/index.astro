@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import AuditForm from '../components/AuditForm.astro';
 import FoundingPartnerSection from '../components/FoundingPartnerSection.astro';
 import PremiumPitchStrip from '../components/PremiumPitchStrip.astro';
+import ConsumerTrustStack from '../components/ConsumerTrustStack.astro';
 import { Image } from 'astro:assets';
 import { showcaseFeaturedItems } from '../data/showcase';
 import { buildFaqPageSchema, buildItemListSchema, buildLighthouseSoftwareApplicationSchema } from '../lib/seo';
@@ -211,6 +212,10 @@ const homeFooterCta = {
 
   <section class="section-shell section-shell--premium-pitch">
     <PremiumPitchStrip variant="home" />
+  </section>
+
+  <section class="section-shell section-shell--wash">
+    <ConsumerTrustStack />
   </section>
 
   <section class="section-shell section-shell--proof command-shell">

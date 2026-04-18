@@ -24,11 +24,13 @@ test.describe('RSS and release feeds', () => {
 });
 
 test.describe('HTTP behavior', () => {
-  test('legacy central-ny service area redirects to Rome (Firebase Hosting)', async ({ request }) => {
+  test('legacy central-ny service area redirects to Rome (static parity / edge)', async ({
+    request,
+  }) => {
     const response = await request.get('/service-areas/central-ny', { maxRedirects: 0 });
     test.skip(
       response.status() === 404,
-      'firebase.json redirects run on Firebase Hosting only; astro preview returns 404 for this path.',
+      'static-headers.json redirects apply on parity server / edge; astro preview returns 404 for this path.',
     );
     expect(response.status()).toBe(301);
     const loc = response.headers()['location'] ?? '';

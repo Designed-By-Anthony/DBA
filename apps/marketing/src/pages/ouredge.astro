@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ConsumerTrustStack from '../components/ConsumerTrustStack.astro';
 import SourceList from '../components/SourceList.astro';
 import { evidenceLinks } from '../data/evidence';
 import { buildItemListSchema } from '../lib/seo';
@@ -145,6 +146,8 @@ const edgeFooterCta = {
       </div>
     </div>
   </section>
+
+  <ConsumerTrustStack variant="compact" />
 
   <section class="section-shell">
     <div class="section-container">

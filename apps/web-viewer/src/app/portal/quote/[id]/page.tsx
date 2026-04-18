@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
  * is not yet migrated to Neon. Will be re-enabled once the
  * quotes schema is pushed.
  */
-export default async function PortalQuotePage(_props: { params: { id: string } }) {
+export default async function PortalQuotePage(props: { params: { id: string } }) {
+  void props;
   notFound();
 }

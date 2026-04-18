@@ -10,8 +10,8 @@
     "lint": "eslint",
     "verify:webhook": "node scripts/verify-lead-webhook.mjs",
     "test": "playwright test",
-    "test:no-emu-server": "E2E_NO_FIRESTORE_EMULATOR=1 playwright test",
-    "test:pw": "E2E_NO_FIRESTORE_EMULATOR=1 playwright test",
+    "test:no-emu-server": "playwright test",
+    "test:pw": "playwright test",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report"
   },

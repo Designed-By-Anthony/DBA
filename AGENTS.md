@@ -4,7 +4,7 @@
 - **Root-Only Execution:** All builds and installs must run from the root `./`.
 - **Absolute Monorepo Paths:** Never use relative imports like `../../packages`. Always use workspace protocols: `@dba/database`, `@dba/theme`, `@dba/ui`.
 - **Zero-Trust Multi-Tenancy:** Every database query MUST be scoped with `agencyId`. If a function lacks a tenant filter, it is a critical security bug.
-- **SQL-First:** Firestore is deprecated. Any new feature must use Drizzle + Postgres 18.
+- **SQL-First:** Any new feature must use Drizzle + Postgres (production: **Neon**). Do not add Firebase or other legacy BaaS client SDKs.
 
 ## VERBATIM SYSTEM MAPPING
 - **Sales Term:** "Agency" or "Agency OS"
@@ -15,7 +15,7 @@
 **Note to Agent:** While the user may refer to "Agency ID," all Drizzle queries MUST use the schema-defined `tenant_id` or `clerk_org_id` to maintain Postgres 18 integrity.
 
 ## Infrastructure Context
-- **Database:** Postgres 18 live at `34.172.29.180`.
+- **Database:** **Neon** Postgres (connection string in `DATABASE_URL` / `DATABASE_URL_UNPOOLED`). `@dba/database` uses `pg` + Drizzle with interactive transactions for tenant RLS (`withTenantContext`).
 - **Auth:** Clerk-managed. `orgId` maps to `tenants.clerkOrgId`.
 - **Routing:** Handled by root `middleware.ts`.
 - **Apps:**
@@ -37,8 +37,8 @@ Treat **regulated-data expectations** as the default for this monorepo (even whe
 When in doubt, choose the option that **discloses less** to clients and third parties.
 
 ## Code Quality & Purge Rules
-- **Search Before Write:** Before adding a feature, check if a legacy Firebase version exists. If it does, delete it first.
-- **Cleanup Duty:** After every feature completion, search for and remove unused imports, `console.log` statements, and any string containing "firebase".
+- **Search Before Write:** Before adding a feature, check if a legacy or duplicate implementation exists. If it does, delete it first.
+- **Cleanup Duty:** After every feature completion, search for and remove unused imports and `console.log` statements.
 - **Strict Typing:** No `any`. Use Zod for schema validation on all API inputs and JSONB columns.
 
 ## Communication Preferences
@@ -49,7 +49,7 @@ When in doubt, choose the option that **discloses less** to clients and third pa
 ## Definition of Done
 A task is only **Done** when all three are true:
 1. It passes `pnpm turbo build` (a.k.a. `pnpm build`) from the repo root with zero errors.
-2. It has been audited by BugBot (self-review pass: tenant scoping, Zod on inputs, no `any`, no orphaned Firebase strings, no stray `console.log`, no unused imports).
+2. It has been audited by BugBot (self-review pass: tenant scoping, Zod on inputs, no `any`, no stray `console.log`, no unused imports).
 3. The logo / branding renders **unbroken** on every affected surface — `/brand/logo.png` and `/brand/mark.webp` resolve, `@dba/theme` tokens are intact, and no subdomain is serving a fallback mark.
 
 ---
@@ -73,12 +73,12 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 └── packages/
     ├── dba-theme/           # @dba/theme — global CSS tokens + brand assets
     ├── lead-form-contract/  # @dba/lead-form-contract — shared lead payload schema
-    └── database/            # @dba/database — Drizzle schema + Cloud SQL client
+    └── database/            # @dba/database — Drizzle schema + Postgres client (`pg`)
 ```
 
 Per-app agent rules (read these before editing inside an app):
 
-- `apps/marketing/AGENTS.md` — Astro site, Playwright projects, IndexNow, Firebase Hosting emulator, Spotlight gotcha.
+- `apps/marketing/AGENTS.md` — Astro site, Playwright projects, IndexNow, static parity headers for E2E, Spotlight gotcha.
 - `apps/web-viewer/AGENTS.md` — Next.js 16 (read `node_modules/next/dist/docs/` before coding; APIs differ from training data).
 - `apps/lighthouse/AGENTS.md` — Same Next.js 16 caveat.
 
@@ -133,7 +133,7 @@ When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update 
 
 ### Data layer — `@dba/database`
 
-- Drizzle ORM against Cloud SQL (Postgres 18 — see **Infrastructure Context**). Schema in `packages/database/schema.ts`.
+- Drizzle ORM against Neon Postgres (see **Infrastructure Context**). Schema in `packages/database/schema.ts`.
 - Tenant-scoped tables include `tenants`, `sites`, `leads`, `automations`, `tickets`, plus portal token/session tables.
 - Tenant key in SQL is `clerk_org_id` (column) / `tenantId` (Drizzle field) / `agencyId` (guardrail wording). Every query **must** filter on it — see **Zero-Trust Multi-Tenancy**.
 - Agency OS reads `DATABASE_URL` (and optional `DATABASE_SSL=true`) from `apps/web-viewer/.env.local`.
@@ -158,10 +158,10 @@ Apex project requires `ADMIN_UPSTREAM_URL`, `ACCOUNTS_UPSTREAM_URL`, `LIGHTHOUSE
 
 ### Migration / cleanup notes
 
-`STATUS.md` tracks the in-progress Firebase → Cloud SQL migration. When touching `apps/web-viewer/src` you may still see transitional `@/lib/firebase` imports and Firestore-shaped modules — per **Search Before Write** + **Cleanup Duty**, delete the Firebase version when you replace it, and grep for stray `firebase` strings before closing the task. Do not reintroduce Firebase deps to `apps/lighthouse` or `packages/database` (both are clean).
+`STATUS.md` tracks migration and security work. Data layer is Drizzle + Postgres only; do not reintroduce Firebase or other legacy BaaS client SDKs to app bundles.
 
 ### Cursor Cloud specific instructions
 
 - The cloud agent VM ships with pnpm + Node 22; run `pnpm install` at the repo root before any build/test if `node_modules` is missing.
-- Per-app `AGENTS.md` files contain additional Cursor-Cloud-specific testing notes (especially `apps/marketing/AGENTS.md` for Playwright projects and the Firebase Hosting emulator on `127.0.0.1:5500`).
+- Per-app `AGENTS.md` files contain additional Cursor-Cloud-specific testing notes (especially `apps/marketing/AGENTS.md` for Playwright and the static parity server on `127.0.0.1:5500`).
 - Branch + PR conventions for cloud agents: create branches as `cursor/<descriptive-name>-<suffix>`, commit small logical changes, and open a PR per branch.

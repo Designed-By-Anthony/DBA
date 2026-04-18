@@ -1,5 +1,5 @@
 /**
- * Prospect email utilities — pure Drizzle, no Firestore.
+ * Prospect email utilities — pure Drizzle + Postgres.
  */
 import { getDb, withTenantContext, withBypassRls, leads } from "@dba/database";
 import { eq, and } from "drizzle-orm";

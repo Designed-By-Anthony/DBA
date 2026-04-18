@@ -1,5 +1,5 @@
 /**
- * Email sequence processor — pure Drizzle, no Firestore.
+ * Email sequence processor — pure Drizzle + Postgres.
  * Processes active email sequence enrollments and sends the next step.
  */
 import {

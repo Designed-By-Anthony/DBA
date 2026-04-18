@@ -3,14 +3,14 @@ import { rejectCookieConsentIfPresent } from './helpers';
 import { isConsoleMessageAllowed } from './console-allowlist';
 
 /**
- * Runs only against Firebase Hosting emulator (real CSP headers).
+ * Runs only against the static parity server (real CSP headers).
  * Declines analytics so GTM does not load — keeps console closer to "ours only".
  * Third-party widgets (Turnstile) may still log; add allowlist entries only when justified.
  */
-test.describe('Console / page errors (Hosting emulator, analytics declined)', () => {
+test.describe('Console / page errors (static parity, analytics declined)', () => {
   test.beforeEach(() => {
     test.skip(
-      process.env.PLAYWRIGHT_USE_FIREBASE_EMULATOR !== '1',
+      process.env.PLAYWRIGHT_USE_STATIC_PARITY_SERVER !== '1',
       'Use: npm run test:security-headers or npm run test:e2e:hosting (playwright.hosting.config.ts)',
     );
   });
@@ -39,7 +39,7 @@ test.describe('Console / page errors (Hosting emulator, analytics declined)', ()
     expect(pageErrors, `Uncaught page errors: ${pageErrors.join(' | ')}`).toEqual([]);
     expect(
       consoleErrors,
-      `Console errors (not allowlisted): ${consoleErrors.join(' | ')}`,
+      `Console errors not allowlisted: ${consoleErrors.join(' | ')}`,
     ).toEqual([]);
   });
 });

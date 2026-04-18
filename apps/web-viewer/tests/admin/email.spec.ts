@@ -28,7 +28,7 @@ test.describe('Email Composer', () => {
     const recipientField = page.getByPlaceholder(/recipient|prospect|to/i)
       .or(page.getByLabel(/recipient|prospect|to/i))
       .or(page.getByText(/select prospect|recipient/i));
-    // Just check it exists — actual data depends on Firestore
+    // Just check it exists — actual data depends on CRM / Postgres
     const count = await recipientField.count();
     expect(count).toBeGreaterThanOrEqual(0);
   });
@@ -62,7 +62,7 @@ test.describe('Email History', () => {
   });
 
   test('history entries show key metadata when present', async ({ page }) => {
-    // Wait for firebase loading to finish
+    // Wait for async UI to settle
     await expect(page.getByText('Loading...')).not.toBeVisible({ timeout: 10000 });
     
     const rowCount = await page.locator('.divide-y > div').count();

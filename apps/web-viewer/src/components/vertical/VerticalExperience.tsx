@@ -4,8 +4,8 @@ import KitchenDisplay from "./KitchenDisplay";
 import JobEstimator from "./JobEstimator";
 
 /**
- * Server wrapper: reads `tenant.vertical` from Cloud SQL and renders vertical-specific CRM chrome.
- * When `DATABASE_URL` is unset or no row exists, only `children` render (legacy Firestore-only mode).
+ * Server wrapper: reads `tenant.vertical` from Postgres (Neon) and renders vertical-specific CRM chrome.
+ * When `DATABASE_URL` is unset or no row exists, only `children` render.
  */
 export default async function VerticalExperience({ children }: { children: React.ReactNode }) {
   const { orgId } = await auth();

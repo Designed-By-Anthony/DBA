@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Cross-platform: runs Playwright with `playwright.hosting.config.ts` (Firebase Hosting emulator + production headers).
+ * Cross-platform: runs Playwright with `playwright.hosting.config.ts` (static parity server + production headers).
  * Use: npm run test:e2e:hosting
  * Extra args: npm run test:e2e:hosting -- e2e/security-headers.spec.ts
  */

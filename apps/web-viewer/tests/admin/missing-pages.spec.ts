@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { gotoPage } from "../helpers/navigation";
 
 /**
- * These pages are largely server-driven and may depend on server actions/Firestore.
+ * These pages are largely server-driven and may depend on server actions / Postgres.
  * For audit coverage, we assert they render a stable shell (no 500 / no Application Error)
  * and expose a primary heading or obvious UI landmark.
  */

@@ -27,7 +27,7 @@ function safeHttpUrl(raw: string): string | null {
 /**
  * Creates/updates prospect, activity, admin notification, optional submitter confirmation.
  * Used by /api/webhooks/lead and /api/lead.
- * Pure SQL — no Firestore.
+ * Pure SQL (Drizzle + Postgres).
  */
 export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadIntakeResult> {
   const agencyId = await resolveLeadAgencyId(fields.agencyId);
@@ -54,7 +54,7 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
   let prospectId: string;
   let isNew = true;
 
-  // SQL (Neon Postgres 17) is the sole source of truth.
+  // SQL (Neon Postgres) is the sole source of truth.
   let sqlResult: { prospectId: string; isNew: boolean } | null = null;
   if (agencyId) {
     try {

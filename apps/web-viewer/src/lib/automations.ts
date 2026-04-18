@@ -6,10 +6,19 @@ import {
   activities,
   notifications,
   type AutomationRow,
+  type Database,
 } from "@dba/database";
 import { eq, and } from "drizzle-orm";
 import { sendProspectEmailFromTemplate } from "@/lib/prospect-email";
-import type { AutomationAction, AutomationTrigger } from "./types";
+import type { AutomationTrigger } from "./types";
+
+/** JSONB action shape from `automations.action` (may include legacy / DB-only kinds). */
+type AutomationEngineAction = {
+  type: string;
+  payload?: Record<string, unknown>;
+};
+
+type TenantTx = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 /**
  * Automations Core Engine
@@ -34,7 +43,7 @@ export async function processAutomations(
           and(
             eq(automations.tenantId, agencyId),
             eq(automations.isActive, true),
-            eq(automations.trigger, trigger as any)
+            eq(automations.trigger, trigger as AutomationRow["trigger"])
           )
         );
 
@@ -47,7 +56,7 @@ export async function processAutomations(
           tx,
           agencyId,
           prospectId,
-          rule.action as any as AutomationAction,
+          rule.action as unknown as AutomationEngineAction,
           triggerData,
           ruleName
         );
@@ -65,10 +74,10 @@ export async function processAutomations(
  * Executes a single automation action
  */
 async function executeRuleAction(
-  db: any,
+  db: TenantTx,
   agencyId: string,
   prospectId: string,
-  action: AutomationAction,
+  action: AutomationEngineAction,
   contextData: Record<string, unknown>,
   ruleName: string
 ) {
@@ -140,7 +149,7 @@ async function executeRuleAction(
         break;
       }
 
-      case "create_task" as any: {
+      case "create_task": {
         const title = String(action.payload?.title || "System Task");
         await logAutomationActivity(
           db,
@@ -179,7 +188,7 @@ async function executeRuleAction(
         break;
       }
 
-      case "send_notification" as any: {
+      case "send_notification": {
         const title = String(action.payload?.title || "Notification");
         const body = String(action.payload?.body || "");
 
@@ -216,7 +225,7 @@ async function executeRuleAction(
  * Logs automation activity to the activities table
  */
 async function logAutomationActivity(
-  db: any,
+  db: TenantTx,
   agencyId: string,
   prospectId: string,
   ruleName: string,

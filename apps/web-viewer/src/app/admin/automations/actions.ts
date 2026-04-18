@@ -5,6 +5,7 @@ import {
   withTenantContext,
   automations,
   type AutomationRow,
+  type AutomationTrigger as DbAutomationTrigger,
 } from "@dba/database";
 import { eq, and, desc } from "drizzle-orm";
 import { verifyAuth } from "@/app/admin/actions";
@@ -115,8 +116,8 @@ export async function createAutomation(
       id: automationId,
       tenantId,
       name,
-      trigger: trigger as any,
-      action: action as any,
+      trigger: trigger as unknown as DbAutomationTrigger,
+      action: action as unknown as AutomationRow["action"],
       condition: {},
       metadata: {},
       isActive: true,
@@ -201,7 +202,7 @@ export async function updateAutomation(
     if (fields.name !== undefined) payload.name = fields.name;
     if (fields.trigger !== undefined) payload.trigger = fields.trigger;
     if (fields.action !== undefined)
-      payload.action = fields.action as any;
+      payload.action = fields.action as unknown as AutomationRow["action"];
     if (fields.condition !== undefined) payload.condition = fields.condition;
 
     await tx

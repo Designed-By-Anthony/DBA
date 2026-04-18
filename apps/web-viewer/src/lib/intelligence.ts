@@ -5,7 +5,7 @@ import {
   activities,
   tickets,
 } from "@dba/database";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import type { ActivityType, ProspectHealthStatus } from "./types";
 
 const SCORE_WEIGHTS: Record<ActivityType, number> = {
@@ -71,9 +71,9 @@ export async function recalculateLeadScore(
         );
 
       let rawScore = 0;
-      let lastEngagementDate: any = null;
+      let lastEngagementDate: Date | undefined;
 
-      prospectActivities.forEach((activity) => {
+      for (const activity of prospectActivities) {
         const type = activityType(activity.type);
         rawScore += type ? SCORE_WEIGHTS[type] : 0;
 
@@ -81,7 +81,7 @@ export async function recalculateLeadScore(
         if (date && (!lastEngagementDate || date > lastEngagementDate)) {
           lastEngagementDate = date;
         }
-      });
+      }
 
       // Time decay factor: subtract 2 points for every full day of inactivity
       if (lastEngagementDate) {

@@ -16,7 +16,7 @@ export default function BusinessSettingsPage() {
 
   const handleSave = async () => {
     setLoading(true);
-    // In a real app we'd trigger an action to save this to the Agency doc in Firestore.
+    // In a real app we'd trigger an action to persist this to Postgres (org_settings).
     // e.g. await saveBusinessSettings(settings);
     setTimeout(() => {
       alert("Business Settings successfully saved!");

@@ -1,4 +1,4 @@
-# API and lightweight checks (complements Firebase Hosting workflows and Cursor Bugbot on PRs).
+# API and lightweight checks (complements Vercel deploys and Cursor Bugbot on PRs).
 name: CI
 
 on:

@@ -16,7 +16,7 @@ Acknowledgement target: within 3 business days. Fix target: HIGH/CRITICAL within
 
 ## Supported versions
 
-Only `main` and the currently deployed Vercel / Firebase Hosting commits are supported. There is no release branch model — security fixes land on `main`, deploy, and that's the new baseline.
+Only `main` and the currently deployed Vercel commits are supported. There is no release branch model — security fixes land on `main`, deploy, and that's the new baseline.
 
 ## Threat model (abbreviated)
 
@@ -24,7 +24,7 @@ The product runs three user-facing surfaces:
 
 | App | Audience | Auth |
 |---|---|---|
-| `apps/marketing` (Astro on Firebase Hosting) | Anonymous public | none |
+| `apps/marketing` (Astro on Vercel) | Anonymous public | none |
 | `apps/lighthouse` (Next on Vercel) | Anonymous public submitting audit requests | Turnstile CAPTCHA, per-IP rate limit |
 | `apps/web-viewer` (Next on Vercel) | Tenant admins + portal clients | Clerk sessions for admins; `portal_session` cookie (hashed token) for clients |
 
@@ -49,7 +49,7 @@ Production deployments refuse to start or fail closed at runtime when these are 
 | `EMAIL_LINK_SIGNING_SECRET` | email click-tracking signing | `wrapLinksForTracking` throws |
 | `TURNSTILE_SECRET_KEY` | `/api/lead` (public lead ingest) | 503 (unless `PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE=true`) |
 | `CRON_SECRET` | `/api/cron/*` | cron routes 503 |
-| `DATABASE_URL`, `FIREBASE_*` | data plane | runtime errors |
+| `DATABASE_URL` | data plane | runtime errors |
 | `RESEND_API_KEY` | transactional email | emails silently skipped (best-effort) |
 
 ### Vercel environment variables — optional, fail-open by design
@@ -120,7 +120,7 @@ Upgrade path if abuse emerges: swap the in-memory counter in `src/lib/rate-limit
 | Portal session hash | `apps/web-viewer/src/lib/portal-auth.ts` |
 | Apex-operator allowlist | `apps/web-viewer/src/lib/admin-allowlist.ts` |
 | Postgres row-level security policies | `packages/database/sql/enable_rls.sql` |
-| Security response headers | `apps/web-viewer/next.config.ts`, `apps/lighthouse/next.config.ts`, `apps/marketing/firebase.json` |
+| Security response headers | `apps/web-viewer/next.config.ts`, `apps/lighthouse/next.config.ts`, `apps/marketing/static-headers.json` (edge parity; synced from `build/csp.mjs`) |
 
 ## Audit log for this document
 

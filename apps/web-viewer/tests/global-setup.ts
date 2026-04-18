@@ -39,9 +39,8 @@ export default async function globalSetup(config: FullConfig) {
   throw new Error(
     [
       `SKIP_WEBSERVER=1 but nothing is responding at ${base}.`,
-      'Remove SKIP_WEBSERVER and run `npm test` (starts Firestore + Next on :3001),',
-      'or start manually: Firestore emulator (see firebase.json / .env.test FIRESTORE_EMULATOR_HOST)',
-      'and `NODE_ENV=test` with `.env.test` loaded: `npm run dev -- -p 3001`.',
+      'Remove SKIP_WEBSERVER and run `pnpm test` (starts Next on :3001),',
+      'or start manually with `NODE_ENV=test` and `.env.test`: `pnpm exec next dev -p 3001`.',
     ].join(' ')
   );
 }

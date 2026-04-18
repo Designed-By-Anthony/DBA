@@ -1,10 +1,9 @@
 "use server";
 
 import { getDb, withTenantContext, leads, tickets } from "@dba/database";
-import { eq, and, count, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { verifyAuth, getProspects, getDashboardStats } from "@/app/admin/actions";
 import { getTicketSlaState } from "@/lib/ticket-sla";
-import type { Prospect } from "@/lib/types";
 
 export type ReportingSnapshot = {
   dashboard: Awaited<ReturnType<typeof getDashboardStats>>;
@@ -25,7 +24,7 @@ export async function getReportingSnapshot(): Promise<ReportingSnapshot> {
   ]);
 
   const db = getDb();
-  let ticketStats = {
+  const ticketStats = {
     total: 0,
     open: 0,
     slaMet: 0,

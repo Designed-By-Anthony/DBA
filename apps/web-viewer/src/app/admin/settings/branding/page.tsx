@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { getTenantSettings, updateTenantSettings } from "../actions";
 
 export default function BrandingPage() {
@@ -134,8 +135,14 @@ export default function BrandingPage() {
           Used in emails, portal, and client-facing reports
         </p>
         {brandLogoUrl && (
-          <div className="mt-3 p-3 bg-surface-2 rounded-lg inline-block">
-            <img src={brandLogoUrl} alt="Logo preview" className="h-10 object-contain" />
+          <div className="mt-3 p-3 bg-surface-2 rounded-lg inline-block relative h-10 w-40">
+            <Image
+              src={brandLogoUrl}
+              alt="Logo preview"
+              fill
+              className="object-contain object-left"
+              unoptimized
+            />
           </div>
         )}
       </div>

@@ -19,7 +19,7 @@ const VerticalContext = createContext<VerticalContextType>({
 
 /**
  * Provides the current org's vertical template config to all child components.
- * Reads verticalTemplate from org_settings in Firestore via a lightweight API call.
+ * Reads verticalTemplate from org_settings via a lightweight API call.
  */
 export function VerticalProvider({ children }: { children: React.ReactNode }) {
   const { organization } = useOrganization();

@@ -44,10 +44,8 @@ next-env.d.ts
 # Sentry Config File
 .env.sentry-build-plugin
 
-# Firebase emulator logs
-firebase-debug.log
-firestore-debug.log
-ui-debug.log
+# Local debug logs
+*-debug.log
 
 # Playwright / test artifacts
 test-results/

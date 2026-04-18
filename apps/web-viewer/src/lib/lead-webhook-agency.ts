@@ -1,5 +1,5 @@
 /**
- * Lead webhook agency resolver — pure Drizzle, no Firestore.
+ * Lead webhook agency resolver — pure Drizzle + Postgres.
  */
 import { getDb, tenants } from "@dba/database";
 import { eq } from "drizzle-orm";

@@ -25,7 +25,7 @@ test.describe('Deep routes', () => {
 
 test.describe('Report viewer shell', () => {
   test('malformed report id shows error state', async ({ page }) => {
-    // Use report.html + query so static preview resolves; clean /report/ID URLs rely on Firebase rewrites.
+    // Use report.html + query so static preview resolves; clean /report/ID URLs rely on edge rewrites.
     await page.goto('/report.html?id=DBA-BAD', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#report-error')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('#report-loading')).toBeHidden();

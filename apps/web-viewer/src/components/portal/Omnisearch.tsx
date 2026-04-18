@@ -61,7 +61,7 @@ export default function Omnisearch() {
       const results = await searchOmni(query);
       setProspects(results);
       setLoading(false);
-    }, 400); // 400ms buffer to save Firestore reads
+    }, 400); // debounce search input
 
     return () => clearTimeout(timer);
   }, [query, prospects.length]);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getTenantSettings, updateTenantSettings } from "../actions";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 

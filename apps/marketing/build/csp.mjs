@@ -1,6 +1,6 @@
 /**
- * Single source of truth for Firebase Hosting CSP-related headers.
- * Run `npm run sync:firebase-csp` to write values into `firebase.json`.
+ * Single source of truth for marketing CSP-related headers (synced into static-headers.json).
+ * Run `pnpm run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
  * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.
@@ -140,6 +140,23 @@ export function buildContentSecurityPolicyReportOnly(reportUrl) {
       }
     : base;
   return joinDirectives(withReporting);
+}
+
+/** Enforcing CSP when Sentry reporting may be unavailable (no DSN in env). */
+export function buildContentSecurityPolicyEnforcingMaybe(reportUrl) {
+  if (!reportUrl) return joinDirectives(DIRECTIVES);
+  return buildContentSecurityPolicyEnforcing(reportUrl);
+}
+
+/** Report-only CSP when Sentry reporting may be unavailable. */
+export function buildContentSecurityPolicyReportOnlyMaybe(reportUrl) {
+  if (!reportUrl) {
+    return joinDirectives({
+      ...DIRECTIVES,
+      'script-src': REPORT_ONLY_SCRIPT_SRC,
+    });
+  }
+  return buildContentSecurityPolicyReportOnly(reportUrl);
 }
 
 /**

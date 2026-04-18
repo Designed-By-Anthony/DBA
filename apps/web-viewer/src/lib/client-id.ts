@@ -1,9 +1,9 @@
 /**
- * Client ID generator — pure Drizzle, no Firestore.
+ * Client ID generator — pure Drizzle + Postgres.
  * Generates deterministic prospect IDs like "desi0001" from company/name.
  */
 import { getDb, withBypassRls, leads } from "@dba/database";
-import { eq, and, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 /**
  * Extract an ID source from company or name.

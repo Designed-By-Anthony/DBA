@@ -81,7 +81,6 @@ export default function VerticalPage() {
 
       <div className="space-y-3">
         {verticals.map((v) => {
-          const Icon = v.icon;
           const isSelected = selected === v.id;
           return (
             <button

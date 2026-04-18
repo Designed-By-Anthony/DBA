@@ -1,5 +1,5 @@
 import { after, NextResponse } from 'next/server';
-import { db, FieldValue, Timestamp, REPORTS_COLLECTION } from '@/lib/firestore';
+import { db, FieldValue, Timestamp, REPORTS_COLLECTION } from '@/lib/report-store';
 import { isValidReportId } from '@/lib/reportId';
 import { buildCorsHeaders } from '@/lib/http';
 

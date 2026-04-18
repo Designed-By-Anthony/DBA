@@ -9,7 +9,7 @@ import { parseCrmConfigFromPublicMetadata, parseVerticalFromPublicMetadata } fro
 export const dynamic = "force-dynamic";
 
 /**
- * Clerk → Cloud SQL sync for multi-tenant registry.
+ * Clerk → Postgres (Neon) sync for multi-tenant registry.
  *
  * Dashboard: Webhooks → endpoint `https://<your-viewer-host>/api/webhooks/clerk`
  * Events: `organization.created`, `organization.updated`, `organization.deleted`

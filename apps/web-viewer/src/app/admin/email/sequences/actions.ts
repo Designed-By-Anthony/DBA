@@ -5,12 +5,45 @@ import {
   withTenantContext,
   emailSequences,
   sequenceEnrollments,
-  leads,
+  type EmailSequenceRow,
 } from "@dba/database";
 import { eq, and } from "drizzle-orm";
-import { verifyAuth, getProspect } from "@/app/admin/actions";
+import { verifyAuth } from "@/app/admin/actions";
 import { processEmailSequences } from "@/lib/email-sequence-processor";
 import type { EmailSequenceDefinition, EmailSequenceStep } from "@/lib/types";
+
+type EmailSequenceStepRow = {
+  delayDays?: number;
+  delayHours?: number;
+  subject: string;
+  bodyHtml: string;
+};
+
+function stepsFromDbJson(steps: unknown): EmailSequenceStep[] {
+  if (!Array.isArray(steps)) return [];
+  return steps.map((raw) => {
+    const step = raw as EmailSequenceStepRow;
+    const delayHours =
+      typeof step.delayHours === "number"
+        ? step.delayHours
+        : typeof step.delayDays === "number"
+          ? step.delayDays * 24
+          : 24;
+    return {
+      delayHours,
+      subject: String(step.subject ?? ""),
+      bodyHtml: String(step.bodyHtml ?? ""),
+    };
+  });
+}
+
+function stepsToDbJson(steps: EmailSequenceStep[]): EmailSequenceRow["steps"] {
+  return steps.map((s) => ({
+    delayDays: Math.max(0, s.delayHours) / 24,
+    subject: s.subject,
+    bodyHtml: s.bodyHtml,
+  }));
+}
 
 export async function listEmailSequences(): Promise<EmailSequenceDefinition[]> {
   const session = await verifyAuth();
@@ -29,7 +62,7 @@ export async function listEmailSequences(): Promise<EmailSequenceDefinition[]> {
       agencyId: r.tenantId,
       name: r.name,
       isActive: r.isActive ?? true,
-      steps: (r.steps as any as EmailSequenceStep[]) || [],
+      steps: stepsFromDbJson(r.steps),
       createdAt: r.createdAt || "",
       updatedAt: r.updatedAt || "",
     }))
@@ -59,7 +92,7 @@ export async function createEmailSequence(input: {
         tenantId: session.user.agencyId,
         name,
         isActive: true,
-        steps: input.steps as any,
+        steps: stepsToDbJson(input.steps),
         createdAt: now,
         updatedAt: now,
       })
@@ -94,7 +127,7 @@ export async function updateEmailSequence(
     const payload: Record<string, unknown> = { updatedAt: new Date().toISOString() };
     if (fields.name !== undefined) payload.name = fields.name;
     if (fields.isActive !== undefined) payload.isActive = fields.isActive;
-    if (fields.steps !== undefined) payload.steps = fields.steps;
+    if (fields.steps !== undefined) payload.steps = stepsToDbJson(fields.steps);
 
     await tx
       .update(emailSequences)
@@ -147,7 +180,7 @@ export async function enrollProspectInSequence(
 
     if (seqRows.length === 0) return { success: false, error: "Sequence not found" };
     const seq = seqRows[0];
-    const steps = (seq.steps as any as EmailSequenceStep[]) || [];
+    const steps = stepsFromDbJson(seq.steps);
     if (!steps.length) return { success: false, error: "Sequence has no steps" };
 
     // Check for existing active enrollment
@@ -169,8 +202,8 @@ export async function enrollProspectInSequence(
     }
 
     const now = new Date();
-    const firstDelay = (steps[0] as any).delayDays || steps[0].delayHours || 24;
-    const nextRunAt = new Date(now.getTime() + firstDelay * 3600000);
+    const firstDelayHours = steps[0].delayHours ?? 24;
+    const nextRunAt = new Date(now.getTime() + firstDelayHours * 60 * 60 * 1000);
 
     await tx.insert(sequenceEnrollments).values({
       tenantId: session.user.agencyId,

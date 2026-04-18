@@ -1,5 +1,24 @@
 # Migration Status Report
 
+## Marketing: consumer trust stack copy (2026-04-18)
+
+- Added `ConsumerTrustStack.astro` (Neon, Vercel, Cloudflare, Next.js CRM) with outcome-first language on the homepage, `/ouredge`, and `/services/managed-hosting`.
+
+## Neon as production Postgres (2026-04-18)
+
+- **Runtime:** `@dba/database` uses `pg` + Drizzle against `DATABASE_URL` (Neon pooled URL in Vercel; direct/unpooled for `drizzle-kit` when required). No Firebase SDK, no Firebase env vars, no Google Cloud SQL IP in app code.
+- **Docs:** Root `AGENTS.md`, `.env.example`, `apps/web-viewer/.env.example`, and `apps/web-viewer/AGENTS.md` describe Neon instead of Cloud SQL / `34.172.29.180`. Legacy STATUS notes below may still mention Cloud SQL for historical migration context.
+
+## Agency OS ESLint + typecheck (2026-04-18)
+
+- Cleared remaining `agency-os` ESLint errors (`no-explicit-any`, unused imports, `prefer-const`, `no-img-element`) and fixed follow-on TypeScript issues (portal quote action signature, lead-score loop narrowing). Root `pnpm lint` and `pnpm build` succeed.
+
+## Firebase removal (2026-04-18)
+
+- **Marketing:** Removed `firebase.json`, `firebase-tools`, `apps/marketing/functions/`, Firebase Hosting workflows, and `sync-firebase-csp`. Replaced with `static-headers.json` + `build/sync-static-headers.mjs` and `scripts/static-parity-server.mjs` for Playwright parity (`PLAYWRIGHT_USE_STATIC_PARITY_SERVER=1`).
+- **Agency OS:** Removed `firebase.json`, Firestore rules/indexes, `src/lib/firebase.ts` shim; Playwright no longer starts the Firestore emulator. Google Workspace fallback env renamed to `GOOGLE_SERVICE_ACCOUNT_EMAIL` / `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` (removed `FIREBASE_*` from `turbo.json`).
+- **Lighthouse:** Renamed in-memory `src/lib/firestore.ts` → `report-store.ts` (no Firebase SDK).
+- **Docs:** Updated `SECURITY.md`, `AGENTS.md`, `.env.example` files; root `pnpm` no longer lists `@firebase/util` in `onlyBuiltDependencies`.
 ## Agency OS auth + performance (2026-04-18)
 
 - **`src/proxy.ts`:** Stopped calling `auth.protect()` for `/sign-in` and `/sign-up` on admin domains (and for `/admin` on the default host). Protecting those routes forced redirect loops / blocked Clerk’s OAuth handshake. **`app/admin/layout.tsx`** still enforces session for `/admin/*` after sign-in.

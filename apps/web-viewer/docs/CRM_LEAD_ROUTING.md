@@ -1,6 +1,6 @@
 # CRM lead routing — forms to Postgres
 
-This document is the source of truth for how public leads reach Cloud SQL (`leads` table) and appear in Agency OS.
+This document is the source of truth for how public leads reach Postgres (`leads` table on Neon) and appear in Agency OS.
 
 ## Endpoints (Agency OS / `apps/web-viewer`)
 
@@ -8,7 +8,7 @@ This document is the source of truth for how public leads reach Cloud SQL (`lead
 |-------|----------|------|-------------------|----------|
 | `POST /api/v1/ingest` | Marketing site (primary), partners | Turnstile **or** `X-DBA-SECRET` **or** `LEAD_WEBHOOK_SECRET` (headers/body) | `X-Tenant-Id` / `X-Agency-Id` / body `tenantId`, then env / fallback chain | `insertSqlLead` → `leads` |
 | `POST /api/leads/ingest` | Same as v1 | Same | Same | Same (shared handler) |
-| `POST /api/lead` | Legacy browser JSON; still supported | Turnstile in prod (fail-closed) | **Ignores** `agencyId` from body — uses `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` / fallback only (anti cross-tenant stuffing) | `executeLeadIntake` → `insertSqlLead` + Firestore shim + email |
+| `POST /api/lead` | Legacy browser JSON; still supported | Turnstile in prod (fail-closed) | **Ignores** `agencyId` from body — uses `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` / fallback only (anti cross-tenant stuffing) | `executeLeadIntake` → `insertSqlLead` + email |
 | `POST /api/webhooks/lead` | Server-to-server with shared secret | `LEAD_WEBHOOK_SECRET` | Explicit `agencyId` allowed | `executeLeadIntake` |
 
 ## Marketing site (`apps/marketing`)
@@ -20,7 +20,7 @@ This document is the source of truth for how public leads reach Cloud SQL (`lead
 
 1. **Vercel (web-viewer):** `DATABASE_URL` or `DATABASE_URL_UNPOOLED`, `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` = your Clerk **org id** (same as `tenants.clerk_org_id`), `TURNSTILE_SECRET_KEY`.
 2. **Vercel (marketing build):** `PUBLIC_TENANT_ID` = same Clerk org id (so `X-Tenant-Id` matches a row in `tenants`), or rely on server-side `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` for **`/api/lead`** only (ingest **still** needs header or body tenant unless you use the fallback below).
-3. **Optional single-tenant shortcut:** `LEAD_WEBHOOK_SQL_SINGLE_TENANT_FALLBACK=true` on web-viewer uses the **first** row in Postgres `tenants` when env/Firestore legacy lookup fails. **Do not** enable on multi-tenant SaaS.
+3. **Optional single-tenant shortcut:** `LEAD_WEBHOOK_SQL_SINGLE_TENANT_FALLBACK=true` on web-viewer uses the **first** row in Postgres `tenants` when tenant resolution from env fails. **Do not** enable on multi-tenant SaaS.
 
 ## Data shape
 

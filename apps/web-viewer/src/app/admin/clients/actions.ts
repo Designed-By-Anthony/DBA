@@ -3,7 +3,7 @@
 import type { PlanSuite } from "@dba/lead-form-contract";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getDb, withTenantContext, tenants, leads } from "@dba/database";
-import { eq, and, count } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { verifyAuth } from "../actions";
 
 // ============================================

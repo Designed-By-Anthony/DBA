@@ -1,5 +1,5 @@
 /**
- * Cloud SQL (PostgreSQL) — tenant + CRM registry with RLS enforcement.
+ * Postgres (Neon in production) — tenant + CRM registry with RLS enforcement.
  * @see packages/database/drizzle.config.ts — `pnpm exec drizzle-kit push` from this package.
  *
  * Multi-tenant CRM schema for service professionals, restaurants, agencies, wellness.
