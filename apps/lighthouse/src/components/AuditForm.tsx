@@ -34,27 +34,28 @@ export function AuditForm() {
   const [reportId, setReportId] = useState<string | null>(null);
 
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
-  /** Pending resolver installed by the submit handler while Turnstile executes invisibly. */
-  const turnstileResolverRef = useRef<((token: string | null) => void) | null>(null);
-  const turnstileWidgetIdRef = useRef<string | null>(null);
+  const turnstileTokenRef = useRef<string>("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const anyWindow = window as Window & {
-      turnstile?: TurnstileApi;
+      turnstile?: {
+        render: (container: string | HTMLElement, options: Record<string, unknown>) => string;
+      };
       __lighthouseTurnstileOnSuccess?: (token: string) => void;
       __lighthouseTurnstileOnExpired?: () => void;
       __lighthouseTurnstileOnError?: () => void;
     };
 
-    const resolvePending = (token: string | null) => {
-      const resolver = turnstileResolverRef.current;
-      turnstileResolverRef.current = null;
-      if (resolver) resolver(token);
+    anyWindow.__lighthouseTurnstileOnSuccess = (token: string) => {
+      turnstileTokenRef.current = token;
     };
-    anyWindow.__lighthouseTurnstileOnSuccess = (token: string) => resolvePending(token);
-    anyWindow.__lighthouseTurnstileOnExpired = () => resolvePending(null);
-    anyWindow.__lighthouseTurnstileOnError = () => resolvePending(null);
+    anyWindow.__lighthouseTurnstileOnExpired = () => {
+      turnstileTokenRef.current = "";
+    };
+    anyWindow.__lighthouseTurnstileOnError = () => {
+      turnstileTokenRef.current = "";
+    };
 
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     if (!siteKey) return;
@@ -62,16 +63,13 @@ export function AuditForm() {
     const mount = () => {
       const host = document.getElementById("lighthouse-turnstile");
       if (!host || !anyWindow.turnstile || host.childElementCount > 0) return;
-      const widgetId = anyWindow.turnstile.render(host, {
+      anyWindow.turnstile.render(host, {
         sitekey: siteKey,
         theme: "dark",
-        size: "invisible",
-        appearance: "interaction-only",
         callback: "__lighthouseTurnstileOnSuccess",
         "expired-callback": "__lighthouseTurnstileOnExpired",
         "error-callback": "__lighthouseTurnstileOnError",
       });
-      if (typeof widgetId === "string") turnstileWidgetIdRef.current = widgetId;
     };
 
     mount();
@@ -81,16 +79,6 @@ export function AuditForm() {
       anyWindow.__lighthouseTurnstileOnSuccess = undefined;
       anyWindow.__lighthouseTurnstileOnExpired = undefined;
       anyWindow.__lighthouseTurnstileOnError = undefined;
-      const widgetId = turnstileWidgetIdRef.current;
-      if (widgetId && anyWindow.turnstile?.remove) {
-        try {
-          anyWindow.turnstile.remove(widgetId);
-        } catch {
-          /* ignore */
-        }
-      }
-      turnstileWidgetIdRef.current = null;
-      turnstileResolverRef.current = null;
     };
   }, []);
 
@@ -118,36 +106,10 @@ export function AuditForm() {
     setErrorMsg("");
 
     try {
-      const anyWindow = window as Window & { turnstile?: TurnstileApi };
-      const widgetId = turnstileWidgetIdRef.current;
-      const widgetEl = document.getElementById("lighthouse-turnstile");
-
-      if (!anyWindow.turnstile || (!widgetId && !widgetEl)) {
-        setErrorMsg("Security check could not load. Please refresh and try again.");
-        setStatus("error");
-        return;
-      }
-
-      const turnstileToken = await new Promise<string | null>((resolve) => {
-        turnstileResolverRef.current = resolve;
-        try {
-          anyWindow.turnstile!.execute(widgetId ?? widgetEl!);
-        } catch {
-          turnstileResolverRef.current = null;
-          resolve(null);
-        }
-      });
-
+      const turnstileToken = turnstileTokenRef.current;
       if (!turnstileToken) {
-        setErrorMsg("Security check failed. Please refresh and try again.");
+        setErrorMsg("Please complete the security check.");
         setStatus("error");
-        if (anyWindow.turnstile && (widgetId || widgetEl)) {
-          try {
-            anyWindow.turnstile.reset(widgetId ?? widgetEl!);
-          } catch {
-            /* ignore */
-          }
-        }
         return;
       }
 
@@ -290,7 +252,7 @@ export function AuditForm() {
         )}
 
         {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
-          <div id="lighthouse-turnstile" aria-hidden="true" style={{ display: "none" }} />
+          <div id="lighthouse-turnstile" className="min-h-[65px]" />
         ) : null}
 
         <button

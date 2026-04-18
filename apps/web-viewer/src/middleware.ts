@@ -1,17 +1,7 @@
-import "@dba/env/web-viewer-aliases";
-/**
- * Next.js 16 uses `src/proxy.ts` with a **named** `proxy` export (see Next.js
- * `middleware.js` template: `mod.proxy`). Clerk’s quickstart still shows
- * `export default clerkMiddleware()` for `middleware.ts`; this file is the
- * App Router equivalent — do not rename to `middleware` without migrating exports.
- */
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-
-/** Clerk-hosted sign-in/up must not run `auth.protect()` — it blocks the interactive OAuth/session flow. */
-const isPublicAuthSurface = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 
 function shouldProtectAdmin() {
   return process.env.NODE_ENV === "production";
@@ -21,7 +11,7 @@ function normalizeHost(hostHeader: string | null): string {
   return (hostHeader || "").split(":")[0]?.toLowerCase() || "";
 }
 
-export const proxy = clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   const url = req.nextUrl;
   const hostname = normalizeHost(req.headers.get("host"));
 
@@ -33,8 +23,7 @@ export const proxy = clerkMiddleware(async (auth, req) => {
 
   if (isAdminDomain) {
     const isInboundWebhook = url.pathname.startsWith("/api/webhooks/");
-    const needsSession = !isInboundWebhook && !isPublicAuthSurface(req);
-    if (needsSession && shouldProtectAdmin()) {
+    if (!isInboundWebhook && shouldProtectAdmin()) {
       await auth.protect();
     }
 
@@ -45,17 +34,7 @@ export const proxy = clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // `accounts.*` is the public-facing client-portal subdomain and shares
-  // the same /portal surface; local dev (e.g. `accounts.localhost:3001`)
-  // relies on this prefix rewrite to match production parity. In prod the
-  // apex middleware.ts rewrites the path before it reaches here, so the
-  // upstream host is `dba-agency-os.vercel.app` — these branches are the
-  // local-dev safety net.
-  const isPortalDomain =
-    hostname.startsWith("portal.") ||
-    hostname.startsWith("portal-") ||
-    hostname.startsWith("accounts.") ||
-    hostname.startsWith("accounts-");
+  const isPortalDomain = hostname.startsWith("portal.") || hostname.startsWith("portal-");
   if (isPortalDomain) {
     if (!url.pathname.startsWith("/portal") && !url.pathname.startsWith("/api/")) {
       return NextResponse.rewrite(new URL(`/portal${url.pathname}`, req.url));
@@ -64,7 +43,7 @@ export const proxy = clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  if (isAdminRoute(req) && !isPublicAuthSurface(req) && shouldProtectAdmin()) {
+  if (isAdminRoute(req) && shouldProtectAdmin()) {
     await auth.protect();
   }
 

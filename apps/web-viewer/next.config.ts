@@ -42,11 +42,10 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'self'; " +
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://scdn.clerk.com https://*.designedbyanthony.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
               "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.designedbyanthony.com; " +
-              // img.clerk.com + va.vercel-scripts.com: Clerk avatar fetch() + Vercel Analytics/Speed Insights beacons (connect-src; img-src already allows img.clerk.com for <img>)
-              "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://img.clerk.com https://scdn.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
-              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.designedbyanthony.com https://calendly.com https://*.calendly.com; " +
-              "worker-src 'self' blob: https://*.designedbyanthony.com;",
+              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com; " +
+              "connect-src 'self' https://api.stripe.com https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com; " +
+              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev; " +
+              "worker-src 'self' blob:;",
           },
           // HSTS: pin the host to HTTPS for two years (preload-eligible once you
           // verify apex+subdomain coverage). Safe to apply on Vercel which is
