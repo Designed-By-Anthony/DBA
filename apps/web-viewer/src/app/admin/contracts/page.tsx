@@ -419,6 +419,36 @@ function ViewContractModal({ contract, onClose, onSigned }: { contract: Contract
                 <div className="p-3 rounded-lg bg-surface-1"><span className="text-text-muted">Signed:</span> <span className="text-white ml-1">{contract.signedAt ? new Date(contract.signedAt).toLocaleString() : "—"}</span></div>
                 <div className="p-3 rounded-lg bg-surface-1"><span className="text-text-muted">Hash:</span> <span className="text-white ml-1 font-mono text-[10px]">{contract.certificateHash?.slice(0, 24)}...</span></div>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const w = window.open("", "_blank");
+                  if (!w) { toast.error("Pop-up blocked — allow pop-ups to download PDF"); return; }
+                  w.document.write(`<!DOCTYPE html><html><head><title>${contract.contractNumber}</title>
+                    <style>body{font-family:system-ui,sans-serif;padding:40px;color:#111}
+                    .sig-block{margin-top:32px;border-top:1px solid #ddd;padding-top:16px}
+                    .sig-img{height:60px;margin:8px 0}
+                    .meta{font-size:12px;color:#666;margin:4px 0}
+                    .hash{font-family:monospace;font-size:10px;color:#999;word-break:break-all}
+                    @media print{body{padding:20px}}</style></head><body>
+                    ${contract.htmlContent}
+                    <div class="sig-block">
+                      <p style="font-weight:bold;margin:0">Electronically Signed</p>
+                      ${contract.signatureData ? `<img class="sig-img" src="${contract.signatureData}" alt="Signature"/>` : ""}
+                      <p class="meta"><strong>Signer:</strong> ${contract.signerName ?? ""}</p>
+                      <p class="meta"><strong>Email:</strong> ${contract.signerEmail ?? ""}</p>
+                      <p class="meta"><strong>Signed:</strong> ${contract.signedAt ? new Date(contract.signedAt).toLocaleString() : ""}</p>
+                      <p class="hash"><strong>Certificate Hash:</strong> ${contract.certificateHash ?? ""}</p>
+                      <p class="meta" style="margin-top:12px;font-size:10px;color:#999">This document was signed electronically in compliance with the ESIGN Act and UETA.</p>
+                    </div></body></html>`);
+                  w.document.close();
+                  setTimeout(() => { w.print(); }, 400);
+                }}
+                className="w-full py-2.5 rounded-xl bg-surface-1 border border-glass-border text-white text-sm font-medium hover:bg-surface-2 transition-colors flex items-center justify-center gap-2"
+              >
+                <FileCheck size={14} />
+                Download as PDF
+              </button>
             </div>
           ) : (
             /* Signing UI */

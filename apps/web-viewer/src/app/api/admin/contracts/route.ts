@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
-import { getDb, contracts, estimates, withTenantContext } from "@dba/database";
+import { getDb, contracts, estimates, withTenantContext, withBypassRls } from "@dba/database";
 import { eq, and, desc } from "drizzle-orm";
 import { z } from "zod";
 import { apiError } from "@/lib/api-error";
@@ -163,46 +163,54 @@ export async function PATCH(req: NextRequest) {
     const signerIp = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
     const signerUserAgent = req.headers.get("user-agent") ?? "unknown";
 
-    // Fetch the contract to get htmlContent for the hash
-    const [existing] = await db
-      .select()
-      .from(contracts)
-      .where(eq(contracts.id, body.data.id))
-      .limit(1);
+    const result = await withBypassRls(db, async (tx) => {
+      // Fetch the contract to get htmlContent for the hash
+      const [existing] = await tx
+        .select()
+        .from(contracts)
+        .where(eq(contracts.id, body.data.id))
+        .limit(1);
 
-    if (!existing) {
-      return NextResponse.json({ error: "Contract not found" }, { status: 404 });
-    }
-    if (existing.status === "signed") {
-      return NextResponse.json({ error: "Contract already signed" }, { status: 409 });
-    }
+      if (!existing) {
+        return { error: "Contract not found", status: 404 } as const;
+      }
+      if (existing.status === "signed") {
+        return { error: "Contract already signed", status: 409 } as const;
+      }
 
-    // Generate SHA-256 certificate hash (ESIGN compliance)
-    const hashInput = [
-      existing.htmlContent,
-      body.data.signatureData,
-      now,
-      signerIp,
-    ].join("|");
-    const certificateHash = createHash("sha256").update(hashInput).digest("hex");
-
-    await db
-      .update(contracts)
-      .set({
-        status: "signed",
-        signerName: body.data.signerName,
-        signerEmail: body.data.signerEmail,
-        signatureData: body.data.signatureData,
+      // Generate SHA-256 certificate hash (ESIGN compliance)
+      const hashInput = [
+        existing.htmlContent,
+        body.data.signatureData,
+        now,
         signerIp,
-        signerUserAgent,
-        certificateHash,
-        signedAt: now,
-        consentGiven: true,
-        updatedAt: now,
-      })
-      .where(eq(contracts.id, body.data.id));
+      ].join("|");
+      const certificateHash = createHash("sha256").update(hashInput).digest("hex");
 
-    return NextResponse.json({ ok: true, certificateHash });
+      await tx
+        .update(contracts)
+        .set({
+          status: "signed",
+          signerName: body.data.signerName,
+          signerEmail: body.data.signerEmail,
+          signatureData: body.data.signatureData,
+          signerIp,
+          signerUserAgent,
+          certificateHash,
+          signedAt: now,
+          consentGiven: true,
+          updatedAt: now,
+        })
+        .where(eq(contracts.id, body.data.id));
+
+      return { ok: true, certificateHash } as const;
+    });
+
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+
+    return NextResponse.json({ ok: true, certificateHash: result.certificateHash });
   } catch (error: unknown) {
     return apiError("admin/contracts/PATCH", error);
   }
