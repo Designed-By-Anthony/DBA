@@ -76,6 +76,8 @@ function buildSidebar(overrides: Partial<Record<string, { label: string; icon: L
     { label: "Billing", href: "/admin/billing", icon: CreditCard },
     { label: "Reports", href: "/admin/reports", icon: BarChart3 },
     { label: "Price Book", href: "/admin/pricebook", icon: ShoppingBag },
+    { label: "Estimates", href: "/admin/estimates", icon: FileText },
+    { label: "Invoices", href: "/admin/invoices", icon: CreditCard },
     { label: "Automations", href: "/admin/automations", icon: Zap },
     { label: "Inbox", href: "/admin/inbox", icon: Inbox },
     { label: "Calendar", href: "/admin/calendar", icon: CalendarDays },
