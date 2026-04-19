@@ -438,7 +438,7 @@ export const sequenceEnrollments = pgTable(
     leadId: text("lead_id"),
 
     /** References emailSequences.id */
-    sequenceId: text("sequence_id")
+    sequenceId: uuid("sequence_id")
       .notNull()
       .references(() => emailSequences.id, { onDelete: "cascade" }),
 
