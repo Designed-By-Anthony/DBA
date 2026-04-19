@@ -15,6 +15,9 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
   <>
     {/* ── Chat Bubble (bottom-right, above reach-out sticky) ── */}
     <div id="dba-chat-widget" class="dba-chat-widget" data-api-key={apiKey}>
+      {/* "Chat with us" label above the bubble */}
+      <span id="dba-chat-label" class="dba-chat-label">Chat with us</span>
+
       {/* Floating trigger button */}
       <button
         type="button"
@@ -118,6 +121,9 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         bottom: 24px;
         right: 24px;
         z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
       }
 
@@ -158,12 +164,33 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         border: 2px solid var(--chat-bg);
       }
 
+      /* ── "Chat with us" label ── */
+      .dba-chat-label {
+        display: block;
+        margin-bottom: 8px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: var(--chat-surface);
+        border: 1px solid var(--chat-border);
+        color: var(--chat-text);
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        animation: dba-chat-label-in 0.4s ease-out 1s both;
+        pointer-events: none;
+      }
+      @keyframes dba-chat-label-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
       /* ── Panel ── */
       .dba-chat-panel {
         position: absolute;
         bottom: 72px;
         right: 0;
-        width: 380px;
+        width: 340px;
         max-height: 520px;
         border-radius: var(--chat-radius);
         background: var(--chat-bg);
@@ -435,26 +462,35 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         return 'visitor_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
       }
 
-      function toggle() {
-        isOpen = !isOpen;
-        if (isOpen) {
-          panel.removeAttribute('hidden');
-          iconMsg.style.display = 'none';
-          iconClose.style.display = 'block';
-          toggleBtn.setAttribute('aria-expanded', 'true');
-          badge.setAttribute('hidden', '');
+      var chatLabel = document.getElementById('dba-chat-label');
 
-          if (visitorId && visitorIdentity) {
-            showChat();
-          } else {
-            identityInput.focus();
-          }
+      function openChat() {
+        isOpen = true;
+        panel.removeAttribute('hidden');
+        iconMsg.style.display = 'none';
+        iconClose.style.display = 'block';
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        badge.setAttribute('hidden', '');
+        if (chatLabel) chatLabel.style.display = 'none';
+
+        if (visitorId && visitorIdentity) {
+          showChat();
         } else {
-          panel.setAttribute('hidden', '');
-          iconMsg.style.display = 'block';
-          iconClose.style.display = 'none';
-          toggleBtn.setAttribute('aria-expanded', 'false');
+          identityInput.focus();
         }
+      }
+
+      function closeChat() {
+        isOpen = false;
+        panel.setAttribute('hidden', '');
+        iconMsg.style.display = 'block';
+        iconClose.style.display = 'none';
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        if (chatLabel) chatLabel.style.display = 'block';
+      }
+
+      function toggle() {
+        if (isOpen) { closeChat(); } else { openChat(); }
       }
 
       function showChat() {
@@ -572,7 +608,10 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
 
       // ── Event listeners ──
       toggleBtn.addEventListener('click', toggle);
-      closeBtn.addEventListener('click', toggle);
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeChat();
+      });
 
       // If returning visitor, auto-show chat state
       if (visitorId && visitorIdentity) {
