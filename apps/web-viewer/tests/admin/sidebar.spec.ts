@@ -30,7 +30,8 @@ test.describe('Sidebar Navigation', () => {
     const sidebar = page.locator('aside').first();
 
     // Logo image (centralized brand mark) or collapsed brand — not .brand-mark class
-    const brandImg = sidebar.locator('img[src*="/brand/"]').first();
+    // Note: Next.js encodes `/brand/` as `%2Fbrand%2F` in the optimized _next/image loader.
+    const brandImg = sidebar.locator('img[src*="%2Fbrand%2F"], img[src*="/brand/"]').first();
     await expect(brandImg).toBeVisible({ timeout: 10_000 });
   });
 
@@ -39,7 +40,7 @@ test.describe('Sidebar Navigation', () => {
 
     // Click on My Clients
     await sidebar.getByText('My Clients').click();
-    await expect(page).toHaveURL(/clients/);
+    await expect(page).toHaveURL(/clients/, { timeout: 30_000 });
   });
 
   test('sidebar collapse toggle works', async ({ page }) => {

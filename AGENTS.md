@@ -40,6 +40,7 @@ When in doubt, choose the option that **discloses less** to clients and third pa
 - **Search Before Write:** Before adding a feature, check if a legacy or duplicate implementation exists. If it does, delete it first.
 - **Cleanup Duty:** After every feature completion, search for and remove unused imports and `console.log` statements.
 - **Strict Typing:** No `any`. Use Zod for schema validation on all API inputs and JSONB columns.
+- **Update the Changelog:** As you update or add CRM functions and vertical features, you MUST flow that information into `CHANGELOG.md`. Keep the changelog up to date with new capabilities.
 
 ## Communication Preferences
 - **Conciseness:** Keep responses under 1000 characters.
@@ -104,7 +105,7 @@ pnpm test:e2e:lighthouse
 pnpm test:e2e:web
 ```
 
-Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter agency-os run lint`). Workspace names live in each `package.json` (`agency-os`, `lighthouse-audit`, `designed-by-anthony`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
+Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter dba-agency-os run lint`). Workspace names live in each `package.json` (`dba-agency-os`, `dba-lighthouse-audit`, `dbastudio-315`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
 
 ### Host-based routing — Vercel Routing Middleware
 

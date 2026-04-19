@@ -1,5 +1,5 @@
 {
-  "name": "agency-os",
+  "name": "dba-agency-os",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,9 +14,14 @@
     "test:no-emu-server": "playwright test",
     "test:pw": "playwright test",
     "test:ui": "playwright test --ui",
+    "test:ai:leaks": "tsx tests/stagehand/scenarios/tenant-leak-check.ts",
+    "test:ai:verticals": "tsx tests/stagehand/scenarios/vertical-flow-check.ts",
+    "test:ai:all": "pnpm run test:ai:leaks && pnpm run test:ai:verticals",
     "test:report": "playwright show-report"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
+    "@aws-sdk/client-s3": "^3.1032.0",
     "@clerk/nextjs": "^7.2.3",
     "@dba/automation": "workspace:*",
     "@dba/database": "workspace:*",
@@ -26,6 +31,7 @@
     "@dba/ui": "workspace:*",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/outfit": "^5.2.8",
+    "@google/generative-ai": "^0.24.1",
     "@react-email/components": "^1.0.12",
     "@sentry/nextjs": "^10.48.0",
     "@serwist/turbopack": "^9.5.7",
@@ -66,6 +72,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

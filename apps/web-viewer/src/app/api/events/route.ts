@@ -1,76 +1,75 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import type { WebhookEventPayload } from 'resend';
-import { isTestMode } from '@/lib/test-mode';
-
-const webhookSecret = process.env.RESEND_WEBHOOK_SECRET || '';
+import { NextRequest, NextResponse } from "next/server";
+import { getDb, events, eventBookings } from "@dba/database";
+import { eq, and, gte, sql } from "drizzle-orm";
 
 /**
- * Resend webhook endpoint (Svix-signed).
+ * GET /api/events?tenant=<clerkOrgId>
  *
- * Dashboard: Webhooks → endpoint URL `https://<your-domain>/api/events`,
- * events include `email.received`. Paste the signing secret into `RESEND_WEBHOOK_SECRET`.
- *
- * @see https://resend.com/docs/dashboard/webhooks/introduction
+ * Public endpoint — returns upcoming public events for the website calendar.
+ * Includes remaining seats for urgency display.
  */
-export async function POST(request: NextRequest) {
-  const body = await request.text();
-
-  let event: WebhookEventPayload;
-
-  if (isTestMode()) {
-    try {
-      event = JSON.parse(body) as WebhookEventPayload;
-    } catch {
-      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-    }
-  } else {
-    if (!webhookSecret) {
-      console.error('[resend events] RESEND_WEBHOOK_SECRET not configured');
-      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
-    }
-
-    const svixId = request.headers.get('svix-id');
-    const svixTs = request.headers.get('svix-timestamp');
-    const svixSig = request.headers.get('svix-signature');
-    if (!svixId || !svixTs || !svixSig) {
-      return NextResponse.json({ error: 'Missing Svix headers' }, { status: 400 });
-    }
-
-    try {
-      const resend = new Resend();
-      event = resend.webhooks.verify({
-        webhookSecret,
-        payload: body,
-        headers: {
-          id: svixId,
-          timestamp: svixTs,
-          signature: svixSig,
-        },
-      });
-    } catch (err) {
-      console.error('[resend events] signature verification failed', err);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-    }
+export async function GET(req: NextRequest) {
+  const tenantId = req.nextUrl.searchParams.get("tenant");
+  if (!tenantId) {
+    return NextResponse.json({ error: "Missing tenant parameter" }, { status: 400 });
   }
 
-  if (event.type === 'email.received') {
-    const apiKey = process.env.RESEND_API_KEY;
-    const fetchFull =
-      process.env.RESEND_INBOUND_FETCH_BODY === 'true' && Boolean(apiKey);
-    if (fetchFull) {
-      try {
-        const client = new Resend(apiKey);
-        const full = await client.emails.receiving.get(event.data.email_id);
-        if (full.error) {
-          console.warn('[resend events] receiving.get failed', full.error);
-        }
-      } catch (e) {
-        console.warn('[resend events] receiving.get threw', e);
-      }
-    }
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
-  return NextResponse.json({ received: true });
+  const now = new Date().toISOString();
+
+  // Fetch upcoming public events
+  const upcomingEvents = await db
+    .select()
+    .from(events)
+    .where(
+      and(
+        eq(events.tenantId, tenantId),
+        eq(events.isPublic, true),
+        gte(events.startTime, now)
+      )
+    )
+    .orderBy(events.startTime);
+
+  // Enrich with booking counts
+  const enriched = await Promise.all(
+    upcomingEvents.map(async (event) => {
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(eventBookings)
+        .where(
+          and(
+            eq(eventBookings.eventId, event.id),
+            eq(eventBookings.tenantId, tenantId),
+            eq(eventBookings.status, "confirmed")
+          )
+        );
+
+      const bookedCount = count ?? 0;
+      const remainingSeats = event.maxCapacity
+        ? Math.max(0, event.maxCapacity - bookedCount)
+        : null;
+
+      return {
+        id: event.id,
+        name: event.name,
+        description: event.description,
+        location: event.location,
+        imageUrl: event.imageUrl,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        priceCents: event.priceCents,
+        maxCapacity: event.maxCapacity,
+        remainingSeats,
+        isAlmostFull: remainingSeats !== null && remainingSeats <= 5 && remainingSeats > 0,
+        isFull: remainingSeats !== null && remainingSeats <= 0,
+        waitlistEnabled: event.waitlistEnabled,
+      };
+    })
+  );
+
+  return NextResponse.json({ events: enriched });
 }

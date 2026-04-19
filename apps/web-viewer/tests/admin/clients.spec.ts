@@ -54,7 +54,7 @@ test.describe('My Clients Page', () => {
 
     // Vertical template picker should show all 8 verticals
     await expect(form.getByText('What kind of business?')).toBeVisible();
-    await expect(form.getByText('Contractor', { exact: true })).toBeVisible();
+    await expect(form.getByText('Service Pro', { exact: true })).toBeVisible();
     await expect(form.getByText('Food & Beverage')).toBeVisible();
     await expect(form.getByText('Beauty & Wellness')).toBeVisible();
     await expect(form.getByText('Health & Fitness')).toBeVisible();
@@ -69,8 +69,8 @@ test.describe('My Clients Page', () => {
 
     const form = addClientModalForm(page);
 
-    // Click on Contractor
-    await form.getByText('Contractor', { exact: true }).click();
+    // Click on Service Pro
+    await form.getByText('Service Pro', { exact: true }).click();
     await expect(form.getByText(/roofing.*plumbing/i)).toBeVisible();
 
     // Click on Beauty & Wellness

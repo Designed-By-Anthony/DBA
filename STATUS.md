@@ -1,5 +1,26 @@
 # Migration Status Report
 
+## CRM V1 Sprint — Complete (2026-04-19)
+
+Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.
+
+### What shipped:
+- **Legal Framework:** TOS, Privacy Policy, AUP pages + consent checkpoint with version-stamped recording in `tenants.crmConfig.legal`
+- **Onboarding Flow:** Stripe-style sticky floater with 7-step progress checklist (Create Org → Accept Legal → Select Vertical → Add Lead → Setup Email → Connect Stripe → Install PWA)
+- **AI Onboarding Specialist:** Gemini 2.0 Flash chat widget with auto-escalation to support tickets after 6 exchanges or frustration keywords
+- **Mobile & PWA:** Bottom navigation bar, PWA manifest shortcuts (POS, Clock In, Calendar, Portal), safe area insets
+- **Complete Vertical Action Coverage:** Every schema table now has full server action CRUD — memberships, tax rates, hardware devices, restaurant tables, file attachments (before/after photos), plus previously shipped inventory, POS, menu, appointments, events, rewards, timeclock, returns
+- **Infrastructure:** Cloudflare R2 file storage, PrintNode cloud printing, barcode engine, inventory auto-sync
+
+### Env vars needed for new features:
+- `GEMINI_API_KEY` — AI onboarding specialist (already in env schema)
+
+### Next steps (user in Cursor):
+1. Review PR, run local dev, test onboarding flow
+2. Add `GEMINI_API_KEY` to `.env.local` and Vercel
+3. Set up `blog.designedbyanthony.com` CNAME in Cloudflare DNS → BabyLoveGrowth.ai
+4. Debug and merge in Cursor
+
 ## Release readiness pass (2026-04-18)
 
 - **Go-green checks:** `pnpm lint`, `pnpm build`, and live marketing smoke (`BASE_URL=https://designedbyanthony.com pnpm --filter designed-by-anthony run test:smoke:live`) pass from the monorepo root after the TopBar + CRM action typing fixes below. Live smoke covered homepage CTAs, money pages, contact/calendar, audit form, and crawl files on desktop + mobile projects.

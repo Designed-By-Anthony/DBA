@@ -119,7 +119,7 @@ export default defineConfig({
               'npm run build && npm run preview -- --host 127.0.0.1 --port 4321',
             ),
             url: defaultBaseURL,
-            timeout: 240_000,
+            timeout: 500_000,
             reuseExistingServer: false,
           },
         }

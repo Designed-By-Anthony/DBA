@@ -9,7 +9,8 @@ import {
   Ticket, CreditCard, Zap, Inbox, Settings,
   Hammer, ShoppingBag, Scissors, Dumbbell, Home, Camera, Store, ClipboardList,
   CalendarDays, FileText, Package, Heart, Briefcase, ListOrdered, BarChart3,
-  FileCheck,
+  FileCheck, Warehouse, ScanBarcode, UtensilsCrossed, Clock, Gift,
+  CalendarPlus, MonitorSmartphone, RotateCcw, Star,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────
@@ -61,7 +62,13 @@ export type VerticalConfig = {
 
 // ── Helper to build sidebar items with common structure ──
 
-function buildSidebar(overrides: Partial<Record<string, { label: string; icon: LucideIcon }>>): SidebarItem[] {
+/** Extra sidebar items injected per-vertical after the base set. */
+export type SidebarExtra = { label: string; href: string; icon: LucideIcon };
+
+function buildSidebar(
+  overrides: Partial<Record<string, { label: string; icon: LucideIcon }>>,
+  extras: SidebarExtra[] = [],
+): SidebarItem[] {
   const base: SidebarItem[] = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { label: "My Clients", href: "/admin/clients", icon: Building2 },
@@ -80,6 +87,7 @@ function buildSidebar(overrides: Partial<Record<string, { label: string; icon: L
     { label: "Automations", href: "/admin/automations", icon: Zap },
     { label: "Inbox", href: "/admin/inbox", icon: Inbox },
     { label: "Calendar", href: "/admin/calendar", icon: CalendarDays },
+    ...extras,
     { label: "Business Rules", href: "/admin/settings/business", icon: Settings },
     { label: "Settings", href: "/admin/settings", icon: Settings },
   ];
@@ -117,10 +125,10 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
     sidebarItems: buildSidebar({}),
   },
 
-  // ── 2. Contractor ──────────────────────────
+  // ── 2. Service Pro ──────────────────────────
   contractor: {
     id: "contractor",
-    name: "Contractor",
+    name: "Service Pro",
     icon: Hammer,
     emoji: "🏗️",
     description: "Roofing, plumbing, HVAC, electrical, landscaping",
@@ -146,7 +154,11 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       pipeline: { label: "Jobs", icon: Briefcase },
       email: { label: "Communications", icon: Mail },
       tickets: { label: "Work Orders", icon: ClipboardList },
-    }),
+    }, [
+      { label: "Appointments", href: "/admin/appointments", icon: CalendarPlus },
+      { label: "Inventory", href: "/admin/inventory", icon: Warehouse },
+      { label: "Time Clock", href: "/admin/timeclock", icon: Clock },
+    ]),
   },
 
   // ── 3. Food & Beverage ──────────────────────────
@@ -178,7 +190,13 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       pipeline: { label: "Orders", icon: Package },
       tickets: { label: "Support", icon: Ticket },
       email: { label: "Messages", icon: Mail },
-    }),
+    }, [
+      { label: "Menu", href: "/admin/menu", icon: UtensilsCrossed },
+      { label: "POS", href: "/admin/pos", icon: MonitorSmartphone },
+      { label: "Inventory", href: "/admin/inventory", icon: Warehouse },
+      { label: "Events", href: "/admin/events", icon: CalendarPlus },
+      { label: "Gift Cards", href: "/admin/giftcards", icon: Gift },
+    ]),
   },
 
   // ── 4. Beauty & Wellness ──────────────────────────
@@ -210,7 +228,12 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       pipeline: { label: "Appointments", icon: CalendarDays },
       tickets: { label: "Client Notes", icon: Heart },
       email: { label: "Messages", icon: Mail },
-    }),
+    }, [
+      { label: "Appointments", href: "/admin/appointments", icon: CalendarPlus },
+      { label: "Memberships", href: "/admin/memberships", icon: Star },
+      { label: "Gift Cards", href: "/admin/giftcards", icon: Gift },
+      { label: "Loyalty", href: "/admin/loyalty", icon: Heart },
+    ]),
   },
 
   // ── 5. Health & Fitness ──────────────────────────
@@ -242,7 +265,11 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       pipeline: { label: "Memberships", icon: CreditCard },
       tickets: { label: "Support", icon: Ticket },
       email: { label: "Communications", icon: Mail },
-    }),
+    }, [
+      { label: "Events", href: "/admin/events", icon: CalendarPlus },
+      { label: "Memberships", href: "/admin/memberships", icon: Star },
+      { label: "Loyalty", href: "/admin/loyalty", icon: Heart },
+    ]),
   },
 
   // ── 6. Real Estate ──────────────────────────
@@ -337,7 +364,14 @@ const VERTICALS: Record<VerticalId, VerticalConfig> = {
       pipeline: { label: "Orders", icon: Package },
       tickets: { label: "Support", icon: Ticket },
       email: { label: "Messages", icon: Mail },
-    }),
+    }, [
+      { label: "POS", href: "/admin/pos", icon: MonitorSmartphone },
+      { label: "Inventory", href: "/admin/inventory", icon: Warehouse },
+      { label: "Barcode Scan", href: "/admin/scan", icon: ScanBarcode },
+      { label: "Returns", href: "/admin/returns", icon: RotateCcw },
+      { label: "Gift Cards", href: "/admin/giftcards", icon: Gift },
+      { label: "Loyalty", href: "/admin/loyalty", icon: Heart },
+    ]),
   },
 };
 

@@ -29,6 +29,7 @@ export const verticalTypeEnum = pgEnum("vertical_type", [
   "agency",
   "service_pro",
   "restaurant",
+  "retail",
   "wellness",
 ]);
 
@@ -67,6 +68,14 @@ export const automationTriggerEnum = pgEnum("automation_trigger", [
   "email_sent",
   "payment_received",
   "tag_added",
+  "order_placed",
+  "order_completed",
+  "appointment_scheduled",
+  "appointment_no_show",
+  "event_booked",
+  "event_waitlist_opened",
+  "inventory_low",
+  "gift_card_redeemed",
 ]);
 
 /** Automation action types. */
@@ -93,6 +102,59 @@ export const stripeConnectStatusEnum = pgEnum("stripe_connect_status", [
   "onboarding",
   "active",
   "restricted",
+]);
+
+/** Inventory stock type — drives ERP tracking behavior. */
+export const stockTypeEnum = pgEnum("stock_type", [
+  "stock",
+  "non_stock",
+  "special_order",
+]);
+
+/** Order lifecycle status. */
+export const orderStatusEnum = pgEnum("order_status", [
+  "new",
+  "preparing",
+  "ready",
+  "completed",
+  "cancelled",
+  "refunded",
+]);
+
+/** Order fulfillment channel. */
+export const orderTypeEnum = pgEnum("order_type", [
+  "dine_in",
+  "takeout",
+  "delivery",
+  "retail_pos",
+  "ecommerce",
+  "catering",
+]);
+
+/** Payment tendering method. */
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "card",
+  "cash",
+  "check",
+  "gift_card",
+  "split",
+]);
+
+/** Appointment lifecycle status. */
+export const appointmentStatusEnum = pgEnum("appointment_status", [
+  "scheduled",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "no_show",
+  "cancelled",
+]);
+
+/** Event booking status. */
+export const eventBookingStatusEnum = pgEnum("event_booking_status", [
+  "confirmed",
+  "waitlisted",
+  "cancelled",
 ]);
 
 export type TenantDomainStatus =
@@ -984,6 +1046,558 @@ export const reviewRequests = pgTable(
     index("idx_review_requests_prospect_id").on(table.prospectId),
   ]
 );
+/**
+ * ──────────────────────────────────────────────────────────────────────
+ * LIGHT ERP — Inventory, Menu, Orders (Restaurant / Retail / All)
+ * ──────────────────────────────────────────────────────────────────────
+ */
+
+/**
+ * Inventory items — Light ERP stock tracking.
+ * stock_type drives tracking: 'stock' decrements, 'non_stock' skips, 'special_order' allows backorder.
+ */
+export const inventoryItems = pgTable(
+  "inventory_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    name: text("name").notNull(),
+    sku: text("sku"),
+    barcode: text("barcode"),
+    description: text("description"),
+
+    stockType: stockTypeEnum("stock_type").notNull().default("stock"),
+    stockCount: integer("stock_count").notNull().default(0),
+    lowStockThreshold: integer("low_stock_threshold").notNull().default(5),
+    /** Cost of goods in cents — for margin tracking. */
+    costOfGoodsCents: integer("cost_of_goods_cents").notNull().default(0),
+
+    /** Stripe sync */
+    stripeProductId: text("stripe_product_id"),
+    stripePriceId: text("stripe_price_id"),
+
+    /** Image stored in R2 — URL only. */
+    imageUrl: text("image_url"),
+
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_inventory_items_tenant_id").on(table.tenantId),
+    index("idx_inventory_items_sku").on(table.sku),
+    index("idx_inventory_items_barcode").on(table.barcode),
+  ]
+);
+
+/**
+ * Item variants — Size/Color/etc for retail products.
+ */
+export const itemVariants = pgTable(
+  "item_variants",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+    inventoryItemId: uuid("inventory_item_id")
+      .notNull()
+      .references(() => inventoryItems.id, { onDelete: "cascade" }),
+
+    label: text("label").notNull(),
+    sku: text("sku"),
+    barcode: text("barcode"),
+    priceCents: integer("price_cents").notNull().default(0),
+    stockCount: integer("stock_count").notNull().default(0),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_item_variants_tenant_id").on(table.tenantId),
+    index("idx_item_variants_inventory_item_id").on(table.inventoryItemId),
+  ]
+);
+
+/**
+ * Menu categories — groups for restaurant/bar menus.
+ */
+export const menuCategories = pgTable("menu_categories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  name: text("name").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/**
+ * Menu items — products synced to Stripe for POS + online ordering.
+ */
+export const menuItems = pgTable(
+  "menu_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+    categoryId: uuid("category_id").references(() => menuCategories.id, { onDelete: "set null" }),
+    inventoryItemId: uuid("inventory_item_id").references(() => inventoryItems.id, { onDelete: "set null" }),
+
+    name: text("name").notNull(),
+    description: text("description"),
+    priceCents: integer("price_cents").notNull().default(0),
+
+    stripeProductId: text("stripe_product_id"),
+    stripePriceId: text("stripe_price_id"),
+
+    imageUrl: text("image_url"),
+    isAvailable: boolean("is_available").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_menu_items_tenant_id").on(table.tenantId),
+    index("idx_menu_items_category_id").on(table.categoryId),
+  ]
+);
+
+/**
+ * Menu modifiers — add-ons and options (e.g. "Add Bacon +$2").
+ */
+export const menuModifiers = pgTable("menu_modifiers", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+  menuItemId: uuid("menu_item_id")
+    .notNull()
+    .references(() => menuItems.id, { onDelete: "cascade" }),
+
+  name: text("name").notNull(),
+  priceCents: integer("price_cents").notNull().default(0),
+  isDefault: boolean("is_default").notNull().default(false),
+
+  createdAt: text("created_at").notNull(),
+});
+
+/**
+ * Orders — universal order record for POS, KDS, online, catering.
+ * Supports split tendering (card/cash/check/gift_card).
+ */
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Human-readable order number (ORD-0001). */
+    orderNumber: text("order_number").notNull(),
+    /** References leads.prospectId (nullable for walk-ins). */
+    prospectId: text("prospect_id"),
+
+    status: orderStatusEnum("status").notNull().default("new"),
+    orderType: orderTypeEnum("order_type").notNull().default("retail_pos"),
+    paymentMethod: paymentMethodEnum("payment_method").notNull().default("card"),
+
+    subtotalCents: integer("subtotal_cents").notNull().default(0),
+    taxCents: integer("tax_cents").notNull().default(0),
+    tipAmountCents: integer("tip_amount_cents").notNull().default(0),
+    totalCents: integer("total_cents").notNull().default(0),
+
+    /** Cash tendering fields */
+    cashTenderedCents: integer("cash_tendered_cents"),
+    changeDueCents: integer("change_due_cents"),
+    /** Check tendering */
+    checkNumber: text("check_number"),
+
+    /** Stripe */
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+
+    /** Restaurant-specific */
+    tableId: uuid("table_id"),
+
+    /** Staff who took the order (Clerk userId). */
+    takenBy: text("taken_by"),
+    notes: text("notes"),
+
+    paidAt: text("paid_at"),
+    completedAt: text("completed_at"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_orders_tenant_id").on(table.tenantId),
+    index("idx_orders_status").on(table.status),
+    index("idx_orders_created_at").on(table.createdAt),
+  ]
+);
+
+/**
+ * Order items — line items with snapshotted price.
+ */
+export const orderItems = pgTable("order_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+  orderId: uuid("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+
+  menuItemId: uuid("menu_item_id"),
+  inventoryItemId: uuid("inventory_item_id"),
+
+  name: text("name").notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  unitPriceCents: integer("unit_price_cents").notNull().default(0),
+  totalCents: integer("total_cents").notNull().default(0),
+
+  /** Selected modifiers snapshot */
+  modifiers: jsonb("modifiers")
+    .$type<Array<{ name: string; priceCents: number }>>()
+    .notNull()
+    .default([]),
+
+  createdAt: text("created_at").notNull(),
+});
+
+/**
+ * Restaurant tables / floor plan.
+ */
+export const restaurantTables = pgTable("restaurant_tables", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  tableNumber: text("table_number").notNull(),
+  zone: text("zone"),
+  seats: integer("seats").notNull().default(4),
+  status: text("status").notNull().default("available"),
+
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/**
+ * ──────────────────────────────────────────────────────────────────────
+ * BOOKING — Appointments & Events (Agency, Service Pro, Wellness)
+ * ──────────────────────────────────────────────────────────────────────
+ */
+
+/**
+ * Appointments — universal booking (discovery calls, jobs, sessions).
+ */
+export const appointments = pgTable(
+  "appointments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** References leads.prospectId */
+    prospectId: text("prospect_id"),
+    prospectName: text("prospect_name"),
+    prospectEmail: text("prospect_email"),
+
+    title: text("title").notNull(),
+    description: text("description"),
+
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+
+    status: appointmentStatusEnum("status").notNull().default("scheduled"),
+
+    /** iCal RRULE for recurring appointments */
+    recurrenceRule: text("recurrence_rule"),
+
+    /** Assigned staff (Clerk userId) */
+    assignedTo: text("assigned_to"),
+    /** Location or address */
+    location: text("location"),
+
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_appointments_tenant_id").on(table.tenantId),
+    index("idx_appointments_start_time").on(table.startTime),
+    index("idx_appointments_status").on(table.status),
+  ]
+);
+
+/**
+ * Events — classes, catering, webinars, special events.
+ * max_capacity drives "X seats remaining" urgency display.
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    name: text("name").notNull(),
+    description: text("description"),
+    location: text("location"),
+    imageUrl: text("image_url"),
+
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+
+    maxCapacity: integer("max_capacity"),
+    /** Push to public website calendar? */
+    isPublic: boolean("is_public").notNull().default(false),
+    waitlistEnabled: boolean("waitlist_enabled").notNull().default(false),
+
+    /** Price per ticket in cents (0 = free). */
+    priceCents: integer("price_cents").notNull().default(0),
+
+    /** Recurring event rule (iCal RRULE). */
+    recurrenceRule: text("recurrence_rule"),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_events_tenant_id").on(table.tenantId),
+    index("idx_events_start_time").on(table.startTime),
+    index("idx_events_is_public").on(table.isPublic),
+  ]
+);
+
+/**
+ * Event bookings — tracks who booked + waitlist status.
+ */
+export const eventBookings = pgTable(
+  "event_bookings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+
+    prospectId: text("prospect_id"),
+    prospectName: text("prospect_name").notNull(),
+    prospectEmail: text("prospect_email").notNull(),
+
+    status: eventBookingStatusEnum("status").notNull().default("confirmed"),
+    /** Stripe Payment Intent for paid events. */
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_event_bookings_tenant_id").on(table.tenantId),
+    index("idx_event_bookings_event_id").on(table.eventId),
+  ]
+);
+
+/**
+ * ──────────────────────────────────────────────────────────────────────
+ * CROSS-VERTICAL — Gift Cards, Loyalty, Memberships, Tax, Files, HW
+ * ──────────────────────────────────────────────────────────────────────
+ */
+
+/** Gift cards — balance tracked in cents. */
+export const giftCards = pgTable("gift_cards", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  code: text("code").notNull(),
+  initialBalanceCents: integer("initial_balance_cents").notNull(),
+  currentBalanceCents: integer("current_balance_cents").notNull(),
+
+  issuedToProspectId: text("issued_to_prospect_id"),
+  issuedToEmail: text("issued_to_email"),
+
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: text("expires_at"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** Loyalty points — ledger per prospect. */
+export const loyaltyPoints = pgTable("loyalty_points", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  prospectId: text("prospect_id").notNull(),
+  points: integer("points").notNull().default(0),
+  lifetimePoints: integer("lifetime_points").notNull().default(0),
+
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** Memberships — recurring packages tied to Stripe Subscriptions. */
+export const memberships = pgTable("memberships", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  prospectId: text("prospect_id").notNull(),
+  name: text("name").notNull(),
+  priceCents: integer("price_cents").notNull().default(0),
+  interval: text("interval").notNull().default("month"),
+
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  status: text("status").notNull().default("active"),
+
+  startDate: text("start_date").notNull(),
+  endDate: text("end_date"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** Tax rates — per-tenant tax configuration. */
+export const taxRates = pgTable("tax_rates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  name: text("name").notNull(),
+  /** Rate in basis points (e.g. 800 = 8.00%). */
+  rateBps: integer("rate_bps").notNull().default(0),
+  isDefault: boolean("is_default").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** File attachments — URLs to Cloudflare R2 (images, PDFs, docs). */
+export const fileAttachments = pgTable(
+  "file_attachments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    url: text("url").notNull(),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type"),
+    sizeBytes: integer("size_bytes"),
+
+    /** Polymorphic link: 'lead', 'order', 'event', 'appointment', 'contract' */
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+
+    uploadedBy: text("uploaded_by"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_file_attachments_tenant_id").on(table.tenantId),
+    index("idx_file_attachments_entity").on(table.entityType, table.entityId),
+  ]
+);
+
+/** Hardware devices — registered Stripe Readers + PrintNode printers. */
+export const hardwareDevices = pgTable("hardware_devices", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+  /** 'stripe_reader', 'printnode_printer' */
+  deviceType: text("device_type").notNull(),
+  label: text("label").notNull(),
+  /** External device ID (Stripe Reader ID or PrintNode Printer ID). */
+  externalId: text("external_id").notNull(),
+  location: text("location"),
+  isActive: boolean("is_active").notNull().default(true),
+
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+/** Time entries — clock in/out per job for Service Pro. */
+export const timeEntries = pgTable(
+  "time_entries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Clerk userId */
+    userId: text("user_id").notNull(),
+    /** References appointments.id or leads.prospectId */
+    appointmentId: uuid("appointment_id"),
+    prospectId: text("prospect_id"),
+
+    clockIn: text("clock_in").notNull(),
+    clockOut: text("clock_out"),
+    /** Duration in minutes (calculated on clock-out). */
+    durationMinutes: integer("duration_minutes"),
+    notes: text("notes"),
+
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_time_entries_tenant_id").on(table.tenantId),
+    index("idx_time_entries_user_id").on(table.userId),
+  ]
+);
+
+/** Returns — return/exchange records for retail + restaurant refunds. */
+export const returns = pgTable(
+  "returns",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+
+    reason: text("reason"),
+    /** 'refund', 'exchange', 'store_credit' */
+    returnType: text("return_type").notNull().default("refund"),
+    refundAmountCents: integer("refund_amount_cents").notNull().default(0),
+
+    stripeRefundId: text("stripe_refund_id"),
+    /** Restock inventory on return? */
+    restocked: boolean("restocked").notNull().default(false),
+
+    processedBy: text("processed_by"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("idx_returns_tenant_id").on(table.tenantId),
+    index("idx_returns_order_id").on(table.orderId),
+  ]
+);
 
 /**
  * ──────────────────────────────────────────────────────────────────────
@@ -1023,4 +1637,31 @@ export type StripeConnectStatus = (typeof stripeConnectStatusEnum.enumValues)[nu
 export type EstimateStatus = (typeof estimateStatusEnum.enumValues)[number];
 export type ContractStatus = (typeof contractStatusEnum.enumValues)[number];
 export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
+export type StockType = (typeof stockTypeEnum.enumValues)[number];
+export type OrderStatus = (typeof orderStatusEnum.enumValues)[number];
+export type OrderType = (typeof orderTypeEnum.enumValues)[number];
+export type PaymentMethod = (typeof paymentMethodEnum.enumValues)[number];
+export type AppointmentStatus = (typeof appointmentStatusEnum.enumValues)[number];
+export type EventBookingStatus = (typeof eventBookingStatusEnum.enumValues)[number];
+
+/** CRM V1 Sprint — Row Types */
+export type InventoryItemRow = typeof inventoryItems.$inferSelect;
+export type ItemVariantRow = typeof itemVariants.$inferSelect;
+export type MenuCategoryRow = typeof menuCategories.$inferSelect;
+export type MenuItemRow = typeof menuItems.$inferSelect;
+export type MenuModifierRow = typeof menuModifiers.$inferSelect;
+export type OrderRow = typeof orders.$inferSelect;
+export type OrderItemRow = typeof orderItems.$inferSelect;
+export type RestaurantTableRow = typeof restaurantTables.$inferSelect;
+export type AppointmentRow = typeof appointments.$inferSelect;
+export type EventRow = typeof events.$inferSelect;
+export type EventBookingRow = typeof eventBookings.$inferSelect;
+export type GiftCardRow = typeof giftCards.$inferSelect;
+export type LoyaltyPointsRow = typeof loyaltyPoints.$inferSelect;
+export type MembershipRow = typeof memberships.$inferSelect;
+export type TaxRateRow = typeof taxRates.$inferSelect;
+export type FileAttachmentRow = typeof fileAttachments.$inferSelect;
+export type HardwareDeviceRow = typeof hardwareDevices.$inferSelect;
+export type TimeEntryRow = typeof timeEntries.$inferSelect;
+export type ReturnRow = typeof returns.$inferSelect;
 

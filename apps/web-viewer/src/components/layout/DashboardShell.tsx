@@ -3,6 +3,7 @@
 import { useState, useLayoutEffect, startTransition } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import MobileBottomNav from "./MobileBottomNav";
 import QuickAddLead from "@/components/ui/QuickAddLead";
 import { VerticalProvider } from "@/lib/VerticalContext";
 
@@ -61,11 +62,12 @@ export default function DashboardShell({
             title={title}
           />
 
-          <main className="p-6 page-enter">
+          <main className="p-6 pb-24 md:pb-6 page-enter">
             {children}
           </main>
 
           <QuickAddLead />
+          <MobileBottomNav />
         </div>
       </div>
     </VerticalProvider>

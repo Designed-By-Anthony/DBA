@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+import OnboardingFloater from "@/components/onboarding/OnboardingFloater";
+import AiSupportWidget from "@/components/onboarding/AiSupportWidget";
 import VerticalExperience from "@/components/vertical/VerticalExperience";
 
 export default async function AdminLayout({
@@ -41,6 +43,8 @@ export default async function AdminLayout({
     <DashboardShell>
       <VerticalExperience>{children}</VerticalExperience>
       <CommandPalette />
+      <OnboardingFloater />
+      <AiSupportWidget />
     </DashboardShell>
   );
 }

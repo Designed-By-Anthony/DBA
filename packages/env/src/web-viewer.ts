@@ -89,6 +89,19 @@ const webViewerSchema = z
     SENTRY_AUTH_TOKEN: z.string().trim().optional(),
     SENTRY_ORG: z.string().trim().optional(),
     SENTRY_PROJECT: z.string().trim().optional(),
+
+    // Stagehand (Browserbase + Gemini)
+    GEMINI_API_KEY: z.string().trim().optional(),
+    BROWSERBASE_API_KEY: z.string().trim().optional(),
+
+    // Cloudflare R2 — asset storage (images, PDFs, docs).
+    R2_ACCOUNT_ID: z.string().trim().optional(),
+    R2_ACCESS_KEY_ID: z.string().trim().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().trim().optional(),
+    R2_BUCKET_NAME: z.string().trim().optional(),
+
+    // PrintNode — cloud receipt/kitchen printing.
+    PRINTNODE_API_KEY: z.string().trim().optional(),
   })
   .superRefine((env, ctx) => {
     // Hard requirements only apply to production Vercel deploys

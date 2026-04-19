@@ -32,6 +32,8 @@ const ENV_BLEED_KEYS = [
   "LEAD_WEBHOOK_SECRET",
   "GOOGLE_PAGESPEED_API_KEY",
   "GEMINI_API_KEY",
+  "BROWSERBASE_API_KEY",
+  "OPENAI_API_KEY",
 ] as const;
 
 function detectEnvBleed(
