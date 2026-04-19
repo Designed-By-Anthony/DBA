@@ -1,0 +1,585 @@
+---
+/**
+ * StreamChatWidget — floating live-chat bubble powered by Stream Chat.
+ *
+ * Gated behind PUBLIC_ENABLE_STREAM_CHAT env var.
+ * Visitors enter a name OR email before chatting (configurable).
+ * Creates anonymous guest sessions via the Stream Chat REST API.
+ * Routes all messages to the agency inbox user.
+ */
+const enableChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === '1';
+const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
+---
+
+{enableChat && apiKey && (
+  <>
+    {/* ── Chat Bubble (bottom-right, above reach-out sticky) ── */}
+    <div id="dba-chat-widget" class="dba-chat-widget" data-api-key={apiKey}>
+      {/* Floating trigger button */}
+      <button
+        type="button"
+        id="dba-chat-toggle"
+        class="dba-chat-toggle"
+        aria-label="Open live chat"
+        aria-expanded="false"
+        aria-controls="dba-chat-panel"
+      >
+        <svg id="dba-chat-icon-msg" class="dba-chat-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        <svg id="dba-chat-icon-close" class="dba-chat-icon dba-chat-icon--close" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:none;">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+        <span class="dba-chat-badge" id="dba-chat-badge" hidden>1</span>
+      </button>
+
+      {/* Chat panel */}
+      <div id="dba-chat-panel" class="dba-chat-panel" hidden>
+        {/* Header */}
+        <div class="dba-chat-header">
+          <div class="dba-chat-header-info">
+            <span class="dba-chat-header-dot"></span>
+            <span class="dba-chat-header-title">Designed by Anthony</span>
+          </div>
+          <button type="button" id="dba-chat-close" class="dba-chat-close" aria-label="Close chat">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Pre-chat form (name or email) */}
+        <div id="dba-chat-prechat" class="dba-chat-prechat">
+          <p class="dba-chat-prechat-title">👋 Hi there!</p>
+          <p class="dba-chat-prechat-subtitle">Enter your name or email to start chatting.</p>
+          <form id="dba-chat-prechat-form" class="dba-chat-prechat-form" autocomplete="off">
+            <input
+              type="text"
+              id="dba-chat-identity"
+              class="dba-chat-input"
+              placeholder="Name or email…"
+              required
+              minlength="2"
+              maxlength="120"
+              autocomplete="off"
+            />
+            <button type="submit" class="dba-chat-submit-btn">
+              Start Chat
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        {/* Messages area */}
+        <div id="dba-chat-messages" class="dba-chat-messages" hidden>
+          <div id="dba-chat-messages-list" class="dba-chat-messages-list">
+            <div class="dba-chat-system-msg">
+              <p>Welcome! We typically reply within a few minutes during business hours.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Compose bar */}
+        <form id="dba-chat-compose" class="dba-chat-compose" hidden autocomplete="off">
+          <input
+            type="text"
+            id="dba-chat-compose-input"
+            class="dba-chat-input dba-chat-compose-input"
+            placeholder="Type a message…"
+            autocomplete="off"
+            maxlength="2000"
+          />
+          <button type="submit" class="dba-chat-send" aria-label="Send message">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {/* ── Chat widget styles ── */}
+    <style>
+      .dba-chat-widget {
+        --chat-brand: var(--color-brand, #6366f1);
+        --chat-brand-hover: var(--color-brand-hover, #4f46e5);
+        --chat-bg: #0d1117;
+        --chat-surface: #161b22;
+        --chat-border: rgba(255, 255, 255, 0.08);
+        --chat-text: #e6edf3;
+        --chat-text-muted: #8b949e;
+        --chat-bubble-me: var(--chat-brand);
+        --chat-bubble-them: #21262d;
+        --chat-radius: 16px;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+
+      /* ── Toggle button ── */
+      .dba-chat-toggle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--chat-brand), var(--chat-brand-hover));
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+      }
+      .dba-chat-toggle:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 28px rgba(99, 102, 241, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+      .dba-chat-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #ef4444;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--chat-bg);
+      }
+
+      /* ── Panel ── */
+      .dba-chat-panel {
+        position: absolute;
+        bottom: 72px;
+        right: 0;
+        width: 380px;
+        max-height: 520px;
+        border-radius: var(--chat-radius);
+        background: var(--chat-bg);
+        border: 1px solid var(--chat-border);
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: dba-chat-slide-up 0.25s ease-out;
+      }
+      @keyframes dba-chat-slide-up {
+        from { opacity: 0; transform: translateY(12px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      /* ── Header ── */
+      .dba-chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: var(--chat-surface);
+        border-bottom: 1px solid var(--chat-border);
+      }
+      .dba-chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .dba-chat-header-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+        animation: dba-chat-pulse 2s ease-in-out infinite;
+      }
+      @keyframes dba-chat-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      .dba-chat-header-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--chat-text);
+      }
+      .dba-chat-close {
+        background: none;
+        border: none;
+        color: var(--chat-text-muted);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 8px;
+        transition: color 0.15s, background 0.15s;
+      }
+      .dba-chat-close:hover {
+        color: var(--chat-text);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      /* ── Pre-chat ── */
+      .dba-chat-prechat {
+        padding: 32px 24px;
+        text-align: center;
+      }
+      .dba-chat-prechat-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--chat-text);
+        margin: 0 0 6px;
+      }
+      .dba-chat-prechat-subtitle {
+        font-size: 13px;
+        color: var(--chat-text-muted);
+        margin: 0 0 20px;
+        line-height: 1.5;
+      }
+      .dba-chat-prechat-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .dba-chat-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--chat-border);
+        background: var(--chat-surface);
+        color: var(--chat-text);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.15s;
+        box-sizing: border-box;
+      }
+      .dba-chat-input:focus {
+        border-color: var(--chat-brand);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+      .dba-chat-input::placeholder {
+        color: var(--chat-text-muted);
+      }
+      .dba-chat-submit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--chat-brand), var(--chat-brand-hover));
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.1s;
+      }
+      .dba-chat-submit-btn:hover {
+        opacity: 0.92;
+      }
+      .dba-chat-submit-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* ── Messages ── */
+      .dba-chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 200px;
+        max-height: 320px;
+      }
+      .dba-chat-messages-list {
+        padding: 16px 16px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .dba-chat-system-msg {
+        text-align: center;
+        padding: 8px 16px;
+      }
+      .dba-chat-system-msg p {
+        font-size: 12px;
+        color: var(--chat-text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+      .dba-chat-msg {
+        max-width: 80%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 13px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        animation: dba-chat-msg-in 0.2s ease-out;
+      }
+      @keyframes dba-chat-msg-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .dba-chat-msg--me {
+        align-self: flex-end;
+        background: var(--chat-bubble-me);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+      .dba-chat-msg--them {
+        align-self: flex-start;
+        background: var(--chat-bubble-them);
+        color: var(--chat-text);
+        border-bottom-left-radius: 4px;
+      }
+      .dba-chat-msg-time {
+        font-size: 10px;
+        color: rgba(255,255,255,0.5);
+        margin-top: 4px;
+        display: block;
+      }
+
+      /* ── Compose bar ── */
+      .dba-chat-compose {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        border-top: 1px solid var(--chat-border);
+        background: var(--chat-surface);
+      }
+      .dba-chat-compose-input {
+        flex: 1;
+        border-radius: 20px;
+        padding: 10px 16px;
+      }
+      .dba-chat-send {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--chat-brand);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .dba-chat-send:hover {
+        background: var(--chat-brand-hover);
+      }
+      .dba-chat-send:active {
+        transform: scale(0.92);
+      }
+
+      /* ── Mobile responsive ── */
+      @media (max-width: 480px) {
+        .dba-chat-widget {
+          bottom: 16px;
+          right: 16px;
+        }
+        .dba-chat-panel {
+          width: calc(100vw - 32px);
+          max-height: 70vh;
+          right: 0;
+          bottom: 68px;
+        }
+      }
+    </style>
+
+    {/* ── Chat widget logic ── */}
+    <script is:inline>
+    (function () {
+      if (typeof window === 'undefined') return;
+
+      var widget = document.getElementById('dba-chat-widget');
+      if (!widget) return;
+
+      var API_KEY = widget.getAttribute('data-api-key');
+      if (!API_KEY) return;
+
+      var toggleBtn = document.getElementById('dba-chat-toggle');
+      var panel = document.getElementById('dba-chat-panel');
+      var closeBtn = document.getElementById('dba-chat-close');
+      var iconMsg = document.getElementById('dba-chat-icon-msg');
+      var iconClose = document.getElementById('dba-chat-icon-close');
+      var prechat = document.getElementById('dba-chat-prechat');
+      var prechatForm = document.getElementById('dba-chat-prechat-form');
+      var identityInput = document.getElementById('dba-chat-identity');
+      var messagesArea = document.getElementById('dba-chat-messages');
+      var messagesList = document.getElementById('dba-chat-messages-list');
+      var compose = document.getElementById('dba-chat-compose');
+      var composeInput = document.getElementById('dba-chat-compose-input');
+      var badge = document.getElementById('dba-chat-badge');
+
+      var isOpen = false;
+      var visitorId = null;
+      var visitorIdentity = '';
+      var pollTimer = null;
+
+      // Restore session
+      try {
+        var stored = sessionStorage.getItem('dba_chat_session');
+        if (stored) {
+          var s = JSON.parse(stored);
+          visitorId = s.visitorId;
+          visitorIdentity = s.identity;
+        }
+      } catch (e) {}
+
+      function generateId() {
+        return 'visitor_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
+      }
+
+      function toggle() {
+        isOpen = !isOpen;
+        if (isOpen) {
+          panel.removeAttribute('hidden');
+          iconMsg.style.display = 'none';
+          iconClose.style.display = 'block';
+          toggleBtn.setAttribute('aria-expanded', 'true');
+          badge.setAttribute('hidden', '');
+
+          if (visitorId && visitorIdentity) {
+            showChat();
+          } else {
+            identityInput.focus();
+          }
+        } else {
+          panel.setAttribute('hidden', '');
+          iconMsg.style.display = 'block';
+          iconClose.style.display = 'none';
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function showChat() {
+        prechat.setAttribute('hidden', '');
+        messagesArea.removeAttribute('hidden');
+        compose.removeAttribute('hidden');
+        composeInput.focus();
+        startPolling();
+      }
+
+      // ── Pre-chat form submit ──
+      prechatForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var val = identityInput.value.trim();
+        if (!val) return;
+
+        visitorIdentity = val;
+        visitorId = visitorId || generateId();
+
+        try {
+          sessionStorage.setItem('dba_chat_session', JSON.stringify({
+            visitorId: visitorId,
+            identity: visitorIdentity,
+          }));
+        } catch (e) {}
+
+        showChat();
+      });
+
+      // ── Send message ──
+      var composeForm = document.getElementById('dba-chat-compose');
+      composeForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var text = composeInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'me');
+        composeInput.value = '';
+
+        // Send to backend (Firebase Cloud Function or API route)
+        sendToBackend(text);
+      });
+
+      function appendMessage(text, who) {
+        var div = document.createElement('div');
+        div.className = 'dba-chat-msg dba-chat-msg--' + who;
+        div.textContent = text;
+        var time = document.createElement('span');
+        time.className = 'dba-chat-msg-time';
+        time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        div.appendChild(time);
+        messagesList.appendChild(div);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+      }
+
+      /**
+       * Sends the visitor message to the chat backend.
+       * Uses the Firebase Cloud Functions chatWebhook endpoint.
+       */
+      function sendToBackend(text) {
+        var payload = {
+          visitorId: visitorId,
+          visitorName: visitorIdentity,
+          message: text,
+          pageUrl: window.location.href,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Use the CRM lead URL base to construct the chat webhook
+        // Falls back to a relative path for the marketing functions
+        var chatEndpoint = '/__/functions/chatWebhook';
+
+        fetch(chatEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(function (err) {
+          console.warn('[Chat] Send failed:', err.message);
+        });
+      }
+
+      /**
+       * Poll for operator replies via the chatPoll endpoint.
+       */
+      var lastPollTimestamp = new Date().toISOString();
+
+      function startPolling() {
+        if (pollTimer) return;
+        pollTimer = setInterval(pollForReplies, 5000);
+      }
+
+      function pollForReplies() {
+        if (!visitorId) return;
+
+        var pollEndpoint = '/__/functions/chatPoll?visitorId=' + encodeURIComponent(visitorId) + '&since=' + encodeURIComponent(lastPollTimestamp);
+
+        fetch(pollEndpoint)
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.messages && data.messages.length > 0) {
+              data.messages.forEach(function (msg) {
+                appendMessage(msg.text || msg.message, 'them');
+              });
+              lastPollTimestamp = new Date().toISOString();
+
+              // Show badge if panel is closed
+              if (!isOpen) {
+                badge.removeAttribute('hidden');
+                badge.textContent = String(data.messages.length);
+              }
+            }
+          })
+          .catch(function () {});
+      }
+
+      // ── Event listeners ──
+      toggleBtn.addEventListener('click', toggle);
+      closeBtn.addEventListener('click', toggle);
+
+      // If returning visitor, auto-show chat state
+      if (visitorId && visitorIdentity) {
+        // Pre-fill but don't auto-open
+        identityInput.value = visitorIdentity;
+      }
+    })();
+    </script>
+  </>
+)}

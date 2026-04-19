@@ -7,6 +7,7 @@ import { sendMail } from "@/lib/mailer";
 import { complianceConfig } from "@/lib/theme.config";
 import { escapeHtml } from "@/lib/email-utils";
 import { apiError } from "@/lib/api-error";
+import { sendWebPushToProspect } from "@/lib/push-notify";
 
 /**
  * PATCH /api/admin/tickets/[id]
@@ -115,6 +116,15 @@ export async function PATCH(
       } catch (e) {
         console.error("Client reply notification failed:", e);
       }
+    }
+
+    // Push notification to client portal
+    if (ticket.leadId && hasReply) {
+      sendWebPushToProspect(ticket.leadId, {
+        title: `Ticket Update: ${ticket.subject}`,
+        body: adminReply!.trim().slice(0, 120),
+        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com"}/portal/tickets`,
+      }).catch((e: unknown) => console.error("Push to prospect failed:", e));
     }
 
     return NextResponse.json({ success: true });

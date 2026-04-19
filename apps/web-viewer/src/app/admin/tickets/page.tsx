@@ -94,6 +94,16 @@ export default function AdminTicketsPage() {
   const [replyStatus, setReplyStatus] = useState("in_progress");
   const [sending, setSending] = useState(false);
   const [filter, setFilter] = useState<"all" | "open" | "in_progress" | "resolved">("all");
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    leadId: "",
+    leadName: "",
+    leadEmail: "",
+    subject: "",
+    description: "",
+    priority: "medium" as "low" | "medium" | "high" | "urgent",
+  });
 
   const load = useCallback(async () => {
     const data = await fetchTickets();
@@ -119,6 +129,25 @@ export default function AdminTicketsPage() {
     }
   };
 
+  const handleCreate = async () => {
+    if (!createForm.leadEmail || !createForm.subject || !createForm.description) return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/admin/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(createForm),
+      });
+      if (res.ok) {
+        setShowCreate(false);
+        setCreateForm({ leadId: "", leadName: "", leadEmail: "", subject: "", description: "", priority: "medium" });
+        await load();
+      }
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const filtered = filter === "all" ? tickets : tickets.filter(t => t.status === filter);
   const openCount = tickets.filter(t => t.status === "open").length;
 
@@ -132,7 +161,13 @@ export default function AdminTicketsPage() {
             {openCount} open · {tickets.length} total
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-4 py-1.5 rounded-lg text-xs font-medium bg-(--color-brand) text-white hover:bg-brand-hover transition-colors"
+          >
+            + New Ticket
+          </button>
           {(["all", "open", "in_progress", "resolved"] as const).map((f) => (
             <button
               key={f}
@@ -148,6 +183,69 @@ export default function AdminTicketsPage() {
           ))}
         </div>
       </div>
+
+      {/* Create Ticket Modal */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface-1 border border-glass-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Create Ticket for Client</h2>
+              <button onClick={() => setShowCreate(false)} className="text-text-muted hover:text-white text-lg">✕</button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                placeholder="Client name"
+                value={createForm.leadName}
+                onChange={(e) => setCreateForm({ ...createForm, leadName: e.target.value, leadId: createForm.leadId || `lead_${Date.now()}` })}
+                className="col-span-1 bg-surface-2 border border-glass-border rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-(--color-brand)"
+              />
+              <input
+                type="email"
+                placeholder="Client email"
+                value={createForm.leadEmail}
+                onChange={(e) => setCreateForm({ ...createForm, leadEmail: e.target.value })}
+                className="col-span-1 bg-surface-2 border border-glass-border rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-(--color-brand)"
+              />
+            </div>
+
+            <input
+              placeholder="Ticket subject"
+              value={createForm.subject}
+              onChange={(e) => setCreateForm({ ...createForm, subject: e.target.value })}
+              className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-(--color-brand)"
+            />
+
+            <textarea
+              placeholder="Describe the issue or message to the client..."
+              rows={4}
+              value={createForm.description}
+              onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+              className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-(--color-brand) resize-none"
+            />
+
+            <div className="flex items-center gap-3">
+              <select
+                value={createForm.priority}
+                onChange={(e) => setCreateForm({ ...createForm, priority: e.target.value as "low" | "medium" | "high" | "urgent" })}
+                className="bg-surface-2 border border-glass-border rounded-lg px-3 py-2 text-sm text-white"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+              <button
+                onClick={handleCreate}
+                disabled={creating || !createForm.leadEmail || !createForm.subject || !createForm.description}
+                className="flex-1 py-2 rounded-lg bg-(--color-brand) hover:bg-brand-hover text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {creating ? "Creating..." : "Create & Notify Client"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Ticket List */}
