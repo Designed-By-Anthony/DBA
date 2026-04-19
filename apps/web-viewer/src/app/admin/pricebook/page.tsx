@@ -209,43 +209,50 @@ export default function PriceBookPage() {
 
       {/* Creation Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md bg-surface-1 rounded-2xl border border-glass-border p-6 shadow-2xl relative animate-fade-up">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-surface-2 text-text-gray hover:text-white transition-colors"
-            >
-              ╳
-            </button>
-            <h2 className="text-xl font-bold text-white mb-6">New Stripe Product</h2>
-            
-            <form onSubmit={handleCreate} className="space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowModal(false)} />
+          <div className="relative w-full max-w-md rounded-2xl border border-glass-border bg-[#0d0e14]/95 backdrop-blur-xl shadow-[0_0_80px_rgba(37,99,235,0.08),0_24px_48px_rgba(0,0,0,0.6)] animate-fade-in overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-glass-border bg-gradient-to-r from-surface-2/80 to-transparent rounded-t-2xl">
               <div>
-                <label className="block text-xs font-medium text-text-gray mb-1">Product Name</label>
+                <h2 className="text-base font-semibold text-white">New Stripe Product</h2>
+                <p className="text-[11px] text-text-muted mt-0.5">Publish a product to your Stripe catalog</p>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-text-gray hover:text-white hover:bg-surface-3 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreate} className="px-6 py-5 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-text-gray">Product Name</label>
                 <input
                   autoFocus
                   required
                   value={form.name}
                   onChange={(e) => setForm({...form, name: e.target.value})}
                   placeholder="e.g. Local SEO Expansion"
-                  className="w-full bg-surface-2 border border-glass-border rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                  className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-4 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                 />
               </div>
               
-              <div>
-                <label className="block text-xs font-medium text-text-gray mb-1">Description (Optional)</label>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-text-gray">Description (Optional)</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({...form, description: e.target.value})}
                   placeholder="Appears on invoice..."
-                  className="w-full bg-surface-2 border border-glass-border rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-(--color-brand) transition-colors resize-none"
+                  className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-4 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all resize-none"
                   rows={2}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-text-gray mb-1">Price (USD)</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-text-gray">Price (USD)</label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-text-muted">$</span>
                     <input
@@ -255,13 +262,13 @@ export default function PriceBookPage() {
                       value={form.priceDollars}
                       onChange={(e) => setForm({...form, priceDollars: e.target.value})}
                       placeholder="199.00"
-                      className="w-full bg-surface-2 border border-glass-border rounded-lg pl-7 pr-3 py-2 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                      className="w-full bg-surface-0/60 border border-glass-border rounded-lg pl-7 pr-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                     />
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-xs font-medium text-text-gray mb-1">Billing Interval</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-text-gray">Billing Interval</label>
                   <select
                     value={form.interval}
                     onChange={(e) =>
@@ -270,7 +277,7 @@ export default function PriceBookPage() {
                         interval: e.target.value as "month" | "year" | "one_time",
                       })
                     }
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   >
                     <option value="one_time">One-Time Fee</option>
                     <option value="month">Monthly Retainer</option>
@@ -279,13 +286,23 @@ export default function PriceBookPage() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full mt-6 py-3 rounded-lg bg-(--color-brand) hover:bg-brand-hover text-white font-bold transition-all disabled:opacity-50"
-              >
-                {submitting ? 'Pushing to Stripe...' : 'Publish to Stripe'}
-              </button>
+              {/* Footer */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 py-2.5 rounded-lg text-sm text-text-muted hover:text-white hover:bg-surface-3 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 py-2.5 rounded-lg bg-(--color-brand) hover:bg-brand-hover text-white font-semibold text-sm transition-all disabled:opacity-40 shadow-[0_0_20px_rgba(37,99,235,0.25)]"
+                >
+                  {submitting ? 'Pushing to Stripe...' : 'Publish to Stripe'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

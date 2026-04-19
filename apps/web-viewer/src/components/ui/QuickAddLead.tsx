@@ -91,15 +91,18 @@ export default function QuickAddLead() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70 backdrop-blur-md"
             onClick={() => setOpen(false)}
           />
 
           {/* Modal */}
-          <div className="relative w-full max-w-lg bg-surface-1 border border-glass-border rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+          <div className="relative w-full max-w-lg bg-[#0d0e14]/95 backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_0_80px_rgba(37,99,235,0.08),0_24px_48px_rgba(0,0,0,0.6)] animate-scale-in overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-glass-border flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">Quick Add Lead</h2>
+            <div className="px-6 py-4 border-b border-glass-border bg-gradient-to-r from-surface-2/80 to-transparent flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-white">Quick Add Lead</h2>
+                <p className="text-[11px] text-text-muted mt-0.5">Add a new prospect to your pipeline</p>
+              </div>
               <button
                 onClick={() => setOpen(false)}
                 className="p-1.5 rounded-lg text-text-gray hover:text-white hover:bg-surface-3 transition-colors"
@@ -117,7 +120,7 @@ export default function QuickAddLead() {
                     value={form.name}
                     onChange={(e) => update("name", e.target.value)}
                     placeholder="John Smith"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                 </div>
                 <div>
@@ -127,7 +130,7 @@ export default function QuickAddLead() {
                     onChange={(e) => update("email", e.target.value)}
                     placeholder="john@example.com"
                     type="email"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                   {dupHint && (
                     <p className="text-[11px] text-amber-400 mt-1">
@@ -150,7 +153,7 @@ export default function QuickAddLead() {
                     value={form.phone}
                     onChange={(e) => update("phone", e.target.value)}
                     placeholder="(555) 123-4567"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                 </div>
                 <div>
@@ -159,7 +162,7 @@ export default function QuickAddLead() {
                     value={form.company}
                     onChange={(e) => update("company", e.target.value)}
                     placeholder="Acme Corp"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                 </div>
               </div>
@@ -171,7 +174,7 @@ export default function QuickAddLead() {
                     value={form.website}
                     onChange={(e) => update("website", e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                 </div>
                 <div>
@@ -181,7 +184,7 @@ export default function QuickAddLead() {
                     onChange={(e) => update("dealValue", e.target.value)}
                     placeholder="5000"
                     type="number"
-                    className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                    className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                   />
                 </div>
               </div>
@@ -191,7 +194,7 @@ export default function QuickAddLead() {
                 <select
                   value={form.source}
                   onChange={(e) => update("source", e.target.value)}
-                  className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors"
+                  className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all"
                 >
                   <option value="">Select source...</option>
                   <option value="Referral">Referral</option>
@@ -211,13 +214,13 @@ export default function QuickAddLead() {
                   onChange={(e) => update("notes", e.target.value)}
                   rows={3}
                   placeholder="Initial conversation details..."
-                  className="w-full bg-surface-2 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-(--color-brand) transition-colors resize-none"
+                  className="w-full bg-surface-0/60 border border-glass-border rounded-lg px-3 py-2.5 text-sm text-white placeholder-text-gray/50 outline-none focus:border-(--color-brand) focus:ring-1 focus:ring-(--color-brand)/30 transition-all resize-none"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-glass-border flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-glass-border bg-surface-0/30 flex justify-end gap-3">
               <button
                 onClick={() => setOpen(false)}
                 className="px-4 py-2.5 rounded-lg text-sm text-text-gray hover:text-white hover:bg-surface-3 transition-colors"

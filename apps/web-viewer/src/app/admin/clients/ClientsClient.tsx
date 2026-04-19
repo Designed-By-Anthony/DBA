@@ -182,13 +182,13 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
       {/* Create org modal */}
       {showCreate && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md overflow-y-auto py-8"
           role="dialog"
           aria-modal="true"
           aria-labelledby="add-client-title"
           data-testid="clients-add-modal"
         >
-          <div className="glass-card p-6 w-full max-w-lg animate-scale-in relative">
+          <div className="glass-card p-6 w-full max-w-lg animate-scale-in relative shadow-[0_0_80px_rgba(37,99,235,0.08),0_24px_48px_rgba(0,0,0,0.6)]">
             <button
               type="button"
               aria-label="Close"
@@ -272,8 +272,8 @@ export default function ClientsClient({ initialOrgs }: { initialOrgs: OrgData[] 
 
       {/* Branding editor modal */}
       {editingOrg && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="glass-card p-6 w-full max-w-md animate-scale-in relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
+          <div className="glass-card p-6 w-full max-w-md animate-scale-in relative shadow-[0_0_80px_rgba(37,99,235,0.08),0_24px_48px_rgba(0,0,0,0.6)]">
             <button
               type="button"
               onClick={() => setEditingOrg(null)}
