@@ -51,32 +51,8 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
           </button>
         </div>
 
-        {/* Pre-chat form (name or email) */}
-        <div id="dba-chat-prechat" class="dba-chat-prechat">
-          <p class="dba-chat-prechat-title">👋 Hi there!</p>
-          <p class="dba-chat-prechat-subtitle">Enter your name or email to start chatting.</p>
-          <form id="dba-chat-prechat-form" class="dba-chat-prechat-form" autocomplete="off">
-            <input
-              type="text"
-              id="dba-chat-identity"
-              class="dba-chat-input"
-              placeholder="Name or email…"
-              required
-              minlength="2"
-              maxlength="120"
-              autocomplete="off"
-            />
-            <button type="submit" class="dba-chat-submit-btn">
-              Start Chat
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-          </form>
-        </div>
-
         {/* Messages area */}
-        <div id="dba-chat-messages" class="dba-chat-messages" hidden>
+        <div id="dba-chat-messages" class="dba-chat-messages">
           <div id="dba-chat-messages-list" class="dba-chat-messages-list">
             <div class="dba-chat-system-msg">
               <p>Welcome! We typically reply within a few minutes during business hours.</p>
@@ -85,7 +61,7 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         </div>
 
         {/* Compose bar */}
-        <form id="dba-chat-compose" class="dba-chat-compose" hidden autocomplete="off">
+        <form id="dba-chat-compose" class="dba-chat-compose" autocomplete="off">
           <input
             type="text"
             id="dba-chat-compose-input"
@@ -251,28 +227,6 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         background: rgba(255, 255, 255, 0.06);
       }
 
-      /* ── Pre-chat ── */
-      .dba-chat-prechat {
-        padding: 32px 24px;
-        text-align: center;
-      }
-      .dba-chat-prechat-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--chat-text);
-        margin: 0 0 6px;
-      }
-      .dba-chat-prechat-subtitle {
-        font-size: 13px;
-        color: var(--chat-text-muted);
-        margin: 0 0 20px;
-        line-height: 1.5;
-      }
-      .dba-chat-prechat-form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
       .dba-chat-input {
         width: 100%;
         padding: 12px 16px;
@@ -291,27 +245,6 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
       }
       .dba-chat-input::placeholder {
         color: var(--chat-text-muted);
-      }
-      .dba-chat-submit-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 24px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--chat-brand), var(--chat-brand-hover));
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: opacity 0.15s, transform 0.1s;
-      }
-      .dba-chat-submit-btn:hover {
-        opacity: 0.92;
-      }
-      .dba-chat-submit-btn:active {
-        transform: scale(0.98);
       }
 
       /* ── Messages ── */
@@ -433,9 +366,6 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
       var closeBtn = document.getElementById('dba-chat-close');
       var iconMsg = document.getElementById('dba-chat-icon-msg');
       var iconClose = document.getElementById('dba-chat-icon-close');
-      var prechat = document.getElementById('dba-chat-prechat');
-      var prechatForm = document.getElementById('dba-chat-prechat-form');
-      var identityInput = document.getElementById('dba-chat-identity');
       var messagesArea = document.getElementById('dba-chat-messages');
       var messagesList = document.getElementById('dba-chat-messages-list');
       var compose = document.getElementById('dba-chat-compose');
@@ -472,11 +402,17 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         badge.setAttribute('hidden', '');
         if (chatLabel) chatLabel.style.display = 'none';
 
-        if (visitorId && visitorIdentity) {
-          showChat();
-        } else {
-          identityInput.focus();
+        if (!visitorId) {
+          visitorId = generateId();
+          visitorIdentity = 'Guest';
+          try {
+            sessionStorage.setItem('dba_chat_session', JSON.stringify({
+              visitorId: visitorId,
+              identity: visitorIdentity,
+            }));
+          } catch (e) {}
         }
+        showChat();
       }
 
       function closeChat() {
@@ -493,31 +429,9 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
       }
 
       function showChat() {
-        prechat.setAttribute('hidden', '');
-        messagesArea.removeAttribute('hidden');
-        compose.removeAttribute('hidden');
         composeInput.focus();
         startPolling();
       }
-
-      // ── Pre-chat form submit ──
-      prechatForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var val = identityInput.value.trim();
-        if (!val) return;
-
-        visitorIdentity = val;
-        visitorId = visitorId || generateId();
-
-        try {
-          sessionStorage.setItem('dba_chat_session', JSON.stringify({
-            visitorId: visitorId,
-            identity: visitorIdentity,
-          }));
-        } catch (e) {}
-
-        showChat();
-      });
 
       // ── Send message ──
       var composeForm = document.getElementById('dba-chat-compose');
@@ -612,11 +526,6 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         closeChat();
       });
 
-      // If returning visitor, auto-show chat state
-      if (visitorId && visitorIdentity) {
-        // Pre-fill but don't auto-open
-        identityInput.value = visitorIdentity;
-      }
     });
     </script>
   </>
