@@ -130,3 +130,54 @@ export async function createSubscription(params: {
 
   return { url: session.url, sessionId: session.id, customerId };
 }
+
+/**
+ * Create a Stripe Checkout session from an Agency OS invoice.
+ * Links the invoice ID in metadata for webhook reconciliation.
+ */
+export async function createInvoiceCheckout(params: {
+  clerkOrgId: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  prospectEmail?: string;
+  lineItems: Array<{
+    name: string;
+    description?: string;
+    unitPriceCents: number;
+    quantity: number;
+    interval?: string;
+  }>;
+}) {
+  const stripeLineItems = params.lineItems.map((item) => ({
+      price_data: {
+        currency: "usd",
+        unit_amount: item.unitPriceCents,
+        product_data: {
+          name: item.name,
+          ...(item.description ? { description: item.description } : {}),
+        },
+        ...(item.interval && item.interval !== "one_time"
+          ? { recurring: { interval: item.interval as "month" | "year" } }
+          : {}),
+      },
+      quantity: item.quantity,
+    }));
+
+  const hasRecurring = params.lineItems.some((i) => i.interval && i.interval !== "one_time");
+
+  const session = await stripe.checkout.sessions.create({
+    mode: hasRecurring ? "subscription" : "payment",
+    ...(params.prospectEmail ? { customer_email: params.prospectEmail } : {}),
+    line_items: stripeLineItems,
+    metadata: {
+      [STRIPE_METADATA_CLERK_ORG]: params.clerkOrgId,
+      invoiceId: params.invoiceId,
+      invoiceNumber: params.invoiceNumber,
+      source: "agency_os_invoice",
+    },
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/portal/payment-cancelled`,
+  });
+
+  return { url: session.url, sessionId: session.id };
+}

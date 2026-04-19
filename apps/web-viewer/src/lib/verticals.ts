@@ -12,6 +12,7 @@ import {
   Ticket, CreditCard, Zap, Inbox, Settings,
   Hammer, ShoppingBag, Scissors, Dumbbell, Home, Camera, Store, ClipboardList,
   CalendarDays, FileText, Package, Heart, Briefcase, ListOrdered, BarChart3,
+  FileCheck,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────
@@ -78,6 +79,7 @@ function buildSidebar(overrides: Partial<Record<string, { label: string; icon: L
     { label: "Price Book", href: "/admin/pricebook", icon: ShoppingBag },
     { label: "Estimates", href: "/admin/estimates", icon: FileText },
     { label: "Invoices", href: "/admin/invoices", icon: CreditCard },
+    { label: "Contracts", href: "/admin/contracts", icon: FileCheck },
     { label: "Automations", href: "/admin/automations", icon: Zap },
     { label: "Inbox", href: "/admin/inbox", icon: Inbox },
     { label: "Calendar", href: "/admin/calendar", icon: CalendarDays },

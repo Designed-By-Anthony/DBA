@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getDb, withBypassRls, leads, activities, type Database } from '@dba/database';
+import { getDb, withBypassRls, leads, activities, invoices, reviewRequests, type Database } from '@dba/database';
 import { and, eq } from 'drizzle-orm';
 import { sendMail } from '@/lib/mailer';
 import { complianceConfig } from '@/lib/theme.config';
@@ -202,6 +202,40 @@ export async function POST(request: NextRequest) {
             });
           } catch {
             // non-critical
+          }
+
+          // ── Invoice reconciliation (Revenue Pipeline) ────────────────
+          const invoiceId = session.metadata?.invoiceId;
+          if (invoiceId) {
+            try {
+              const now = new Date().toISOString();
+              await tx
+                .update(invoices)
+                .set({
+                  status: 'paid',
+                  paidAt: now,
+                  stripeSessionId: session.id,
+                  stripePaymentIntentId: typeof session.payment_intent === 'string'
+                    ? session.payment_intent
+                    : null,
+                  updatedAt: now,
+                })
+                .where(eq(invoices.id, invoiceId));
+
+              // Auto-create review request
+              const defaultReviewUrl = `https://search.google.com/local/writereview?placeid=PLACEHOLDER`;
+              await tx.insert(reviewRequests).values({
+                tenantId,
+                invoiceId,
+                prospectId,
+                platform: 'google',
+                reviewUrl: defaultReviewUrl,
+                createdAt: now,
+                updatedAt: now,
+              });
+            } catch {
+              // non-critical — invoice may not exist
+            }
           }
 
           break;
