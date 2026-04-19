@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { SignIn } from "@clerk/nextjs";
 import Image from "next/image";
 import { BRAND_ASSETS } from "@dba/theme/brand";
@@ -26,6 +27,17 @@ const clerkAppearance = {
  *   Default `false` → used on the dedicated `/sign-in` route with `routing="path"`.
  */
 export function AgencySignIn({ inline = false }: { inline?: boolean }) {
+  const [showRetry, setShowRetry] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      // If Clerk still hasn't mounted after 8s, show the retry button
+      const clerkEl = document.querySelector(".cl-rootBox, [data-clerk-component]");
+      if (!clerkEl) setShowRetry(true);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-(--color-surface-0) p-4 relative overflow-hidden">
       <div className="orb w-[500px] h-[500px] bg-[rgb(59_130_246/0.08)] -top-40 -right-40" />
@@ -50,14 +62,25 @@ export function AgencySignIn({ inline = false }: { inline?: boolean }) {
 
         {/*
          * Loading skeleton — Clerk mounts async; on mobile the JS can take
-         * a few seconds. This placeholder is hidden once Clerk's root mounts
-         * via the adjacent sibling CSS trick.
+         * a few seconds. Hidden via CSS once Clerk's root mounts.
          */}
         <div className="clerk-loading-skeleton mb-4">
-          <div className="mx-auto w-full max-w-[400px] rounded-xl border border-glass-border bg-surface-1 p-6 space-y-4 animate-pulse">
-            <div className="h-10 rounded-lg bg-surface-2" />
-            <div className="h-10 rounded-lg bg-surface-2" />
-            <div className="h-10 rounded-lg bg-surface-2 w-1/2 mx-auto" />
+          <div className="mx-auto w-full max-w-[400px] rounded-xl border border-glass-border bg-surface-1 p-6 space-y-4">
+            <div className="h-10 rounded-lg bg-surface-2 animate-pulse" />
+            <div className="h-10 rounded-lg bg-surface-2 animate-pulse" />
+            <div className="h-10 rounded-lg bg-surface-2 animate-pulse w-1/2 mx-auto" />
+            <p className="text-[11px] text-text-muted text-center pt-2">Loading sign-in...</p>
+            {showRetry && (
+              <div className="pt-2 space-y-2 animate-fade-in">
+                <p className="text-xs text-amber-400">Sign-in is taking longer than expected.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 rounded-lg bg-(--color-brand) text-white text-xs font-semibold hover:bg-brand-hover transition-all"
+                >
+                  Reload Page
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

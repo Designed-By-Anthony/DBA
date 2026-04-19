@@ -34,18 +34,44 @@ export default function NotificationsPage() {
 
   const loadPreferences = async () => {
     try {
-      const defaults = EVENT_TYPES.map((e) => ({
-        eventType: e.type,
-        label: e.label,
-        description: e.description,
-        emailEnabled: true,
-        pushEnabled: true,
-        inAppEnabled: true,
-        mandatory: false,
-      }));
-      setEvents(defaults);
+      const res = await fetch("/api/admin/notification-preferences");
+      if (res.ok) {
+        const data = await res.json();
+        const orgMap = new Map<string, { emailEnabled: boolean; pushEnabled: boolean; inAppEnabled: boolean; mandatory: boolean }>();
+        for (const row of data.orgDefaults ?? []) {
+          orgMap.set(row.eventType, row);
+        }
+        const personalMap = new Map<string, { emailEnabled: boolean; pushEnabled: boolean; inAppEnabled: boolean }>();
+        for (const row of data.personal ?? []) {
+          personalMap.set(row.eventType, row);
+        }
+
+        const merged = EVENT_TYPES.map((e) => {
+          const org = orgMap.get(e.type);
+          const personal = personalMap.get(e.type);
+          return {
+            eventType: e.type,
+            label: e.label,
+            description: e.description,
+            emailEnabled: personal?.emailEnabled ?? org?.emailEnabled ?? true,
+            pushEnabled: personal?.pushEnabled ?? org?.pushEnabled ?? true,
+            inAppEnabled: personal?.inAppEnabled ?? org?.inAppEnabled ?? true,
+            mandatory: org?.mandatory ?? false,
+          };
+        });
+        setEvents(merged);
+      } else {
+        // Fallback to defaults if API not ready
+        setEvents(EVENT_TYPES.map((e) => ({
+          eventType: e.type, label: e.label, description: e.description,
+          emailEnabled: true, pushEnabled: true, inAppEnabled: true, mandatory: false,
+        })));
+      }
     } catch {
-      // non-critical
+      setEvents(EVENT_TYPES.map((e) => ({
+        eventType: e.type, label: e.label, description: e.description,
+        emailEnabled: true, pushEnabled: true, inAppEnabled: true, mandatory: false,
+      })));
     }
     setLoading(false);
   };
@@ -88,10 +114,23 @@ export default function NotificationsPage() {
     setSaving(true);
     setSaved(false);
     try {
-      // Save preferences — placeholder for API integration
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      const res = await fetch("/api/admin/notification-preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          events: events.map((e) => ({
+            eventType: e.eventType,
+            emailEnabled: e.emailEnabled,
+            pushEnabled: e.pushEnabled,
+            inAppEnabled: e.inAppEnabled,
+            mandatory: e.mandatory,
+          })),
+        }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
     } catch {
       // error
     }
