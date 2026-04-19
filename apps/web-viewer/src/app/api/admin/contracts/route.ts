@@ -18,9 +18,7 @@ const signContractSchema = z.object({
   signerName: z.string().min(1),
   signerEmail: z.string().email(),
   signatureData: z.string().min(1),
-  consentGiven: z.literal(true, {
-    errorMap: () => ({ message: "Electronic signature consent is required" }),
-  }),
+  consentGiven: z.literal(true, { message: "Electronic signature consent is required" }),
 });
 
 /**
