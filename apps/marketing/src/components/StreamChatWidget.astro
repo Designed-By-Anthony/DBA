@@ -420,8 +420,7 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
 
     {/* ── Chat widget logic ── */}
     <script is:inline>
-    (function () {
-      if (typeof window === 'undefined') return;
+    document.addEventListener('DOMContentLoaded', function () {
 
       var widget = document.getElementById('dba-chat-widget');
       if (!widget) return;
@@ -618,7 +617,7 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         // Pre-fill but don't auto-open
         identityInput.value = visitorIdentity;
       }
-    })();
+    });
     </script>
   </>
 )}
