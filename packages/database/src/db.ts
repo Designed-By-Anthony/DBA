@@ -87,12 +87,12 @@ function resolveSslConfig(url: string): pg.PoolConfig["ssl"] {
   }
 
   if (explicitOn || sslmode === "require" || sslmode === "prefer" || sslmode === "allow") {
-    return { rejectUnauthorized: false };
+    return { rejectUnauthorized: true };
   }
 
   // Production default — public Postgres endpoints require SSL.
   if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
-    return { rejectUnauthorized: false };
+    return { rejectUnauthorized: true };
   }
 
   return undefined;
