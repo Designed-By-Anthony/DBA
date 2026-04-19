@@ -46,20 +46,29 @@ export async function GET() {
 
     // If they have an account, get live status from Stripe
     if (tenant.stripeConnectAccountId) {
-      const status = await getAccountStatus(tenant.stripeConnectAccountId);
-      if ("error" in status) {
+      try {
+        const status = await getAccountStatus(tenant.stripeConnectAccountId);
+        if ("error" in status) {
+          return NextResponse.json({
+            connectStatus: tenant.stripeConnectStatus,
+            accountId: tenant.stripeConnectAccountId,
+            platformFeeBps: tenant.platformFeeBps,
+            error: status.error,
+          });
+        }
+        return NextResponse.json({
+          connectStatus: tenant.stripeConnectStatus,
+          platformFeeBps: tenant.platformFeeBps,
+          ...status,
+        });
+      } catch {
+        // Stripe key may not be configured — return DB-only status
         return NextResponse.json({
           connectStatus: tenant.stripeConnectStatus,
           accountId: tenant.stripeConnectAccountId,
           platformFeeBps: tenant.platformFeeBps,
-          error: status.error,
         });
       }
-      return NextResponse.json({
-        connectStatus: tenant.stripeConnectStatus,
-        platformFeeBps: tenant.platformFeeBps,
-        ...status,
-      });
     }
 
     return NextResponse.json({
