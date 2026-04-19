@@ -438,7 +438,7 @@ export const sequenceEnrollments = pgTable(
     leadId: text("lead_id"),
 
     /** References emailSequences.id */
-    sequenceId: text("sequence_id")
+    sequenceId: uuid("sequence_id")
       .notNull()
       .references(() => emailSequences.id, { onDelete: "cascade" }),
 
@@ -729,6 +729,264 @@ export const notificationPreferences = pgTable(
 
 /**
  * ──────────────────────────────────────────────────────────────────────
+ * REVENUE PIPELINE — Estimate → Contract → Invoice → Review
+ * ──────────────────────────────────────────────────────────────────────
+ */
+
+/** Estimate / Proposal status flow. */
+export const estimateStatusEnum = pgEnum("estimate_status", [
+  "draft",
+  "sent",
+  "viewed",
+  "accepted",
+  "declined",
+  "expired",
+]);
+
+/** Contract signing status. */
+export const contractStatusEnum = pgEnum("contract_status", [
+  "draft",
+  "sent",
+  "viewed",
+  "signed",
+  "voided",
+]);
+
+/** Invoice payment status. */
+export const invoiceStatusEnum = pgEnum("invoice_status", [
+  "draft",
+  "sent",
+  "paid",
+  "overdue",
+  "voided",
+  "refunded",
+]);
+
+/** Line item on an estimate. */
+export type EstimateLineItem = {
+  id: string;
+  /** Stripe Product ID (from PriceBook) — optional for custom line items. */
+  stripeProductId?: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  /** Unit price in cents. */
+  unitPriceCents: number;
+  /** 'one_time' | 'month' | 'year' */
+  interval: string;
+};
+
+/**
+ * Estimates & Proposals — quote builder tied to PriceBook + prospects.
+ * Two modes: quick estimate (line items only) or long-form proposal (rich content).
+ */
+export const estimates = pgTable(
+  "estimates",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Human-readable estimate number (EST-0001). */
+    estimateNumber: text("estimate_number").notNull(),
+
+    /** References leads.prospectId (text, not FK for flexibility). */
+    prospectId: text("prospect_id"),
+
+    /** 'estimate' for quick line-item quotes, 'proposal' for rich content. */
+    templateType: text("template_type").notNull().default("estimate"),
+
+    status: estimateStatusEnum("status").notNull().default("draft"),
+
+    /** Line items pulled from PriceBook or custom. */
+    lineItems: jsonb("line_items")
+      .$type<EstimateLineItem[]>()
+      .notNull()
+      .default([]),
+
+    /** Long-form proposal rich content (HTML). */
+    proposalContent: text("proposal_content"),
+
+    /** Terms and conditions text. */
+    terms: text("terms"),
+
+    /** Total in cents (calculated from line items). */
+    totalCents: integer("total_cents").notNull().default(0),
+
+    /** Date the estimate was sent to the prospect. */
+    sentAt: text("sent_at"),
+    /** Expiration date for the estimate. */
+    validUntil: text("valid_until"),
+    /** When the prospect viewed it. */
+    viewedAt: text("viewed_at"),
+
+    /** Who created it (Clerk userId). */
+    createdBy: text("created_by"),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_estimates_tenant_id").on(table.tenantId),
+    index("idx_estimates_prospect_id").on(table.prospectId),
+    index("idx_estimates_status").on(table.status),
+  ]
+);
+
+/**
+ * Contracts — e-signature documents generated from estimates.
+ * Captures full audit trail for ESIGN Act / UETA compliance:
+ * intent, consent, association, IP, user agent, timestamp, document hash.
+ */
+export const contracts = pgTable(
+  "contracts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Link back to estimate that generated this contract. */
+    estimateId: uuid("estimate_id").references(() => estimates.id, { onDelete: "set null" }),
+
+    /** Human-readable contract number (CTR-0001). */
+    contractNumber: text("contract_number").notNull(),
+
+    /** References leads.prospectId. */
+    prospectId: text("prospect_id"),
+
+    status: contractStatusEnum("contract_status").notNull().default("draft"),
+
+    /** Full HTML content of the contract. */
+    htmlContent: text("html_content").notNull(),
+
+    // ── E-SIGN AUDIT TRAIL ──────────────────────────────────────────
+    signerName: text("signer_name"),
+    signerEmail: text("signer_email"),
+    /** Base64-encoded signature image (drawn or typed). */
+    signatureData: text("signature_data"),
+    /** IP address at time of signing. */
+    signerIp: text("signer_ip"),
+    /** User-Agent at time of signing. */
+    signerUserAgent: text("signer_user_agent"),
+    /** SHA-256 hash of (htmlContent + signatureData + signedAt + signerIp). */
+    certificateHash: text("certificate_hash"),
+    /** Timestamp of signing (ISO 8601). */
+    signedAt: text("signed_at"),
+    /** Explicit consent flag — signer checked "I agree to sign electronically". */
+    consentGiven: boolean("consent_given").notNull().default(false),
+
+    sentAt: text("sent_at"),
+    viewedAt: text("viewed_at"),
+
+    createdBy: text("created_by"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_contracts_tenant_id").on(table.tenantId),
+    index("idx_contracts_prospect_id").on(table.prospectId),
+    index("idx_contracts_estimate_id").on(table.estimateId),
+  ]
+);
+
+/**
+ * Invoices — generated from signed contracts, paid via Stripe Connect.
+ */
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Link to contract. */
+    contractId: uuid("contract_id").references(() => contracts.id, { onDelete: "set null" }),
+    /** Direct link to estimate (denormalized for convenience). */
+    estimateId: uuid("estimate_id").references(() => estimates.id, { onDelete: "set null" }),
+
+    /** Human-readable invoice number (INV-0001). */
+    invoiceNumber: text("invoice_number").notNull(),
+
+    /** References leads.prospectId. */
+    prospectId: text("prospect_id"),
+
+    status: invoiceStatusEnum("invoice_status").notNull().default("draft"),
+
+    /** Line items snapshot at time of invoice creation. */
+    lineItems: jsonb("line_items")
+      .$type<EstimateLineItem[]>()
+      .notNull()
+      .default([]),
+
+    /** Total amount in cents. */
+    totalCents: integer("total_cents").notNull().default(0),
+
+    /** Due date. */
+    dueDate: text("due_date"),
+
+    // ── STRIPE ──────────────────────────────────────────────────────
+    /** Stripe Checkout Session or Payment Intent ID. */
+    stripeSessionId: text("stripe_session_id"),
+    /** Stripe Payment Intent ID. */
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    /** Stripe payment link URL (for secure pay links). */
+    stripePaymentUrl: text("stripe_payment_url"),
+
+    paidAt: text("paid_at"),
+    sentAt: text("sent_at"),
+
+    createdBy: text("created_by"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_invoices_tenant_id").on(table.tenantId),
+    index("idx_invoices_prospect_id").on(table.prospectId),
+    index("idx_invoices_status").on(table.status),
+  ]
+);
+
+/**
+ * Review requests — auto-generated after payment completion.
+ * Default platform is Google; tenant can configure a custom review URL.
+ */
+export const reviewRequests = pgTable(
+  "review_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Link to invoice that triggered the review request. */
+    invoiceId: uuid("invoice_id").references(() => invoices.id, { onDelete: "set null" }),
+
+    /** References leads.prospectId. */
+    prospectId: text("prospect_id"),
+
+    /** Platform name: 'google', 'yelp', 'bbb', 'custom'. */
+    platform: text("platform").notNull().default("google"),
+    /** Direct review URL (Google Place ID link, Yelp page, or custom). */
+    reviewUrl: text("review_url").notNull(),
+
+    sentAt: text("sent_at"),
+    /** When the client completed the review (manual or webhook). */
+    completedAt: text("completed_at"),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("idx_review_requests_tenant_id").on(table.tenantId),
+    index("idx_review_requests_prospect_id").on(table.prospectId),
+  ]
+);
+
+/**
+ * ──────────────────────────────────────────────────────────────────────
  * EXPORTED TYPES
  * ──────────────────────────────────────────────────────────────────────
  */
@@ -749,6 +1007,10 @@ export type PortalTokenRow = typeof portalTokens.$inferSelect;
 export type PortalSessionRow = typeof portalSessions.$inferSelect;
 export type SiteRow = typeof sites.$inferSelect;
 export type NotificationPreferenceRow = typeof notificationPreferences.$inferSelect;
+export type EstimateRow = typeof estimates.$inferSelect;
+export type ContractRow = typeof contracts.$inferSelect;
+export type InvoiceRow = typeof invoices.$inferSelect;
+export type ReviewRequestRow = typeof reviewRequests.$inferSelect;
 
 export type VerticalId = (typeof verticalTypeEnum.enumValues)[number];
 export type LeadStatus = (typeof leadStatusEnum.enumValues)[number];
@@ -758,3 +1020,7 @@ export type AutomationTrigger = (typeof automationTriggerEnum.enumValues)[number
 export type AutomationActionType = (typeof automationActionTypeEnum.enumValues)[number];
 export type NotificationChannel = (typeof notificationChannelEnum.enumValues)[number];
 export type StripeConnectStatus = (typeof stripeConnectStatusEnum.enumValues)[number];
+export type EstimateStatus = (typeof estimateStatusEnum.enumValues)[number];
+export type ContractStatus = (typeof contractStatusEnum.enumValues)[number];
+export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
+
