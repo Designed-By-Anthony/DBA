@@ -1,13 +1,10 @@
-/**
- * Web Push (VAPID) — pure Drizzle + Postgres.
- * Reads push subscriptions from the `push_subscriptions` table.
- */
 import webpush from "web-push";
 import {
   getDb,
   withTenantContext,
   withBypassRls,
   pushSubscriptions,
+  notifications,
   leads,
 } from "@dba/database";
 import { eq, and } from "drizzle-orm";
@@ -80,6 +77,75 @@ export async function sendWebPushToUser(
 }
 
 /**
+ * Send Web Push to ALL subscribed members of a tenant org.
+ * Also inserts an in-app notification row so the bell inbox stays in sync.
+ */
+export async function sendPushToTenantAdmins(
+  tenantId: string,
+  payload: {
+    title: string;
+    body: string;
+    type: string;
+    actionUrl?: string;
+    referenceId?: string;
+    referenceType?: string;
+  },
+): Promise<void> {
+  const db = getDb();
+  if (!db) return;
+
+  await withBypassRls(db, async (tx) => {
+    // 1. Insert in-app notification (visible to all org members via null userId)
+    await tx.insert(notifications).values({
+      tenantId,
+      userId: null,
+      title: payload.title,
+      body: payload.body,
+      type: payload.type,
+      actionUrl: payload.actionUrl ?? null,
+      referenceId: payload.referenceId ?? null,
+      referenceType: payload.referenceType ?? null,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    // 2. Send Web Push to every subscribed device in this tenant
+    if (!ensureVapid()) return;
+
+    const subs = await tx
+      .select()
+      .from(pushSubscriptions)
+      .where(eq(pushSubscriptions.tenantId, tenantId));
+
+    const pushBody = JSON.stringify({
+      title: payload.title,
+      body: payload.body,
+      url:
+        payload.actionUrl ||
+        `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin`,
+    });
+
+    for (const sub of subs) {
+      const subscription: webpush.PushSubscription = {
+        endpoint: sub.endpoint,
+        keys: { p256dh: sub.p256dh, auth: sub.auth },
+      };
+
+      try {
+        await webpush.sendNotification(subscription, pushBody);
+      } catch (e: unknown) {
+        const err = e as { statusCode?: number };
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          await tx
+            .delete(pushSubscriptions)
+            .where(eq(pushSubscriptions.id, sub.id));
+        }
+      }
+    }
+  });
+}
+
+/**
  * Send Web Push to a prospect (from their fcmToken field — legacy PushSubscription JSON).
  */
 export async function sendWebPushToProspect(
@@ -129,3 +195,4 @@ export async function sendWebPushToProspect(
     }
   });
 }
+

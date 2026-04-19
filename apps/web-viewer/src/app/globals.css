@@ -213,3 +213,9 @@
 .page-enter {
   animation: fade-up 0.4s ease-out both;
 }
+
+/* Hide Clerk loading skeleton once the real sign-in widget mounts */
+.clerk-loading-skeleton:has(~ .cl-rootBox),
+.clerk-loading-skeleton:has(~ [data-clerk-component]) {
+  display: none;
+}

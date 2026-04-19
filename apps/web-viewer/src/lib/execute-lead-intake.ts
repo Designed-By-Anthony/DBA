@@ -5,6 +5,7 @@ import { resolveLeadAgencyId } from "@/lib/lead-webhook-agency";
 import { escapeHtml } from "@/lib/email-utils";
 import { insertSqlLead } from "@/lib/lead-intake/sql";
 import { fireAutomationEvent } from "@/lib/automation-runner";
+import { sendPushToTenantAdmins } from "@/lib/push-notify";
 import { getTenantByOrgId } from "@/lib/tenant-db";
 import { getDb, withTenantContext, activities } from "@dba/database";
 import type { VerticalId } from "@dba/ui";
@@ -214,6 +215,20 @@ export async function executeLeadIntake(fields: LeadIntakeSource): Promise<LeadI
         },
       },
     });
+
+    // Push + in-app notification to all admin subscribers
+    try {
+      await sendPushToTenantAdmins(agencyId, {
+        title: `🔔 New Lead: ${name}`,
+        body: company ? `${name} from ${company} via ${source}` : `${name} via ${source}`,
+        type: "new_lead",
+        actionUrl: `/admin/prospects/${prospectId}`,
+        referenceId: prospectId,
+        referenceType: "lead",
+      });
+    } catch {
+      // Non-critical — never block lead intake
+    }
   }
 
   return {

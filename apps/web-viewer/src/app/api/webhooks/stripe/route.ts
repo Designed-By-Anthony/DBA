@@ -7,6 +7,8 @@ import { complianceConfig } from '@/lib/theme.config';
 import { escapeHtml } from '@/lib/email-utils';
 import { isTestMode } from '@/lib/test-mode';
 import { apiError } from '@/lib/api-error';
+import { sendPushToTenantAdmins } from '@/lib/push-notify';
+import { syncConnectAccountStatus } from '@/lib/stripe-connect';
 import {
   readClerkOrgIdFromMetadata,
   readProspectIdFromMetadata,
@@ -188,6 +190,20 @@ export async function POST(request: NextRequest) {
             console.error('Payment notification email failed:', e);
           }
 
+          // Push notification to admin bell
+          try {
+            await sendPushToTenantAdmins(tenantId, {
+              title: `💰 Payment: $${amount.toLocaleString()}`,
+              body: `${session.customer_details?.name || 'Client'} — ${paymentType?.replace('_', ' ') || 'payment'}`,
+              type: 'payment_received',
+              actionUrl: `/admin/prospects/${prospectId}`,
+              referenceId: prospectId,
+              referenceType: 'lead',
+            });
+          } catch {
+            // non-critical
+          }
+
           break;
         }
 
@@ -355,6 +371,19 @@ export async function POST(request: NextRequest) {
 
         case 'entitlements.active_entitlement_summary.updated':
           break;
+
+        // Stripe Connect — sync account status on onboarding completion
+        case 'account.updated': {
+          const account = event.data.object as Stripe.Account;
+          if (account.id) {
+            try {
+              await syncConnectAccountStatus(account.id);
+            } catch (e) {
+              console.error('Connect account sync failed:', e);
+            }
+          }
+          break;
+        }
       }
     });
 

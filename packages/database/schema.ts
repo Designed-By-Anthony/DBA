@@ -87,6 +87,14 @@ export const notificationChannelEnum = pgEnum("notification_channel", [
   "in_app",
 ]);
 
+/** Stripe Connect onboarding status. */
+export const stripeConnectStatusEnum = pgEnum("stripe_connect_status", [
+  "not_started",
+  "onboarding",
+  "active",
+  "restricted",
+]);
+
 export type TenantDomainStatus =
   | "pending"
   | "verified"
@@ -172,6 +180,15 @@ export const tenants = pgTable("tenants", {
    * Used as a trust anchor when an admin route creates or mutates a record.
    */
   cloudflareApexHostname: text("cloudflare_apex_hostname"),
+
+  // ── STRIPE CONNECT ─────────────────────────────────────────────────
+  /** Stripe Connected Account ID (Standard Connect). */
+  stripeConnectAccountId: text("stripe_connect_account_id"),
+  stripeConnectStatus: stripeConnectStatusEnum("stripe_connect_status")
+    .notNull()
+    .default("not_started"),
+  /** Platform fee in basis points (250 = 2.50%). Industry standard. */
+  platformFeeBps: integer("platform_fee_bps").notNull().default(250),
 
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
@@ -554,11 +571,17 @@ export const notifications = pgTable(
       .notNull()
       .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
 
+    /** Clerk user ID — null means visible to all org members. */
+    userId: text("user_id"),
+
     title: text("title").notNull(),
     body: text("body").notNull(),
 
     /** Type: 'lead', 'ticket', 'payment', 'system', etc. */
     type: text("type").notNull(),
+
+    /** Deep-link URL within admin, e.g. /admin/prospects/desi0012 */
+    actionUrl: text("action_url"),
 
     /** FK reference: e.g. lead ID or ticket ID */
     referenceId: text("reference_id"),
@@ -666,6 +689,45 @@ export const sites = pgTable("sites", {
 });
 
 /**
+ * Notification preferences — per-user with admin-controlled mandatory minimums.
+ * org:admin sets which events are mandatory (members can't turn them off).
+ * Members choose their delivery channel (push/email/in_app) for non-mandatory events.
+ */
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .references(() => tenants.clerkOrgId, { onDelete: "cascade" }),
+
+    /** Clerk user ID — null row = org-wide default / mandatory baseline. */
+    userId: text("user_id"),
+
+    /** Event type: 'new_lead', 'ticket_created', 'payment_received', 'stage_change', 'daily_digest' */
+    eventType: text("event_type").notNull(),
+
+    /** Delivery channels enabled for this event. */
+    emailEnabled: boolean("email_enabled").notNull().default(true),
+    pushEnabled: boolean("push_enabled").notNull().default(true),
+    inAppEnabled: boolean("in_app_enabled").notNull().default(true),
+
+    /** When true, members cannot disable this event — admin-enforced minimum. */
+    mandatory: boolean("mandatory").notNull().default(false),
+
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_notif_prefs_tenant_user_event").on(
+      table.tenantId,
+      table.userId,
+      table.eventType,
+    ),
+  ]
+);
+
+/**
  * ──────────────────────────────────────────────────────────────────────
  * EXPORTED TYPES
  * ──────────────────────────────────────────────────────────────────────
@@ -686,6 +748,7 @@ export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
 export type PortalTokenRow = typeof portalTokens.$inferSelect;
 export type PortalSessionRow = typeof portalSessions.$inferSelect;
 export type SiteRow = typeof sites.$inferSelect;
+export type NotificationPreferenceRow = typeof notificationPreferences.$inferSelect;
 
 export type VerticalId = (typeof verticalTypeEnum.enumValues)[number];
 export type LeadStatus = (typeof leadStatusEnum.enumValues)[number];
@@ -694,3 +757,4 @@ export type TicketPriority = (typeof ticketPriorityEnum.enumValues)[number];
 export type AutomationTrigger = (typeof automationTriggerEnum.enumValues)[number];
 export type AutomationActionType = (typeof automationActionTypeEnum.enumValues)[number];
 export type NotificationChannel = (typeof notificationChannelEnum.enumValues)[number];
+export type StripeConnectStatus = (typeof stripeConnectStatusEnum.enumValues)[number];

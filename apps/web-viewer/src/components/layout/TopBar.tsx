@@ -6,15 +6,17 @@ import Omnisearch from "@/components/portal/Omnisearch";
 import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminPrefix } from "@/lib/useAdminPrefix";
-import { getRecentActivities } from "@/app/admin/actions";
 
 type Notification = {
   id: string;
-  type: "alert" | "success" | "info" | "email";
+  type: string;
   title: string;
   body: string;
-  href?: string;
-  time: string;
+  actionUrl?: string | null;
+  referenceId?: string | null;
+  referenceType?: string | null;
+  isRead: boolean;
+  createdAt: string;
 };
 
 function getGreeting(): string {
@@ -49,12 +51,59 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
-function activityIcon(type: string) {
+function notifIcon(type: string) {
   switch (type) {
-    case "alert": return <AlertTriangle size={12} className="text-red-400" />;
-    case "success": return <CheckCircle size={12} className="text-emerald-400" />;
-    case "email": return <Mail size={12} className="text-blue-400" />;
-    default: return <UserPlus size={12} className="text-(--color-brand)" />;
+    case "payment_received": return <CheckCircle size={12} className="text-emerald-400" />;
+    case "ticket_created":
+    case "ticket_reply": return <AlertTriangle size={12} className="text-amber-400" />;
+    case "email_sent":
+    case "email_opened": return <Mail size={12} className="text-blue-400" />;
+    case "new_lead": return <UserPlus size={12} className="text-(--color-brand)" />;
+    default: return <Bell size={12} className="text-text-gray" />;
+  }
+}
+
+function notifAccentColor(type: string): string {
+  switch (type) {
+    case "payment_received": return "bg-emerald-500";
+    case "ticket_created":
+    case "ticket_reply": return "bg-amber-500";
+    case "new_lead": return "bg-blue-500";
+    default: return "bg-text-gray";
+  }
+}
+
+async function fetchNotifications(): Promise<{ notifications: Notification[]; unreadCount: number }> {
+  try {
+    const res = await fetch("/api/admin/notifications?unread=false", { cache: "no-store" });
+    if (!res.ok) return { notifications: [], unreadCount: 0 };
+    return await res.json() as { notifications: Notification[]; unreadCount: number };
+  } catch {
+    return { notifications: [], unreadCount: 0 };
+  }
+}
+
+async function markAllRead(): Promise<void> {
+  try {
+    await fetch("/api/admin/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all: true }),
+    });
+  } catch {
+    // non-critical
+  }
+}
+
+async function markRead(ids: string[]): Promise<void> {
+  try {
+    await fetch("/api/admin/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+  } catch {
+    // non-critical
   }
 }
 
@@ -67,7 +116,7 @@ export default function TopBar({
 }) {
   const [showNotifs, setShowNotifs] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [hasUnread, setHasUnread] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useUser();
   const { organization } = useOrganization();
   const firstName = user?.firstName || "there";
@@ -83,38 +132,41 @@ export default function TopBar({
   const router = useRouter();
   const stripAdmin = useAdminPrefix();
 
-  // Load real activity data for notifications
+  // Load notifications from API + poll every 30s
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      try {
-        const activities = await getRecentActivities(10);
-        if (cancelled) return;
-        const mapped: Notification[] = activities.map((activity) => ({
-          id: activity.id,
-          type: activity.type === "status_change" ? "info" as const :
-                activity.type === "email_sent" || activity.type === "email_opened" ? "email" as const :
-                activity.type === "churn_risk" ? "alert" as const : "success" as const,
-          title: activity.type.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-          body: activity.description,
-          href: activity.prospectId ? `/admin/prospects/${activity.prospectId}` : undefined,
-          time: activity.createdAt,
-        }));
-        setNotifications(mapped);
-        setHasUnread(mapped.length > 0);
-      } catch {
-        // Notifications are non-critical
-      }
+      const data = await fetchNotifications();
+      if (cancelled) return;
+      setNotifications(data.notifications);
+      setUnreadCount(data.unreadCount);
     }
     load();
-    return () => { cancelled = true; };
+    const interval = setInterval(load, 30_000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, []);
 
   const handleNotifClick = (notif: Notification) => {
-    if (notif.href) {
-      setShowNotifs(false);
-      router.push(stripAdmin(notif.href));
+    if (!notif.isRead) {
+      markRead([notif.id]);
+      setUnreadCount((c) => Math.max(0, c - 1));
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n)),
+      );
     }
+    const href = notif.actionUrl || (notif.referenceId && notif.referenceType === "lead"
+      ? `/admin/prospects/${notif.referenceId}`
+      : null);
+    if (href) {
+      setShowNotifs(false);
+      router.push(stripAdmin(href));
+    }
+  };
+
+  const handleMarkAllRead = () => {
+    markAllRead();
+    setUnreadCount(0);
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   return (
@@ -150,22 +202,31 @@ export default function TopBar({
         <button
           type="button"
           aria-label="Notifications"
-          onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs) setHasUnread(false); }}
+          onClick={() => setShowNotifs(!showNotifs)}
           className={`relative p-2 rounded-lg transition-colors ${showNotifs ? 'bg-surface-3 text-white' : 'text-text-gray hover:text-white hover:bg-surface-3'}`}
         >
           <Bell size={18} />
-          {hasUnread && (
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full border border-(--color-surface-0)" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-danger rounded-full border-2 border-(--color-surface-0) text-[9px] font-bold text-white px-1">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
           )}
         </button>
 
         {showNotifs && (
           <div className="absolute top-12 right-12 w-80 bg-[#090A0F] border border-glass-border rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.8)] overflow-hidden animate-fade-in z-50">
             <div className="p-3 border-b flex items-center justify-between border-glass-border bg-surface-2">
-              <span className="text-sm font-semibold text-white">Notifications</span>
-              <button onClick={() => setShowNotifs(false)} className="text-[10px] text-(--color-brand) hover:underline uppercase tracking-wide">Mark all read</button>
+              <span className="text-sm font-semibold text-white">
+                Notifications
+                {unreadCount > 0 && (
+                  <span className="ml-2 text-[10px] font-normal text-text-muted">
+                    {unreadCount} unread
+                  </span>
+                )}
+              </span>
+              <button onClick={handleMarkAllRead} className="text-[10px] text-(--color-brand) hover:underline uppercase tracking-wide">Mark all read</button>
             </div>
-            <div className="max-h-64 overflow-y-auto w-full">
+            <div className="max-h-80 overflow-y-auto w-full">
               {notifications.length === 0 ? (
                 <div className="p-6 text-center">
                   <Bell size={24} className="mx-auto mb-2 text-text-gray opacity-40" />
@@ -177,28 +238,27 @@ export default function TopBar({
                   <button
                     key={notif.id}
                     onClick={() => handleNotifClick(notif)}
-                    className={`w-full text-left p-3 border-b border-glass-border hover:bg-surface-2 transition-colors relative overflow-hidden group ${notif.href ? 'cursor-pointer' : 'cursor-default'}`}
+                    className={`w-full text-left p-3 border-b border-glass-border hover:bg-surface-2 transition-colors relative overflow-hidden group ${!notif.isRead ? 'bg-surface-1/50' : ''} ${notif.actionUrl || notif.referenceId ? 'cursor-pointer' : 'cursor-default'}`}
                   >
-                    {notif.type === "alert" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
-                    {notif.type === "success" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500" />}
-                    {notif.type === "email" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />}
-                    <p className="text-xs font-semibold text-white mb-1 flex items-center gap-1.5">
-                      {activityIcon(notif.type)}
-                      {notif.title}
-                      {notif.href && <ArrowRight size={10} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-(--color-brand)" />}
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${notifAccentColor(notif.type)}`} />
+                    <p className="text-xs font-semibold text-white mb-1 flex items-center gap-1.5 pl-2">
+                      {notifIcon(notif.type)}
+                      <span className={notif.isRead ? "opacity-70" : ""}>{notif.title}</span>
+                      {!notif.isRead && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-(--color-brand) shrink-0" />}
+                      {(notif.actionUrl || notif.referenceId) && <ArrowRight size={10} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-(--color-brand)" />}
                     </p>
-                    <p className="text-[11px] text-text-muted line-clamp-2">{notif.body}</p>
-                    <p className="text-[9px] text-text-gray mt-1.5 uppercase">{timeAgo(notif.time)}</p>
+                    <p className="text-[11px] text-text-muted line-clamp-2 pl-2">{notif.body}</p>
+                    <p className="text-[9px] text-text-gray mt-1.5 uppercase pl-2">{timeAgo(notif.createdAt)}</p>
                   </button>
                 ))
               )}
             </div>
             <div className="p-2 border-t border-glass-border text-center">
               <button 
-                onClick={() => { setShowNotifs(false); router.push(stripAdmin("/admin/inbox")); }}
+                onClick={() => { setShowNotifs(false); router.push(stripAdmin("/admin/settings/notifications")); }}
                 className="text-[11px] text-(--color-brand) hover:text-white transition-colors flex items-center gap-1 mx-auto"
               >
-                View All Activity <ArrowRight size={10} />
+                Notification Settings <ArrowRight size={10} />
               </button>
             </div>
           </div>
