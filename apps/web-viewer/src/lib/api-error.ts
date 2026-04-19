@@ -18,6 +18,7 @@
  * Deliberately no `stack` return. Deliberately no error code return.
  */
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 type LogContext = Record<string, unknown>;
 
@@ -46,6 +47,13 @@ export function apiError(
   const detail = err instanceof Error ? err.stack || err.message : String(err);
   const context = opts?.extra ? ` ${JSON.stringify(opts.extra)}` : "";
   console.error(`[${tag}] ${detail}${context}`);
+
+  // Report to Sentry as a first-class exception
+  if (err instanceof Error) {
+    Sentry.captureException(err, { tags: { apiRoute: tag }, extra: opts?.extra });
+  } else {
+    Sentry.captureMessage(`[${tag}] ${String(err)}`, { level: "error", tags: { apiRoute: tag }, extra: opts?.extra });
+  }
 
   const init: ResponseInit = opts?.headers ? { status, headers: opts.headers } : { status };
   return NextResponse.json({ error: publicMessage }, init);

@@ -62,8 +62,7 @@ export async function getCalendarBookings(
             eq(activities.type, "call_booked"),
             sql`(metadata->>'scheduledTime') IS NOT NULL`,
             sql`trim(metadata->>'scheduledTime') <> ''`,
-            // Validate the string looks like an ISO timestamp before casting
-            sql`(metadata->>'scheduledTime') ~ '^\d{4}-\d{2}-\d{2}'`,
+            sql`length(metadata->>'scheduledTime') >= 10`,
             sql`(metadata->>'scheduledTime')::timestamptz >= ${rangeStart.toISOString()}`,
             sql`(metadata->>'scheduledTime')::timestamptz < ${rangeEnd.toISOString()}`,
           ),
