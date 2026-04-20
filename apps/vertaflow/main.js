@@ -1,3 +1,5 @@
+import { installGlobalSyncProvider } from "./src/providers/GlobalSyncProvider";
+
 // ─── VertaFlow Marketing — Interactive Logic ───
 
 // ── Vertical Data (mirrors the real product's verticals.ts) ──
@@ -292,6 +294,7 @@ document.getElementById("verticalTabs")?.addEventListener("click", (e) => {
 
 // Initial render
 renderVertical("contractor");
+installGlobalSyncProvider();
 
 // ── Scroll reveal ──
 const observer = new IntersectionObserver(
