@@ -14,7 +14,7 @@ import { hydrateWebViewerEnvAliases } from "./web-viewer-aliases";
  * Agency OS (`apps/web-viewer`) — admin.* + accounts.* (Next.js 16).
  *
  * Required for the admin surface to function:
- *   - `NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN` + `STYTCH_PROJECT_ID` + `STYTCH_SECRET` (auth).
+ *   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` (auth).
  *   - `DATABASE_URL` or `DATABASE_URL_UNPOOLED` (Drizzle / Postgres) —
  *     tenant-scoped queries depend on it.
  *
@@ -27,13 +27,13 @@ const webViewerSchema = z
     NODE_ENV: z.enum(["development", "test", "production"]).optional(),
     VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
 
-    // Stytch — required in production; optional in dev/preview.
+    // Legacy Stytch vars — accepted only so old project envs do not fail parsing.
     NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: z.string().trim().optional(),
     STYTCH_PROJECT_ID: z.string().trim().optional(),
     STYTCH_SECRET: z.string().trim().optional(),
     STYTCH_PROJECT_ENV: z.enum(["test", "live"]).optional(),
 
-    // Legacy Clerk vars (temporary migration compatibility).
+    // Clerk auth — required in production; alias hydration handles Vercel-prefixed names.
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().trim().optional(),
     NEXT_PUBLIC_CLERK_DOMAIN: z.string().trim().optional(),
     NEXT_PUBLIC_CLERK_PROXY_URL: z.string().trim().optional(),
@@ -120,28 +120,20 @@ const webViewerSchema = z
           "DATABASE_URL or DATABASE_URL_UNPOOLED is required in production (Postgres 18 — see AGENTS.md > Infrastructure Context).",
       });
     }
-    if (!env.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN) {
+    if (!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN"],
+        path: ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
         message:
-          "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN is required in production (Stytch dashboard).",
+          "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production (Clerk dashboard).",
       });
     }
-    if (!env.STYTCH_PROJECT_ID) {
+    if (!env.CLERK_SECRET_KEY) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["STYTCH_PROJECT_ID"],
+        path: ["CLERK_SECRET_KEY"],
         message:
-          "STYTCH_PROJECT_ID is required in production (Stytch dashboard).",
-      });
-    }
-    if (!env.STYTCH_SECRET) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["STYTCH_SECRET"],
-        message:
-          "STYTCH_SECRET is required in production (Stytch dashboard).",
+          "CLERK_SECRET_KEY is required in production (Clerk dashboard).",
       });
     }
   });

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### Vercel build sanitation (2026-04-20)
+
+- **Marketing deploy:** Removed the obsolete root-level `.vercel/output` copy step from the app-local Vercel config; Astro's Vercel adapter output now stays where the marketing project expects it.
+- **Agency OS deploy:** Production env validation now follows the Clerk auth model and no longer blocks builds on unused legacy Stytch variables.
+- **Agency OS build:** `next build` now runs with an 8 GB Node heap so TypeScript does not abort near the default heap limit.
+
 ### Go-live hardening (2026-04-19)
 
 - **Public lead ingest (`POST /api/lead`):** Validates with `parsePublicLeadIngestBody` from `@dba/lead-form-contract`, then `validatePublicLead` (disposable domains + format), bot heuristics, and Turnstile when configured. Marketing attribution fields are passed to `executeLeadIntake` via `marketingMetaFromPublicBody`.

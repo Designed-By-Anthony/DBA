@@ -37,16 +37,16 @@ If an upstream URL is unset in production, the middleware returns a loud `502` i
 
 ### Why not `vercel.json` rewrites?
 
-`vercel.json` rewrites run **before** middleware and are static JSON. Once the rules grew past "swap these paths" (plan-suite gating, tenant skins, feature flags), Routing Middleware became the right place because it lets us express the logic in typed TypeScript. The current `vercel.json` intentionally contains only the framework/build/output config so it never conflicts with the middleware.
+`vercel.json` rewrites run **before** middleware and are static JSON. Once the rules grew past "swap these paths" (plan-suite gating, tenant skins, feature flags), Routing Middleware became the right place because it lets us express the logic in typed TypeScript. App-local `vercel.json` files intentionally contain framework/build settings only, so they never conflict with the middleware.
 
-## Turborepo — root build fans out to all three apps
+## Turborepo — root build fans out to all apps
 
 Running `pnpm turbo run build` (or just `pnpm build`) at the repo root builds:
 
-1. `@dba/lead-form-contract`, `@dba/theme` (topologically first via `dependsOn: ["^build"]`)
-2. `designed-by-anthony` (Astro), `agency-os` (Next.js), `lighthouse-audit` (Next.js) — in parallel
+1. `@dba/lead-form-contract`, `@dba/theme`, and other shared packages (topologically first via `dependsOn: ["^build"]`)
+2. `dbastudio-315` (Astro), `dba-agency-os` (Next.js), `dba-lighthouse-audit` (Next.js), and `vertaflow-marketing` (Vite) — in parallel
 
-Cache keys include the root [`middleware.ts`](./middleware.ts), [`tsconfig.json`](./tsconfig.json), and [`vercel.json`](./vercel.json) (see `turbo.json` → `globalDependencies`) so a change to the gateway invalidates every app build.
+Cache keys include the root [`middleware.ts`](./middleware.ts), [`tsconfig.json`](./tsconfig.json), and app-local `vercel.json` files (see `turbo.json` → `globalDependencies`) so a change to the gateway or project config invalidates app builds.
 
 ### Per-app dev servers
 

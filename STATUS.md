@@ -1,5 +1,12 @@
 # Migration Status Report
 
+## Vercel monorepo build sanitation (2026-04-20)
+
+- **Marketing build fix:** `apps/marketing/vercel.json` now runs only `turbo run build --filter=dbastudio-315`. The previous copy step was root-config glue; once the config moved under `apps/marketing`, it deleted the app's own `.vercel/output` and then failed with `cp: cannot stat 'apps/marketing/.vercel/output'`.
+- **Agency OS env fix:** Production env validation now matches the current Clerk auth model. `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and Neon `DATABASE_URL` / `DATABASE_URL_UNPOOLED` remain required; legacy Stytch vars no longer block `next build`.
+- **Agency OS build fix:** `apps/web-viewer` now actually runs `next build` with `NODE_OPTIONS=--max-old-space-size=8192`, matching the documented mitigation for Next's TypeScript heap spike.
+- **Vercel project settings required:** keep each project Root Directory pointed at its app folder, remove Production Overrides, and leave Build Command Override off so the checked-in app `vercel.json` files are used.
+
 ## Web-viewer domain targeting update (2026-04-20)
 
 - Updated Agency OS runtime domain targeting from `designedbyanthony.com` to `vertaflow.io` in web-viewer host allowlists and URL defaults (`next.config.ts` CSP `*.vertaflow.io`, lead CORS defaults/pattern, preview host detection, service worker allowed hosts, and fallback `NEXT_PUBLIC_APP_URL` links used by lead/ticket notifications).
@@ -38,7 +45,7 @@ Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.
 
 ## Release readiness pass (2026-04-18)
 
-- **Go-green checks:** `pnpm lint`, `pnpm build`, and live marketing smoke (`BASE_URL=https://designedbyanthony.com pnpm --filter designed-by-anthony run test:smoke:live`) pass from the monorepo root after the TopBar + CRM action typing fixes below. Live smoke covered homepage CTAs, money pages, contact/calendar, audit form, and crawl files on desktop + mobile projects.
+- **Go-green checks:** `pnpm lint`, `pnpm build`, and live marketing smoke (`BASE_URL=https://designedbyanthony.com pnpm --filter dbastudio-315 run test:smoke:live`) pass from the monorepo root after the TopBar + CRM action typing fixes below. Live smoke covered homepage CTAs, money pages, contact/calendar, audit form, and crawl files on desktop + mobile projects.
 - **CRM hardening in this pass:** removed the TopBar `no-explicit-any` suppression, removed explicit `any`s from the touched admin action paths, kept task update/delete mutations scoped by `tenant_id + lead_id + task_id`, and typed quote-package submission at the builder boundary.
 - **Production client-create fix:** live `POST /admin/pricebook` 500s were traced to Postgres missing `public.leads.stripe_subscription_id` while deployed Agency OS code inserts that column. Applied the existing additive migration (`ALTER TABLE "public"."leads" ADD COLUMN IF NOT EXISTS "stripe_subscription_id" text;`) to production and verified a rollback-only client insert probe succeeds.
 - **Live surface check:** `designedbyanthony.com`, `www.designedbyanthony.com`, `admin.designedbyanthony.com/admin`, `accounts.designedbyanthony.com/portal`, `lighthouse.designedbyanthony.com`, `/brand/logo.png`, and `/brand/mark.webp` returned 200.
@@ -50,7 +57,7 @@ Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.
 
 - **Live recovery:** Rolled the apex `dbastudio-315` project back to deployment `dpl_FdQkCXMwhTE3CTeWui1a3K1MrkVx`; `www.designedbyanthony.com`, `/brand/logo.png`, and `/brand/mark.webp` returned 200 after rollback.
 - **Cause:** Commit `1aa5b4e` pointed `outputDirectory` at `apps/marketing/.vercel/output`. That folder is a Vercel Build Output API bundle, not a static web root; the actual HTML lives under `static/index.html`, so Vercel served `/` as 404.
-- **Git deploy fix:** Keep the adapter output as Build Output API by copying `apps/marketing/.vercel/output` to root `.vercel/output` after the marketing build, clear `outputDirectory`, and include `.vercel/output/**` in Turbo outputs so cached builds restore the adapter bundle.
+- **Superseded deploy fix:** This root-copy strategy only applied while the marketing Vercel config lived at the repo root. With `apps/marketing/vercel.json`, the app-local build must not copy or delete `.vercel/output`; Astro's Vercel adapter output is already in the project root Vercel expects.
 - **Prebuilt warning:** A manual `vercel deploy --prebuilt` of only `.vercel/output` omits the root gateway `middleware.ts` and breaks admin/accounts routing. Use the normal Git/cloud build path for this project unless middleware packaging is explicitly added to the prebuilt bundle.
 
 ## Agency OS: embeddable lead widget + Neon-backed skin API (2026-04-18)
@@ -127,7 +134,7 @@ Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.
 
 ## Marketing + Lighthouse env audit (2026-04-18)
 
-- **Build / typecheck:** `pnpm --filter designed-by-anthony exec astro check` and `pnpm --filter lighthouse-audit build` pass from root.
+- **Build / typecheck:** `pnpm --filter dbastudio-315 exec astro check` and `pnpm --filter dba-lighthouse-audit build` pass from root.
 - **Docs:** `apps/marketing/AGENTS.md` and `apps/lighthouse/AGENTS.md` now document local env file placement (`apps/marketing/.env`, `apps/lighthouse/.env.local`), Vercel three-project split vs bleed keys, and split between Agency OS (Workspace/Docs/Drive for CRM) vs Lighthouse (PageSpeed, Places, Gemini, optional Sheets/Drive for audit pipeline).
 
 ## Agency OS audit: smoke E2E + inbox no-DB (2026-04-18)
@@ -158,7 +165,7 @@ Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.
 
 ## Agency OS ESLint + typecheck (2026-04-18)
 
-- Cleared remaining `agency-os` ESLint errors (`no-explicit-any`, unused imports, `prefer-const`, `no-img-element`) and fixed follow-on TypeScript issues (portal quote action signature, lead-score loop narrowing). Root `pnpm lint` and `pnpm build` succeed.
+- Cleared remaining `dba-agency-os` ESLint errors (`no-explicit-any`, unused imports, `prefer-const`, `no-img-element`) and fixed follow-on TypeScript issues (portal quote action signature, lead-score loop narrowing). Root `pnpm lint` and `pnpm build` succeed.
 
 ## Firebase removal (2026-04-18)
 
@@ -256,9 +263,9 @@ The Agency OS lint cleanup also removed the remaining `any`/namespace lint error
 
 Verification pass:
 - Vercel CLI 51.5.0 is installed and authenticated as `anthony-9364`.
-- `pnpm --filter agency-os lint` passed.
-- `pnpm --filter agency-os exec tsc --noEmit` passed.
-- `pnpm --filter agency-os build` passed and reports `ƒ Proxy (Middleware)`.
+- `pnpm --filter dba-agency-os lint` passed.
+- `pnpm --filter dba-agency-os exec tsc --noEmit` passed.
+- `pnpm --filter dba-agency-os build` passed and reports `ƒ Proxy (Middleware)`.
 - Root `pnpm build` passed across marketing, lighthouse, and Agency OS. The command exited 0, but Turbo emitted a final low-disk warning: `No space left on device (os error 28)`.
 - Brand asset mirrors were present for all three apps and `packages/dba-theme`: `/brand/logo.png` and `/brand/mark.webp`.
 
@@ -267,8 +274,8 @@ Verification pass:
 The Vercel team is now reset to the intended three-project Turborepo layout:
 
 - `dbastudio-315` (`prj_v9IdDn8DT9xEbmyZZ0dSHzBLIGJH`) remains the apex marketing/gateway project for `designedbyanthony.com` and `www.designedbyanthony.com`.
-- `dba-agency-os` (`prj_wQTfns0ZSz5WKsEiLFot80r7eqp9`) was created for `apps/web-viewer` with `framework=nextjs`, `rootDirectory=apps/web-viewer`, and `turbo run build --filter=agency-os`.
-- `dba-lighthouse-audit` (`prj_DE2b3J5IYsgJMyiRFRiIe7EW6EcL`) was created for `apps/lighthouse` with `framework=nextjs`, `rootDirectory=apps/lighthouse`, and `turbo run build --filter=lighthouse-audit`.
+- `dba-agency-os` (`prj_wQTfns0ZSz5WKsEiLFot80r7eqp9`) was created for `apps/web-viewer` with `framework=nextjs`, `rootDirectory=apps/web-viewer`, and `turbo run build --filter=dba-agency-os`.
+- `dba-lighthouse-audit` (`prj_DE2b3J5IYsgJMyiRFRiIe7EW6EcL`) was created for `apps/lighthouse` with `framework=nextjs`, `rootDirectory=apps/lighthouse`, and `turbo run build --filter=dba-lighthouse-audit`.
 
 Vercel environment variables were split by app: Agency OS received the Clerk, SQL, lead, Stripe, Resend, and Google admin/runtime values from `apps/web-viewer/.env.local`; Lighthouse received the audit/API/Sentry/Turnstile values from `apps/lighthouse/.env.local`; the apex marketing project was cleaned so app-only secrets no longer trip the marketing env-bleed guard. The apex project now points upstream routing at the stable aliases `https://dba-agency-os.vercel.app` and `https://dba-lighthouse-audit.vercel.app`.
 
