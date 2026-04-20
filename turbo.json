@@ -3,7 +3,6 @@
 	"globalDependencies": [
 		"middleware.ts",
 		"tsconfig.json",
-		"vercel.json",
 		"apps/*/vercel.json"
 	],
 	"globalEnv": [
