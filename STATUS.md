@@ -1,5 +1,14 @@
 # Migration Status Report
 
+## VertaFlow offline-first synchronization engine (2026-04-20)
+
+- Added `apps/vertaflow/src/lib/db.ts` Dexie schema for `leads` and `estimates` with `local_id` UUID primary keys, `sync_status` (`pending`/`synced`), and timestamp metadata used for sync ordering.
+- Added `apps/vertaflow/src/providers/GlobalSyncProvider.tsx` plus `installGlobalSyncProvider()` bootstrap in `main.js` to watch `navigator.onLine` and trigger sync on reconnect.
+- Added `apps/vertaflow/src/lib/sync.ts` batch sender to `POST /api/sync` that promotes synced local records to `sync_status="synced"` after successful round-trip.
+- Added `apps/vertaflow/src/api/sync/handler.ts` + schema with conflict resolution that keeps the most recent `updated_at` between offline payload and existing Neon-backed rows.
+- Added Vitest + JSDOM test harness (`vitest.config.ts`, `src/test/setup.ts`) and `src/test/offline-sync.spec.tsx` covering offline queueing, online transition, and API trigger verification.
+- Verified locally with `pnpm --filter vertaflow-marketing test` and `pnpm --filter vertaflow-marketing build`.
+
 ## Vercel monorepo build sanitation (2026-04-20)
 
 - **Marketing build fix:** `apps/marketing/vercel.json` now runs only `turbo run build --filter=dbastudio-315`. The previous copy step was root-config glue; once the config moved under `apps/marketing`, it deleted the app's own `.vercel/output` and then failed with `cp: cannot stat 'apps/marketing/.vercel/output'`.

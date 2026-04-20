@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### VertaFlow offline-first synchronization engine (2026-04-20)
+
+- **Client persistence:** Added Dexie-backed local storage in `apps/vertaflow/src/lib/db.ts` with tenant-safe `leads` and `estimates` tables using `local_id` (UUID), `sync_status` (`pending`/`synced`), and timestamps.
+- **Global sync runtime:** Added `GlobalSyncProvider` in `apps/vertaflow/src/providers/GlobalSyncProvider.tsx` and auto-installed it from `main.js`, so online/offline transitions trigger sync attempts through `navigator.onLine` event listeners.
+- **Sync transport:** Added batch sync client in `apps/vertaflow/src/lib/sync.ts` that collects pending records and POSTs to `/api/sync`, then marks local rows as `synced` on success.
+- **Conflict resolution:** Added server-side sync handler in `apps/vertaflow/src/api/sync/handler.ts` with last-write-wins logic (`updated_at` newest record wins) for both leads and estimates against Neon via `@dba/database`.
+- **Verification:** Added Vitest + jsdom + fake-indexeddb tests (`apps/vertaflow/src/test/offline-sync.spec.tsx`) that simulate offline queueing, online toggle, and assert `/api/sync` call execution and local status transitions.
+
 ### Vercel build sanitation (2026-04-20)
 
 - **Marketing deploy:** Removed the obsolete root-level `.vercel/output` copy step from the app-local Vercel config; Astro's Vercel adapter output now stays where the marketing project expects it.
