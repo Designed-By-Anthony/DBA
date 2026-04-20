@@ -2,8 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "turbo run build --filter=designed-by-anthony && rm -rf .vercel/output && mkdir -p .vercel && cp -R apps/marketing/.vercel/output .vercel/output",
+  "buildCommand": "turbo run build --filter=dbastudio-315 && rm -rf .vercel/output && mkdir -p .vercel && cp -R apps/marketing/.vercel/output .vercel/output",
   "outputDirectory": null,
   "cleanUrls": true,
   "trailingSlash": false
 }
+

@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "turbo run build --filter=agency-os"
+  "buildCommand": "turbo run build --filter=dba-agency-os"
 }
