@@ -1,5 +1,11 @@
 # Migration Status Report
 
+## Ship to `main` — portable embeds + VertaFlow marketing hardening (2026-04-20)
+
+- Merged `codex/vercel-build-sanitize` to **`main`** and pushed (`b71a6a9`): customer-site embed pack, `POST /api/lead` optional `agencyId`, VertaFlow PWA/SEO/Sentry/tests, marketing contact embed showcase, changelog updates.
+- **Verified before push:** `pnpm install --frozen-lockfile`, `pnpm build` (turbo — all four apps), `pnpm --filter vertaflow-marketing test` (12 tests). Local turbo emitted **disk full warning** once after successful tasks — clear build caches if CI runners are tight.
+- **Lint:** `pnpm lint` still fails on long-standing `dba-agency-os` ESLint volume (react-hooks + unused vars); **Vercel deploys use per-app `build`**, not this full lint gate unless you add it. Triage ESLint separately if you want CI green on `turbo run lint`.
+
 ## VertaFlow offline-first synchronization engine (2026-04-20)
 
 - Added `apps/vertaflow/src/lib/db.ts` Dexie schema for `leads` and `estimates` with `local_id` UUID primary keys, `sync_status` (`pending`/`synced`), and timestamp metadata used for sync ordering.
