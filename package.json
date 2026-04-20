@@ -37,6 +37,7 @@
     "test:e2e:web": "pnpm --filter dba-agency-os run test"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
     "@types/node": "^22.10.2",
     "turbo": "^2.9.6",
     "typescript": "^5.9.3"

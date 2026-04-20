@@ -4,9 +4,10 @@
  * Zero-Trust Multi-Tenancy: every query filters on `tenantId`
  * (Drizzle field) / `tenant_id` (SQL column) / the Clerk `orgId`.
  */
-import { eq, and, desc } from "drizzle-orm";
-import { getDb, leads, type LeadRow } from "@dba/database";
-import { generateClientId, getIdSource } from "@/lib/client-id";
+
+import { getDb, type LeadRow, leads } from '@dba/database';
+import { and, desc, eq } from 'drizzle-orm';
+import { generateClientId, getIdSource } from '@/lib/client-id';
 
 export type SqlLeadInsertInput = {
   agencyId: string;
@@ -37,12 +38,14 @@ export type SqlLeadInsertResult = {
  * JSONB is shallow-merged so partial updates don't clobber existing
  * vertical-specific fields.
  */
-export async function insertSqlLead(input: SqlLeadInsertInput): Promise<SqlLeadInsertResult | null> {
+export async function insertSqlLead(
+  input: SqlLeadInsertInput,
+): Promise<SqlLeadInsertResult | null> {
   const db = getDb();
   if (!db) return null;
 
   const agencyId = input.agencyId.trim();
-  if (!agencyId) throw new Error("agencyId (Clerk org id) is required for SQL lead intake");
+  if (!agencyId) throw new Error('agencyId (Clerk org id) is required for SQL lead intake');
 
   const emailNormalized = input.email.trim().toLowerCase();
   const nowIso = new Date().toISOString();
@@ -81,10 +84,7 @@ export async function insertSqlLead(input: SqlLeadInsertInput): Promise<SqlLeadI
     return { prospectId: existing[0].prospectId, isNew: false };
   }
 
-  const prospectId = await generateClientId(
-    getIdSource(input.company, input.name),
-    agencyId,
-  );
+  const prospectId = await generateClientId(getIdSource(input.company, input.name), agencyId);
 
   await db.insert(leads).values({
     tenantId: agencyId,
@@ -96,7 +96,7 @@ export async function insertSqlLead(input: SqlLeadInsertInput): Promise<SqlLeadI
     emailNormalized,
     phone: input.phone?.trim() ?? null,
     source: input.source?.trim() ?? null,
-    status: "new",
+    status: 'new',
     metadata: incomingMetadata,
     createdAt: nowIso,
     updatedAt: nowIso,

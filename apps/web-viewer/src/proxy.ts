@@ -62,7 +62,7 @@ export const proxy = clerkMiddleware(async (auth, req) => {
   }
 
   const isPreviewDomain =
-    hostname.includes(".preview.designedbyanthony.com") ||
+    hostname.includes(".preview.vertaflow.io") ||
     (hostname.includes(".localhost") && !hostname.startsWith("www."));
 
   if (isPreviewDomain) {

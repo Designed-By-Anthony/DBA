@@ -172,10 +172,13 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
         background: var(--chat-bg);
         border: 1px solid var(--chat-border);
         box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
-        display: flex;
+        display: none;
         flex-direction: column;
         overflow: hidden;
         animation: dba-chat-slide-up 0.25s ease-out;
+      }
+      .dba-chat-panel.is-open {
+        display: flex;
       }
       @keyframes dba-chat-slide-up {
         from { opacity: 0; transform: translateY(12px) scale(0.96); }
@@ -395,6 +398,7 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
 
       function openChat() {
         isOpen = true;
+        panel.classList.add('is-open');
         panel.removeAttribute('hidden');
         iconMsg.style.display = 'none';
         iconClose.style.display = 'block';
@@ -417,11 +421,13 @@ const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
 
       function closeChat() {
         isOpen = false;
+        panel.classList.remove('is-open');
         panel.setAttribute('hidden', '');
         iconMsg.style.display = 'block';
         iconClose.style.display = 'none';
         toggleBtn.setAttribute('aria-expanded', 'false');
         if (chatLabel) chatLabel.style.display = 'block';
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       }
 
       function toggle() {

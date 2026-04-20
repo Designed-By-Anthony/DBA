@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             // Clerk FAPI (*.clerk.accounts.dev), scdn project settings fetch, telemetry, img — see https://clerk.com/docs/security/clerk-csp
-            // `connect-src` includes *.designedbyanthony.com so admin./accounts. can call sibling subdomains (CRM family).
+            // `connect-src` includes *.vertaflow.io so admin./accounts. can call sibling subdomains (CRM family).
             // `frame-ancestors 'self'` supersedes the legacy X-Frame-Options and is the
             // check modern browsers actually honor.
             value:
@@ -40,13 +40,13 @@ const nextConfig: NextConfig = {
               "base-uri 'self'; " +
               "object-src 'none'; " +
               "frame-ancestors 'self'; " +
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://scdn.clerk.com https://*.designedbyanthony.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://scdn.clerk.com https://*.vertaflow.io https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
               "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.designedbyanthony.com; " +
+              "img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.vertaflow.io; " +
               // img.clerk.com + va.vercel-scripts.com: Clerk avatar fetch() + Vercel Analytics/Speed Insights beacons (connect-src; img-src already allows img.clerk.com for <img>)
-              "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://*.clerk.accounts.dev https://img.clerk.com https://scdn.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
-              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.designedbyanthony.com https://calendly.com https://*.calendly.com; " +
-              "worker-src 'self' blob: https://*.designedbyanthony.com;",
+              "connect-src 'self' https://*.vertaflow.io https://api.stripe.com https://*.clerk.accounts.dev https://img.clerk.com https://scdn.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://cloudflareinsights.com https://*.cloudflareinsights.com; " +
+              "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.vertaflow.io https://calendly.com https://*.calendly.com; " +
+              "worker-src 'self' blob: https://*.vertaflow.io;",
           },
           // HSTS: pin the host to HTTPS for two years (preload-eligible once you
           // verify apex+subdomain coverage). Safe to apply on Vercel which is

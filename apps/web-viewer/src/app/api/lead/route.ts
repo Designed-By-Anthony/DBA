@@ -1,54 +1,44 @@
-import { NextRequest, NextResponse } from "next/server";
-import type { PublicLeadMarketingMeta } from "@dba/lead-form-contract";
-import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
-import { executeLeadIntake } from "@/lib/execute-lead-intake";
-import { verifyTurnstileToken } from "@/lib/turnstile";
-import { apiError } from "@/lib/api-error";
+import type { PublicLeadIngestBody, PublicLeadMarketingMeta } from '@dba/lead-form-contract';
+import { parsePublicLeadIngestBody } from '@dba/lead-form-contract';
+import { type NextRequest, NextResponse } from 'next/server';
+import { ZodError } from 'zod';
+import { apiError } from '@/lib/api-error';
+import { readBoundedJson } from '@/lib/body-limit';
+import { executeLeadIntake } from '@/lib/execute-lead-intake';
 import {
   checkLeadRateLimit,
   isLikelyBotSubmission,
   requireTurnstileInProd,
   validatePublicLead,
-} from "@/lib/lead-intake/spam-guard";
-import { readBoundedJson } from "@/lib/body-limit";
+} from '@/lib/lead-intake/spam-guard';
+import { leadWebhookCorsHeaders } from '@/lib/lead-webhook-cors';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 const LEAD_INGEST_MAX_BYTES = 8 * 1024;
 
-function pickStr(body: Record<string, unknown>, ...keys: string[]): string {
-  for (const k of keys) {
-    const v = body[k];
-    if (v != null && String(v).trim() !== "") return String(v).trim();
-  }
-  return "";
-}
-
-function buildMarketingMeta(body: Record<string, unknown>): PublicLeadMarketingMeta | undefined {
+function marketingMetaFromPublicBody(b: PublicLeadIngestBody): PublicLeadMarketingMeta | undefined {
   const meta: PublicLeadMarketingMeta = {
-    ctaSource: pickStr(body, "ctaSource", "cta_source") || undefined,
-    pageContext: pickStr(body, "pageContext", "page_context") || undefined,
-    offerType: pickStr(body, "offerType", "offer_type") || undefined,
-    leadSource: pickStr(body, "leadSource", "lead_source") || undefined,
-    pageUrl: pickStr(body, "pageUrl", "page_url") || undefined,
-    referrerUrl: pickStr(body, "referrerUrl", "referrer_url") || undefined,
-    pageTitle: pickStr(body, "pageTitle", "page_title") || undefined,
-    sourcePage: pickStr(body, "sourcePage", "source_page") || undefined,
-    gaClientId: pickStr(body, "gaClientId", "ga_client_id") || undefined,
+    ctaSource: b.ctaSource,
+    pageContext: b.pageContext,
+    offerType: b.offerType,
+    leadSource: b.leadSource,
+    pageUrl: b.pageUrl,
+    referrerUrl: b.referrerUrl,
+    pageTitle: b.pageTitle,
+    sourcePage: b.sourcePage,
+    gaClientId: b.gaClientId,
   };
-  const hasAny = Object.values(meta).some((v) => v != null && v !== "");
+  const hasAny = Object.values(meta).some((v) => v != null && v !== '');
   return hasAny ? meta : undefined;
 }
 
 function resolveClientIp(request: NextRequest): string {
-  const xff = request.headers.get("x-forwarded-for");
+  const xff = request.headers.get('x-forwarded-for');
   if (xff) {
-    const first = xff.split(",")[0]?.trim();
+    const first = xff.split(',')[0]?.trim();
     if (first) return first;
   }
-  return (
-    request.headers.get("x-real-ip") ||
-    request.headers.get("cf-connecting-ip") ||
-    "unknown"
-  );
+  return request.headers.get('x-real-ip') || request.headers.get('cf-connecting-ip') || 'unknown';
 }
 
 /**
@@ -63,7 +53,7 @@ function resolveClientIp(request: NextRequest): string {
  *   2. Per-IP sliding-window rate limit (default 3 submissions / 60s).
  *   3. Required Turnstile verification when `VERCEL_ENV=production`
  *      (fail-closed: missing `TURNSTILE_SECRET_KEY` => 503, not "accept").
- *   4. Email format / disposable-domain validation.
+ *   4. Zod parse + disposable-domain validation (`validatePublicLead`).
  *   5. Silent bot heuristics (URL-stuffed names, duplicate email-as-name, …).
  *
  * Set `PUBLIC_LEAD_INGEST_DISABLED=true` to turn this route off, or
@@ -79,9 +69,9 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       ok: true,
-      endpoint: "public-lead-ingest",
-      post: "POST JSON: name|first_name, email, optional phone, company, website, message|biggest_issue, source, auditUrl, marketing attribution fields, _hp (empty), cfTurnstileResponse",
-      honeypot: "Include _hp as empty string (hidden field) to reduce spam bots.",
+      endpoint: 'public-lead-ingest',
+      post: 'POST JSON: name|first_name, email, optional phone, company, website, message|biggest_issue, source, auditUrl, marketing attribution fields, _hp (empty), cfTurnstileResponse',
+      honeypot: 'Include _hp as empty string (hidden field) to reduce spam bots.',
       turnstileRequired: requireTurnstileInProd(),
     },
     { headers },
@@ -91,8 +81,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const cors = leadWebhookCorsHeaders(request);
 
-  if (process.env.PUBLIC_LEAD_INGEST_DISABLED === "true") {
-    return NextResponse.json({ error: "Not found" }, { status: 404, headers: cors });
+  if (process.env.PUBLIC_LEAD_INGEST_DISABLED === 'true') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404, headers: cors });
   }
 
   // Fail closed when Turnstile isn't configured. Previously the Turnstile
@@ -104,28 +94,50 @@ export async function POST(request: NextRequest) {
   const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
   const turnstileEnforced = Boolean(turnstileSecret);
   if (!turnstileEnforced) {
-    const isProd = process.env.VERCEL_ENV === "production" ||
-      (process.env.NODE_ENV === "production" && process.env.VERCEL === "1");
-    const bypassOk = process.env.PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE === "true";
+    const isProd =
+      process.env.VERCEL_ENV === 'production' ||
+      (process.env.NODE_ENV === 'production' && process.env.VERCEL === '1');
+    const bypassOk = process.env.PUBLIC_LEAD_INGEST_ALLOW_NO_TURNSTILE === 'true';
     if (isProd && !bypassOk) {
-      console.error("[public-lead] rejected: TURNSTILE_SECRET_KEY not configured in production");
       return NextResponse.json(
-        { error: "Bot verification not configured" },
+        { error: 'Bot verification not configured' },
         { status: 503, headers: cors },
       );
     }
   }
 
   try {
-    const parsed = await readBoundedJson<Record<string, unknown>>(request, LEAD_INGEST_MAX_BYTES);
-    if (!parsed.ok) {
-      const status = parsed.reason === "too_large" ? 413 : 400;
-      return NextResponse.json({ error: "Invalid request" }, { status, headers: cors });
+    const parsedBody = await readBoundedJson<unknown>(request, LEAD_INGEST_MAX_BYTES);
+    if (!parsedBody.ok) {
+      const status = parsedBody.reason === 'too_large' ? 413 : 400;
+      return NextResponse.json({ error: 'Invalid request' }, { status, headers: cors });
     }
-    const body = parsed.value;
+
+    let body: PublicLeadIngestBody;
+    try {
+      body = parsePublicLeadIngestBody(parsedBody.value);
+    } catch (error) {
+      // `@dba/lead-form-contract` may resolve a different `zod` instance than this route file,
+      // so `instanceof ZodError` can be false even for validation failures.
+      if (
+        error instanceof ZodError ||
+        (error !== null &&
+          typeof error === 'object' &&
+          (error as { name?: string }).name === 'ZodError')
+      ) {
+        return NextResponse.json(
+          {
+            error: 'Invalid submission data',
+            details: error instanceof ZodError ? error.flatten() : undefined,
+          },
+          { status: 400, headers: cors },
+        );
+      }
+      throw error;
+    }
 
     // 1. Honeypot — must be absent or empty
-    if (body._hp != null && String(body._hp).trim() !== "") {
+    if (body._hp != null && String(body._hp).trim() !== '') {
       return NextResponse.json({ success: true }, { headers: cors });
     }
 
@@ -134,55 +146,37 @@ export async function POST(request: NextRequest) {
     const rateLimit = checkLeadRateLimit(clientIp);
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: "Too many submissions. Please wait a moment and try again." },
+        { error: 'Too many submissions. Please wait a moment and try again.' },
         {
           status: 429,
           headers: {
             ...cors,
-            "Retry-After": String(rateLimit.retryAfterSeconds),
+            'Retry-After': String(rateLimit.retryAfterSeconds),
           },
         },
       );
     }
 
-    const name =
-      pickStr(body, "name", "first_name", "firstName") ||
-      pickStr(body, "full_name");
-    const email = pickStr(body, "email");
-    const phone = pickStr(body, "phone");
-    const company = pickStr(body, "company");
-    const website = pickStr(body, "website", "websiteUrl");
-    const source = pickStr(body, "source") || "contact_form";
-    const message = pickStr(body, "message", "biggest_issue", "projectRequirements");
-    const auditUrl = pickStr(body, "auditUrl", "auditReportUrl");
-    // Deliberately IGNORE body.agencyId for the public endpoint. The browser
-    // must not be able to direct a lead into a tenant it doesn't own — that
-    // was a cross-tenant lead-stuffing path. All public submissions route
-    // through the server-resolved LEAD_WEBHOOK_DEFAULT_AGENCY_ID in
-    // executeLeadIntake(). The authenticated /api/webhooks/lead endpoint
-    // still accepts an explicit agencyId.
-    const marketing = buildMarketingMeta(body);
-
     // 3. Required Turnstile in production (fail-closed; key guard handled above)
-    const turnstileToken = pickStr(
-      body,
-      "cfTurnstileResponse",
-      "cf-turnstile-response",
-      "turnstileToken",
-    );
-
     if (turnstileEnforced) {
-      const tv = await verifyTurnstileToken(turnstileToken, clientIp);
+      const tv = await verifyTurnstileToken(body.cfTurnstileResponse ?? '', clientIp);
       if (!tv.success) {
         return NextResponse.json(
-          { error: "Bot verification failed. Please refresh and try again." },
+          { error: 'Bot verification failed. Please refresh and try again.' },
           { status: 403, headers: cors },
         );
       }
     }
 
-    // 4. Format + disposable-domain validation
-    const validationIssue = validatePublicLead({ name, email, phone, company, website, message });
+    // 4. Disposable-domain + format checks (user-facing 400s)
+    const validationIssue = validatePublicLead({
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+      company: body.company,
+      website: body.website,
+      message: body.message,
+    });
     if (validationIssue) {
       return NextResponse.json(
         { error: validationIssue.message, errors: [validationIssue] },
@@ -192,25 +186,21 @@ export async function POST(request: NextRequest) {
 
     // 5. Silent bot heuristics — accept 200 so automated scanners move on,
     //    but never create a prospect or fire an email.
-    if (isLikelyBotSubmission({ name, email, phone, company, website, message })) {
-      console.warn("[/api/lead] Dropped likely-bot submission", {
-        ip: clientIp,
-        email,
-        source,
-      });
+    if (isLikelyBotSubmission(body)) {
       return NextResponse.json({ success: true }, { headers: cors });
     }
 
+    const marketing = marketingMetaFromPublicBody(body);
+
     const result = await executeLeadIntake({
-      name,
-      email,
-      phone,
-      company,
-      website,
-      source,
-      message,
-      auditUrl,
-      // agencyId intentionally omitted — see comment above.
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+      company: body.company,
+      website: body.website,
+      source: body.source ?? 'contact_form',
+      message: body.message,
+      auditUrl: body.auditUrl,
       marketing,
     });
 
@@ -226,10 +216,6 @@ export async function POST(request: NextRequest) {
       { headers: cors },
     );
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "";
-    if (msg === "Name and email are required") {
-      return NextResponse.json({ error: msg }, { status: 400, headers: cors });
-    }
-    return apiError("public-lead-ingest", error, { headers: cors });
+    return apiError('public-lead-ingest', error, { headers: cors });
   }
 }

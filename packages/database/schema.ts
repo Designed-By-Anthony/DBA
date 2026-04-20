@@ -182,12 +182,17 @@ export type TenantDomainDnsRecord = {
  */
 
 /**
- * Clerk-first tenant registry.
- * `clerk_org_id` is the canonical tenant key for all lookups.
+ * Tenant registry.
+ *
+ * `clerk_org_id` remains the current canonical tenant key used by foreign-key
+ * references (`tenant_id`) and RLS bindings. During the Stytch migration we
+ * also persist `stytch_organization_id` for direct identity-provider mapping.
+ *
  * Every row in other tables MUST have a matching tenantId.
  */
 export const tenants = pgTable("tenants", {
   clerkOrgId: text("clerk_org_id").primaryKey(),
+  stytchOrganizationId: text("stytch_organization_id").unique(),
   name: text("name").notNull(),
   verticalType: verticalTypeEnum("vertical_type").notNull().default("agency"),
 

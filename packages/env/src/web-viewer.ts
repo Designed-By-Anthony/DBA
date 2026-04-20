@@ -8,13 +8,13 @@ import {
 import { hydrateWebViewerEnvAliases } from "./web-viewer-aliases";
 
 /**
- * Clerk env alias hydration lives in `web-viewer-aliases.ts` (Vercel may use
+ * Auth env alias hydration lives in `web-viewer-aliases.ts` (Vercel may use
  * `admin_*` / `NEXT_PUBLIC_admin_*` names — they map to canonical keys before Zod).
  *
  * Agency OS (`apps/web-viewer`) — admin.* + accounts.* (Next.js 16).
  *
  * Required for the admin surface to function:
- *   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` (auth).
+ *   - `NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN` + `STYTCH_PROJECT_ID` + `STYTCH_SECRET` (auth).
  *   - `DATABASE_URL` or `DATABASE_URL_UNPOOLED` (Drizzle / Postgres) —
  *     tenant-scoped queries depend on it.
  *
@@ -27,15 +27,18 @@ const webViewerSchema = z
     NODE_ENV: z.enum(["development", "test", "production"]).optional(),
     VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
 
-    // Clerk — required in production; optional in dev/preview so devs can
-    // boot the app without a Clerk account. Enforced via superRefine below.
+    // Stytch — required in production; optional in dev/preview.
+    NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: z.string().trim().optional(),
+    STYTCH_PROJECT_ID: z.string().trim().optional(),
+    STYTCH_SECRET: z.string().trim().optional(),
+    STYTCH_PROJECT_ENV: z.enum(["test", "live"]).optional(),
+
+    // Legacy Clerk vars (temporary migration compatibility).
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().trim().optional(),
-    /** Satellite / custom domain: without DNS for `clerk.<domain>`, set `NEXT_PUBLIC_CLERK_PROXY_URL` to your `*.clerk.accounts.dev` Frontend API so clerk-js loads. */
     NEXT_PUBLIC_CLERK_DOMAIN: z.string().trim().optional(),
     NEXT_PUBLIC_CLERK_PROXY_URL: z.string().trim().optional(),
     NEXT_PUBLIC_CLERK_JS_URL: z.string().trim().optional(),
     NEXT_PUBLIC_CLERK_UI_URL: z.string().trim().optional(),
-    /** Server-only: Frontend API origin (`https://…clerk.accounts.dev`). Enables `/clerk-fapi` rewrite + Clerk `proxyUrl` when custom `clerk.<domain>` DNS is missing. */
     CLERK_FAPI_UPSTREAM: optionalUrl,
     CLERK_SECRET_KEY: z.string().trim().optional(),
     CLERK_WEBHOOK_SIGNING_SECRET: z.string().trim().optional(),
@@ -45,7 +48,7 @@ const webViewerSchema = z
     DATABASE_URL_UNPOOLED: optionalPostgresUrl,
     DATABASE_SSL: booleanFromString,
 
-    // Default Clerk org for lead intake + Calendly when the webhook URL has no ?tenant=.
+    // Default tenant for lead intake + Calendly when the webhook URL has no ?tenant=.
     // Multi-tenant: prefer /api/webhooks/calendly?tenant=<org_id> per Calendly subscription.
     LEAD_WEBHOOK_DEFAULT_AGENCY_ID: z.string().trim().optional(),
     LEAD_WEBHOOK_SECRET: z.string().trim().optional(),
@@ -64,7 +67,7 @@ const webViewerSchema = z
     EMAIL_TEST_MODE: booleanFromString,
     IS_TEST: booleanFromString,
 
-    // App URL used in outbound emails + Clerk redirect URLs.
+    // App URL used in outbound emails + auth redirect URLs.
     NEXT_PUBLIC_APP_URL: optionalUrl,
     /** Optional Calendly embed URL for admin calendar (strategy: iframe + existing webhooks). */
     NEXT_PUBLIC_CALENDLY_EMBED_URL: optionalUrl,
@@ -117,20 +120,28 @@ const webViewerSchema = z
           "DATABASE_URL or DATABASE_URL_UNPOOLED is required in production (Postgres 18 — see AGENTS.md > Infrastructure Context).",
       });
     }
-    if (!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    if (!env.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+        path: ["NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN"],
         message:
-          "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production (Clerk dashboard).",
+          "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN is required in production (Stytch dashboard).",
       });
     }
-    if (!env.CLERK_SECRET_KEY) {
+    if (!env.STYTCH_PROJECT_ID) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["CLERK_SECRET_KEY"],
+        path: ["STYTCH_PROJECT_ID"],
         message:
-          "CLERK_SECRET_KEY is required in production (Clerk dashboard). Missing this key causes a White Screen of Death on admin. subdomain.",
+          "STYTCH_PROJECT_ID is required in production (Stytch dashboard).",
+      });
+    }
+    if (!env.STYTCH_SECRET) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["STYTCH_SECRET"],
+        message:
+          "STYTCH_SECRET is required in production (Stytch dashboard).",
       });
     }
   });

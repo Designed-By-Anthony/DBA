@@ -26,13 +26,20 @@
  *
  * Reference: https://vercel.com/docs/routing-middleware
  */
-import { next, rewrite } from '@vercel/functions';
+import { next, rewrite } from "@vercel/functions";
 
-const APEX_DOMAIN = 'designedbyanthony.com';
+const APEX_DOMAIN = "designedbyanthony.com";
+const VERTAFLOW_DOMAIN = "vertaflow.io";
 
 const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
+
+// VertaFlow subdomains (same web-viewer upstream, separate marketing site)
+const VF_ADMIN_HOST = `admin.${VERTAFLOW_DOMAIN}`;
+const VF_LOGIN_HOST = `login.${VERTAFLOW_DOMAIN}`;
+const VF_ACCOUNTS_HOST = `accounts.${VERTAFLOW_DOMAIN}`;
+const VF_APEX_HOSTS = [VERTAFLOW_DOMAIN, `www.${VERTAFLOW_DOMAIN}`];
 
 /**
  * Matcher — run the gateway for all user-facing paths, including static
@@ -43,42 +50,42 @@ const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
  * 404s, breaking hydration on admin/accounts/lighthouse.
  */
 export const config = {
-  matcher: ['/((?!_vercel).*)'],
+	matcher: ["/((?!_vercel).*)"],
 };
 
 function hostnameOf(request: Request): string {
-  const raw = request.headers.get('host') ?? '';
-  // Strip the port (e.g. :3000) for local dev, lowercase for safety.
-  return raw.split(':')[0]!.toLowerCase();
+	const raw = request.headers.get("host") ?? "";
+	// Strip the port (e.g. :3000) for local dev, lowercase for safety.
+	return (raw.split(":")[0] ?? "").toLowerCase();
 }
 
 function buildUpstream(
-  upstreamBase: string,
-  pathname: string,
-  search: string,
-  pathPrefix = '',
+	upstreamBase: string,
+	pathname: string,
+	search: string,
+	pathPrefix = "",
 ): URL {
-  const base = upstreamBase.replace(/\/$/, '');
-  const joinedPath = `${pathPrefix}${pathname}`.replace(/\/{2,}/g, '/');
-  return new URL(`${joinedPath}${search}`, base);
+	const base = upstreamBase.replace(/\/$/, "");
+	const joinedPath = `${pathPrefix}${pathname}`.replace(/\/{2,}/g, "/");
+	return new URL(`${joinedPath}${search}`, base);
 }
 
 function isAppAssetPath(pathname: string): boolean {
-  if (pathname.startsWith('/_next/')) return true;
-  if (pathname.startsWith('/brand/')) return true;
-  if (pathname.startsWith('/icons/')) return true;
-  if (pathname.startsWith('/serwist/')) return true;
-  if (pathname === '/manifest.webmanifest') return true;
-  if (pathname.startsWith('/favicon.')) return true;
-  return /\.[a-z0-9]{2,8}$/i.test(pathname);
+	if (pathname.startsWith("/_next/")) return true;
+	if (pathname.startsWith("/brand/")) return true;
+	if (pathname.startsWith("/icons/")) return true;
+	if (pathname.startsWith("/serwist/")) return true;
+	if (pathname === "/manifest.webmanifest") return true;
+	if (pathname.startsWith("/favicon.")) return true;
+	return /\.[a-z0-9]{2,8}$/i.test(pathname);
 }
 
 function isSharedAppRoute(pathname: string): boolean {
-  return (
-    pathname === '/offline' ||
-    pathname === '/sign-in' ||
-    pathname.startsWith('/sign-in/')
-  );
+	return (
+		pathname === "/offline" ||
+		pathname === "/sign-in" ||
+		pathname.startsWith("/sign-in/")
+	);
 }
 
 /**
@@ -93,15 +100,15 @@ function isSharedAppRoute(pathname: string): boolean {
  * fallthrough so unconfigured preview URLs still render something.
  */
 function misconfigured(hostLabel: string): Response {
-  const body = `Upstream for ${hostLabel}.${APEX_DOMAIN} is not configured. Set ${hostLabel.toUpperCase()}_UPSTREAM_URL on the apex Vercel project.`;
-  return new Response(body, {
-    status: 502,
-    headers: { 'content-type': 'text/plain; charset=utf-8' },
-  });
+	const body = `Upstream for ${hostLabel}.${APEX_DOMAIN} is not configured. Set ${hostLabel.toUpperCase()}_UPSTREAM_URL on the apex Vercel project.`;
+	return new Response(body, {
+		status: 502,
+		headers: { "content-type": "text/plain; charset=utf-8" },
+	});
 }
 
 function isProduction(): boolean {
-  return process.env.VERCEL_ENV === 'production';
+	return process.env.VERCEL_ENV === "production";
 }
 
 /**
@@ -118,68 +125,101 @@ function isProduction(): boolean {
  * live at `/api/*` (not `/admin/api/*` or `/portal/api/*`).
  */
 function needsAppPrefix(pathname: string, prefix: string): boolean {
-  if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
-  if (pathname.startsWith('/api/')) return false;
-  if (isSharedAppRoute(pathname)) return false;
-  if (isAppAssetPath(pathname)) return false;
-  // Sentry tunnel MUST hit the root of the upstream Next.js app
-  if (pathname === '/monitoring') return false;
-  return true;
+	if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
+	if (pathname.startsWith("/api/")) return false;
+	if (isSharedAppRoute(pathname)) return false;
+	if (isAppAssetPath(pathname)) return false;
+	// Sentry tunnel MUST hit the root of the upstream Next.js app
+	if (pathname === "/monitoring") return false;
+	return true;
 }
 
 export default function middleware(request: Request) {
-  const host = hostnameOf(request);
-  const url = new URL(request.url);
-  const { pathname, search } = url;
+	const host = hostnameOf(request);
+	const url = new URL(request.url);
+	const { pathname, search } = url;
 
-  if (host === ADMIN_HOST) {
-    const upstream = process.env.ADMIN_UPSTREAM_URL;
-    if (!upstream) return isProduction() ? misconfigured('admin') : next();
-    // Admin dashboard lives under /admin in web-viewer; /api/* is a sibling.
-    const prefix = needsAppPrefix(pathname, '/admin') ? '/admin' : '';
-    return rewrite(buildUpstream(upstream, pathname, search, prefix));
-  }
+	if (host === ADMIN_HOST) {
+		const upstream = process.env.ADMIN_UPSTREAM_URL;
+		if (!upstream) return isProduction() ? misconfigured("admin") : next();
+		// Admin dashboard lives under /admin in web-viewer; /api/* is a sibling.
+		const prefix = needsAppPrefix(pathname, "/admin") ? "/admin" : "";
+		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+	}
 
-  if (host === ACCOUNTS_HOST) {
-    const upstream =
-      process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
-    if (!upstream) return isProduction() ? misconfigured('accounts') : next();
-    // The "accounts" subdomain is the client portal surface of web-viewer,
-    // which is implemented under /portal. Keep /api/* un-prefixed so
-    // `accounts.designedbyanthony.com/api/portal/branding` still resolves.
-    const prefix = needsAppPrefix(pathname, '/portal') ? '/portal' : '';
-    return rewrite(buildUpstream(upstream, pathname, search, prefix));
-  }
+	if (host === ACCOUNTS_HOST) {
+		const upstream =
+			process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
+		if (!upstream) return isProduction() ? misconfigured("accounts") : next();
+		// The "accounts" subdomain is the client portal surface of web-viewer,
+		// which is implemented under /portal. Keep /api/* un-prefixed so
+		// `accounts.designedbyanthony.com/api/portal/branding` still resolves.
+		const prefix = needsAppPrefix(pathname, "/portal") ? "/portal" : "";
+		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+	}
 
-  if (host === LIGHTHOUSE_HOST) {
-    const upstream = process.env.LIGHTHOUSE_UPSTREAM_URL;
-    if (!upstream) return isProduction() ? misconfigured('lighthouse') : next();
-    return rewrite(buildUpstream(upstream, pathname, search));
-  }
+	if (host === LIGHTHOUSE_HOST) {
+		const upstream = process.env.LIGHTHOUSE_UPSTREAM_URL;
+		if (!upstream) return isProduction() ? misconfigured("lighthouse") : next();
+		return rewrite(buildUpstream(upstream, pathname, search));
+	}
 
-  // Apex + www + previews → fall through to Astro marketing site.
-  const res = next();
-  
-  // Apply security headers for the marketing site
-  res.headers.set('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "base-uri 'self'; " +
-    "object-src 'none'; " +
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://www.googletagmanager.com https://vercel.live; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https://images.unsplash.com https://american-operator-assets-public.s3.us-east-1.amazonaws.com https://astro.badg.es; " +
-    "connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
-    "frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
-    "worker-src 'self' blob:; " +
-    "frame-ancestors 'none'; " +
-    "require-trusted-types-for 'script';"
-  );
-  res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  res.headers.set('X-Content-Type-Options', 'nosniff');
-  res.headers.set('X-Frame-Options', 'DENY');
-  res.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()');
-  
-  return res;
+	// ─── VertaFlow CRM subdomains ───
+	// admin.vertaflow.io + login.vertaflow.io → same web-viewer upstream as DBA admin
+	if (host === VF_ADMIN_HOST || host === VF_LOGIN_HOST) {
+		const upstream = process.env.ADMIN_UPSTREAM_URL;
+		if (!upstream) return isProduction() ? misconfigured("vf-admin") : next();
+		const prefix = needsAppPrefix(pathname, "/admin") ? "/admin" : "";
+		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+	}
+
+	// accounts.vertaflow.io → client portal surface of web-viewer
+	if (host === VF_ACCOUNTS_HOST) {
+		const upstream =
+			process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
+		if (!upstream)
+			return isProduction() ? misconfigured("vf-accounts") : next();
+		const prefix = needsAppPrefix(pathname, "/portal") ? "/portal" : "";
+		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+	}
+
+	// vertaflow.io / www.vertaflow.io → VertaFlow marketing site
+	if (VF_APEX_HOSTS.includes(host)) {
+		const upstream = process.env.VERTAFLOW_UPSTREAM_URL;
+		if (!upstream) return isProduction() ? misconfigured("vertaflow") : next();
+		return rewrite(buildUpstream(upstream, pathname, search));
+	}
+
+	// Apex + www + previews → fall through to Astro marketing site.
+	const res = next();
+
+	// Apply security headers for the marketing site
+	res.headers.set(
+		"Content-Security-Policy",
+		"default-src 'self'; " +
+			"base-uri 'self'; " +
+			"object-src 'none'; " +
+			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://www.googletagmanager.com https://vercel.live; " +
+			"style-src 'self' 'unsafe-inline'; " +
+			"img-src 'self' data: blob: https://images.unsplash.com https://american-operator-assets-public.s3.us-east-1.amazonaws.com https://astro.badg.es; " +
+			"connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
+			"frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
+			"worker-src 'self' blob:; " +
+			"frame-ancestors 'none'; " +
+			"require-trusted-types-for 'script';",
+	);
+	res.headers.set(
+		"Strict-Transport-Security",
+		"max-age=63072000; includeSubDomains; preload",
+	);
+	res.headers.set("X-Content-Type-Options", "nosniff");
+	res.headers.set("X-Frame-Options", "DENY");
+	res.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+	res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+	res.headers.set(
+		"Permissions-Policy",
+		"camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=(), usb=()",
+	);
+
+	return res;
 }

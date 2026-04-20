@@ -1,5 +1,20 @@
 # Migration Status Report
 
+## Web-viewer domain targeting update (2026-04-20)
+
+- Updated Agency OS runtime domain targeting from `designedbyanthony.com` to `vertaflow.io` in web-viewer host allowlists and URL defaults (`next.config.ts` CSP `*.vertaflow.io`, lead CORS defaults/pattern, preview host detection, service worker allowed hosts, and fallback `NEXT_PUBLIC_APP_URL` links used by lead/ticket notifications).
+- Build verification pending in this pass: run `pnpm build` from repo root after env/domain cutover variables are set in Vercel.
+
+## Go-live hardening pass (2026-04-19)
+
+- **CRM tooling (2026-04-19 follow-up):** `packages/database/scripts/seed-master-tenant.mjs` aligned with `tenants` schema (`clerk_org_id`, `vertical_type`, timestamps). `apps/web-viewer` production build uses `NODE_OPTIONS=--max-old-space-size=8192` in the `build` script to avoid TypeScript heap OOM. Playwright smoke (`tests/smoke.spec.ts`) passes with restored `apps/web-viewer/.env.test` and `pnpm exec playwright install chromium` when browsers are missing; Clerk logs may show production-key domain warnings on `localhost` — use Clerk test keys for fully clean local sign-in, or rely on `ALLOW_ADMIN_AUTH_BYPASS` for E2E.
+- **Implemented:** Zod + spam-guard layering on `POST /api/lead`, Drizzle `Database` typing fixes, console removal + ESLint guard, marketing Sentry replay defaults, `tsconfig` exclude for Browserbase Playwright config.
+- **Also:** Web-viewer `includeLocalVariables: false` in `sentry.server.config.ts`; marketing Astro Sentry sourcemaps opt-in via `SENTRY_SOURCEMAP_UPLOAD=1`; Husky pre-commit blocks new `console.*` in staged app/package sources; root devDependency `vercel@51.7.0` + `pnpm run vercel`.
+- **Verified:** `pnpm install` at repo root then `pnpm build` — all three apps green in this workspace; `pnpm lint` green (warnings only in web-viewer).
+- **Note:** Run `pnpm install` before CI/Vercel builds if `node_modules` is incomplete (fixes missing `@dba/env` resolution). For marketing Sentry source maps in CI, set `SENTRY_SOURCEMAP_UPLOAD=1` with a token that matches `SENTRY_ORG` / `SENTRY_PROJECT`.
+- **Blocked on you (not code):** Register **vertaflow.io** DNS at registrar; in Vercel add domains / subdomains (`admin`, `accounts`, `lighthouse`, apex marketing) and point DNS; set `PUBLIC_CRM_LEAD_URL` and gateway upstreams to the new hosts when you cut over.
+- **E2E:** Full `pnpm test:e2e` not run to completion in this agent (marketing smoke hung on webServer in CI VM — run locally or in CI with adequate timeout). Browserbase tests need `PW_USE_BROWSERBASE=1` + Browserbase API keys.
+
 ## CRM V1 Sprint — Complete (2026-04-19)
 
 Branch `feature/crm-v1-sprint` — 6 commits, all 3 apps build green.

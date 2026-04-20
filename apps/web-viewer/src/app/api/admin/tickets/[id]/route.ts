@@ -123,7 +123,7 @@ export async function PATCH(
       sendWebPushToProspect(ticket.leadId, {
         title: `Ticket Update: ${ticket.subject}`,
         body: adminReply!.trim().slice(0, 120),
-        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com"}/portal/tickets`,
+        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://admin.vertaflow.io"}/portal/tickets`,
       }).catch((e: unknown) => console.error("Push to prospect failed:", e));
     }
 

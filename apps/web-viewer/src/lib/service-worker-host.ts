@@ -1,6 +1,6 @@
 const SERVICE_WORKER_HOSTS = new Set([
-  "admin.designedbyanthony.com",
-  "accounts.designedbyanthony.com",
+  "admin.vertaflow.io",
+  "accounts.vertaflow.io",
   "dba-agency-os.vercel.app",
   "localhost",
   "127.0.0.1",

@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
  * CORS helper for lead endpoints (`/api/lead`, `/api/webhooks/lead`).
  *
  * Now that admin. and accounts. are separate subdomains of
- * designedbyanthony.com (see `middleware.ts` Chameleon rules), the
+ * vertaflow.io (see `middleware.ts` Chameleon rules), the
  * browser fetch from admin. → accounts. (or marketing → admin.) is a
  * cross-origin request — it must be allow-listed here or the CRM will
  * reject requests from its own family.
@@ -12,25 +12,25 @@ import type { NextRequest } from "next/server";
  * Rules:
  *   1. If the Origin matches the `LEAD_WEBHOOK_CORS_ORIGINS` explicit
  *      allow-list, echo it back.
- *   2. Otherwise, accept any `https://*.designedbyanthony.com` origin
+ *   2. Otherwise, accept any `https://*.vertaflow.io` origin
  *      (cross-subdomain requests within our own family).
  *   3. For server-to-server POSTs (no Origin header) fall through to the
  *      first allow-listed origin — the CORS header is irrelevant there
  *      since the request isn't subject to same-origin policy.
  */
 const DEFAULT_ORIGINS = [
-  "https://designedbyanthony.com",
-  "https://www.designedbyanthony.com",
-  "https://admin.designedbyanthony.com",
-  "https://accounts.designedbyanthony.com",
-  "https://lighthouse.designedbyanthony.com",
+  "https://vertaflow.io",
+  "https://www.vertaflow.io",
+  "https://admin.vertaflow.io",
+  "https://accounts.vertaflow.io",
+  "https://lighthouse.vertaflow.io",
   "http://localhost:4321",
   "http://127.0.0.1:4321",
   `http://localhost:${3000}`,
   "http://127.0.0.1:3000",
 ];
 
-const APEX_SUBDOMAIN_PATTERN = /^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
+const APEX_SUBDOMAIN_PATTERN = /^https:\/\/([a-z0-9-]+\.)*vertaflow\.io$/i;
 
 export function isLeadWebhookOriginAllowed(
   origin: string | null | undefined,
@@ -58,7 +58,7 @@ export function leadWebhookCorsHeaders(request: NextRequest): Record<string, str
 
   const allow = isLeadWebhookOriginAllowed(origin)
     ? origin!
-    : allowed[0] ?? "https://designedbyanthony.com";
+    : allowed[0] ?? "https://vertaflow.io";
 
   return {
     "Access-Control-Allow-Origin": allow,

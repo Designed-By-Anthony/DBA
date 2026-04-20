@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### Go-live hardening (2026-04-19)
+
+- **Public lead ingest (`POST /api/lead`):** Validates with `parsePublicLeadIngestBody` from `@dba/lead-form-contract`, then `validatePublicLead` (disposable domains + format), bot heuristics, and Turnstile when configured. Marketing attribution fields are passed to `executeLeadIntake` via `marketingMetaFromPublicBody`.
+- **Strict typing:** Barcode and inventory helpers use `Database` from `@dba/database` instead of incorrect `PostgresJsDatabase` imports.
+- **Cleanup:** Removed `console.*` from app/server code paths; ESLint `no-console` enabled for `dba-agency-os` and `dba-lighthouse-audit`.
+- **Sentry (marketing client):** Session replay stays opt-in via `PUBLIC_SENTRY_REPLAY=1`; default session sampling is `0`, error replay `0.25` when enabled (was `1.0`).
+- **Sentry (web-viewer server):** `includeLocalVariables: false` on server init (aligns with Lighthouse).
+- **Sentry (marketing Astro):** Source map upload is opt-in via `SENTRY_SOURCEMAP_UPLOAD=1` (avoids failed upload noise when token/org/project do not match).
+- **Pre-commit:** Husky hook rejects new `console.*` in staged `apps/` and `packages/` TypeScript/JavaScript (excludes `node_modules`, `.next`, `dist`).
+- **Build:** Excluded `playwright.browserbase.config.ts` from Next.js typecheck (optional Browserbase config; avoids missing optional `dotenv` during `next build`).
+- **Build (web-viewer):** `next build` runs with `NODE_OPTIONS=--max-old-space-size=8192` to avoid TypeScript OOM on large projects.
+- **Database:** `pnpm db:seed:master` script inserts into `tenants` using `clerk_org_id`, `vertical_type`, and required `created_at` / `updated_at` (matches Drizzle schema).
+- **Playwright:** Restored `apps/web-viewer/.env.test` sandbox (Neon `DATABASE_URL`, correct `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`). Run `pnpm exec playwright install chromium` once after installing deps if browsers are missing.
+- **Playwright + OWASP ZAP:** Optional `PLAYWRIGHT_ZAP=1` routes Chromium through a local ZAP proxy (`zaproxy` client, `tests/helpers/zap.ts`); HTML report under `test-results/zap/` after the run. Root: `pnpm test:e2e:web:zap`; app: `pnpm test:zap`. Set `ZAP_API_KEY` from ZAP Options → API (see `.env.example`).
+
 ### 🚀 Upcoming Features (V2)
 - **Two-Way SMS / Twilio** — "On My Way" texts, appointment reminders via SMS
 - **Route Optimization** — Map-based dispatching for Service Pro

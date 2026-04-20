@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     const safeFirstName = escapeHtml((leadName || "there").split(" ")[0]);
     const safeSubject = escapeHtml(subject);
     const safeDescription = escapeHtml(description);
-    const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://admin.designedbyanthony.com"}/portal/tickets`;
+    const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://admin.vertaflow.io"}/portal/tickets`;
 
     try {
       await sendMail({
