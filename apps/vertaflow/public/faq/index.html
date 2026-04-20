@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VertaFlow FAQ | CRM Questions by Vertical</title>
+    <meta
+      name="description"
+      content="Answers to common VertaFlow questions on vertical switching, tenant isolation, PWA support, Stripe payments, and client portal access."
+    />
+    <link rel="canonical" href="https://vertaflow.io/faq/" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can I switch verticals after signup?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. VertaFlow lets you change vertical views while keeping your underlying tenant data model intact."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does VertaFlow support offline mode?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The PWA includes offline-first record capture and background sync when connectivity returns."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How are payments handled?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Stripe powers invoices, subscriptions, and POS transactions across supported vertical modules."
+            }
+          }
+        ]
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #07090e;
+        color: #f8fafc;
+      }
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 3rem 1.25rem;
+      }
+      a {
+        color: #06d6a0;
+      }
+      article {
+        border: 1px solid #2a2f3e;
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 0.9rem;
+        background: #0f1218;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      p {
+        color: #d6d9e0;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>VertaFlow FAQ</h1>
+      <p>Core operational answers for every supported vertical configuration.</p>
+      <article>
+        <h2>Can I switch verticals after signup?</h2>
+        <p>Yes. You can switch between Service Pro, Retail, Restaurant, and other vertical views without losing tenant data.</p>
+      </article>
+      <article>
+        <h2>Does VertaFlow work offline?</h2>
+        <p>Yes. Leads and estimates queue locally while offline and sync automatically when the device is back online.</p>
+      </article>
+      <article>
+        <h2>How does VertaFlow protect tenant data?</h2>
+        <p>Tenant-scoped records remain isolated by org-level keys and row-level context in backend processing.</p>
+      </article>
+      <p><a href="/">Back to VertaFlow home</a></p>
+    </main>
+  </body>
+</html>

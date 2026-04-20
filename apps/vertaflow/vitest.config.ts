@@ -13,6 +13,9 @@ export default defineConfig({
       "src/**/*.spec.ts",
       "src/**/*.spec.tsx",
     ],
+    pool: "forks",
+    maxWorkers: 1,
+    minWorkers: 1,
     globals: true,
   },
   resolve: {

@@ -239,6 +239,10 @@ img { max-width: 100%; display: block; }
   text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
   font-family: var(--vf-font-body);
 }
+.faq-question:focus-visible {
+  outline: 2px solid var(--vf-brand);
+  outline-offset: -2px;
+}
 .faq-question::after { content: '+'; font-size: 1.4rem; color: var(--vf-text-tertiary); transition: transform .3s; }
 .faq-item.open .faq-question::after { transform: rotate(45deg); color: var(--vf-brand); }
 .faq-answer { padding: 0 1.5rem; max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.22,1,.36,1), padding .4s; }
@@ -278,6 +282,11 @@ select.request-input { appearance: none; cursor: pointer; }
 select.request-input option { background: var(--vf-surface-1); }
 .request-note { font-size: .82rem; color: var(--vf-text-tertiary); margin-top: .5rem; }
 .request-success { text-align: center; padding: 2rem 0; }
+.request-error {
+  margin-top: 1rem;
+  color: #fca5a5;
+  font-size: 0.9rem;
+}
 
 /* ─── DBA Footer Cross-Promo ─── */
 .footer-dba {
@@ -298,6 +307,13 @@ select.request-input option { background: var(--vf-surface-1); }
 .blog-card:hover { border-color: var(--vf-border-hover); transform: translateY(-4px); box-shadow: 0 20px 50px -20px rgba(0,0,0,.5); }
 .blog-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--vf-text-primary); line-height: 1.35; }
 .blog-card p { font-size: .88rem; line-height: 1.65; flex: 1; }
+.blog-card a {
+  margin-top: auto;
+  color: var(--vf-brand);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .blog-tag { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--vf-brand); background: var(--vf-brand-subtle); padding: .3rem .7rem; border-radius: 999px; align-self: flex-start; }
 .blog-date { font-size: .78rem; color: var(--vf-text-tertiary); }
 

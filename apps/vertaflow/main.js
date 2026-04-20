@@ -1,4 +1,14 @@
 import { installGlobalSyncProvider } from "./src/providers/GlobalSyncProvider";
+import { registerServiceWorker } from "./src/pwa/registerServiceWorker";
+import {
+	captureHandledError,
+	captureMessage,
+	initSentryFromRuntimeConfig,
+	setSentryTags,
+} from "./src/telemetry/sentry";
+import { registerGlobalErrorHandlers } from "./src/telemetry/globalErrorHandlers";
+import { getRuntimeConfig } from "./src/runtime/config";
+import { buildFaqStructuredData, buildBlogCollectionStructuredData } from "./src/seo/structuredData";
 
 // ─── VertaFlow Marketing — Interactive Logic ───
 
@@ -234,6 +244,30 @@ const verticals = {
 	},
 };
 
+const verticalLabels = {
+	contractor: "service-pro",
+	food: "restaurant",
+	beauty: "beauty",
+	retail: "retail",
+	fitness: "health-fitness",
+	realestate: "real-estate",
+	creative: "creative",
+};
+
+const runtimeConfig = getRuntimeConfig();
+
+initSentryFromRuntimeConfig(runtimeConfig);
+registerGlobalErrorHandlers({
+	captureException: captureHandledError,
+	captureMessage,
+});
+
+setSentryTags({
+	app: "vertaflow-marketing",
+	env: runtimeConfig.envName,
+	host: runtimeConfig.appHost,
+});
+
 // ── Render vertical preview ──
 function renderVertical(id) {
 	const v = verticals[id];
@@ -279,6 +313,23 @@ function renderVertical(id) {
 		pipeline.style.opacity = "1";
 		kpis.style.opacity = "1";
 	});
+
+	document.body.setAttribute("data-active-vertical", id);
+	const canonicalForVertical = `${runtimeConfig.siteUrl}/?vertical=${verticalLabels[id] ?? "service-pro"}`;
+	const canonicalLink = document.querySelector('link[rel="canonical"]');
+	if (canonicalLink) {
+		canonicalLink.setAttribute("href", canonicalForVertical);
+	}
+
+	setSentryTags({
+		vertical: id,
+	});
+	captureMessage("vertical-preview-loaded", {
+		level: "info",
+		context: {
+			vertical: id,
+		},
+	});
 }
 
 // ── Tab switching ──
@@ -295,6 +346,19 @@ document.getElementById("verticalTabs")?.addEventListener("click", (e) => {
 // Initial render
 renderVertical("contractor");
 installGlobalSyncProvider();
+void registerServiceWorker({
+	captureException: captureHandledError,
+	captureMessage,
+});
+
+const faqJsonLdTag = document.getElementById("vf-faq-jsonld");
+if (faqJsonLdTag) {
+	faqJsonLdTag.textContent = JSON.stringify(buildFaqStructuredData(), null, 2);
+}
+const blogJsonLdTag = document.getElementById("vf-blog-jsonld");
+if (blogJsonLdTag) {
+	blogJsonLdTag.textContent = JSON.stringify(buildBlogCollectionStructuredData(runtimeConfig.siteUrl), null, 2);
+}
 
 // ── Scroll reveal ──
 const observer = new IntersectionObserver(
@@ -380,8 +444,7 @@ document
 
 		try {
 			// POST to the CRM lead endpoint
-			const CRM_URL = "https://admin.designedbyanthony.com/api/lead";
-			const res = await fetch(CRM_URL, {
+			const res = await fetch(runtimeConfig.crmLeadUrl, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
@@ -392,6 +455,15 @@ document
 			form.hidden = true;
 			document.getElementById("requestSuccess").hidden = false;
 		} catch (_err) {
+			captureHandledError(_err, {
+				tags: {
+					module: "request-access",
+				},
+				extra: {
+					crmLeadUrl: runtimeConfig.crmLeadUrl,
+					source: payload.source,
+				},
+			});
 			// Fallback: still show success (form data logged server-side for manual follow-up)
 			form.hidden = true;
 			document.getElementById("requestSuccess").hidden = false;
