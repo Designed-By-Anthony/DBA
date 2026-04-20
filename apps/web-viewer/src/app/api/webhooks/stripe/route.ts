@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getDb, withBypassRls, leads, activities, invoices, reviewRequests, type Database } from '@dba/database';
 import { and, eq } from 'drizzle-orm';

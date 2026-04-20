@@ -202,6 +202,8 @@ export async function POST(request: NextRequest) {
       message: body.message,
       auditUrl: body.auditUrl,
       marketing,
+      /** When set (Clerk org id present in `tenants`), routes the lead to that tenant instead of the default. */
+      agencyId: body.agencyId,
     });
 
     return NextResponse.json(

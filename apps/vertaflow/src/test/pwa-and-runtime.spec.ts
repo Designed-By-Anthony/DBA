@@ -9,6 +9,16 @@ describe("runtime config", () => {
     const config = getRuntimeConfig({ origin: "https://vertaflow.io" });
     expect(config.crmLeadUrl).toBe("https://admin.vertaflow.io/api/lead");
     expect(config.canonicalOrigin).toBe("https://vertaflow.io");
+    expect(config.siteUrl).toBe("https://vertaflow.io");
+    expect(config.appHost).toBe("vertaflow.io");
+  });
+
+  it("marks production env when MODE is production", () => {
+    const config = getRuntimeConfig({
+      origin: "https://vertaflow.io",
+      env: { MODE: "production", PROD: true, VITE_SENTRY_DSN: "" },
+    });
+    expect(config.envName).toBe("production");
   });
 
   it("uses env override for lead endpoint", () => {

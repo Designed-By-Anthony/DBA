@@ -214,6 +214,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://js.stripe.com">
   <link rel="dns-prefetch" href="https://admin.vertaflow.io">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
+    window.__vfRequestTurnstileOk = function (token) {
+      var f = document.getElementById("requestForm");
+      if (f && typeof f.__vfResolve === "function") {
+        var r = f.__vfResolve;
+        delete f.__vfResolve;
+        r(token || "");
+      }
+    };
+    window.__vfRequestTurnstileErr = function () {
+      var f = document.getElementById("requestForm");
+      if (f && typeof f.__vfResolve === "function") {
+        var r = f.__vfResolve;
+        delete f.__vfResolve;
+        r("");
+      }
+    };
+  </script>
+  <script>window.__VF_PUBLIC__ = __VF_PUBLIC_JSON__;</script>
 </head>
 <!-- Built with: Vite 6 · Vanilla JS · Neon Postgres · Stripe · Drizzle ORM · Clerk Auth · Vercel -->
 <body data-vertaflow-version="1.0.0" data-platform="vertaflow-crm">
@@ -230,8 +250,8 @@
       <li><a href="#features">Features</a></li>
       <li><a href="#compare">Compare</a></li>
       <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#blog">Blog</a></li>
+      <li><a href="/faq/">FAQ</a></li>
+      <li><a href="/blog/">Blog</a></li>
       <li><a href="https://login.vertaflow.io" class="nav-login-link">Customer Login</a></li>
     </ul>
     <a href="#request-access" class="btn btn-primary btn-sm nav-cta" style="padding:.6rem 1.4rem;font-size:.85rem;">Request Access</a>
@@ -269,13 +289,13 @@
     <p class="section-sub text-center mx-auto reveal">Same database. Same security. Completely different experience — tuned to how <em>you</em> actually run your business.</p>
 
     <div class="switcher-tabs reveal" id="verticalTabs" role="tablist">
-      <button class="switcher-tab active" data-vertical="contractor" role="tab">🏗️ Service Pro</button>
-      <button class="switcher-tab" data-vertical="food" role="tab">🍰 Restaurant</button>
-      <button class="switcher-tab" data-vertical="beauty" role="tab">💇 Beauty & Wellness</button>
-      <button class="switcher-tab" data-vertical="retail" role="tab">🏪 Retail</button>
-      <button class="switcher-tab" data-vertical="fitness" role="tab">🏥 Health & Fitness</button>
-      <button class="switcher-tab" data-vertical="realestate" role="tab">🏠 Real Estate</button>
-      <button class="switcher-tab" data-vertical="creative" role="tab">🎯 Creative</button>
+      <button type="button" class="switcher-tab active" data-vertical="contractor" role="tab" aria-selected="true">🏗️ Service Pro</button>
+      <button type="button" class="switcher-tab" data-vertical="food" role="tab" aria-selected="false">🍰 Restaurant</button>
+      <button type="button" class="switcher-tab" data-vertical="beauty" role="tab" aria-selected="false">💇 Beauty & Wellness</button>
+      <button type="button" class="switcher-tab" data-vertical="retail" role="tab" aria-selected="false">🏪 Retail</button>
+      <button type="button" class="switcher-tab" data-vertical="fitness" role="tab" aria-selected="false">🏥 Health & Fitness</button>
+      <button type="button" class="switcher-tab" data-vertical="realestate" role="tab" aria-selected="false">🏠 Real Estate</button>
+      <button type="button" class="switcher-tab" data-vertical="creative" role="tab" aria-selected="false">🎯 Creative</button>
     </div>
 
     <div class="switcher-preview reveal" id="verticalPreview">
@@ -489,6 +509,16 @@
       <h2>Stop paying for tools that don't fit.</h2>
       <p>VertaFlow is in early access. Request your spot — we'll onboard you personally and get your vertical configured in under 24 hours.</p>
       <form class="request-form" id="requestForm" action="/api/request-access" method="POST">
+        <input
+          type="text"
+          name="_hp"
+          value=""
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+          class="request-input"
+          style="position:absolute;left:-10000px;width:1px;height:1px;opacity:0;"
+        />
         <div class="request-form-row">
           <input type="text" name="name" placeholder="Your name" required class="request-input">
           <input type="email" name="email" placeholder="Work email" required class="request-input">
@@ -514,6 +544,16 @@
           <input type="checkbox" name="webDesignInterest" value="yes">
           <span>I'm also interested in professional web design services</span>
         </label>
+        <div
+          class="cf-turnstile"
+          data-sitekey="__VF_TURNSTILE_SITE_KEY__"
+          data-theme="dark"
+          data-size="invisible"
+          data-appearance="interaction-only"
+          data-callback="__vfRequestTurnstileOk"
+          data-error-callback="__vfRequestTurnstileErr"
+          style="margin:0.5rem 0 0;min-height:0;"
+        ></div>
         <button type="submit" class="btn btn-primary" style="font-size:1.05rem;padding:1rem 2.5rem;width:100%;max-width:360px;" id="requestSubmitBtn">Request Early Access</button>
         <p class="request-note">No credit card required · Personal onboarding included</p>
       </form>
@@ -534,21 +574,21 @@
     <div class="blog-grid">
       <article class="blog-card reveal">
         <span class="blog-tag">Product</span>
-        <h3>Why we built a CRM that changes shape</h3>
+        <h3><a href="/blog/why-we-built-a-crm-that-changes-shape/">Why we built a CRM that changes shape</a></h3>
         <p>Every industry has its own vocabulary. We got tired of watching salon owners wrestle with "Leads" and plumbers click past "Appointments." So we built a CRM that speaks your language from day one.</p>
-        <span class="blog-date">Coming soon</span>
+        <span class="blog-date"><a href="/blog/why-we-built-a-crm-that-changes-shape/">Read article →</a></span>
       </article>
       <article class="blog-card reveal">
         <span class="blog-tag">Operations</span>
-        <h3>POS + CRM: why they should be the same tool</h3>
+        <h3><a href="/blog/pos-crm-one-system-for-operators/">POS + CRM: why they should be the same tool</a></h3>
         <p>Restaurants and retailers juggle a POS, a CRM, an email tool, and a loyalty platform. We think that's four tools too many. Here's how VertaFlow collapses the stack.</p>
-        <span class="blog-date">Coming soon</span>
+        <span class="blog-date"><a href="/blog/pos-crm-one-system-for-operators/">Read article →</a></span>
       </article>
       <article class="blog-card reveal">
         <span class="blog-tag">Security</span>
-        <h3>Zero-trust multi-tenancy: what it means for your data</h3>
+        <h3><a href="/blog/zero-trust-multi-tenancy-for-small-business-crm/">Zero-trust multi-tenancy: what it means for your data</a></h3>
         <p>Row-level isolation isn't a feature checkbox — it's an architecture decision. We explain why every query in VertaFlow is scoped to your organization, and what that protects you from.</p>
-        <span class="blog-date">Coming soon</span>
+        <span class="blog-date"><a href="/blog/zero-trust-multi-tenancy-for-small-business-crm/">Read article →</a></span>
       </article>
     </div>
   </div>
@@ -574,17 +614,18 @@
       </div>
       <div class="footer-col">
         <h4>Verticals</h4>
-        <a href="#">Service Pro</a>
-        <a href="#">Restaurant</a>
-        <a href="#">Beauty & Wellness</a>
-        <a href="#">Retail</a>
+        <a href="/?vertical=service-pro">Service Pro</a>
+        <a href="/?vertical=restaurant">Restaurant</a>
+        <a href="/?vertical=beauty">Beauty &amp; Wellness</a>
+        <a href="/?vertical=retail">Retail</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
-        <a href="#">About</a>
-        <a href="/blog/index.html">Blog</a>
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
+        <a href="https://designedbyanthony.com" target="_blank" rel="noopener">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq/">FAQ</a>
+        <a href="https://designedbyanthony.com/privacy" target="_blank" rel="noopener">Privacy</a>
+        <a href="https://designedbyanthony.com/terms" target="_blank" rel="noopener">Terms</a>
       </div>
     </div>
     <div class="footer-dba reveal">

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
 import { getDb, reviewRequests, withTenantContext } from "@dba/database";

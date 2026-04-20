@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { AuditResults, AuditData } from "./AuditResults";
+import type React from "react";
+import { useState, useEffect, useRef } from "react";
+import { AuditResults, type AuditData } from "./AuditResults";
 
 const LOADING_MESSAGES = [
   "Running Google Pagespeed Scan...",

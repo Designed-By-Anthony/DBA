@@ -1,5 +1,6 @@
 ---
 import AuditForm from '../components/AuditForm.astro';
+import PortableEmbedShowcase from '../components/PortableEmbedShowcase.astro';
 import Layout from '../layouts/Layout.astro';
 import { FOUNDING_PARTNER_SEO_LABEL, MONTHLY_LOCAL_SEO_PRICE } from '../lib/offers';
 import { ORGANIZATION_ID, businessProfile, toAbsoluteUrl, type SchemaValue } from '../lib/seo';
@@ -134,6 +135,8 @@ const contactSchema: SchemaValue = {
       </div>
     </div>
   </section>
+
+  <PortableEmbedShowcase />
 
   <section class="section-shell calendly-shell">
     <div class="section-container">

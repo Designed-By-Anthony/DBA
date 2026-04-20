@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { type AutomationRule, type AutomationTrigger, type AutomationAction } from "@/lib/types";
+import type { AutomationRule, AutomationTrigger, AutomationAction } from "@/lib/types";
 import { toggleAutomation, deleteAutomation, createAutomation } from "./actions";
 import { Activity, ArrowRight, Plus, Trash2, Zap, Settings2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

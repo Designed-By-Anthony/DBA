@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 import { getDb, withTenantContext, pushSubscriptions, leads } from "@dba/database";
 import { eq, and } from "drizzle-orm";

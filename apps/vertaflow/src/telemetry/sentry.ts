@@ -40,48 +40,65 @@ function toTags(context: TelemetryErrorContext) {
 
 export function captureAppError(input: unknown, context: TelemetryErrorContext): void {
   const err = normalizeError(input);
-  const payload = {
-    tags: toTags(context),
-    extra: context.metadata ?? {},
-  };
+  const tags = toTags(context);
+  const extra = context.metadata ?? {};
 
   const sentry = window.Sentry;
   if (sentry?.captureException) {
-    sentry.captureException(err, payload);
+    sentry.captureException(err, { tags, extra });
     return;
   }
 
   // Keep local observability in non-Sentry development environments.
   // eslint-disable-next-line no-console
-  console.error("[VertaFlow telemetry]", err, payload);
+  console.error("[VertaFlow telemetry]", err, { tags, extra });
+}
+
+function sentryMessageLevel(context: TelemetryErrorContext): string {
+  if (context.severity === "info") return "info";
+  if (context.severity === "warning") return "warning";
+  return "error";
 }
 
 export function captureAppMessage(message: string, context: TelemetryErrorContext): void {
-  const payload = {
-    tags: toTags(context),
-    extra: context.metadata ?? {},
-  };
+  const tags = toTags(context);
+  const extra = context.metadata ?? {};
 
   const sentry = window.Sentry;
   if (sentry?.captureMessage) {
-    sentry.captureMessage(message, payload);
+    sentry.captureMessage(message, {
+      level: sentryMessageLevel(context),
+      tags,
+      extra,
+    });
     return;
   }
 
   // eslint-disable-next-line no-console
-  console.warn("[VertaFlow telemetry]", message, payload);
+  console.warn("[VertaFlow telemetry]", message, { tags, extra });
 }
 
-export function initSentryFromRuntimeConfig(config: {
+export type SentryRuntimeInitConfig = {
   dsn?: string;
-  environment: string;
+  sentryDsn?: string;
+  environment?: string;
+  envName?: string;
   release?: string;
   appVersion?: string;
   canonicalOrigin?: string;
-}) {
+  siteUrl?: string;
+  appHost?: string;
+};
+
+export function initSentryFromRuntimeConfig(config: SentryRuntimeInitConfig) {
   if (typeof window === "undefined") return;
-  if (!config.dsn?.trim()) return;
+  const dsn = (config.sentryDsn ?? config.dsn ?? "").trim();
+  if (!dsn) return;
   if (window.Sentry) return;
+
+  const environment = (config.envName ?? config.environment ?? "development").trim();
+  const release = (config.release ?? config.appVersion ?? "").trim() || undefined;
+  const origin = (config.canonicalOrigin ?? config.siteUrl ?? "").trim();
 
   const script = document.createElement("script");
   script.async = true;
@@ -89,16 +106,41 @@ export function initSentryFromRuntimeConfig(config: {
   script.crossOrigin = "anonymous";
   script.onload = () => {
     const sdk = window.Sentry as
-      | (SentryLike & { init?: (opts: Record<string, unknown>) => void; setTag?: (k: string, v: string) => void })
+      | (SentryLike & {
+          init?: (opts: Record<string, unknown>) => void;
+          setTag?: (k: string, v: string) => void;
+        })
       | undefined;
     sdk?.init?.({
-      dsn: config.dsn,
-      environment: config.environment,
-      release: config.release ?? config.appVersion,
-      tracesSampleRate: 0.2,
+      dsn,
+      environment,
+      release,
+      tracesSampleRate: 0.15,
+      ignoreErrors: [
+        /^ResizeObserver loop/,
+        /^Non-Error promise rejection captured/,
+        /chrome-extension:\/\//i,
+        /moz-extension:\/\//i,
+      ],
+      beforeSend(event) {
+        const nextTags = { ...(event.tags ?? {}) };
+        nextTags.app = "vertaflow-marketing";
+        if (config.appHost) nextTags.deployment_host = config.appHost;
+        if (origin) nextTags.canonical_origin = origin;
+        const vertical =
+          typeof document !== "undefined" ? document.body?.getAttribute("data-active-vertical") : null;
+        if (vertical) nextTags.vertical_tab = vertical;
+        const exType = event.exception?.values?.[0]?.type;
+        if (exType) nextTags.exception_type = exType;
+        event.tags = nextTags;
+        return event;
+      },
     });
-    if (config.canonicalOrigin) {
-      sdk?.setTag?.("canonical_origin", config.canonicalOrigin);
+    if (origin) {
+      sdk?.setTag?.("canonical_origin", origin);
+    }
+    if (config.appHost) {
+      sdk?.setTag?.("deployment_host", config.appHost);
     }
     if (config.appVersion) {
       sdk?.setTag?.("app_version", config.appVersion);

@@ -16,7 +16,7 @@
  * local dev loops (e.g. this cloud-agent VM). Honeypot short-circuit
  * runs BEFORE Zod so bots can't probe for validation errors.
  */
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { parseGlobalLeadIngestBody, constantTimeEqual } from "@dba/lead-form-contract";
 import { safeParseVerticalLeadMetadata, type VerticalId } from "@dba/ui";

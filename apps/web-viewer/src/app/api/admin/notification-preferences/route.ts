@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb, notificationPreferences, withTenantContext } from "@dba/database";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";

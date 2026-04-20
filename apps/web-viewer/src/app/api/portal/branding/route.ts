@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import type { PlanSuite } from '@dba/lead-form-contract';
 import { getTenantByOrgId } from '@/lib/tenant-db';
 import { resolveUiVerticalTemplateFromTenant } from '@/lib/vertical-template-map';

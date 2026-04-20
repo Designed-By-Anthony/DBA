@@ -1,0 +1,51 @@
+---
+/**
+ * Live reference for `apps/customer-site-embeds/` — same fields as portable HTML,
+ * with Turnstile + ingest wired through the normal Astro `AuditForm` pipeline.
+ *
+ * Triage: `offer_type=dba_studio_portable_embed_showcase` on your **Designed by Anthony** tenant.
+ */
+import AuditForm from './AuditForm.astro';
+---
+
+<section class="section-shell section-shell--wash" id="portable-embed-pack" aria-labelledby="portable-embed-title">
+  <div class="section-container">
+    <div class="section-header">
+      <p class="section-eyebrow">Portable embed pack</p>
+      <h2 id="portable-embed-title">Customer-site form (studio lane)</h2>
+      <p>
+        This block mirrors the standalone HTML in <code>apps/customer-site-embeds/designed-by-anthony-studio/</code> so
+        you can verify Turnstile, ingest, and attribution on <strong>designedbyanthony.com</strong> before pasting the
+        snippet on a client domain. Submissions are labeled for CRM triage — see the pack README for the VertaFlow
+        product lane and calendar snippets.
+      </p>
+    </div>
+    <div class="surface-card" style="max-width: 640px; margin: 0 auto;">
+      <AuditForm
+        ctaSource="portable_embed_pack"
+        pageContext="designedbyanthony_embed_showcase"
+        offerType="dba_studio_portable_embed_showcase"
+        subjectLine="Portable embed showcase — Designed by Anthony"
+        submitLabel="Send message (embed pack demo)"
+        metaMessage="Same pipeline as portable HTML — Used to validate the pack before client drops."
+        websiteLabel="Website URL (optional)"
+        websitePlaceholder="yourwebsite.com"
+        websiteRequired={false}
+        issueLabel="What should Anthony know?"
+        issuePlaceholder="Project type, timeline, or link to the page you will embed on…"
+        issueRequired={true}
+        successMode="inline"
+        successTag="Message sent"
+        successTitle="Got it"
+        successMessage="This form uses the portable-pack attribution keys so you can filter it in the CRM."
+        successPoints={[
+          'Offer type: dba_studio_portable_embed_showcase',
+          'Check tenant + offer_type in Agency OS before replying.',
+        ]}
+      />
+    </div>
+    <p class="section-footnote" style="text-align: center; margin-top: 1.5rem; color: var(--color-muted, #64748b); font-size: 0.9rem;">
+      Master project owner: <strong>Designed by Anthony</strong> — see <code>apps/customer-site-embeds/OWNERSHIP.md</code>.
+    </p>
+  </div>
+</section>

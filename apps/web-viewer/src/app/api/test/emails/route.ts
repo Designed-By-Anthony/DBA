@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { clearTestOutbox, findTestEmails, getTestOutbox, isEmailTestMode } from "@/lib/mailer";
 
 /**

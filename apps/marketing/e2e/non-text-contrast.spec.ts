@@ -17,7 +17,7 @@ async function getBoundaryContrast(page: Page, selector: string) {
       const normalized = value / 255;
       return normalized <= 0.03928
         ? normalized / 12.92
-        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+        : ((normalized + 0.055) / 1.055) ** 2.4;
     };
 
     const luminance = ({ r, g, b }: { r: number; g: number; b: number }) =>

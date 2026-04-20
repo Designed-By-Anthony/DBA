@@ -1,45 +1,37 @@
 import { describe, expect, it } from "vitest";
+import {
+  marketingVerticalLabels,
+  marketingVerticals,
+  marketingVerticalTabOrder,
+} from "../marketing-verticals";
 
-const verticalsForTest = {
-  service: {
-    sidebar: ["Dashboard", "Leads", "Jobs", "Work Orders"],
-    pipeline: ["New Lead", "Estimate Sent", "In Progress", "Complete"],
-  },
-  retail: {
-    sidebar: ["Dashboard", "Customers", "POS", "Inventory"],
-    pipeline: ["New Order", "Processing", "Shipped", "Delivered"],
-  },
-  restaurant: {
-    sidebar: ["Dashboard", "Orders", "Menu", "KDS"],
-    pipeline: ["New Order", "Confirmed", "In Prep", "Ready"],
-  },
-} as const;
-
-function renderVerticalPreview(
-  id: keyof typeof verticalsForTest,
-): { sidebarHtml: string; pipelineHtml: string } {
-  const model = verticalsForTest[id];
-  const sidebarHtml = model.sidebar.map((item) => `<li>${item}</li>`).join("");
-  const pipelineHtml = model.pipeline.map((stage) => `<span>${stage}</span>`).join("");
-  return { sidebarHtml, pipelineHtml };
-}
-
-describe("vertical preview integrity", () => {
-  it("renders service vertical labels", () => {
-    const output = renderVerticalPreview("service");
-    expect(output.sidebarHtml).toContain("Work Orders");
-    expect(output.pipelineHtml).toContain("Estimate Sent");
+describe("marketing vertical models (production parity)", () => {
+  it("covers every home-page tab with sidebar + pipeline content", () => {
+    for (const id of marketingVerticalTabOrder) {
+      const v = marketingVerticals[id];
+      expect(v?.sidebar.length).toBeGreaterThan(4);
+      expect(v?.pipeline.length).toBeGreaterThanOrEqual(4);
+      expect(v?.kpis.length).toBeGreaterThanOrEqual(2);
+      expect(marketingVerticalLabels[id]).toBeTruthy();
+    }
   });
 
-  it("renders retail vertical labels", () => {
-    const output = renderVerticalPreview("retail");
-    expect(output.sidebarHtml).toContain("Inventory");
-    expect(output.pipelineHtml).toContain("Processing");
+  it("service (contractor) exposes dispatch + estimate language", () => {
+    const v = marketingVerticals.contractor;
+    expect(v.sidebar.join(" ")).toMatch(/Work Orders/);
+    expect(v.pipeline.map((s) => s.label).join("|")).toMatch(/Estimate Sent/);
   });
 
-  it("renders restaurant vertical labels", () => {
-    const output = renderVerticalPreview("restaurant");
-    expect(output.sidebarHtml).toContain("KDS");
-    expect(output.pipelineHtml).toContain("In Prep");
+  it("restaurant (food) exposes KDS + prep language", () => {
+    const v = marketingVerticals.food;
+    expect(v.sidebar.join(" ")).toMatch(/KDS|Menu/);
+    expect(v.pipeline.map((s) => s.label).join("|")).toMatch(/In Prep/);
+  });
+
+  it("retail exposes POS + inventory language", () => {
+    const v = marketingVerticals.retail;
+    expect(v.sidebar.join(" ")).toMatch(/POS/);
+    expect(v.sidebar.join(" ")).toMatch(/Inventory/);
+    expect(v.pipeline.map((s) => s.label).join("|")).toMatch(/Shipped/);
   });
 });

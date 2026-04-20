@@ -5,7 +5,7 @@
  * a versioned alias that delegates to the same handler. Both use the
  * shared `handleIngestPost` in `@/lib/lead-intake/ingest-handler`.
  */
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { handleIngestPost, ingestManifest } from "@/lib/lead-intake/ingest-handler";
 import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
 

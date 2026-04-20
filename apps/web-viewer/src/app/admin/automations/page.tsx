@@ -1,6 +1,6 @@
 import { getAutomations } from "./actions";
 import AutomationsClient from "./AutomationsClient";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 

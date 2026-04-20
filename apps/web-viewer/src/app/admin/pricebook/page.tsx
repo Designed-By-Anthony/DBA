@@ -5,7 +5,7 @@ import {
   getStripeProducts,
   createStripeProductAction,
   setStripeProductActiveAction,
-  StripeProductDetail,
+  type StripeProductDetail,
 } from "../actions/stripe";
 import { formatCents, dollarsToCents } from "@/lib/currency";
 import { toast } from "sonner";

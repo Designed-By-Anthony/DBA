@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * Mocks the external Stripe Checkout API to instantly return a mocked 

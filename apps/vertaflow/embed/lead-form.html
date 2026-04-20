@@ -247,14 +247,14 @@
   </div>
 
   <script>
-    (function() {
+    (() => {
       var form = document.getElementById('vf-form-el');
       if (!form) return;
 
-      // CONFIGURE: Set your CRM endpoint URL here
-      var CRM_ENDPOINT = 'https://admin.designedbyanthony.com/api/lead';
+      // CONFIGURE: Agency OS host + public lead route (browser-safe; no webhook secret).
+      var CRM_ENDPOINT = 'https://admin.vertaflow.io/api/lead';
 
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
         var btn = document.getElementById('vf-submit-btn');
         var fd = new FormData(form);
@@ -264,13 +264,23 @@
           email: fd.get('email') || '',
           phone: fd.get('phone') || '',
           company: fd.get('company') || '',
-          service: fd.get('service') || '',
-          message: fd.get('message') || '',
-          source: window.location.hostname,
-          referrer: document.referrer || '',
-          webDesignInterest: fd.get('webDesignInterest') === 'yes',
-          type: 'lead_form_embed',
-          formVersion: '1.0.0'
+          message: [
+            fd.get('message') || '',
+            'service=' + (fd.get('service') || ''),
+            'webDesignInterest=' + (fd.get('webDesignInterest') === 'yes' ? 'yes' : 'no'),
+          ].filter(Boolean).join(' | '),
+          source: 'embed|hostname:' + window.location.hostname + '|lane:vertaflow_embed',
+          agencyId: 'REPLACE_CLERK_ORG_FOR_VERTAFLOW_MASTER',
+          offer_type: 'vertaflow_embed_lead_form',
+          cta_source: 'third_party_site_embed',
+          page_context: 'vertaflow_embed_html',
+          lead_source: 'VertaFlow embeddable lead form',
+          page_url: location.href,
+          page_title: document.title,
+          source_page: location.pathname,
+          referrer_url: document.referrer || '',
+          _hp: '',
+          formVersion: '1.1.0'
         };
 
         btn.disabled = true;
@@ -281,12 +291,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         })
-        .then(function(res) {
+        .then((res) => {
           if (!res.ok) throw new Error('HTTP ' + res.status);
           form.hidden = true;
           document.getElementById('vf-success').hidden = false;
         })
-        .catch(function() {
+        .catch(() => {
           form.hidden = true;
           document.getElementById('vf-success').hidden = false;
         });

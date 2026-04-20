@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyCronAuth } from "@/lib/cron-auth";
 
 export async function GET(req: NextRequest) {

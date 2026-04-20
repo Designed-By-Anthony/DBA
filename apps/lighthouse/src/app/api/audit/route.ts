@@ -6,11 +6,11 @@ import { generateAiInsight, buildFallbackInsight } from '@/lib/ai';
 import { buildCorsHeaders, checkLocalRateLimit, fetchWithTimeout, getClientAddress } from '@/lib/http';
 import { normalizeEmail, normalizeHttpUrl, normalizeText } from '@/lib/validation';
 import { verifyTurnstileToken } from '@/lib/turnstile';
-import { scanHtml, HtmlScanResult } from '@/lib/htmlScanner';
-import { scanPlaces, PlacesResult, scanCompetitors, Competitor } from '@/lib/places';
-import { scanSitewide, SitewideScanResult } from '@/lib/sitewideScan';
-import { scanMoz, MozMetrics } from '@/lib/mozAnalysis';
-import { estimateIndexCoverage, IndexCheckResult } from '@/lib/indexCheck';
+import { scanHtml, type HtmlScanResult } from '@/lib/htmlScanner';
+import { scanPlaces, type PlacesResult, scanCompetitors, type Competitor } from '@/lib/places';
+import { scanSitewide, type SitewideScanResult } from '@/lib/sitewideScan';
+import { scanMoz, type MozMetrics } from '@/lib/mozAnalysis';
+import { estimateIndexCoverage, type IndexCheckResult } from '@/lib/indexCheck';
 import { buildReceiptEmail, isGmailConfigured, sendViaGmail } from '@/lib/gmail';
 
 export const runtime = 'nodejs';

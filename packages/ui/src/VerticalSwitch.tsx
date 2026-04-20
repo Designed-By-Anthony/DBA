@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { z } from "zod";
 import { VERTICAL_IDS, type VerticalId, getVerticalConfig } from "./vertical-config";
 

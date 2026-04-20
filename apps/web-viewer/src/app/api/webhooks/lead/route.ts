@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { webhookConfig } from '@/lib/theme.config';
 import { resolveLeadAgencyId } from '@/lib/lead-webhook-agency';
 import { leadWebhookCorsHeaders } from '@/lib/lead-webhook-cors';

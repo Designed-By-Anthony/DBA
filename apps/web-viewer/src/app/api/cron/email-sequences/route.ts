@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { processEmailSequences } from "@/lib/email-sequence-processor";
 import { verifyCronAuth } from "@/lib/cron-auth";
 

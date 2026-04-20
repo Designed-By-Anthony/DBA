@@ -42,7 +42,7 @@ function applyRedirect(pathname) {
     if (!src || !dest) continue;
     const noSlash = pathname.replace(/^\//, '');
     if (noSlash === src) {
-      let location = dest.startsWith('/') ? dest : `/${dest}`;
+      const location = dest.startsWith('/') ? dest : `/${dest}`;
       return { location, statusCode: type };
     }
   }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { getDb, leads, portalTokens } from "@dba/database";
 import { sendMail } from "@/lib/mailer";

@@ -8,6 +8,11 @@ const APP_SHELL = [
   "/offline.html",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
+  "/faq/index.html",
+  "/blog/index.html",
+  "/blog/why-we-built-a-crm-that-changes-shape/index.html",
+  "/blog/pos-crm-one-system-for-operators/index.html",
+  "/blog/zero-trust-multi-tenancy-for-small-business-crm/index.html",
 ];
 
 self.addEventListener("install", (event) => {

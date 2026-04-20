@@ -11,7 +11,7 @@
  * Astro site, partner webhooks, Zapier) can point at a stable
  * versioned URL while we iterate on the canonical route path.
  */
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { handleIngestPost, ingestManifest } from "@/lib/lead-intake/ingest-handler";
 import { leadWebhookCorsHeaders } from "@/lib/lead-webhook-cors";
 

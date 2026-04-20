@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { and, eq, gt } from "drizzle-orm";
 import { getDb, portalSessions, portalTokens } from "@dba/database";
 import crypto from "crypto";

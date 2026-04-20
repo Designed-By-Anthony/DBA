@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### Customer-site embed pack + two-tenant lead triage (2026-04-20)
+
+- **Portable pack:** Added [`apps/customer-site-embeds/`](apps/customer-site-embeds/) with studio vs VertaFlow product HTML forms, Calendly iframe templates, optional BuiltWith/Wappalyzer-style `tech-trace-snippet.html`, and **OWNERSHIP.md** (Designed by Anthony as master owner).
+- **Agency OS:** `POST /api/lead` now forwards optional `agencyId` from the public body to `executeLeadIntake` so browser embeds can target the correct Clerk tenant when multiple orgs share one deployment.
+- **Marketing:** Contact page includes a **Portable embed pack** showcase (`PortableEmbedShowcase.astro`) using distinct `offer_type` / `cta_source` for CRM filtering.
+- **VertaFlow marketing:** Early-access form posts the public lead contract (including `offer_type`, `page_context`, optional `agencyId` + Turnstile via `VITE_*` build-time injection).
+
 ### VertaFlow offline-first synchronization engine (2026-04-20)
 
 - **Client persistence:** Added Dexie-backed local storage in `apps/vertaflow/src/lib/db.ts` with tenant-safe `leads` and `estimates` tables using `local_id` (UUID), `sync_status` (`pending`/`synced`), and timestamps.

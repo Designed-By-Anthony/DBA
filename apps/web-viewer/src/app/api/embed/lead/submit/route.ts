@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyEmbedTenantSignature } from "@/lib/embed-widget-signature";
 import { embedLeadCorsHeaders } from "@/lib/embed-lead-cors";

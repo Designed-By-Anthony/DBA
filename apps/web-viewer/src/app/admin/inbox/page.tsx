@@ -1,6 +1,6 @@
 import { getInboxStream } from "./actions";
 import InboxClient from "./InboxClient";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 

@@ -1,0 +1,173 @@
+<!--
+  VertaFlow product — portable lead form (CRM master / product lane).
+  Replace REPLACE_CRM_ORIGIN, REPLACE_AGENCY_ID, REPLACE_TURNSTILE_SITE_KEY.
+-->
+<div id="vf-portable-lead" data-embed-owner="designed-by-anthony" data-embed-lane="vertaflow_product">
+  <style>
+    #vf-portable-lead {
+      --brand: #06d6a0;
+      font: 15px/1.5 system-ui, sans-serif;
+      max-width: 480px;
+      padding: 1.25rem;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      background: #07090e;
+      color: #e5e7eb;
+    }
+    #vf-portable-lead label {
+      display: block;
+      font-size: 0.78rem;
+      margin: 0.35rem 0 0.2rem;
+      color: #94a3b8;
+    }
+    #vf-portable-lead input,
+    #vf-portable-lead textarea,
+    #vf-portable-lead select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #020617;
+      color: #f8fafc;
+      margin-bottom: 0.5rem;
+    }
+    #vf-portable-lead button {
+      margin-top: 0.5rem;
+      padding: 0.65rem 1rem;
+      border: 0;
+      border-radius: 8px;
+      background: var(--brand);
+      color: #04120c;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #vf-portable-lead .hp {
+      position: absolute;
+      left: -200vw;
+      height: 0;
+      opacity: 0;
+    }
+  </style>
+  <form id="vf-portable-form">
+    <input class="hp" type="text" name="_hp" value="" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <label>Name</label>
+    <input name="name" required />
+    <label>Work email</label>
+    <input name="email" type="email" required />
+    <label>Company</label>
+    <input name="company" />
+    <label>Industry</label>
+    <select name="vertical">
+      <option value="service">Service / trades</option>
+      <option value="restaurant">Restaurant</option>
+      <option value="retail">Retail</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Message</label>
+    <textarea name="message" rows="3" placeholder="What are you trying to run on VertaFlow?"></textarea>
+    <div
+      class="cf-turnstile"
+      data-sitekey="REPLACE_TURNSTILE_SITE_KEY"
+      data-theme="dark"
+      data-size="invisible"
+      data-appearance="interaction-only"
+      data-callback="__vfPortableTurnstileOk"
+      data-error-callback="__vfPortableTurnstileErr"
+    ></div>
+    <button type="submit" id="vf-portable-submit">Request VertaFlow info</button>
+    <p id="vf-portable-status" style="font-size: 0.85rem; color: #94a3b8"></p>
+  </form>
+</div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  (function () {
+    var CRM = "REPLACE_CRM_ORIGIN/api/lead";
+    var AGENCY = "REPLACE_AGENCY_ID";
+    var form = document.getElementById("vf-portable-form");
+    if (!form) return;
+    function send(token) {
+      var btn = document.getElementById("vf-portable-submit");
+      var st = document.getElementById("vf-portable-status");
+      var fd = new FormData(form);
+      if (String(fd.get("_hp") || "").trim() !== "") return;
+      btn.disabled = true;
+      st.textContent = "Sending…";
+      var vertical = String(fd.get("vertical") || "");
+      var payload = {
+        name: String(fd.get("name") || "").trim(),
+        email: String(fd.get("email") || "").trim(),
+        company: String(fd.get("company") || "").trim() || undefined,
+        message: String(fd.get("message") || "").trim() || "VertaFlow portable embed inquiry",
+        agencyId: AGENCY,
+        offer_type: "vertaflow_product_portable_embed",
+        cta_source: "customer_site_embed",
+        page_context: "portable_html_vertaflow_product",
+        lead_source: "Portable embed — VertaFlow (product)",
+        page_url: location.href,
+        page_title: document.title,
+        source_page: location.pathname,
+        referrer_url: document.referrer || "",
+        source: "customer_site_embed|lane:vertaflow_product|vertical:" + vertical,
+        _hp: "",
+        cfTurnstileResponse: token || undefined,
+      };
+      fetch(CRM, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          st.textContent = "Sent — we will follow up shortly.";
+          form.reset();
+        })
+        .catch(function () {
+          st.textContent = "Could not send right now. Try again or visit vertaflow.io.";
+        })
+        .finally(function () {
+          btn.disabled = false;
+          var el = form.querySelector(".cf-turnstile");
+          var ts = window.turnstile;
+          if (ts && el) try { ts.reset(el); } catch (e) {}
+        });
+    }
+    window.__vfPortableTurnstileOk = function (token) {
+      var cb = form.__vfPortableNext;
+      form.__vfPortableNext = undefined;
+      if (typeof cb === "function") cb(token || "");
+    };
+    window.__vfPortableTurnstileErr = function () {
+      var cb = form.__vfPortableNext;
+      form.__vfPortableNext = undefined;
+      if (typeof cb === "function") cb("");
+    };
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var st = document.getElementById("vf-portable-status");
+      var el = form.querySelector(".cf-turnstile");
+      var ts = window.turnstile;
+      var siteKey = el && el.getAttribute("data-sitekey");
+      if (!siteKey || siteKey.indexOf("REPLACE_") === 0) {
+        st.textContent = "Configure Turnstile site key in this embed.";
+        return;
+      }
+      if (!ts || typeof ts.execute !== "function") {
+        st.textContent = "Security check did not load. Refresh and try again.";
+        return;
+      }
+      st.textContent = "Verifying…";
+      form.__vfPortableNext = function (token) {
+        if (!token) {
+          st.textContent = "Security check failed. Refresh and try again.";
+          return;
+        }
+        send(token);
+      };
+      try {
+        ts.execute(el);
+      } catch (err) {
+        st.textContent = "Security check could not start.";
+      }
+    });
+  })();
+</script>

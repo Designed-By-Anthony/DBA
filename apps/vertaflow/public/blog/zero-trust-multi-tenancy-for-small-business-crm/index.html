@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zero-trust multi-tenancy for small-business CRM | VertaFlow</title>
+    <meta
+      name="description"
+      content="Row-level tenant isolation is not a checkbox—it is how VertaFlow keeps PHI-sensitive and retail data separated with deterministic SQL scoping on every query."
+    />
+    <link rel="canonical" href="https://vertaflow.io/blog/zero-trust-multi-tenancy-for-small-business-crm/" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Zero-trust multi-tenancy for small-business CRM" />
+    <meta
+      property="og:description"
+      content="Practical notes on tenant_id scoping, portal tokens, and why marketing PWAs still tag Sentry with deployment host."
+    />
+    <meta property="og:url" content="https://vertaflow.io/blog/zero-trust-multi-tenancy-for-small-business-crm/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Zero-trust multi-tenancy for small-business CRM",
+        "description": "How VertaFlow enforces tenant isolation and pairs it with observable client errors.",
+        "datePublished": "2026-04-20T00:00:00.000Z",
+        "dateModified": "2026-04-20T00:00:00.000Z",
+        "mainEntityOfPage": "https://vertaflow.io/blog/zero-trust-multi-tenancy-for-small-business-crm/",
+        "author": { "@type": "Organization", "name": "VertaFlow" },
+        "publisher": {
+          "@type": "Organization",
+          "name": "VertaFlow",
+          "url": "https://vertaflow.io",
+          "logo": { "@type": "ImageObject", "url": "https://vertaflow.io/icons/icon-512.png" }
+        },
+        "articleSection": "Security"
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #07090e;
+        color: #e6edf3;
+        line-height: 1.65;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2.5rem 1.25rem 4rem;
+      }
+      a {
+        color: #06d6a0;
+      }
+      h1 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin: 0 0 1rem;
+      }
+      .meta {
+        color: #9ca7bb;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+      }
+      h2 {
+        font-size: 1.2rem;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p><a href="/blog/">← VertaFlow Blog</a></p>
+      <h1>Zero-trust multi-tenancy: what it means for your data</h1>
+      <p class="meta">Security · April 20, 2026 · 8 min read</p>
+      <p>
+        Small businesses still need enterprise-grade isolation: a leaked query should never return another tenant’s
+        customers. VertaFlow’s Agency OS lineage means every server path resolves a Clerk organization, maps it to
+        <code>tenant_id</code>, and applies that scope to SQL—no “global admin browse” shortcuts in production.
+      </p>
+      <h2>Why the marketing PWA still tags Sentry aggressively</h2>
+      <p>
+        The public site is the top of the funnel. When a service worker fails or a lead form cannot reach
+        <code>admin.vertaflow.io</code>, we need host, release, vertical tab, and exception type on the event so you can
+        triage without reproducing on a phone in the parking lot. That is why the browser bundle adds
+        <strong>deployment_host</strong>, <strong>canonical_origin</strong>, and <strong>vertical_tab</strong> tags in
+        <code>beforeSend</code>.
+      </p>
+      <h2>FAQ parity</h2>
+      <p>
+        Common isolation and PWA questions also live on <a href="/faq/">/faq/</a> with FAQPage structured data for
+        crawlers that prefer standalone HTML answers.
+      </p>
+      <p><a href="/">← VertaFlow home</a></p>
+    </main>
+  </body>
+</html>

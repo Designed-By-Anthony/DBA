@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb, emails } from "@dba/database";
 import { eq, sql } from "drizzle-orm";
 import { verifyClickSignature } from "@/lib/email-utils";

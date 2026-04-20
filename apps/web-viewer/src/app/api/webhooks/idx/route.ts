@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getDb, leads } from "@dba/database";
 import { eq } from "drizzle-orm";
 import { getSecret, verifySharedSecret } from "@/lib/webhook-auth";
