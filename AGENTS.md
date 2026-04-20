@@ -5,6 +5,8 @@
 - **Absolute Monorepo Paths:** Never use relative imports like `../../packages`. Always use workspace protocols: `@dba/database`, `@dba/theme`, `@dba/ui`.
 - **Zero-Trust Multi-Tenancy:** Every database query MUST be scoped with `agencyId`. If a function lacks a tenant filter, it is a critical security bug.
 - **SQL-First:** Any new feature must use Drizzle + Postgres (production: **Neon**). Do not add Firebase or other legacy BaaS client SDKs.
+- **Git-to-Vercel Only:** NEVER deploy directly to Vercel. All deployments flow through Git → GitHub → Vercel auto-deploy. No `vercel deploy`, no `vercel --prod`, no manual uploads. If code isn't on `main`, it doesn't ship.
+- **Lockfile Integrity:** After ANY change to `package.json` (root or workspace), you MUST run `pnpm install` and commit the updated `pnpm-lock.yaml` in the **same commit**. Verify with `pnpm install --frozen-lockfile` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## VERBATIM SYSTEM MAPPING
 - **Sales Term:** "Agency" or "Agency OS"
@@ -22,6 +24,10 @@
   - `admin.designedbyanthony.com` -> `apps/web-viewer`
   - `accounts.designedbyanthony.com` -> `apps/web-viewer/accounts`
   - `designedbyanthony.com` -> `apps/marketing`
+  - `vertaflow.io` -> `apps/vertaflow` (Vite marketing)
+  - `admin.vertaflow.io` -> `apps/web-viewer` (CRM admin)
+  - `accounts.vertaflow.io` -> `apps/web-viewer/portal`
+  - `login.vertaflow.io` -> `apps/web-viewer/sign-in`
 
 ## Compliance bar — DoD / HIPAA-oriented engineering
 
@@ -70,7 +76,8 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 ├── apps/
 │   ├── marketing/   # Astro v6 — designedbyanthony.com (apex + www)
 │   ├── web-viewer/  # Next.js 16 — admin.* + accounts.* (Agency OS / CRM)
-│   └── lighthouse/  # Next.js 16 — lighthouse.* (audit tool)
+│   ├── lighthouse/  # Next.js 16 — lighthouse.* (audit tool)
+│   └── vertaflow/   # Vite — vertaflow.io (VertaFlow SaaS marketing)
 └── packages/
     ├── dba-theme/           # @dba/theme — global CSS tokens + brand assets
     ├── lead-form-contract/  # @dba/lead-form-contract — shared lead payload schema
@@ -114,6 +121,10 @@ Root `middleware.ts` is Vercel Routing Middleware that runs on the apex (marketi
 - `admin.designedbyanthony.com/*` → `$ADMIN_UPSTREAM_URL/*` (web-viewer)
 - `accounts.designedbyanthony.com/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (web-viewer)
 - `lighthouse.designedbyanthony.com/*` → `$LIGHTHOUSE_UPSTREAM_URL/*` (lighthouse)
+- `vertaflow.io/*` → `$VERTAFLOW_UPSTREAM_URL/*` (vertaflow marketing)
+- `admin.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/admin/*` (web-viewer)
+- `accounts.vertaflow.io/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (web-viewer)
+- `login.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/sign-in/*` (web-viewer)
 - everything else → Astro marketing (fallthrough via `next()`)
 
 Notes:
@@ -150,13 +161,16 @@ When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update 
 
 ### Vercel deploy model
 
-Three Vercel projects pointing at this repo, each with a different Root Directory:
+Four Vercel projects pointing at this repo, each with a different Root Directory:
 
 - `apps/marketing` — apex project; also serves the root `middleware.ts`.
 - `apps/web-viewer` — admin + accounts.
 - `apps/lighthouse` — lighthouse.
+- `apps/vertaflow` — VertaFlow SaaS marketing (Vite).
 
-Apex project requires `ADMIN_UPSTREAM_URL`, `ACCOUNTS_UPSTREAM_URL`, `LIGHTHOUSE_UPSTREAM_URL` (also declared in `turbo.json` → `globalEnv`). All other secrets are per-app; the full allow-list is in `turbo.json` → `tasks.build.env`.
+Apex project requires `ADMIN_UPSTREAM_URL`, `ACCOUNTS_UPSTREAM_URL`, `LIGHTHOUSE_UPSTREAM_URL`, `VERTAFLOW_UPSTREAM_URL` (also declared in `turbo.json` → `globalEnv`). All other secrets are per-app; the full allow-list is in `turbo.json` → `tasks.build.env`.
+
+**Deployment rule:** All deploys happen via Git push → Vercel auto-build. Never use `vercel deploy` or `vercel --prod` directly. After any `package.json` change, always commit the updated `pnpm-lock.yaml` in the same commit and verify with `pnpm install --frozen-lockfile` before pushing.
 
 ### Migration / cleanup notes
 
