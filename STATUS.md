@@ -1,5 +1,24 @@
 # Migration Status Report
 
+## VertaFlow hybrid rendering split (2026-04-21)
+
+- Made the public VertaFlow entry surfaces explicit static routes in `apps/vertaflow-crm`: `/`, `/sign-in`, `/portal`, `/portal/verify`, `/portal/order`, `/portal/kiosk`, `/portal/payment-success`, `/portal/payment-cancelled`, and `/offline`.
+- Moved authenticated portal experiences behind explicit dynamic server wrappers so `/portal/dashboard` and `/portal/tickets` now render as dynamic routes, alongside existing dynamic CRM/admin routes.
+- Kept customer-specific preview and quote routes dynamic (`/preview/[customer]`, `/portal/quote/[id]`) so tenant/customer data stays request-scoped.
+- Verified with `pnpm --filter vertaflow-crm build`; route output now reflects the intended static-before-login, dynamic-after-login split.
+
+## Lighthouse audit CORS + Turnstile fix (2026-04-21)
+
+- Confirmed the free audit failure on `designedbyanthony.com` was caused by the browser preflight to `https://lighthouse.designedbyanthony.com/api/audit`, not by the audit engine itself.
+- Kept `apps/lighthouse/src/app/api/audit/route.ts` serving explicit CORS-aware `OPTIONS` responses so the cross-origin audit POST can proceed from the DBA marketing site.
+- Updated `apps/marketing/src/components/LighthouseAudit.astro` to reset the invisible Turnstile widget before `execute()` so repeat submissions request a fresh token instead of reusing the prior one.
+- Verified with `pnpm --filter dba-lighthouse-audit build` and then full root `pnpm build`.
+
+## VertaFlow single-front-door restore (2026-04-20)
+
+- Replaced the old `Agency OS | Designed by Anthony` homepage in `apps/vertaflow-crm/src/app/page.tsx` with a restored VertaFlow landing built directly into the CRM app root.
+- Updated `apps/vertaflow-crm/src/app/layout.tsx` metadata, theme color, and install title so `vertaflow.io` now presents as VertaFlow instead of legacy DBA / Agency OS branding.
+- Verified locally with `pnpm --filter vertaflow-crm build`; the CRM project now ships the restored landing at `/` while preserving `/sign-in`, `/admin`, `/portal`, and the rest of the product routes in the same deployment.
 ## VertaFlow apex routing triage (2026-04-20)
 
 - Added root regression test `middleware.test.mjs` to assert `vertaflow.io` and `www.vertaflow.io` rewrite to `VERTAFLOW_UPSTREAM_URL` instead of falling through to the Designed by Anthony marketing app.

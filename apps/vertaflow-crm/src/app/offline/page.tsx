@@ -4,6 +4,8 @@ import { BRAND_ASSETS } from "@dba/theme/brand";
 import { RefreshCw, WifiOff } from "lucide-react";
 import Image from "next/image";
 
+export const dynamic = "force-static";
+
 export default function OfflinePage() {
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center bg-(--color-surface-0) text-white p-6 text-center relative overflow-hidden">

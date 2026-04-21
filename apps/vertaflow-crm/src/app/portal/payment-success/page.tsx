@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = "force-static";
+
 export default function PaymentSuccessPage() {
 	return (
 		<div className="flex items-center justify-center min-h-[60vh]">

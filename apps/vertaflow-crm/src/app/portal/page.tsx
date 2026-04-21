@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import PortalLoginPage from "./PortalLoginClient";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
 	title: "Client Portal | Agency OS",
 	description: "Access your project dashboard",

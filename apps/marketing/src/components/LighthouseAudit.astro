@@ -322,6 +322,7 @@ const LOADING_MESSAGES = [
       var token = await new Promise(function (resolve) {
         form.__dbaLhTurnstileResolver = resolve;
         try {
+          window.turnstile.reset(turnstileEl);
           window.turnstile.execute(turnstileEl);
         } catch (err) {
           form.__dbaLhTurnstileResolver = null;

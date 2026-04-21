@@ -2,6 +2,8 @@
 
 import { type MouseEvent, type TouchEvent, useRef, useState } from "react";
 
+export const dynamic = "force-static";
+
 type KioskParticipant = { id: string; name: string; waiverSigned: boolean };
 
 // Mock User checking in (would come from DB by phone number/id)

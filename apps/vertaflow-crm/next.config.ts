@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
 							"base-uri 'self'; " +
 							"object-src 'none'; " +
 							"frame-ancestors 'self'; " +
-							"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://scdn.clerk.com https://*.vertaflow.io https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
+							"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.clerk.accounts.dev https://scdn.clerk.com https://*.vertaflow.io https://*.designedbyanthony.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://va.vercel-scripts.com; " +
 							"style-src 'self' 'unsafe-inline'; " +
 							"img-src 'self' data: blob: https://images.unsplash.com https://qr-code-generator.com https://img.clerk.com https://*.vertaflow.io; " +
 							// img.clerk.com + va.vercel-scripts.com: Clerk avatar fetch() + Vercel Analytics/Speed Insights beacons (connect-src; img-src already allows img.clerk.com for <img>)

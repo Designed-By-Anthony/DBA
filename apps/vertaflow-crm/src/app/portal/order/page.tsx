@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import type { StripeProductDetail } from "@/app/admin/actions/stripe";
 import { formatCents } from "@/lib/currency";
 
+export const dynamic = "force-static";
+
 const MOCK_MENU: StripeProductDetail[] = [
 	{
 		id: "prod_1",

@@ -9,19 +9,19 @@ import { PwaRoot } from "@/components/PwaRoot";
 import { VercelObservability } from "@/components/VercelObservability";
 import { clerkProxyUrlForProvider } from "@/lib/clerk-fapi-proxy";
 
-/** PWA / mobile browser chrome — dark shell + marketing primary blue (designedbyanthony.com) */
+/** PWA / mobile browser chrome — VertaFlow shell */
 export const viewport: Viewport = {
 	themeColor: [
 		{ media: "(prefers-color-scheme: dark)", color: "#0f1218" },
-		{ media: "(prefers-color-scheme: light)", color: "#2563eb" },
+		{ media: "(prefers-color-scheme: light)", color: "#10b981" },
 	],
 	colorScheme: "dark",
 };
 
 export const metadata: Metadata = {
-	title: "Agency OS | Designed by Anthony",
+	title: "VertaFlow | Adaptive CRM for Real Operators",
 	description:
-		"Client portal and project management for Designed by Anthony clients.",
+		"VertaFlow is the adaptive CRM that matches your vertical, explains the product clearly, and takes teams straight into the live workspace.",
 	icons: {
 		icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
 		shortcut: "/favicon.svg",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
-		title: "DBA Portal",
+		title: "VertaFlow",
 	},
 	other: {
 		"mobile-web-app-capable": "yes",

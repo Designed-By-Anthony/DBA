@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Quote page — currently returns "not found" since quotes table
  * is not yet migrated to Neon. Will be re-enabled once the

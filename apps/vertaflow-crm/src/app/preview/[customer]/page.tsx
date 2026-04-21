@@ -3,6 +3,8 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PreviewShell from "@/components/PreviewShell";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomerPreviewPage({
 	params,
 }: {
