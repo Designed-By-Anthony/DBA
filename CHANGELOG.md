@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### Fix: `window is not defined` crash on `/_not-found` prerender (2026-04-21)
+
+- **Root cause:** Next.js statically prerenders `/_not-found` at build time through the full root layout tree. In Vercel's production build environment the layout's `PwaRoot` / `SerwistProvider` dependency chain can touch browser globals (`window`, `document`) before any `useEffect` guard fires, causing `ReferenceError: window is not defined` and failing the build with `Export encountered an error on /_not-found/page`.
+- **`apps/vertaflow-crm/src/app/not-found.tsx`:** Added an explicit custom 404 page with `export const dynamic = "force-dynamic"`. This opts the route out of static prerendering and defers it to request time — the same rendering mode used by every other authenticated route — so browser globals are never accessed in a Node.js-only build worker.
+- **`apps/vertaflow-crm/vercel.json`:** Prefixed `installCommand` and `buildCommand` with `cd ../..` so both commands run from the monorepo root regardless of the Vercel project's Root Directory setting (`apps/vertaflow-crm`). Previously `pnpm install` and `turbo run build` could execute from the wrong directory, causing partial installs and missing workspace context that only surfaced in Vercel's production build environment.
+
 ### VertaFlow portal offline cache + PWA hardening (2026-04-21)
 
 - **Dexie offline storage:** Added `apps/vertaflow-crm/src/lib/offline/portal-offline.ts` so the portal caches the latest dashboard snapshot, support history, and queued ticket submissions in IndexedDB for weak-signal environments.

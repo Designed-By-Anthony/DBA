@@ -1,6 +1,6 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": "nextjs",
-	"installCommand": "pnpm install --frozen-lockfile",
-	"buildCommand": "turbo run build --filter=vertaflow-crm"
+	"installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+	"buildCommand": "cd ../.. && turbo run build --filter=vertaflow-crm"
 }
