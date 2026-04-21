@@ -9,6 +9,8 @@ import { pushAnalyticsEvent, requestGaClientId } from './analytics';
  *   3. Baked default: `https://admin.vertaflow.io/api/v1/ingest`.
  */
 const DEFAULT_FORM_ENDPOINT = 'https://admin.vertaflow.io/api/v1/ingest';
+const LEGACY_CRM_HOST = 'admin.designedbyanthony.com';
+const CURRENT_CRM_HOST = 'admin.vertaflow.io';
 
 export interface AuditFormError {
   field?: string;
@@ -18,6 +20,22 @@ export interface AuditFormError {
 export interface AuditFormResponse {
   errors?: AuditFormError[];
   ok?: boolean;
+}
+
+function resolveFormEndpoint(rawEndpoint: string | null | undefined): string {
+  const candidate = rawEndpoint?.trim() || DEFAULT_FORM_ENDPOINT;
+
+  try {
+    const url = new URL(candidate, window.location.origin);
+    if (url.hostname === LEGACY_CRM_HOST) {
+      url.hostname = CURRENT_CRM_HOST;
+      url.protocol = 'https:';
+      url.port = '';
+    }
+    return url.toString();
+  } catch {
+    return DEFAULT_FORM_ENDPOINT;
+  }
 }
 
 export function resetAuditFormState(form: HTMLFormElement, { force = false } = {}): void {
@@ -263,7 +281,7 @@ async function finalizeAuditFormSubmission(
 ): Promise<void> {
   const submitButton = form.querySelector<HTMLButtonElement>('[data-form-submit]');
   const defaultLabel = submitButton?.dataset.defaultLabel || 'Send My Audit Request';
-  const endpoint = form.getAttribute('action')?.trim() || DEFAULT_FORM_ENDPOINT;
+  const endpoint = resolveFormEndpoint(form.getAttribute('action'));
 
   if (submitButton) {
     submitButton.disabled = true;
@@ -395,6 +413,7 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
     };
 
     try {
+      tsAny.reset(turnstileEl);
       tsAny.execute(turnstileEl);
     } catch {
       (form as any).__dbaTurnstileResolver = undefined;
