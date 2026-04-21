@@ -1,5 +1,14 @@
 # Migration Status Report
 
+## VertaFlow portal offline cache + PWA hardening (2026-04-21)
+
+- Added a Dexie-backed offline layer in `apps/vertaflow-crm/src/lib/offline/portal-offline.ts` so the client portal now persists the latest dashboard snapshot, support ticket history, and queued ticket drafts on-device.
+- Portal APIs now return a non-PII hashed `offlineCacheKey`, letting cached data stay scoped per portal session without exposing raw tenant or prospect ids to the browser store.
+- Updated `PortalDashboardClient` and `PortalTicketsClient` to fall back to cached data when reception drops, surface offline/queued-sync banners, and automatically submit queued tickets after reconnect.
+- Rebranded the CRM manifest to `VertaFlow Portal`, set `start_url` / `id` to `/portal/dashboard`, and re-verified the worker/runtime assets via `next start` (`/manifest.webmanifest`, `/offline`, `/serwist/sw.js` all served correctly).
+- Verification: `pnpm install`, `pnpm install --frozen-lockfile`, `pnpm --filter vertaflow-crm build`, and full root `pnpm build` all passed. Targeted Playwright PWA coverage was attempted, but the local Turbopack dev server panicked before tests started; production runtime checks were used instead.
+
+
 ## VertaFlow hybrid rendering split (2026-04-21)
 
 - Made the public VertaFlow entry surfaces explicit static routes in `apps/vertaflow-crm`: `/`, `/sign-in`, `/portal`, `/portal/verify`, `/portal/order`, `/portal/kiosk`, `/portal/payment-success`, `/portal/payment-cancelled`, and `/offline`.

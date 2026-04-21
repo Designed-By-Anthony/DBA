@@ -2,11 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
-		name: "Agency OS — Business Management",
-		short_name: "Agency OS",
+		name: "VertaFlow Portal",
+		short_name: "VertaFlow",
 		description:
-			"All-in-one CRM, POS, scheduling, and client management platform for 30+ industries.",
-		start_url: "/admin",
+			"Offline-ready client portal and CRM workspace built for real operators in the field.",
+		id: "/portal/dashboard",
+		start_url: "/portal/dashboard",
+		scope: "/",
 		display: "standalone",
 		orientation: "any",
 		background_color: "#0f1218",

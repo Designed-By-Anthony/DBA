@@ -2,6 +2,7 @@ import { getDb, tickets } from "@dba/database";
 import { and, desc, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { apiError } from "@/lib/api-error";
+import { createPortalOfflineCacheKey } from "@/lib/offline/portal-cache-key";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 
 /**
@@ -36,6 +37,10 @@ export async function GET(request: NextRequest) {
 			.limit(10);
 
 		const latestStatus = ticketRows[0]?.status || "lead";
+		const offlineCacheKey = createPortalOfflineCacheKey(
+			session.tenantId,
+			session.prospectId,
+		);
 		const stages = ["lead", "contacted", "proposal", "dev", "launched"];
 		const stageLabels: Record<string, string> = {
 			lead: "Initial Inquiry",
@@ -52,6 +57,7 @@ export async function GET(request: NextRequest) {
 		}));
 
 		return NextResponse.json({
+			offlineCacheKey,
 			prospect: {
 				name: session.prospectName,
 				company: "",

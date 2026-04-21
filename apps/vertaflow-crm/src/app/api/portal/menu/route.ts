@@ -1,11 +1,9 @@
 import {
-	eventBookings,
-	events,
 	getDb,
 	menuCategories,
 	menuItems,
 } from "@dba/database";
-import { and, asc, eq, gte, sql } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**

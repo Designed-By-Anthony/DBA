@@ -3,79 +3,194 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-
-interface Ticket {
-	id: string;
-	subject: string;
-	description: string;
-	status: string;
-	priority: string;
-	adminReply: string | null;
-	messages: Array<{
-		id: string;
-		from: string;
-		content: string;
-		createdAt: string;
-	}>;
-	createdAt: string;
-}
+import {
+	cachePortalTickets,
+	flushQueuedPortalTickets,
+	getActivePortalCacheKey,
+	getCachedPortalTickets,
+	getPendingPortalTicketCount,
+	queuePortalTicket,
+	type PortalTicketThread,
+} from "@/lib/offline/portal-offline";
 
 const statusColors: Record<string, string> = {
 	open: "bg-amber-500/10 text-amber-400",
 	in_progress: "bg-blue-500/10 text-blue-400",
 	resolved: "bg-emerald-500/10 text-emerald-400",
+	queued: "bg-sky-500/10 text-sky-300",
 	closed: "bg-white/5 text-[var(--color-text-muted)]",
 };
 
 export default function PortalTicketsPage() {
 	const router = useRouter();
-	const [tickets, setTickets] = useState<Ticket[]>([]);
+	const [tickets, setTickets] = useState<PortalTicketThread[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [selected, setSelected] = useState<Ticket | null>(null);
+	const [selected, setSelected] = useState<PortalTicketThread | null>(null);
+	const [cacheKey, setCacheKey] = useState<string | null>(null);
+	const [offlineNotice, setOfflineNotice] = useState("");
+	const [queuedTicketCount, setQueuedTicketCount] = useState(0);
 	const [subject, setSubject] = useState("");
 	const [description, setDescription] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [showForm, setShowForm] = useState(false);
 	const [success, setSuccess] = useState("");
 
-	const load = useCallback(async () => {
-		const res = await fetch("/api/portal/tickets");
-		if (res.status === 401) {
-			router.push("/portal");
+	const refreshQueuedTicketCount = useCallback(async (resolvedKey?: string | null) => {
+		const key = resolvedKey ?? cacheKey ?? (await getActivePortalCacheKey());
+		if (!key) {
+			setQueuedTicketCount(0);
 			return;
 		}
-		if (res.ok) {
-			const data = await res.json();
-			setTickets(data.tickets || []);
+		setQueuedTicketCount(await getPendingPortalTicketCount(key));
+	}, [cacheKey]);
+
+	const load = useCallback(async () => {
+		try {
+			const res = await fetch("/api/portal/tickets", { cache: "no-store" });
+			if (res.status === 401) {
+				router.push("/portal");
+				return;
+			}
+			if (!res.ok) {
+				throw new Error(`portal-tickets-${res.status}`);
+			}
+
+			const payload = (await res.json()) as {
+				offlineCacheKey?: string;
+				tickets?: PortalTicketThread[];
+			};
+			const nextCacheKey =
+				payload.offlineCacheKey ?? cacheKey ?? (await getActivePortalCacheKey());
+			const nextTickets = payload.tickets || [];
+
+			setTickets(nextTickets);
+			setSelected((current) =>
+				current
+					? nextTickets.find((ticket) => ticket.id === current.id) ?? null
+					: null,
+			);
+			setCacheKey(nextCacheKey);
+			setOfflineNotice("");
+			if (nextCacheKey) {
+				await cachePortalTickets(nextCacheKey, nextTickets);
+				await refreshQueuedTicketCount(nextCacheKey);
+				const flushed = await flushQueuedPortalTickets(nextCacheKey);
+				if (flushed.sent > 0) {
+					const refresh = await fetch("/api/portal/tickets", {
+						cache: "no-store",
+					});
+					if (refresh.ok) {
+						const refreshedPayload = (await refresh.json()) as {
+							offlineCacheKey?: string;
+							tickets?: PortalTicketThread[];
+						};
+						const refreshedTickets = refreshedPayload.tickets || [];
+						setTickets(refreshedTickets);
+						setSelected((current) =>
+							current
+								? refreshedTickets.find((ticket) => ticket.id === current.id) ??
+										null
+								: null,
+						);
+						await cachePortalTickets(nextCacheKey, refreshedTickets);
+					}
+					await refreshQueuedTicketCount(nextCacheKey);
+					setOfflineNotice(
+						`${flushed.sent} queued support ticket${flushed.sent === 1 ? "" : "s"} sent after reconnecting.`,
+					);
+				}
+			}
+		} catch {
+			const resolvedKey = cacheKey ?? (await getActivePortalCacheKey());
+			const cachedTickets = await getCachedPortalTickets(resolvedKey);
+			if (cachedTickets.length > 0) {
+				setTickets(cachedTickets);
+				setSelected((current) =>
+					current
+						? cachedTickets.find((ticket) => ticket.id === current.id) ?? null
+						: null,
+				);
+				setCacheKey(resolvedKey);
+				setOfflineNotice(
+					"Offline mode: showing saved support history from this device.",
+				);
+				await refreshQueuedTicketCount(resolvedKey);
+			} else {
+				setOfflineNotice(
+					"Support history will appear offline after this device completes its first sync.",
+				);
+			}
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
-	}, [router]);
+	}, [cacheKey, refreshQueuedTicketCount, router]);
 
 	useEffect(() => {
 		queueMicrotask(() => void load());
+	}, [load]);
+
+	useEffect(() => {
+		const handleOnline = () => {
+			void load();
+		};
+
+		window.addEventListener("online", handleOnline);
+		return () => window.removeEventListener("online", handleOnline);
 	}, [load]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!subject.trim()) return;
 		setSubmitting(true);
-		const res = await fetch("/api/portal/tickets", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				subject: subject.trim(),
-				description: description.trim(),
-			}),
-		});
-		if (res.ok) {
+		const trimmedSubject = subject.trim();
+		const trimmedDescription = description.trim();
+		try {
+			const res = await fetch("/api/portal/tickets", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					subject: trimmedSubject,
+					description: trimmedDescription,
+				}),
+			});
+			if (!res.ok) {
+				throw new Error(`portal-ticket-${res.status}`);
+			}
+
 			setSubject("");
 			setDescription("");
 			setShowForm(false);
 			setSuccess("Ticket submitted! We'll be in touch soon.");
 			setTimeout(() => setSuccess(""), 5000);
 			await load();
+		} catch {
+			const resolvedKey = cacheKey ?? (await getActivePortalCacheKey());
+			if (!resolvedKey) {
+				setOfflineNotice(
+					"Offline queueing turns on after this device completes one successful sync.",
+				);
+				return;
+			}
+
+			const queuedTicket = await queuePortalTicket(resolvedKey, {
+				subject: trimmedSubject,
+				description: trimmedDescription,
+			});
+			setTickets((current) => {
+				const nextTickets = [queuedTicket, ...current];
+				void cachePortalTickets(resolvedKey, nextTickets);
+				return nextTickets;
+			});
+			setSelected(queuedTicket);
+			setSubject("");
+			setDescription("");
+			setShowForm(false);
+			setSuccess("Ticket saved offline. It will send when you reconnect.");
+			setTimeout(() => setSuccess(""), 5000);
+			await refreshQueuedTicketCount(resolvedKey);
+		} finally {
+			setSubmitting(false);
 		}
-		setSubmitting(false);
 	};
 
 	return (
@@ -100,6 +215,18 @@ export default function PortalTicketsPage() {
 			{success && (
 				<div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
 					✅ {success}
+				</div>
+			)}
+
+			{(offlineNotice || queuedTicketCount > 0) && (
+				<div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+					<p>{offlineNotice || "Offline support queue active on this device."}</p>
+					{queuedTicketCount > 0 && (
+						<p className="mt-1 text-xs text-amber-200/90">
+							{queuedTicketCount} pending ticket
+							{queuedTicketCount === 1 ? "" : "s"} waiting to sync.
+						</p>
+					)}
 				</div>
 			)}
 

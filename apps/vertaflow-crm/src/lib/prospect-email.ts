@@ -53,8 +53,8 @@ export async function unsubscribeProspect(
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function sendProspectEmailFromTemplate(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	_params: unknown,
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
 	// Stub for automations

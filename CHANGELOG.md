@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - Coming Soon
 
+### VertaFlow portal offline cache + PWA hardening (2026-04-21)
+
+- **Dexie offline storage:** Added `apps/vertaflow-crm/src/lib/offline/portal-offline.ts` so the portal caches the latest dashboard snapshot, support history, and queued ticket submissions in IndexedDB for weak-signal environments.
+- **Tenant-safe cache scoping:** `GET /api/portal/data` and `GET /api/portal/tickets` now return a hashed `offlineCacheKey` derived server-side from tenant + prospect ids instead of exposing raw identifiers in client storage.
+- **Reconnect sync:** Portal dashboard and support views now fall back to Dexie data when the network fails, show cached/offline state banners, and automatically flush queued support tickets once the connection returns.
+- **PWA install polish:** `manifest.webmanifest` is now branded as **VertaFlow Portal**, with `id` and `start_url` pinned to `/portal/dashboard` for a consistent installed-app entry path.
+
 ### Customer-site embed pack + two-tenant lead triage (2026-04-20)
 
 - **Portable pack:** Added [`apps/customer-site-embeds/`](apps/customer-site-embeds/) with studio vs VertaFlow product HTML forms, Calendly iframe templates, optional BuiltWith/Wappalyzer-style `tech-trace-snippet.html`, and **OWNERSHIP.md** (Designed by Anthony as master owner).

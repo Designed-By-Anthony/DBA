@@ -22,6 +22,16 @@ test.describe("PWA — Manifest & Offline", () => {
 		expect(Array.isArray(data.icons)).toBe(true);
 	});
 
+	test("manifest is branded for VertaFlow portal install flow", async ({
+		request,
+	}) => {
+		const res = await request.get("/manifest.webmanifest");
+		const data = (await res.json()) as Record<string, unknown>;
+
+		expect(data.name).toBe("VertaFlow Portal");
+		expect(data.short_name).toBe("VertaFlow");
+	});
+
 	test("manifest start_url points to portal dashboard", async ({ request }) => {
 		const res = await request.get("/manifest.webmanifest");
 		const data = (await res.json()) as Record<string, unknown>;

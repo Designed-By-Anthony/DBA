@@ -41,6 +41,7 @@ export default function PaymentsPage() {
 	}, []);
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		load();
 	}, [load]);
 
@@ -48,6 +49,7 @@ export default function PaymentsPage() {
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		if (params.get("onboarding") === "complete") {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			load();
 			window.history.replaceState({}, "", window.location.pathname);
 		}

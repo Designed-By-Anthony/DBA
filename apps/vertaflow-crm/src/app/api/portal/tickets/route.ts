@@ -5,6 +5,7 @@ import { apiError } from "@/lib/api-error";
 import { readBoundedJson } from "@/lib/body-limit";
 import { escapeHtml } from "@/lib/email-utils";
 import { sendMail } from "@/lib/mailer";
+import { createPortalOfflineCacheKey } from "@/lib/offline/portal-cache-key";
 import { getPortalSessionFromRequest } from "@/lib/portal-auth";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { complianceConfig } from "@/lib/theme.config";
@@ -41,6 +42,10 @@ export async function GET(request: NextRequest) {
 			.orderBy(desc(tickets.createdAt));
 
 		return NextResponse.json({
+			offlineCacheKey: createPortalOfflineCacheKey(
+				session.tenantId,
+				session.prospectId,
+			),
 			tickets: rows.map((row) => ({
 				id: row.id,
 				subject: row.subject,

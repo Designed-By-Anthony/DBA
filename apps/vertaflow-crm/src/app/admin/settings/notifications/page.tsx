@@ -127,11 +127,13 @@ export default function NotificationsPage() {
 	};
 
 	useEffect(() => {
+		/* eslint-disable react-hooks/set-state-in-effect */
 		if (typeof window !== "undefined" && "Notification" in window) {
 			setPushSupported(true);
 			setPushPermission(Notification.permission);
 		}
 		loadPreferences();
+		/* eslint-enable react-hooks/set-state-in-effect */
 	}, []);
 
 	const handleToggle = (

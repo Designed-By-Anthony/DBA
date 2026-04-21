@@ -12,7 +12,7 @@ import { and, eq, lte, sql } from "drizzle-orm";
  * Accept any Drizzle query-runner (full Database OR a transaction object).
  * This keeps the inventory helpers callable from both contexts.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type DB = {
 	select: any;
 	update: any;
@@ -20,6 +20,7 @@ type DB = {
 	delete: any;
 	execute: any;
 } & Record<string, any>;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export type StockCheckResult = {
 	available: boolean;

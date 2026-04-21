@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { getDb, orderItems, orders, restaurantTables } from "@dba/database";
-import { and, desc, eq, inArray } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { and, eq, inArray } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
 /**
  * GET /api/admin/kitchen
