@@ -6,17 +6,8 @@ import "@fontsource-variable/outfit";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { clerkProxyUrlForProvider } from "@/lib/clerk-fapi-proxy";
-import dynamic from "next/dynamic";
-
-const PwaRoot = dynamic(
-	() => import("@/components/PwaRoot").then((mod) => mod.PwaRoot),
-	{ ssr: false }
-);
-
-const VercelObservability = dynamic(
-	() => import("@/components/VercelObservability").then((mod) => mod.VercelObservability),
-	{ ssr: false }
-);
+import { PwaRoot } from "@/components/PwaRoot";
+import { VercelObservability } from "@/components/VercelObservability";
 
 /** PWA / mobile browser chrome — VertaFlow shell */
 export const viewport: Viewport = {
@@ -47,9 +38,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode; }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
@@ -75,11 +64,11 @@ export default function RootLayout({
 								}}
 								closeButton
 							/>
-						</ClerkProvider>
-					</PwaRoot>
-				</div>
-				<VercelObservability />
-			</body>
-		</html>
+							</ClerkProvider>
+						</PwaRoot>
+					</div>
+					<VercelObservability />
+				</body>
+				</html>
 	);
 }
