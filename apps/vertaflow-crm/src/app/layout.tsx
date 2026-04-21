@@ -5,9 +5,18 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/outfit";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { PwaRoot } from "@/components/PwaRoot";
-import { VercelObservability } from "@/components/VercelObservability";
 import { clerkProxyUrlForProvider } from "@/lib/clerk-fapi-proxy";
+import dynamic from "next/dynamic";
+
+const PwaRoot = dynamic(
+	() => import("@/components/PwaRoot").then((mod) => mod.PwaRoot),
+	{ ssr: false }
+);
+
+const VercelObservability = dynamic(
+	() => import("@/components/VercelObservability").then((mod) => mod.VercelObservability),
+	{ ssr: false }
+);
 
 /** PWA / mobile browser chrome — VertaFlow shell */
 export const viewport: Viewport = {
