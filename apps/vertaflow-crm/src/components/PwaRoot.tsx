@@ -1,4 +1,4 @@
-use client;
+"use client";
 
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { useEffect, useState } from "react";
