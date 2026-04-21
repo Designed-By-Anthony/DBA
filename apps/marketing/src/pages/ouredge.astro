@@ -1,124 +1,133 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ConsumerTrustStack from '../components/ConsumerTrustStack.astro';
-import SourceList from '../components/SourceList.astro';
-import { evidenceLinks } from '../data/evidence';
-import { buildItemListSchema } from '../lib/seo';
+import ConsumerTrustStack from "../components/ConsumerTrustStack.astro";
+import SourceList from "../components/SourceList.astro";
+import { evidenceLinks } from "../data/evidence";
+import Layout from "../layouts/Layout.astro";
+import { buildItemListSchema } from "../lib/seo";
 
 const comparisonSources = [
-  {
-    ...evidenceLinks.astroWhy,
-    note: 'Astro positions itself as content-driven, server-first, and zero JavaScript by default.',
-  },
-  {
-    ...evidenceLinks.astroPrerender,
-    note: 'Astro prerenders static HTML by default when a route does not need server rendering.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google ties strong page experience to mobile usability and Core Web Vitals.',
-  },
-  {
-    ...evidenceLinks.wordpressUpdates,
-    note: 'WordPress projects typically involve ongoing plugin and theme update management.',
-  },
-  {
-    ...evidenceLinks.wixThirdPartyCode,
-    note: 'Wix documents that third-party code can affect loading time and performance.',
-  },
-  {
-    ...evidenceLinks.dudaCoreWebVitals,
-    note: 'Duda notes that some default platform code cannot be removed.',
-  },
+	{
+		...evidenceLinks.astroWhy,
+		note: "Astro positions itself as content-driven, server-first, and zero JavaScript by default.",
+	},
+	{
+		...evidenceLinks.astroPrerender,
+		note: "Astro prerenders static HTML by default when a route does not need server rendering.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google ties strong page experience to mobile usability and Core Web Vitals.",
+	},
+	{
+		...evidenceLinks.wordpressUpdates,
+		note: "WordPress projects typically involve ongoing plugin and theme update management.",
+	},
+	{
+		...evidenceLinks.wixThirdPartyCode,
+		note: "Wix documents that third-party code can affect loading time and performance.",
+	},
+	{
+		...evidenceLinks.dudaCoreWebVitals,
+		note: "Duda notes that some default platform code cannot be removed.",
+	},
 ];
 
 const edgeCards = [
-  {
-    title: 'Faster load times',
-    description: 'Pages are built to feel immediate on mobile, which protects trust before the visitor has even read the offer.',
-  },
-  {
-    title: 'Less to break after launch',
-    description: 'No plugin maze, no fragile theme stack, and far less maintenance drag after the site is live.',
-  },
-  {
-    title: 'Built to rank on Google',
-    description: 'Cleaner structure, stronger technical foundations, and pages that are easier for Google to understand.',
-  },
+	{
+		title: "Faster load times",
+		description:
+			"Pages are built to feel immediate on mobile, which protects trust before the visitor has even read the offer.",
+	},
+	{
+		title: "Less to break after launch",
+		description:
+			"No plugin maze, no fragile theme stack, and far less maintenance drag after the site is live.",
+	},
+	{
+		title: "Built to rank on Google",
+		description:
+			"Cleaner structure, stronger technical foundations, and pages that are easier for Google to understand.",
+	},
 ];
 
 const benchmarkItems = [
-  { value: '98+', label: 'Performance' },
-  { value: '98+', label: 'Accessibility' },
-  { value: '98+', label: 'Best Practices' },
-  { value: '98+', label: 'SEO' },
+	{ value: "98+", label: "Performance" },
+	{ value: "98+", label: "Accessibility" },
+	{ value: "98+", label: "Best Practices" },
+	{ value: "98+", label: "SEO" },
 ];
 
 const edgePrinciples = [
-  {
-    tag: '01',
-    title: 'The first impression has to feel expensive',
-    description:
-      'A premium site is not just about color and typography. It is about how quickly the page settles, how clear the message feels, and how confidently the business is presented on the first screen.',
-  },
-  {
-    tag: '02',
-    title: 'The technical foundation should stay calm',
-    description:
-      'Heavy builders usually create too many moving parts. We strip that down so the experience feels cleaner to visitors and easier to manage after launch.',
-  },
-  {
-    tag: '03',
-    title: 'The site should support sales, not just aesthetics',
-    description:
-      'The edge is not design for other designers. The edge is helping the business feel more credible, easier to understand, and easier to contact.',
-  },
+	{
+		tag: "01",
+		title: "The first impression has to feel expensive",
+		description:
+			"A premium site is not just about color and typography. It is about how quickly the page settles, how clear the message feels, and how confidently the business is presented on the first screen.",
+	},
+	{
+		tag: "02",
+		title: "The technical foundation should stay calm",
+		description:
+			"Heavy builders usually create too many moving parts. We strip that down so the experience feels cleaner to visitors and easier to manage after launch.",
+	},
+	{
+		tag: "03",
+		title: "The site should support sales, not just aesthetics",
+		description:
+			"The edge is not design for other designers. The edge is helping the business feel more credible, easier to understand, and easier to contact.",
+	},
 ];
 
 const edgeSystemRows = [
-  {
-    title: 'Design',
-    standard: 'Template-first layouts that can look decent but rarely feel specific to the business.',
-    dba: 'Custom presentation shaped around the business, the objections buyers have, and the action you want them to take.',
-  },
-  {
-    title: 'Performance',
-    standard: 'Extra scripts, plugin overhead, and more front-end drag than most owners ever see.',
-    dba: 'A leaner front end built to load faster, feel steadier on mobile, and stay out of the visitor’s way.',
-  },
-  {
-    title: 'SEO foundation',
-    standard: 'Basic settings switched on, but not much thought put into structure, internal linking, or local clarity.',
-    dba: 'Pages and site architecture built to support local intent, service clarity, and long-term expansion.',
-  },
-  {
-    title: 'Ownership',
-    standard: 'A handoff into a stack of third-party dependencies most business owners never wanted in the first place.',
-    dba: 'A founder-led build with direct accountability and a much clearer understanding of what is actually running.',
-  },
+	{
+		title: "Design",
+		standard:
+			"Template-first layouts that can look decent but rarely feel specific to the business.",
+		dba: "Custom presentation shaped around the business, the objections buyers have, and the action you want them to take.",
+	},
+	{
+		title: "Performance",
+		standard:
+			"Extra scripts, plugin overhead, and more front-end drag than most owners ever see.",
+		dba: "A leaner front end built to load faster, feel steadier on mobile, and stay out of the visitor’s way.",
+	},
+	{
+		title: "SEO foundation",
+		standard:
+			"Basic settings switched on, but not much thought put into structure, internal linking, or local clarity.",
+		dba: "Pages and site architecture built to support local intent, service clarity, and long-term expansion.",
+	},
+	{
+		title: "Ownership",
+		standard:
+			"A handoff into a stack of third-party dependencies most business owners never wanted in the first place.",
+		dba: "A founder-led build with direct accountability and a much clearer understanding of what is actually running.",
+	},
 ];
 
 const edgeSchema = buildItemListSchema({
-  name: 'Technical Advantages',
-  description:
-    'The technical advantages Designed by Anthony emphasizes across build quality, performance, security, and SEO structure.',
-  path: '/ouredge',
-  items: edgeCards.map((card) => ({
-    name: card.title,
-    url: '/ouredge',
-    description: card.description,
-  })),
+	name: "Technical Advantages",
+	description:
+		"The technical advantages Designed by Anthony emphasizes across build quality, performance, security, and SEO structure.",
+	path: "/ouredge",
+	items: edgeCards.map((card) => ({
+		name: card.title,
+		url: "/ouredge",
+		description: card.description,
+	})),
 });
 
 const edgeFooterCta = {
-  eyebrow: 'Free Website Audit',
-  title: 'Want to see whether your current site feels as strong as the business behind it?',
-  description:
-    'Request the free audit and I will show you what is slowing your site down, what is hurting your Google visibility, and whether the right move is a tune-up or a rebuild.',
-  primaryHref: '/contact',
-  primaryLabel: 'See How Your Site Compares',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
+	eyebrow: "Free Website Audit",
+	title:
+		"Want to see whether your current site feels as strong as the business behind it?",
+	description:
+		"Request the free audit and I will show you what is slowing your site down, what is hurting your Google visibility, and whether the right move is a tune-up or a rebuild.",
+	primaryHref: "/contact",
+	primaryLabel: "See How Your Site Compares",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
 };
 ---
 

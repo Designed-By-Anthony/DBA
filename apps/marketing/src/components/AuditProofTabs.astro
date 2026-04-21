@@ -1,73 +1,75 @@
 ---
 export interface Props {
-  eyebrow?: string;
-  title?: string;
-  description?: string;
-  variant?: 'default' | 'premium';
-  beforeBadge?: string;
-  beforeHeading?: string;
-  beforeDescription?: string;
-  afterBadge?: string;
-  afterHeading?: string;
-  afterDescription?: string;
+	eyebrow?: string;
+	title?: string;
+	description?: string;
+	variant?: "default" | "premium";
+	beforeBadge?: string;
+	beforeHeading?: string;
+	beforeDescription?: string;
+	afterBadge?: string;
+	afterHeading?: string;
+	afterDescription?: string;
 }
 
 const {
-  eyebrow = 'Before and After',
-  title = 'A cleaner look at the kind of technical gap we fix.',
-  description = 'Flip between a redacted sample audit and the benchmark from this site. Both examples shown here are mobile Lighthouse runs captured in Chrome private mode on the same MacBook setup.',
-  variant = 'default',
-  beforeBadge = 'Redacted sample',
-  beforeHeading = 'Heavier stack. More friction.',
-  beforeDescription = 'This is the kind of drag we usually find in template-heavy builds: slower loading, weaker accessibility, and more moving parts than most owners realize.',
-  afterBadge = 'Our benchmark',
-  afterHeading = 'Leaner stack. Cleaner result.',
-  afterDescription = 'The goal is not vanity scores. The goal is a cleaner site that loads faster, feels more trustworthy, and gives you a stronger base for search and conversion.',
+	eyebrow = "Before and After",
+	title = "A cleaner look at the kind of technical gap we fix.",
+	description = "Flip between a redacted sample audit and the benchmark from this site. Both examples shown here are mobile Lighthouse runs captured in Chrome private mode on the same MacBook setup.",
+	variant = "default",
+	beforeBadge = "Redacted sample",
+	beforeHeading = "Heavier stack. More friction.",
+	beforeDescription = "This is the kind of drag we usually find in template-heavy builds: slower loading, weaker accessibility, and more moving parts than most owners realize.",
+	afterBadge = "Our benchmark",
+	afterHeading = "Leaner stack. Cleaner result.",
+	afterDescription = "The goal is not vanity scores. The goal is a cleaner site that loads faster, feels more trustworthy, and gives you a stronger base for search and conversion.",
 } = Astro.props;
 
-const beforeImageVersion = '20260402-redacted';
+const beforeImageVersion = "20260402-redacted";
 
 const panels = [
-  {
-    id: 'before',
-    tabId: 'audit-proof-tab-before',
-    panelId: 'audit-proof-panel-before',
-    title: 'Before',
-    badge: beforeBadge,
-    heading: beforeHeading,
-    description: beforeDescription,
-    image: `/images/audit-before-report.png?v=${beforeImageVersion}`,
-    imageAlt: 'Redacted sample Lighthouse audit showing lower scores before technical cleanup.',
-  },
-  {
-    id: 'after',
-    tabId: 'audit-proof-tab-after',
-    panelId: 'audit-proof-panel-after',
-    title: 'After',
-    badge: afterBadge,
-    heading: afterHeading,
-    description: afterDescription,
-    image: '/images/audit-after-report.png',
-    imageAlt: 'Designed by Anthony Lighthouse report showing strong after-cleanup scores.',
-  },
+	{
+		id: "before",
+		tabId: "audit-proof-tab-before",
+		panelId: "audit-proof-panel-before",
+		title: "Before",
+		badge: beforeBadge,
+		heading: beforeHeading,
+		description: beforeDescription,
+		image: `/images/audit-before-report.png?v=${beforeImageVersion}`,
+		imageAlt:
+			"Redacted sample Lighthouse audit showing lower scores before technical cleanup.",
+	},
+	{
+		id: "after",
+		tabId: "audit-proof-tab-after",
+		panelId: "audit-proof-panel-after",
+		title: "After",
+		badge: afterBadge,
+		heading: afterHeading,
+		description: afterDescription,
+		image: "/images/audit-after-report.png",
+		imageAlt:
+			"Designed by Anthony Lighthouse report showing strong after-cleanup scores.",
+	},
 ];
 
 const comparisonStats = [
-  {
-    label: 'Performance',
-    before: '73',
-    after: '100',
-  },
-  {
-    label: 'LCP',
-    before: '6.3s',
-    after: '1.3s',
-  },
-  {
-    label: 'Accessibility',
-    before: '75',
-    after: '100',
-  },
+	{
+		label: "Performance",
+		before: "73",
+		after: "100",
+	},
+	{
+		label: "LCP",
+		before: "6.3s",
+		after: "1.3s",
+	},
+	{
+		label: "Accessibility",
+		before: "75",
+		after: "100",
+	},
 ];
 ---
 

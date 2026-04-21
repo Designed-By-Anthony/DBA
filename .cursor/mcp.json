@@ -1,7 +1,7 @@
 {
-  "mcpServers": {
-    "neon": {
-      "url": "https://mcp.neon.tech/mcp"
-    }
-  }
+	"mcpServers": {
+		"neon": {
+			"url": "https://mcp.neon.tech/mcp"
+		}
+	}
 }

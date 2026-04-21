@@ -2,60 +2,64 @@
 /**
  * Reinforces positioning: fast delivery, custom craft, SEO strength, transparent pricing.
  */
-import { STANDARD_WEBSITE_STARTING_PRICE, FOUNDING_PARTNER_SEO_MONTHLY, FOUNDING_PARTNER_BUILD_SLOTS } from '../lib/offers';
+import {
+	FOUNDING_PARTNER_BUILD_SLOTS,
+	FOUNDING_PARTNER_SEO_MONTHLY,
+	STANDARD_WEBSITE_STARTING_PRICE,
+} from "../lib/offers";
 
 interface Props {
-  variant?: 'home' | 'services';
+	variant?: "home" | "services";
 }
 
-const { variant = 'home' } = Astro.props;
+const { variant = "home" } = Astro.props;
 
 const items =
-  variant === 'home'
-    ? [
-        {
-          label: 'Fast',
-          title: 'Built to load on a phone',
-          body: 'Lean builds that open quickly on a phone, a free audit you can run yourself, and timelines measured in weeks — not quarters lost to meetings.',
-        },
-        {
-          label: 'Stylish',
-          title: 'Yours, not a template',
-          body: 'Layout and type tuned so you look like a real shop someone would call — not a theme someone picked in ten minutes.',
-        },
-        {
-          label: 'High-ranking',
-          title: 'SEO that does not feel bolted on',
-          body: 'Clean structure, fast pages, and the behind-the-scenes tags Google actually reads — so your service area and offers are clear from day one.',
-        },
-        {
-          label: 'Fair price',
-          title: 'Numbers before the invoice',
-          body: `Founding spots (${FOUNDING_PARTNER_BUILD_SLOTS} total) pair a complimentary build with ${FOUNDING_PARTNER_SEO_MONTHLY}/mo growth while the launch program is open. After that, projects start at ${STANDARD_WEBSITE_STARTING_PRICE}, scoped to what the audit shows.`,
-        },
-      ]
-    : [
-        {
-          label: 'Fast',
-          title: 'Momentum, not meetings',
-          body: 'Lean stack and direct communication — fewer calls, faster iterations, and a site that earns phone calls sooner.',
-        },
-        {
-          label: 'Stylish',
-          title: 'Built to earn trust fast',
-          body: 'Hierarchy, proof, and mobile polish so people believe you before they read every line.',
-        },
-        {
-          label: 'High-ranking',
-          title: 'Local + technical SEO',
-          body: 'Structure and tags Google reads, plus page speed that matches how people really search for trades and service businesses.',
-        },
-        {
-          label: 'Fair price',
-          title: 'No mystery bundles',
-          body: `Scope tied to what you need: audit-first recommendations, clear phases, and founder-friendly entry when spots remain (${FOUNDING_PARTNER_BUILD_SLOTS} launch builds + ${FOUNDING_PARTNER_SEO_MONTHLY}/mo SEO tier).`,
-        },
-      ];
+	variant === "home"
+		? [
+				{
+					label: "Fast",
+					title: "Built to load on a phone",
+					body: "Lean builds that open quickly on a phone, a free audit you can run yourself, and timelines measured in weeks — not quarters lost to meetings.",
+				},
+				{
+					label: "Stylish",
+					title: "Yours, not a template",
+					body: "Layout and type tuned so you look like a real shop someone would call — not a theme someone picked in ten minutes.",
+				},
+				{
+					label: "High-ranking",
+					title: "SEO that does not feel bolted on",
+					body: "Clean structure, fast pages, and the behind-the-scenes tags Google actually reads — so your service area and offers are clear from day one.",
+				},
+				{
+					label: "Fair price",
+					title: "Numbers before the invoice",
+					body: `Founding spots (${FOUNDING_PARTNER_BUILD_SLOTS} total) pair a complimentary build with ${FOUNDING_PARTNER_SEO_MONTHLY}/mo growth while the launch program is open. After that, projects start at ${STANDARD_WEBSITE_STARTING_PRICE}, scoped to what the audit shows.`,
+				},
+			]
+		: [
+				{
+					label: "Fast",
+					title: "Momentum, not meetings",
+					body: "Lean stack and direct communication — fewer calls, faster iterations, and a site that earns phone calls sooner.",
+				},
+				{
+					label: "Stylish",
+					title: "Built to earn trust fast",
+					body: "Hierarchy, proof, and mobile polish so people believe you before they read every line.",
+				},
+				{
+					label: "High-ranking",
+					title: "Local + technical SEO",
+					body: "Structure and tags Google reads, plus page speed that matches how people really search for trades and service businesses.",
+				},
+				{
+					label: "Fair price",
+					title: "No mystery bundles",
+					body: `Scope tied to what you need: audit-first recommendations, clear phases, and founder-friendly entry when spots remain (${FOUNDING_PARTNER_BUILD_SLOTS} launch builds + ${FOUNDING_PARTNER_SEO_MONTHLY}/mo SEO tier).`,
+				},
+			];
 ---
 
 <section class="premium-pitch" aria-labelledby={`premium-pitch-heading-${variant}`}>

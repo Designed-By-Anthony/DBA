@@ -1,4 +1,4 @@
-export const STANDARD_WEBSITE_STARTING_PRICE = '$999';
+export const STANDARD_WEBSITE_STARTING_PRICE = "$999";
 /**
  * Typical project range for a standard custom build (5–10 pages, custom design,
  * technical SEO). Benchmarked April 2026 against local Mohawk Valley / Syracuse
@@ -6,22 +6,24 @@ export const STANDARD_WEBSITE_STARTING_PRICE = '$999';
  * small-business custom range ($2,000–$6,000). Competitive with the top of the
  * local pack while clearly positioned above template / DIY work.
  */
-export const STANDARD_WEBSITE_TYPICAL_RANGE = '$2,400–$4,800';
+export const STANDARD_WEBSITE_TYPICAL_RANGE = "$2,400–$4,800";
 /**
  * Starting price for enterprise / multi-location / integration-heavy scope.
  * Benchmarked against the national growing-business / enterprise bracket
  * ($8,000–$25,000) — anchored low so prospects see a concrete floor instead of
  * an opaque "Custom" quote.
  */
-export const ENTERPRISE_WEBSITE_STARTING_PRICE = '$6,000';
-export const FACEBOOK_PRIVATE_WEBSITE_PRICE = '$500';
+export const ENTERPRISE_WEBSITE_STARTING_PRICE = "$6,000";
+export const FACEBOOK_PRIVATE_WEBSITE_PRICE = "$500";
 
-export const PUBLIC_SITE_SOCIAL_IMAGE = '/images/og-site-premium.png';
-export const FACEBOOK_OFFER_SOCIAL_IMAGE = '/images/og-facebook-offer-premium.png';
+export const PUBLIC_SITE_SOCIAL_IMAGE = "/images/og-site-premium.png";
+export const FACEBOOK_OFFER_SOCIAL_IMAGE =
+	"/images/og-facebook-offer-premium.png";
 
-export const PRIVATE_FACEBOOK_LABEL = 'Private Facebook Offer';
+export const PRIVATE_FACEBOOK_LABEL = "Private Facebook Offer";
 
-export const PUBLIC_PAYMENT_STRUCTURE_COPY = '50% down to start, 50% at launch.';
+export const PUBLIC_PAYMENT_STRUCTURE_COPY =
+	"50% down to start, 50% at launch.";
 
 /** Launch program: first N local partners — complimentary build with Growth Plan enrollment. */
 export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
@@ -30,24 +32,24 @@ export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
  * Set at $149/mo: below typical SMB CRM seat bundles ($15–75+/user/mo × tools) while reflecting bundled
  * web + local SEO + product value vs. standalone $100–300/mo hosting retainers.
  */
-export const FOUNDING_PARTNER_SEO_MONTHLY = '$149';
+export const FOUNDING_PARTNER_SEO_MONTHLY = "$149";
 /** Public name for the founding-partner monthly stack (hosting, security, SEO). */
-export const FOUNDING_PARTNER_SEO_LABEL = 'Growth Plan';
+export const FOUNDING_PARTNER_SEO_LABEL = "Growth Plan";
 
 /** Public CRM / admin app URL (Clerk sign-in). Used in schema and positioning copy—not a crawl-first landing page. */
-export const AGENCY_OS_APP_URL = 'https://admin.vertaflow.io';
+export const AGENCY_OS_APP_URL = "https://admin.vertaflow.io";
 /** Client portal (magic-link access); paired with Agency OS in Growth Plan positioning. */
-export const ACCOUNTS_PORTAL_URL = 'https://accounts.designedbyanthony.com';
+export const ACCOUNTS_PORTAL_URL = "https://accounts.designedbyanthony.com";
 
 /**
  * Agency OS CRM — software-only list prices (per organization / month).
  * Capture: leads + scheduling + light pipeline. Suite: full product (portal, automations roadmap, deeper CRM).
  * Growth Plan ($149) bundles Suite-level access with hosting + local SEO — better value than Suite alone for site clients.
  */
-export const AGENCY_OS_CAPTURE_LABEL = 'Capture';
-export const AGENCY_OS_SUITE_LABEL = 'Suite';
-export const AGENCY_OS_CAPTURE_MONTHLY = '$69';
-export const AGENCY_OS_SUITE_MONTHLY = '$179';
+export const AGENCY_OS_CAPTURE_LABEL = "Capture";
+export const AGENCY_OS_SUITE_LABEL = "Suite";
+export const AGENCY_OS_CAPTURE_MONTHLY = "$69";
+export const AGENCY_OS_SUITE_MONTHLY = "$179";
 
 /** Ongoing local SEO + hosting (lighter scope than the full GBP program). Same value as founding partner monthly. */
 export const MONTHLY_LOCAL_SEO_PRICE = FOUNDING_PARTNER_SEO_MONTHLY;
@@ -56,7 +58,7 @@ export const MONTHLY_LOCAL_SEO_PRICE = FOUNDING_PARTNER_SEO_MONTHLY;
  * Full Google Business Profile & local marketing program (Merchynt-style stack), per location / month.
  * Published on /services/google-business-profile — change here to keep pricing consistent sitewide.
  */
-export const GBP_FULL_PROGRAM_MONTHLY_PRICE = '$299';
+export const GBP_FULL_PROGRAM_MONTHLY_PRICE = "$299";
 
 /** Opening line: dev studio launch, $0 upfront vs standard pricing (matches cold email “The offer”). */
 export const FOUNDING_PARTNER_OFFER_SENTENCE = `Designed by Anthony is launching as a dev studio: the first ${FOUNDING_PARTNER_BUILD_SLOTS} approved partners get a professional custom website at $0 upfront (standard builds typically start at ${STANDARD_WEBSITE_STARTING_PRICE}+).`;
@@ -75,8 +77,7 @@ export const PUBLIC_PRICING_PILL = `${FOUNDING_PARTNER_BUILD_SLOTS} launch pilot
 
 export const PUBLIC_PROJECT_DECISION_COPY = `whether the next step is a smaller cleanup, SEO work, a full rebuild, or claiming one of the remaining founding partner spots.`;
 
-export const FACEBOOK_PRIVATE_OFFER_COPY =
-  `${PRIVATE_FACEBOOK_LABEL}. Invite-only rate reserved for direct outreach.`;
+export const FACEBOOK_PRIVATE_OFFER_COPY = `${PRIVATE_FACEBOOK_LABEL}. Invite-only rate reserved for direct outreach.`;
 
 /**
  * Facebook Ads destination URL (paste in Ads Manager; not used by app code):
@@ -85,4 +86,4 @@ export const FACEBOOK_PRIVATE_OFFER_COPY =
 
 /** Calendly with matching UTMs for strategy calls from this landing page. */
 export const FACEBOOK_OFFER_CALENDLY_WITH_UTM =
-  'https://calendly.com/anthony-designedbyanthony/web-design-consult?utm_source=facebook&utm_medium=paid_social&utm_campaign=founding_partner_facebook&utm_content=strategy_call';
+	"https://calendly.com/anthony-designedbyanthony/web-design-consult?utm_source=facebook&utm_medium=paid_social&utm_campaign=founding_partner_facebook&utm_content=strategy_call";

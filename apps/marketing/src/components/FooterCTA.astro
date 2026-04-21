@@ -1,32 +1,32 @@
 ---
 export interface Props {
-  eyebrow: string;
-  title: string;
-  description: string;
-  primaryHref: string;
-  primaryLabel: string;
-  secondaryHref?: string;
-  secondaryLabel?: string;
-  note?: string;
+	eyebrow: string;
+	title: string;
+	description: string;
+	primaryHref: string;
+	primaryLabel: string;
+	secondaryHref?: string;
+	secondaryLabel?: string;
+	note?: string;
 }
 
 const {
-  eyebrow,
-  title,
-  description,
-  primaryHref,
-  primaryLabel,
-  secondaryHref,
-  secondaryLabel,
-  note,
+	eyebrow,
+	title,
+	description,
+	primaryHref,
+	primaryLabel,
+	secondaryHref,
+	secondaryLabel,
+	note,
 } = Astro.props;
 
-const primaryIsCalendly = primaryHref.includes('calendly.com');
-const secondaryIsExternal = Boolean(secondaryHref?.startsWith('http'));
-const secondaryIsCalendly = Boolean(secondaryHref?.includes('calendly.com'));
-const primaryPrefetch = primaryHref.startsWith('/') ? true : undefined;
+const primaryIsCalendly = primaryHref.includes("calendly.com");
+const secondaryIsExternal = Boolean(secondaryHref?.startsWith("http"));
+const secondaryIsCalendly = Boolean(secondaryHref?.includes("calendly.com"));
+const primaryPrefetch = primaryHref.startsWith("/") ? true : undefined;
 const secondaryPrefetch =
-  secondaryHref && secondaryHref.startsWith('/') ? true : undefined;
+	secondaryHref && secondaryHref.startsWith("/") ? true : undefined;
 ---
 
 <section class="section-shell section-shell--proof footer-cta-shell">

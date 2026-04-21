@@ -1,51 +1,58 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const astroPostSources = [
-  {
-    ...evidenceLinks.astroWhy,
-    note: 'Astro describes itself as a framework for content-driven websites with less client-side JavaScript.',
-  },
-  {
-    ...evidenceLinks.astroPrerender,
-    note: 'Astro prerenders static HTML by default unless a route needs server rendering.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google recommends good Core Web Vitals, mobile usability, and overall page experience.',
-  },
-  {
-    ...evidenceLinks.wordpressHardening,
-    note: 'WordPress security guidance emphasizes ongoing precautions and risk reduction.',
-  },
-  {
-    ...evidenceLinks.wixThirdPartyCode,
-    note: 'Wix notes that third-party code can affect performance and loading time.',
-  },
-  {
-    ...evidenceLinks.dudaCoreWebVitals,
-    note: 'Duda notes that some platform JS and CSS cannot be removed.',
-  },
+	{
+		...evidenceLinks.astroWhy,
+		note: "Astro describes itself as a framework for content-driven websites with less client-side JavaScript.",
+	},
+	{
+		...evidenceLinks.astroPrerender,
+		note: "Astro prerenders static HTML by default unless a route needs server rendering.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google recommends good Core Web Vitals, mobile usability, and overall page experience.",
+	},
+	{
+		...evidenceLinks.wordpressHardening,
+		note: "WordPress security guidance emphasizes ongoing precautions and risk reduction.",
+	},
+	{
+		...evidenceLinks.wixThirdPartyCode,
+		note: "Wix notes that third-party code can affect performance and loading time.",
+	},
+	{
+		...evidenceLinks.dudaCoreWebVitals,
+		note: "Duda notes that some platform JS and CSS cannot be removed.",
+	},
 ];
 
-const articleImage =
-  '/images/astro_rocket_cover.png';
-const publishedTime = '2026-02-10T09:00:00-05:00';
+const articleImage = "/images/astro_rocket_cover.png";
+const publishedTime = "2026-02-10T09:00:00-05:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Why We Build Marketing Sites with Astro — From Utica to Manhattan and Beyond',
-  description:
-    'A source-backed look at why we choose Astro over builders for local-business marketing websites — from Manhattan to the Mohawk Valley.',
-  path: '/blog/astro-tech-stack',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Web Design',
-  keywords: ['Astro', 'Web design', 'Performance', 'SEO', 'Manhattan web design', 'Utica web design'],
+	headline:
+		"Why We Build Marketing Sites with Astro — From Utica to Manhattan and Beyond",
+	description:
+		"A source-backed look at why we choose Astro over builders for local-business marketing websites — from Manhattan to the Mohawk Valley.",
+	path: "/blog/astro-tech-stack",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Web Design",
+	keywords: [
+		"Astro",
+		"Web design",
+		"Performance",
+		"SEO",
+		"Manhattan web design",
+		"Utica web design",
+	],
 });
 ---
 <Layout

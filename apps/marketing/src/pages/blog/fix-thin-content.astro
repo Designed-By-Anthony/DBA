@@ -1,33 +1,41 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const postSources = [
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google explicitly targets high-quality content that provides distinct information.',
-  },
-  {
-    ...evidenceLinks.wordpressHardening,
-    note: 'Routine content audits are a hallmark of technical SEO health.',
-  }
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google explicitly targets high-quality content that provides distinct information.",
+	},
+	{
+		...evidenceLinks.wordpressHardening,
+		note: "Routine content audits are a hallmark of technical SEO health.",
+	},
 ];
 
-const articleImage = '/images/thin_content_cover.png';
-const publishedTime = '2026-04-10T09:00:00-05:00';
+const articleImage = "/images/thin_content_cover.png";
+const publishedTime = "2026-04-10T09:00:00-05:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Fix Thin Content Without Hurting SEO',
-  description: 'A practical guide to finding thin pages, improving weak content, and consolidating low-value URLs without hurting SEO.',
-  path: '/blog/fix-thin-content',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'SEO Training',
-  keywords: ['Thin content', 'Content consolidation', 'Content audit', 'SEO cleanup', 'Manhattan web design', 'Miami web design'],
+	headline: "Fix Thin Content Without Hurting SEO",
+	description:
+		"A practical guide to finding thin pages, improving weak content, and consolidating low-value URLs without hurting SEO.",
+	path: "/blog/fix-thin-content",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "SEO Training",
+	keywords: [
+		"Thin content",
+		"Content consolidation",
+		"Content audit",
+		"SEO cleanup",
+		"Manhattan web design",
+		"Miami web design",
+	],
 });
 ---
 <Layout

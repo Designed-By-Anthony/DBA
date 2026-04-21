@@ -166,35 +166,33 @@ export async function cachePortalTickets(
 		.filter((ticket) => ticket.queued === 1)
 		.toArray();
 
-	await db.transaction(
-		"rw",
-		db.portalTickets,
-		db.meta,
-		async () => {
-			const existing = await db.portalTickets.where("cacheKey").equals(cacheKey).toArray();
-			const nonQueuedIds = existing
-				.filter((ticket) => ticket.queued === 0)
-				.map((ticket) => ticket.id);
-			if (nonQueuedIds.length > 0) {
-				await db.portalTickets.bulkDelete(nonQueuedIds);
-			}
+	await db.transaction("rw", db.portalTickets, db.meta, async () => {
+		const existing = await db.portalTickets
+			.where("cacheKey")
+			.equals(cacheKey)
+			.toArray();
+		const nonQueuedIds = existing
+			.filter((ticket) => ticket.queued === 0)
+			.map((ticket) => ticket.id);
+		if (nonQueuedIds.length > 0) {
+			await db.portalTickets.bulkDelete(nonQueuedIds);
+		}
 
-			if (tickets.length > 0) {
-				await db.portalTickets.bulkPut(
-					tickets.map((ticket) => ({
-						...ticket,
-						cacheKey,
-						queued: 0,
-						updatedAt: Date.now(),
-					})),
-				);
-			}
+		if (tickets.length > 0) {
+			await db.portalTickets.bulkPut(
+				tickets.map((ticket) => ({
+					...ticket,
+					cacheKey,
+					queued: 0,
+					updatedAt: Date.now(),
+				})),
+			);
+		}
 
-			if (queuedTickets.length > 0) {
-				await db.portalTickets.bulkPut(queuedTickets);
-			}
-		},
-	);
+		if (queuedTickets.length > 0) {
+			await db.portalTickets.bulkPut(queuedTickets);
+		}
+	});
 }
 
 export async function getCachedPortalTickets(
@@ -212,10 +210,12 @@ export async function getCachedPortalTickets(
 		.reverse()
 		.sortBy("createdAt");
 
-	return rows
-		.reverse()
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		.map(({ cacheKey, queued, updatedAt, ...ticket }) => ticket);
+	return (
+		rows
+			.reverse()
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			.map(({ cacheKey, queued, updatedAt, ...ticket }) => ticket)
+	);
 }
 
 export async function queuePortalTicket(
@@ -289,7 +289,9 @@ export async function getPendingPortalTicketCount(
 	return db.pendingPortalTickets.where("cacheKey").equals(resolvedKey).count();
 }
 
-export async function flushQueuedPortalTickets(cacheKey?: string | null): Promise<{
+export async function flushQueuedPortalTickets(
+	cacheKey?: string | null,
+): Promise<{
 	sent: number;
 	failed: number;
 }> {

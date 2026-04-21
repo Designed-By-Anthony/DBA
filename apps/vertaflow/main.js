@@ -1,18 +1,21 @@
+import {
+	marketingVerticalLabels as verticalLabels,
+	marketingVerticals as verticals,
+} from "./src/marketing-verticals";
 import { installGlobalSyncProvider } from "./src/providers/GlobalSyncProvider";
 import { registerServiceWorker } from "./src/pwa/registerServiceWorker";
+import { getRuntimeConfig } from "./src/runtime/config";
+import {
+	buildBlogCollectionStructuredData,
+	buildFaqStructuredData,
+} from "./src/seo/structuredData";
+import { registerGlobalErrorHandlers } from "./src/telemetry/globalErrorHandlers";
 import {
 	captureHandledError,
 	captureMessage,
 	initSentryFromRuntimeConfig,
 	setSentryTags,
 } from "./src/telemetry/sentry";
-import { registerGlobalErrorHandlers } from "./src/telemetry/globalErrorHandlers";
-import { getRuntimeConfig } from "./src/runtime/config";
-import { buildFaqStructuredData, buildBlogCollectionStructuredData } from "./src/seo/structuredData";
-import {
-	marketingVerticalLabels as verticalLabels,
-	marketingVerticals as verticals,
-} from "./src/marketing-verticals";
 
 // ─── VertaFlow Marketing — Interactive Logic ───
 
@@ -93,7 +96,9 @@ function renderVertical(id) {
 
 // ── Tab switching ──
 function activateVerticalTab(verticalId) {
-	const tab = document.querySelector(`.switcher-tab[data-vertical="${verticalId}"]`);
+	const tab = document.querySelector(
+		`.switcher-tab[data-vertical="${verticalId}"]`,
+	);
 	if (!tab) return false;
 	document.querySelectorAll(".switcher-tab").forEach((t) => {
 		t.classList.remove("active");
@@ -115,13 +120,16 @@ document.getElementById("verticalTabs")?.addEventListener("click", (e) => {
 function verticalIdFromQueryParam(param) {
 	if (!param) return null;
 	const slug = String(param).toLowerCase();
-	const entry = Object.entries(verticalLabels).find(([, label]) => label === slug);
+	const entry = Object.entries(verticalLabels).find(
+		([, label]) => label === slug,
+	);
 	return entry ? entry[0] : verticals[param] ? param : null;
 }
 
 const initialVertical =
-	verticalIdFromQueryParam(new URLSearchParams(window.location.search).get("vertical")) ??
-	"contractor";
+	verticalIdFromQueryParam(
+		new URLSearchParams(window.location.search).get("vertical"),
+	) ?? "contractor";
 
 activateVerticalTab(initialVertical);
 
@@ -141,7 +149,11 @@ if (faqJsonLdTag) {
 }
 const blogJsonLdTag = document.getElementById("vf-blog-jsonld");
 if (blogJsonLdTag) {
-	blogJsonLdTag.textContent = JSON.stringify(buildBlogCollectionStructuredData(runtimeConfig.siteUrl), null, 2);
+	blogJsonLdTag.textContent = JSON.stringify(
+		buildBlogCollectionStructuredData(runtimeConfig.siteUrl),
+		null,
+		2,
+	);
 }
 
 // ── Scroll reveal ──
@@ -201,98 +213,109 @@ document.getElementById("hamburgerBtn")?.addEventListener("click", () => {
 });
 
 // ── Request Access form → POST to Agency OS `POST /api/lead` (public contract) ──
-document.getElementById("requestForm")?.addEventListener("submit", async (e) => {
-	e.preventDefault();
-	const form = e.target;
-	const btn = document.getElementById("requestSubmitBtn");
-	const formData = new FormData(form);
-	if (String(formData.get("_hp") || "").trim() !== "") return;
+document
+	.getElementById("requestForm")
+	?.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		const form = e.target;
+		const btn = document.getElementById("requestSubmitBtn");
+		const formData = new FormData(form);
+		if (String(formData.get("_hp") || "").trim() !== "") return;
 
-	const vfPublic =
-		typeof window !== "undefined" && window.__VF_PUBLIC__ && typeof window.__VF_PUBLIC__ === "object"
-			? window.__VF_PUBLIC__
-			: {};
-	const vertical = String(formData.get("vertical") || "");
-	const webDesign = formData.get("webDesignInterest") === "yes";
+		const vfPublic =
+			typeof window !== "undefined" &&
+			window.__VF_PUBLIC__ &&
+			typeof window.__VF_PUBLIC__ === "object"
+				? window.__VF_PUBLIC__
+				: {};
+		const vertical = String(formData.get("vertical") || "");
+		const webDesign = formData.get("webDesignInterest") === "yes";
 
-	const send = async (cfTurnstileResponse) => {
-		const payload = {
-			name: String(formData.get("name") || "").trim(),
-			email: String(formData.get("email") || "").trim(),
-			company: String(formData.get("business") || "").trim() || undefined,
-			website: String(formData.get("website") || "").trim() || undefined,
-			message: `VertaFlow early access | vertical=${vertical} | web_design_interest=${webDesign ? "yes" : "no"}`,
-			source: `vertaflow_io|lane:vertaflow_product|vertical:${vertical}`,
-			agencyId: String(vfPublic.crmDefaultAgencyId || "").trim() || undefined,
-			offer_type: "vertaflow_early_access",
-			cta_source: "vertaflow_io_request_access",
-			page_context: "vertaflow_marketing_home",
-			lead_source: "VertaFlow marketing — early access",
-			page_url: window.location.href,
-			page_title: document.title,
-			source_page: window.location.pathname,
-			referrer_url: document.referrer || "",
-			_hp: "",
-			cfTurnstileResponse: cfTurnstileResponse || undefined,
+		const send = async (cfTurnstileResponse) => {
+			const payload = {
+				name: String(formData.get("name") || "").trim(),
+				email: String(formData.get("email") || "").trim(),
+				company: String(formData.get("business") || "").trim() || undefined,
+				website: String(formData.get("website") || "").trim() || undefined,
+				message: `VertaFlow early access | vertical=${vertical} | web_design_interest=${webDesign ? "yes" : "no"}`,
+				source: `vertaflow_io|lane:vertaflow_product|vertical:${vertical}`,
+				agencyId: String(vfPublic.crmDefaultAgencyId || "").trim() || undefined,
+				offer_type: "vertaflow_early_access",
+				cta_source: "vertaflow_io_request_access",
+				page_context: "vertaflow_marketing_home",
+				lead_source: "VertaFlow marketing — early access",
+				page_url: window.location.href,
+				page_title: document.title,
+				source_page: window.location.pathname,
+				referrer_url: document.referrer || "",
+				_hp: "",
+				cfTurnstileResponse: cfTurnstileResponse || undefined,
+			};
+
+			const res = await fetch(runtimeConfig.crmLeadUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+				},
+				body: JSON.stringify(payload),
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		};
 
-		const res = await fetch(runtimeConfig.crmLeadUrl, {
-			method: "POST",
-			headers: { "Content-Type": "application/json", Accept: "application/json" },
-			body: JSON.stringify(payload),
-		});
-		if (!res.ok) throw new Error(`HTTP ${res.status}`);
-	};
+		btn.disabled = true;
+		btn.textContent = "Submitting...";
 
-	btn.disabled = true;
-	btn.textContent = "Submitting...";
+		const turnstileEl = form.querySelector(".cf-turnstile");
+		const ts = window.turnstile;
+		const siteKey =
+			(turnstileEl &&
+				turnstileEl.getAttribute("data-sitekey") &&
+				turnstileEl.getAttribute("data-sitekey").trim()) ||
+			String(vfPublic.turnstileSiteKey || "").trim();
 
-	const turnstileEl = form.querySelector(".cf-turnstile");
-	const ts = window.turnstile;
-	const siteKey =
-		(turnstileEl && turnstileEl.getAttribute("data-sitekey") && turnstileEl.getAttribute("data-sitekey").trim()) ||
-		String(vfPublic.turnstileSiteKey || "").trim();
+		try {
+			if (siteKey && ts && typeof ts.execute === "function" && turnstileEl) {
+				await new Promise((resolve) => {
+					form.__vfResolve = (token) => {
+						delete form.__vfResolve;
+						send(token || "")
+							.then(resolve)
+							.catch(resolve);
+					};
+					try {
+						ts.execute(turnstileEl);
+					} catch {
+						delete form.__vfResolve;
+						send("").then(resolve).catch(resolve);
+					}
+				});
+			} else {
+				await send("");
+			}
 
-	try {
-		if (siteKey && ts && typeof ts.execute === "function" && turnstileEl) {
-			await new Promise((resolve) => {
-				form.__vfResolve = (token) => {
-					delete form.__vfResolve;
-					send(token || "").then(resolve).catch(resolve);
-				};
-				try {
-					ts.execute(turnstileEl);
-				} catch {
-					delete form.__vfResolve;
-					send("").then(resolve).catch(resolve);
-				}
+			form.hidden = true;
+			document.getElementById("requestSuccess").hidden = false;
+		} catch (_err) {
+			captureHandledError(_err, {
+				area: "network",
+				feature: "request_access_form",
+				severity: "error",
+				metadata: {
+					crmLeadUrl: runtimeConfig.crmLeadUrl,
+				},
 			});
-		} else {
-			await send("");
-		}
-
-		form.hidden = true;
-		document.getElementById("requestSuccess").hidden = false;
-	} catch (_err) {
-		captureHandledError(_err, {
-			area: "network",
-			feature: "request_access_form",
-			severity: "error",
-			metadata: {
-				crmLeadUrl: runtimeConfig.crmLeadUrl,
-			},
-		});
-		form.hidden = true;
-		document.getElementById("requestSuccess").hidden = false;
-	} finally {
-		btn.disabled = false;
-		btn.textContent = "Request Early Access";
-		if (turnstileEl && window.turnstile?.reset) {
-			try {
-				window.turnstile.reset(turnstileEl);
-			} catch {
-				/* ignore */
+			form.hidden = true;
+			document.getElementById("requestSuccess").hidden = false;
+		} finally {
+			btn.disabled = false;
+			btn.textContent = "Request Early Access";
+			if (turnstileEl && window.turnstile?.reset) {
+				try {
+					window.turnstile.reset(turnstileEl);
+				} catch {
+					/* ignore */
+				}
 			}
 		}
-	}
-});
+	});

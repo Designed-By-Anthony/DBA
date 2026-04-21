@@ -1,6 +1,3 @@
 {
-  "recommendations": [
-    "astro-build.astro-vscode",
-    "ms-playwright.playwright"
-  ]
+	"recommendations": ["astro-build.astro-vscode", "ms-playwright.playwright"]
 }

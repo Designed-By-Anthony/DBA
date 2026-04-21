@@ -34,11 +34,14 @@
 		"test:e2e": "pnpm run test:e2e:marketing && pnpm run test:e2e:lighthouse && pnpm run test:e2e:web",
 		"test:e2e:marketing": "pnpm --filter dbastudio-315 run test:release",
 		"test:e2e:lighthouse": "pnpm --filter dba-lighthouse-audit run test",
-		"test:e2e:web": "pnpm --filter vertaflow-crm run test"
+		"test:e2e:web": "pnpm --filter vertaflow-crm run test",
+		"test:cypress": "npx cypress run",
+		"test:cypress:open": "npx cypress open"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
 		"@types/node": "^22.10.2",
+		"cypress": "^15.14.0",
 		"turbo": "^2.9.6",
 		"typescript": "^5.9.3"
 	},

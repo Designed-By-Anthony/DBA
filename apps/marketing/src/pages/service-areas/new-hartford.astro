@@ -1,104 +1,107 @@
 ---
-import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
-import { buildServiceAreaSchema } from '../../lib/seo';
+import ServiceAreaPage from "../../components/ServiceAreaPage.astro";
+import { buildServiceAreaSchema } from "../../lib/seo";
 
-const pageTitle = 'Web Design in New Hartford, NY | Designed by Anthony';
+const pageTitle = "Web Design in New Hartford, NY | Designed by Anthony";
 const pageDescription =
-  'Custom web design, local SEO, hosting, and website rescue for New Hartford service businesses that need stronger trust and cleaner mobile performance.';
+	"Custom web design, local SEO, hosting, and website rescue for New Hartford service businesses that need stronger trust and cleaner mobile performance.";
 
 const areaSchema = buildServiceAreaSchema({
-  name: 'Web Design and Hosting Services in New Hartford, New York',
-  description: pageDescription,
-  path: '/service-areas/new-hartford',
-  areaServed: 'New Hartford, New York',
-  serviceType: 'Web design, hosting, and local SEO',
-  cityName: 'New Hartford',
-  regionName: 'New York',
-  regionAbbr: 'NY',
-  geo: { latitude: 43.0664, longitude: -75.2902 },
+	name: "Web Design and Hosting Services in New Hartford, New York",
+	description: pageDescription,
+	path: "/service-areas/new-hartford",
+	areaServed: "New Hartford, New York",
+	serviceType: "Web design, hosting, and local SEO",
+	cityName: "New Hartford",
+	regionName: "New York",
+	regionAbbr: "NY",
+	geo: { latitude: 43.0664, longitude: -75.2902 },
 });
 
 const blocks = [
-  {
-    level: 'h2' as const,
-    title: 'Why New Hartford businesses need polish, speed, and clarity',
-    paragraphs: [
-      'New Hartford customers expect a more refined buying experience than what a generic template site usually delivers. Whether you are in home services, wellness, legal, or another trust-based business, your website has to feel organized, current, and credible right away.',
-      'That matters even more in a market where people often compare businesses from the same phone while moving between Commercial Drive, Genesee Street, and nearby neighborhoods. If the site feels clunky or vague, they leave before the first inquiry happens.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Competing in a market where presentation influences trust',
-    paragraphs: [
-      'New Hartford is not just about ranking. It is about appearing established. Strong typography, cleaner hierarchy, better service framing, and fast mobile performance all help your business feel more premium and more dependable without overcomplicating the design. For owners trying to sharpen how the business shows up online, a focused website often does more for the phone than broad marketing activity with a weak destination page behind it.',
-    ],
-  },
-  {
-    level: 'h4' as const,
-    title: 'A local page should reduce hesitation',
-    paragraphs: [
-      'The best New Hartford pages answer quiet customer questions quickly: what you do, whether you are local, whether you are responsive, and whether contacting you will feel easy instead of awkward or high pressure.',
-    ],
-  },
-  {
-    level: 'h5' as const,
-    title: 'Polish matters because presentation shapes trust',
-    paragraphs: [
-      'In a market where buyers expect a more refined experience, small quality cues can be the difference between looking premium and looking forgettable.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Website rescues for businesses that outgrew their first site',
-    paragraphs: [
-      'A lot of New Hartford businesses are not starting from zero. They already have a website, but it no longer reflects the quality of the business behind it. Maybe it was built too cheaply, maybe it has grown messy over time, or maybe it simply was never designed to convert mobile traffic well.',
-      'A rescue project fixes the structure underneath the site while improving the message on top. That means faster pages, stronger calls to action, and a design system that feels more intentional from the first scroll.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Performance matters even for image-heavy service brands',
-    paragraphs: [
-      'If your business relies on galleries, testimonials, before-and-after work, or visual trust signals, the site still has to stay fast. Optimized images, cleaner code, and better page structure let you show quality without making people wait for it.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Local SEO for New Hartford without generic suburb copy',
-    paragraphs: [
-      'The goal is not to stuff the page with place names. It is to build a page that genuinely matches the way local customers search and evaluate options. That usually means tighter service copy, local proof, and selective location pages for the towns that actually matter to your sales pipeline.',
-      'For businesses serving New Hartford, Whitesboro, Yorkville, and Utica, that structure can create much stronger visibility than one catch-all page that tries to cover everything at once.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Hosting that keeps the experience steady',
-    paragraphs: [
-      'Managed hosting helps make sure your site stays fast, secure, and easy to maintain as the business grows. That removes one more point of friction from a customer journey where confidence and responsiveness already matter a lot.',
-    ],
-  },
+	{
+		level: "h2" as const,
+		title: "Why New Hartford businesses need polish, speed, and clarity",
+		paragraphs: [
+			"New Hartford customers expect a more refined buying experience than what a generic template site usually delivers. Whether you are in home services, wellness, legal, or another trust-based business, your website has to feel organized, current, and credible right away.",
+			"That matters even more in a market where people often compare businesses from the same phone while moving between Commercial Drive, Genesee Street, and nearby neighborhoods. If the site feels clunky or vague, they leave before the first inquiry happens.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Competing in a market where presentation influences trust",
+		paragraphs: [
+			"New Hartford is not just about ranking. It is about appearing established. Strong typography, cleaner hierarchy, better service framing, and fast mobile performance all help your business feel more premium and more dependable without overcomplicating the design. For owners trying to sharpen how the business shows up online, a focused website often does more for the phone than broad marketing activity with a weak destination page behind it.",
+		],
+	},
+	{
+		level: "h4" as const,
+		title: "A local page should reduce hesitation",
+		paragraphs: [
+			"The best New Hartford pages answer quiet customer questions quickly: what you do, whether you are local, whether you are responsive, and whether contacting you will feel easy instead of awkward or high pressure.",
+		],
+	},
+	{
+		level: "h5" as const,
+		title: "Polish matters because presentation shapes trust",
+		paragraphs: [
+			"In a market where buyers expect a more refined experience, small quality cues can be the difference between looking premium and looking forgettable.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Website rescues for businesses that outgrew their first site",
+		paragraphs: [
+			"A lot of New Hartford businesses are not starting from zero. They already have a website, but it no longer reflects the quality of the business behind it. Maybe it was built too cheaply, maybe it has grown messy over time, or maybe it simply was never designed to convert mobile traffic well.",
+			"A rescue project fixes the structure underneath the site while improving the message on top. That means faster pages, stronger calls to action, and a design system that feels more intentional from the first scroll.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Performance matters even for image-heavy service brands",
+		paragraphs: [
+			"If your business relies on galleries, testimonials, before-and-after work, or visual trust signals, the site still has to stay fast. Optimized images, cleaner code, and better page structure let you show quality without making people wait for it.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Local SEO for New Hartford without generic suburb copy",
+		paragraphs: [
+			"The goal is not to stuff the page with place names. It is to build a page that genuinely matches the way local customers search and evaluate options. That usually means tighter service copy, local proof, and selective location pages for the towns that actually matter to your sales pipeline.",
+			"For businesses serving New Hartford, Whitesboro, Yorkville, and Utica, that structure can create much stronger visibility than one catch-all page that tries to cover everything at once.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Hosting that keeps the experience steady",
+		paragraphs: [
+			"Managed hosting helps make sure your site stays fast, secure, and easy to maintain as the business grows. That removes one more point of friction from a customer journey where confidence and responsiveness already matter a lot.",
+		],
+	},
 ];
 
 const relatedMarkets = [
-  {
-    title: 'Website Design, Hosting & SEO in Utica, NY',
-    href: '/service-areas/utica',
-    description: 'Useful when the business needs a stronger city-specific page for the broader Utica search market.',
-    tag: 'Utica',
-  },
-  {
-    title: 'Rome NY Website Designer',
-    href: '/service-areas/rome',
-    description: 'A companion page for businesses that also serve Rome and want clearer separation between nearby markets.',
-    tag: 'Rome',
-  },
-  {
-    title: 'Web Design & Local SEO in Clinton, NY',
-    href: '/service-areas/clinton',
-    description: 'A better match for businesses that also sell into Clinton and other quieter trust-first nearby markets.',
-    tag: 'Clinton',
-  },
+	{
+		title: "Website Design, Hosting & SEO in Utica, NY",
+		href: "/service-areas/utica",
+		description:
+			"Useful when the business needs a stronger city-specific page for the broader Utica search market.",
+		tag: "Utica",
+	},
+	{
+		title: "Rome NY Website Designer",
+		href: "/service-areas/rome",
+		description:
+			"A companion page for businesses that also serve Rome and want clearer separation between nearby markets.",
+		tag: "Rome",
+	},
+	{
+		title: "Web Design & Local SEO in Clinton, NY",
+		href: "/service-areas/clinton",
+		description:
+			"A better match for businesses that also sell into Clinton and other quieter trust-first nearby markets.",
+		tag: "Clinton",
+	},
 ];
 ---
 

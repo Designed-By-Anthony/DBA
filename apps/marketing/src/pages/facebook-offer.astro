@@ -1,110 +1,106 @@
 ---
-import { Image } from 'astro:assets';
-import AuditForm from '../components/AuditForm.astro';
-import AuditProofTabs from '../components/AuditProofTabs.astro';
+import { Image } from "astro:assets";
+import fullLogo from "../assets/FullLogo.png";
+import AuditForm from "../components/AuditForm.astro";
+import AuditProofTabs from "../components/AuditProofTabs.astro";
+import Layout from "../layouts/Layout.astro";
 import {
-  FACEBOOK_OFFER_CALENDLY_WITH_UTM,
-  FACEBOOK_OFFER_SOCIAL_IMAGE,
-  FACEBOOK_PRIVATE_OFFER_COPY,
-  FACEBOOK_PRIVATE_WEBSITE_PRICE,
-  FOUNDING_PARTNER_BUILD_SLOTS,
-  FOUNDING_PARTNER_OFFER_SENTENCE,
-  FOUNDING_PARTNER_PATH_CARD_SUMMARY,
-  FOUNDING_PARTNER_SEO_LABEL,
-  FOUNDING_PARTNER_SEO_MONTHLY,
-  FOUNDING_PARTNER_WHY_SENTENCE,
-  MONTHLY_LOCAL_SEO_PRICE,
-  PRIVATE_FACEBOOK_LABEL,
-  PUBLIC_PAYMENT_STRUCTURE_COPY,
-  PUBLIC_PRICING_PILL,
-  STANDARD_WEBSITE_STARTING_PRICE,
-} from '../lib/offers';
-import Layout from '../layouts/Layout.astro';
-import { businessProfile } from '../lib/seo';
-import fullLogo from '../assets/FullLogo.png';
+	FACEBOOK_OFFER_CALENDLY_WITH_UTM,
+	FACEBOOK_OFFER_SOCIAL_IMAGE,
+	FACEBOOK_PRIVATE_OFFER_COPY,
+	FACEBOOK_PRIVATE_WEBSITE_PRICE,
+	FOUNDING_PARTNER_BUILD_SLOTS,
+	FOUNDING_PARTNER_OFFER_SENTENCE,
+	FOUNDING_PARTNER_PATH_CARD_SUMMARY,
+	FOUNDING_PARTNER_SEO_LABEL,
+	FOUNDING_PARTNER_SEO_MONTHLY,
+	FOUNDING_PARTNER_WHY_SENTENCE,
+	MONTHLY_LOCAL_SEO_PRICE,
+	PRIVATE_FACEBOOK_LABEL,
+	PUBLIC_PAYMENT_STRUCTURE_COPY,
+	PUBLIC_PRICING_PILL,
+	STANDARD_WEBSITE_STARTING_PRICE,
+} from "../lib/offers";
+import { businessProfile } from "../lib/seo";
 
-const directEmailHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent('Private Facebook Offer — review request')}`;
+const directEmailHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Private Facebook Offer — review request")}`;
 
 const offerPills = [
-  `${PRIVATE_FACEBOOK_LABEL} · ${FACEBOOK_PRIVATE_WEBSITE_PRICE} invite rate`,
-  `${FOUNDING_PARTNER_BUILD_SLOTS} launch pilot spots · ${FOUNDING_PARTNER_SEO_MONTHLY}/mo ${FOUNDING_PARTNER_SEO_LABEL}`,
-  `${PUBLIC_PAYMENT_STRUCTURE_COPY}`,
+	`${PRIVATE_FACEBOOK_LABEL} · ${FACEBOOK_PRIVATE_WEBSITE_PRICE} invite rate`,
+	`${FOUNDING_PARTNER_BUILD_SLOTS} launch pilot spots · ${FOUNDING_PARTNER_SEO_MONTHLY}/mo ${FOUNDING_PARTNER_SEO_LABEL}`,
+	`${PUBLIC_PAYMENT_STRUCTURE_COPY}`,
 ];
 
 const pathCards = [
-  {
-    eyebrow: 'Best if you qualify',
-    title: 'Founding partner program',
-    body: FOUNDING_PARTNER_PATH_CARD_SUMMARY,
-    cta: 'Book a 15-minute intro call',
-    href: FACEBOOK_OFFER_CALENDLY_WITH_UTM,
-    isCalendly: true,
-  },
-  {
-    eyebrow: 'Invite-only Facebook',
-    title: `${FACEBOOK_PRIVATE_WEBSITE_PRICE} private build`,
-    body: `${FACEBOOK_PRIVATE_OFFER_COPY} First 3 months of local SEO included, then ${MONTHLY_LOCAL_SEO_PRICE}/month if you want ongoing visibility.`,
-    cta: 'Get a private review',
-    href: '#claim-offer',
-    isCalendly: false,
-  },
+	{
+		eyebrow: "Best if you qualify",
+		title: "Founding partner program",
+		body: FOUNDING_PARTNER_PATH_CARD_SUMMARY,
+		cta: "Book a 15-minute intro call",
+		href: FACEBOOK_OFFER_CALENDLY_WITH_UTM,
+		isCalendly: true,
+	},
+	{
+		eyebrow: "Invite-only Facebook",
+		title: `${FACEBOOK_PRIVATE_WEBSITE_PRICE} private build`,
+		body: `${FACEBOOK_PRIVATE_OFFER_COPY} First 3 months of local SEO included, then ${MONTHLY_LOCAL_SEO_PRICE}/month if you want ongoing visibility.`,
+		cta: "Get a private review",
+		href: "#claim-offer",
+		isCalendly: false,
+	},
 ];
 
 const deliverables = [
-  {
-    tag: '01',
-    title: 'A site that feels as serious as the business',
-    copy:
-      'Custom structure and copy—not a template skin—so the first click after Facebook feels intentional.',
-  },
-  {
-    tag: '02',
-    title: 'Performance you can feel on mobile',
-    copy:
-      'Lean Astro build, strong Lighthouse scores, and a calmer technical base than typical builder stacks.',
-  },
-  {
-    tag: '03',
-    title: 'Local SEO runway from day one',
-    copy:
-      'The first three months of local SEO are included so launch does not mean flat visibility.',
-  },
-  {
-    tag: '04',
-    title: 'Direct founder communication',
-    copy:
-      'You get a straight read on fit—whether this is a full build, a smaller cleanup, or a founder spot.',
-  },
+	{
+		tag: "01",
+		title: "A site that feels as serious as the business",
+		copy: "Custom structure and copy—not a template skin—so the first click after Facebook feels intentional.",
+	},
+	{
+		tag: "02",
+		title: "Performance you can feel on mobile",
+		copy: "Lean Astro build, strong Lighthouse scores, and a calmer technical base than typical builder stacks.",
+	},
+	{
+		tag: "03",
+		title: "Local SEO runway from day one",
+		copy: "The first three months of local SEO are included so launch does not mean flat visibility.",
+	},
+	{
+		tag: "04",
+		title: "Direct founder communication",
+		copy: "You get a straight read on fit—whether this is a full build, a smaller cleanup, or a founder spot.",
+	},
 ];
 
 const steps = [
-  {
-    n: '01',
-    title: 'Send what people see today',
-    copy: 'Facebook page, website, or both—whatever prospects land on after the ad.',
-  },
-  {
-    n: '02',
-    title: 'Get a clear read within 24 hours',
-    copy: 'Anthony reviews and replies with the honest next step—no generic funnel.',
-  },
-  {
-    n: '03',
-    title: 'Move into build or call if it fits',
-    copy: 'If a rebuild or founder spot makes sense, you get a direct path—book a short call when you are ready.',
-  },
+	{
+		n: "01",
+		title: "Send what people see today",
+		copy: "Facebook page, website, or both—whatever prospects land on after the ad.",
+	},
+	{
+		n: "02",
+		title: "Get a clear read within 24 hours",
+		copy: "Anthony reviews and replies with the honest next step—no generic funnel.",
+	},
+	{
+		n: "03",
+		title: "Move into build or call if it fits",
+		copy: "If a rebuild or founder spot makes sense, you get a direct path—book a short call when you are ready.",
+	},
 ];
 
 const facebookFooterCta = {
-  eyebrow: 'Next step',
-  title: 'See where your site stands in 60 seconds.',
-  description:
-    'Run the free Lighthouse audit, then book a founder review or strategy call when you are ready.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: FACEBOOK_OFFER_CALENDLY_WITH_UTM,
-  secondaryLabel: 'Book a 15-minute intro call',
-  note: 'Same engineering standard as every site we ship.',
+	eyebrow: "Next step",
+	title: "See where your site stands in 60 seconds.",
+	description:
+		"Run the free Lighthouse audit, then book a founder review or strategy call when you are ready.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref: FACEBOOK_OFFER_CALENDLY_WITH_UTM,
+	secondaryLabel: "Book a 15-minute intro call",
+	note: "Same engineering standard as every site we ship.",
 };
 ---
 

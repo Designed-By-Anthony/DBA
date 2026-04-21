@@ -1,58 +1,65 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const seoMonthlySources = [
-  {
-    ...evidenceLinks.googleBusinessProfileLocalRanking,
-    note: 'Google says local ranking is shaped by relevance, distance, and prominence, and that complete business information and reviews help.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileInfoSources,
-    note: 'Google explains that business information can come from the official website, users, and licensed third-party data sources.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileReviews,
-    note: 'Google says review replies are public and help show that a business values customer feedback.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfilePosts,
-    note: 'Google Business Profile posts allow updates, offers, and event information to be shared directly on Search and Maps.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileServices,
-    note: 'Businesses can manage services directly on the profile so the offering stays clear and current.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileLocalLinks,
-    note: 'Google allows direct local business links, including booking and transaction links, to be managed on the profile.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileSocialLinks,
-    note: 'Google supports social media links on the profile so customers can connect the business identity across platforms.',
-  },
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'Structured data helps communicate business details in a machine-readable way on the website side.',
-  },
+	{
+		...evidenceLinks.googleBusinessProfileLocalRanking,
+		note: "Google says local ranking is shaped by relevance, distance, and prominence, and that complete business information and reviews help.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileInfoSources,
+		note: "Google explains that business information can come from the official website, users, and licensed third-party data sources.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileReviews,
+		note: "Google says review replies are public and help show that a business values customer feedback.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfilePosts,
+		note: "Google Business Profile posts allow updates, offers, and event information to be shared directly on Search and Maps.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileServices,
+		note: "Businesses can manage services directly on the profile so the offering stays clear and current.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileLocalLinks,
+		note: "Google allows direct local business links, including booking and transaction links, to be managed on the profile.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileSocialLinks,
+		note: "Google supports social media links on the profile so customers can connect the business identity across platforms.",
+	},
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Structured data helps communicate business details in a machine-readable way on the website side.",
+	},
 ];
 
-const articleImage = '/images/local_seo_cover.png';
-const publishedTime = '2026-04-02T10:30:00-04:00';
+const articleImage = "/images/local_seo_cover.png";
+const publishedTime = "2026-04-02T10:30:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Why Monthly SEO Matters for Local Service Businesses',
-  description:
-    'A practical look at why local SEO needs monthly follow-through, what should be included, and where directory work actually fits.',
-  path: '/blog/why-monthly-seo-matters',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'SEO',
-  keywords: ['Monthly SEO', 'Local SEO', 'Google Business Profile', 'Citations', 'Columbus web design', 'North Country NY'],
+	headline: "Why Monthly SEO Matters for Local Service Businesses",
+	description:
+		"A practical look at why local SEO needs monthly follow-through, what should be included, and where directory work actually fits.",
+	path: "/blog/why-monthly-seo-matters",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "SEO",
+	keywords: [
+		"Monthly SEO",
+		"Local SEO",
+		"Google Business Profile",
+		"Citations",
+		"Columbus web design",
+		"North Country NY",
+	],
 });
 ---
 <Layout

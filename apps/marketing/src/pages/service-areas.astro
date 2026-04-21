@@ -1,98 +1,110 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { PUBLIC_PRICING_PILL } from '../lib/offers';
-import { buildItemListSchema } from '../lib/seo';
+import Layout from "../layouts/Layout.astro";
+import { PUBLIC_PRICING_PILL } from "../lib/offers";
+import { buildItemListSchema } from "../lib/seo";
 
 const areas = [
-  {
-    name: 'Rome',
-    slug: 'rome',
-    region: 'Mohawk Valley',
-    tagline: 'Local pages built for Rome businesses that need stronger trust, faster load times, and cleaner lead flow.',
-  },
-  {
-    name: 'New Hartford',
-    slug: 'new-hartford',
-    region: 'Mohawk Valley',
-    tagline: 'Performance-first pages for New Hartford service businesses competing on polish, trust, and responsiveness.',
-  },
-  {
-    name: 'Utica',
-    slug: 'utica',
-    region: 'Mohawk Valley',
-    tagline: 'City-specific positioning for Utica businesses that need to stand out in a busier local search market.',
-  },
-  {
-    name: 'Clinton',
-    slug: 'clinton',
-    region: 'Mohawk Valley',
-    tagline: 'Credibility-focused web pages for Clinton businesses selling trust, care, and quality at a local level.',
-  },
-  {
-    name: 'Syracuse',
-    slug: 'syracuse',
-    region: 'Central New York',
-    tagline: 'Competitive local pages for Syracuse businesses that need broader coverage and sharper positioning.',
-  },
-  {
-    name: 'North Country',
-    slug: 'north-country',
-    region: 'Northern New York',
-    tagline: 'Service-area strategy for wide travel territories where clarity, speed, and mobile reliability matter most.',
-  },
-  {
-    name: 'Manhattan',
-    slug: 'manhattan',
-    region: 'New York City',
-    tagline: 'High-competition local pages built to feel credible and easy to trust fast.',
-  },
-  {
-    name: 'Miami',
-    slug: 'miami',
-    region: 'South Florida',
-    tagline: 'Local page strategy for fast-moving service markets where positioning matters immediately.',
-  },
-  {
-    name: 'Naples',
-    slug: 'naples',
-    region: 'Southwest Florida',
-    tagline: 'Premium local positioning for service businesses selling trust and responsiveness.',
-  },
-  {
-    name: 'Columbus',
-    slug: 'columbus',
-    region: 'Central Ohio',
-    tagline: 'Local visibility pages built for a growing service market and mobile-first decision-making.',
-  },
-  {
-    name: 'Houston',
-    slug: 'houston',
-    region: 'Southeast Texas',
-    tagline: 'Service-area strategy for a large, competitive market where clarity and coverage matter.',
-  },
+	{
+		name: "Rome",
+		slug: "rome",
+		region: "Mohawk Valley",
+		tagline:
+			"Local pages built for Rome businesses that need stronger trust, faster load times, and cleaner lead flow.",
+	},
+	{
+		name: "New Hartford",
+		slug: "new-hartford",
+		region: "Mohawk Valley",
+		tagline:
+			"Performance-first pages for New Hartford service businesses competing on polish, trust, and responsiveness.",
+	},
+	{
+		name: "Utica",
+		slug: "utica",
+		region: "Mohawk Valley",
+		tagline:
+			"City-specific positioning for Utica businesses that need to stand out in a busier local search market.",
+	},
+	{
+		name: "Clinton",
+		slug: "clinton",
+		region: "Mohawk Valley",
+		tagline:
+			"Credibility-focused web pages for Clinton businesses selling trust, care, and quality at a local level.",
+	},
+	{
+		name: "Syracuse",
+		slug: "syracuse",
+		region: "Central New York",
+		tagline:
+			"Competitive local pages for Syracuse businesses that need broader coverage and sharper positioning.",
+	},
+	{
+		name: "North Country",
+		slug: "north-country",
+		region: "Northern New York",
+		tagline:
+			"Service-area strategy for wide travel territories where clarity, speed, and mobile reliability matter most.",
+	},
+	{
+		name: "Manhattan",
+		slug: "manhattan",
+		region: "New York City",
+		tagline:
+			"High-competition local pages built to feel credible and easy to trust fast.",
+	},
+	{
+		name: "Miami",
+		slug: "miami",
+		region: "South Florida",
+		tagline:
+			"Local page strategy for fast-moving service markets where positioning matters immediately.",
+	},
+	{
+		name: "Naples",
+		slug: "naples",
+		region: "Southwest Florida",
+		tagline:
+			"Premium local positioning for service businesses selling trust and responsiveness.",
+	},
+	{
+		name: "Columbus",
+		slug: "columbus",
+		region: "Central Ohio",
+		tagline:
+			"Local visibility pages built for a growing service market and mobile-first decision-making.",
+	},
+	{
+		name: "Houston",
+		slug: "houston",
+		region: "Southeast Texas",
+		tagline:
+			"Service-area strategy for a large, competitive market where clarity and coverage matter.",
+	},
 ];
 
 const serviceAreasSchema = buildItemListSchema({
-  name: 'Service Areas',
-  description:
-    'Designed by Anthony provides custom web design, website rescue, managed hosting, and local SEO for service businesses across its active service areas.',
-  path: '/service-areas',
-  items: areas.map((area) => ({
-    name: area.name,
-    url: `/service-areas/${area.slug}`,
-    description: area.tagline,
-  })),
+	name: "Service Areas",
+	description:
+		"Designed by Anthony provides custom web design, website rescue, managed hosting, and local SEO for service businesses across its active service areas.",
+	path: "/service-areas",
+	items: areas.map((area) => ({
+		name: area.name,
+		url: `/service-areas/${area.slug}`,
+		description: area.tagline,
+	})),
 });
 
 const serviceAreasFooterCta = {
-  eyebrow: 'Local Website Audit',
-  title: 'Want to see what your site looks like in your market?',
-  description:
-    'Use the audit and I will show you the clearest trust, conversion, and visibility gaps for the city or region you care about most.',
-  primaryHref: '/contact',
-  primaryLabel: 'Get a Free Market Audit',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
+	eyebrow: "Local Website Audit",
+	title: "Want to see what your site looks like in your market?",
+	description:
+		"Use the audit and I will show you the clearest trust, conversion, and visibility gaps for the city or region you care about most.",
+	primaryHref: "/contact",
+	primaryLabel: "Get a Free Market Audit",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
 };
 ---
 

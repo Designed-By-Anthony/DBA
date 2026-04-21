@@ -9,4 +9,3 @@ export function createPortalOfflineCacheKey(
 		.digest("hex")
 		.slice(0, 24);
 }
-

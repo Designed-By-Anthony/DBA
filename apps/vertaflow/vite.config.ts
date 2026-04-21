@@ -11,7 +11,10 @@ export default defineConfig(({ mode }) => {
 		turnstileSiteKey: env.VITE_PUBLIC_TURNSTILE_SITE_KEY ?? "",
 		crmDefaultAgencyId: env.VITE_CRM_DEFAULT_AGENCY_ID ?? "",
 	});
-	const turnstileKey = (env.VITE_PUBLIC_TURNSTILE_SITE_KEY ?? "").replace(/"/g, "");
+	const turnstileKey = (env.VITE_PUBLIC_TURNSTILE_SITE_KEY ?? "").replace(
+		/"/g,
+		"",
+	);
 
 	return {
 		plugins: [

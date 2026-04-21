@@ -4,16 +4,20 @@
  * Mirrors the inline bootstrap on marketing (Layout.astro).
  */
 (() => {
-  if (typeof window === "undefined" || !window.trustedTypes || !window.trustedTypes.createPolicy) {
-    return;
-  }
-  try {
-    window.trustedTypes.createPolicy("default", {
-      createHTML: (s) => s,
-      createScript: (s) => s,
-      createScriptURL: (s) => s,
-    });
-  } catch {
-    /* duplicate policy name if already registered */
-  }
+	if (
+		typeof window === "undefined" ||
+		!window.trustedTypes ||
+		!window.trustedTypes.createPolicy
+	) {
+		return;
+	}
+	try {
+		window.trustedTypes.createPolicy("default", {
+			createHTML: (s) => s,
+			createScript: (s) => s,
+			createScriptURL: (s) => s,
+		});
+	} catch {
+		/* duplicate policy name if already registered */
+	}
 })();

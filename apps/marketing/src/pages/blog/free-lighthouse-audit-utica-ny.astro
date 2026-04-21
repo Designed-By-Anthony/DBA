@@ -1,29 +1,30 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import { buildBlogPostingSchema } from '../../lib/seo';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
-const articleImage = '/images/lighthouse_audit_cover.png';
-const publishedTime = '2026-04-07T22:00:00-04:00';
+const articleImage = "/images/lighthouse_audit_cover.png";
+const publishedTime = "2026-04-07T22:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Free Lighthouse Website Audit for Utica, Rome & Central NY Service Businesses',
-  description:
-    'Free Lighthouse audit for Utica, Rome, Syracuse, and CNY service businesses—performance, a11y, and SEO scores in about a minute.',
-  path: '/blog/free-lighthouse-audit-utica-ny',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Local SEO',
-  keywords: [
-    'free website audit Utica NY',
-    'lighthouse audit Rome NY',
-    'website performance test Central New York',
-    'contractor website speed Utica',
-    'local SEO audit Mohawk Valley',
-    'free website speed test Syracuse NY',
-    'Google Lighthouse service business',
-  ],
+	headline:
+		"Free Lighthouse Website Audit for Utica, Rome & Central NY Service Businesses",
+	description:
+		"Free Lighthouse audit for Utica, Rome, Syracuse, and CNY service businesses—performance, a11y, and SEO scores in about a minute.",
+	path: "/blog/free-lighthouse-audit-utica-ny",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Local SEO",
+	keywords: [
+		"free website audit Utica NY",
+		"lighthouse audit Rome NY",
+		"website performance test Central New York",
+		"contractor website speed Utica",
+		"local SEO audit Mohawk Valley",
+		"free website speed test Syracuse NY",
+		"Google Lighthouse service business",
+	],
 });
 ---
 <Layout

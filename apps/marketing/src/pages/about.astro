@@ -1,36 +1,37 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 import {
-  FOUNDING_PARTNER_BUILD_SLOTS,
-  FOUNDING_PARTNER_SEO_MONTHLY,
-  PUBLIC_SITE_SOCIAL_IMAGE,
-} from '../lib/offers';
-import { PERSON_ID, toAbsoluteUrl, type SchemaValue } from '../lib/seo';
+	FOUNDING_PARTNER_BUILD_SLOTS,
+	FOUNDING_PARTNER_SEO_MONTHLY,
+	PUBLIC_SITE_SOCIAL_IMAGE,
+} from "../lib/offers";
+import { PERSON_ID, type SchemaValue, toAbsoluteUrl } from "../lib/seo";
 
-const aboutImage = '/images/about_cover.png';
+const aboutImage = "/images/about_cover.png";
 
 const aboutSchema: SchemaValue = {
-  '@context': 'https://schema.org',
-  '@type': 'AboutPage',
-  '@id': `${toAbsoluteUrl('/about')}#about`,
-  url: toAbsoluteUrl('/about'),
-  name: 'About | Designed by Anthony',
-  description:
-    'Anthony is a Marine Corps veteran and technical sales professional who builds custom websites for service businesses that need to win more customers online.',
-  mainEntity: {
-    '@id': PERSON_ID,
-  },
+	"@context": "https://schema.org",
+	"@type": "AboutPage",
+	"@id": `${toAbsoluteUrl("/about")}#about`,
+	url: toAbsoluteUrl("/about"),
+	name: "About | Designed by Anthony",
+	description:
+		"Anthony is a Marine Corps veteran and technical sales professional who builds custom websites for service businesses that need to win more customers online.",
+	mainEntity: {
+		"@id": PERSON_ID,
+	},
 };
 
 const aboutFooterCta = {
-  eyebrow: "Let's Talk",
-  title: 'Get a clear baseline before you commit to anything.',
-  description:
-    'Run the free audit first, then book a short intro call if you want a direct recommendation on what to fix next.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
+	eyebrow: "Let's Talk",
+	title: "Get a clear baseline before you commit to anything.",
+	description:
+		"Run the free audit first, then book a short intro call if you want a direct recommendation on what to fix next.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
 };
 ---
 

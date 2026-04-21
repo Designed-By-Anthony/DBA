@@ -25,118 +25,122 @@ import { optionalUrl, validateEnv } from "./shared";
  * split where marketing truly has its own Vercel project.
  */
 const ENV_BLEED_KEYS = [
-  "CLERK_SECRET_KEY",
-  "DATABASE_URL",
-  "STRIPE_SECRET_KEY",
-  "STRIPE_WEBHOOK_SECRET",
-  "LEAD_WEBHOOK_SECRET",
-  "GOOGLE_PAGESPEED_API_KEY",
-  "GEMINI_API_KEY",
-  "BROWSERBASE_API_KEY",
-  "OPENAI_API_KEY",
+	"CLERK_SECRET_KEY",
+	"DATABASE_URL",
+	"STRIPE_SECRET_KEY",
+	"STRIPE_WEBHOOK_SECRET",
+	"LEAD_WEBHOOK_SECRET",
+	"GOOGLE_PAGESPEED_API_KEY",
+	"GEMINI_API_KEY",
+	"BROWSERBASE_API_KEY",
+	"OPENAI_API_KEY",
 ] as const;
 
 function detectEnvBleed(
-  env: Record<string, string | undefined>,
-  fallback: NodeJS.ProcessEnv = process.env,
+	env: Record<string, string | undefined>,
+	fallback: NodeJS.ProcessEnv = process.env,
 ): string[] {
-  const out: string[] = [];
-  for (const key of ENV_BLEED_KEYS) {
-    const value = env[key] ?? fallback[key];
-    if (value && value.length > 0) out.push(key);
-  }
-  return out;
+	const out: string[] = [];
+	for (const key of ENV_BLEED_KEYS) {
+		const value = env[key] ?? fallback[key];
+		if (value && value.length > 0) out.push(key);
+	}
+	return out;
 }
 
 const marketingSchema = z
-  .object({
-    NODE_ENV: z.enum(["development", "test", "production"]).optional(),
-    VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
-    VERCEL: z.string().optional(),
+	.object({
+		NODE_ENV: z.enum(["development", "test", "production"]).optional(),
+		VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
+		VERCEL: z.string().optional(),
 
-    PUBLIC_CRM_LEAD_URL: optionalUrl,
-    PUBLIC_API_URL: optionalUrl,
-    PUBLIC_TURNSTILE_SITE_KEY: z.string().trim().optional(),
-    PUBLIC_SENTRY_DSN: optionalUrl,
+		PUBLIC_CRM_LEAD_URL: optionalUrl,
+		PUBLIC_API_URL: optionalUrl,
+		PUBLIC_TURNSTILE_SITE_KEY: z.string().trim().optional(),
+		PUBLIC_SENTRY_DSN: optionalUrl,
 
-    INDEXNOW_KEY: z.string().trim().optional(),
-    INDEXNOW_ENDPOINT: optionalUrl,
-    INDEXNOW_FALLBACK_ENDPOINTS: z.string().trim().optional(),
+		INDEXNOW_KEY: z.string().trim().optional(),
+		INDEXNOW_ENDPOINT: optionalUrl,
+		INDEXNOW_FALLBACK_ENDPOINTS: z.string().trim().optional(),
 
-    SENTRY_AUTH_TOKEN: z.string().trim().optional(),
-    SENTRY_ORG: z.string().trim().optional(),
-    SENTRY_PROJECT: z.string().trim().optional(),
+		SENTRY_AUTH_TOKEN: z.string().trim().optional(),
+		SENTRY_ORG: z.string().trim().optional(),
+		SENTRY_PROJECT: z.string().trim().optional(),
 
-    MARKETING_STRICT_ENV_BLEED: z.string().trim().optional(),
+		MARKETING_STRICT_ENV_BLEED: z.string().trim().optional(),
 
-    // Apex Vercel project also ships the host-based middleware. These
-    // upstreams are allowed to be unset (middleware falls through) but
-    // if present they must be valid URLs.
-    ADMIN_UPSTREAM_URL: optionalUrl,
-    ACCOUNTS_UPSTREAM_URL: optionalUrl,
-    LIGHTHOUSE_UPSTREAM_URL: optionalUrl,
+		// Apex Vercel project also ships the host-based middleware. These
+		// upstreams are allowed to be unset (middleware falls through) but
+		// if present they must be valid URLs.
+		ADMIN_UPSTREAM_URL: optionalUrl,
+		ACCOUNTS_UPSTREAM_URL: optionalUrl,
+		LIGHTHOUSE_UPSTREAM_URL: optionalUrl,
 
-    /** GetStream Chat — marketing site widget (optional; off unless PUBLIC_ENABLE_STREAM_CHAT=1) */
-    PUBLIC_ENABLE_STREAM_CHAT: z.string().trim().optional(),
-    PUBLIC_STREAM_CHAT_API_KEY: z.string().trim().optional(),
-    STREAM_CHAT_SECRET: z.string().trim().optional(),
-    STREAM_CHAT_INBOX_USER_ID: z.string().trim().optional(),
-    STREAM_CHAT_INBOX_NAME: z.string().trim().optional(),
-  })
-  .passthrough()
-  .superRefine((env, ctx) => {
-    // Only on Vercel builds; local / cloud-agent machines share one env.
-    if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
+		/** GetStream Chat — marketing site widget (optional; off unless PUBLIC_ENABLE_STREAM_CHAT=1) */
+		PUBLIC_ENABLE_STREAM_CHAT: z.string().trim().optional(),
+		PUBLIC_STREAM_CHAT_API_KEY: z.string().trim().optional(),
+		STREAM_CHAT_SECRET: z.string().trim().optional(),
+		STREAM_CHAT_INBOX_USER_ID: z.string().trim().optional(),
+		STREAM_CHAT_INBOX_NAME: z.string().trim().optional(),
+	})
+	.passthrough()
+	.superRefine((env, ctx) => {
+		// Only on Vercel builds; local / cloud-agent machines share one env.
+		if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
 
-    // Fail-hard when either:
-    //   a) MARKETING_STRICT_ENV_BLEED=1 (explicit opt-in), OR
-    //   b) ADMIN_UPSTREAM_URL is present — the 3-Vercel-project split is
-    //      in effect, so CRM secrets must NOT be on the marketing build.
-    const strict =
-      env.MARKETING_STRICT_ENV_BLEED === "1" ||
-      env.MARKETING_STRICT_ENV_BLEED === "true" ||
-      process.env.MARKETING_STRICT_ENV_BLEED === "1" ||
-      process.env.MARKETING_STRICT_ENV_BLEED === "true";
-    const hasThreeProjectSplit =
-      typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
-        "string" &&
-      ((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
-        .length > 0;
-    if (!strict && !hasThreeProjectSplit) return;
+		// Fail-hard when either:
+		//   a) MARKETING_STRICT_ENV_BLEED=1 (explicit opt-in), OR
+		//   b) ADMIN_UPSTREAM_URL is present — the 3-Vercel-project split is
+		//      in effect, so CRM secrets must NOT be on the marketing build.
+		const strict =
+			env.MARKETING_STRICT_ENV_BLEED === "1" ||
+			env.MARKETING_STRICT_ENV_BLEED === "true" ||
+			process.env.MARKETING_STRICT_ENV_BLEED === "1" ||
+			process.env.MARKETING_STRICT_ENV_BLEED === "true";
+		const hasThreeProjectSplit =
+			typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
+				"string" &&
+			((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
+				.length > 0;
+		if (!strict && !hasThreeProjectSplit) return;
 
-
-    const source = env as unknown as Record<string, string | undefined>;
-    for (const key of detectEnvBleed(source)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [key],
-        message: `${key} must not be set on the marketing project — it belongs to Agency OS / Lighthouse (env-bleed detected). Remove it from this project's Vercel env, or unset MARKETING_STRICT_ENV_BLEED if the single-project deploy is intentional.`,
-      });
-    }
-  });
+		const source = env as unknown as Record<string, string | undefined>;
+		for (const key of detectEnvBleed(source)) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: [key],
+				message: `${key} must not be set on the marketing project — it belongs to Agency OS / Lighthouse (env-bleed detected). Remove it from this project's Vercel env, or unset MARKETING_STRICT_ENV_BLEED if the single-project deploy is intentional.`,
+			});
+		}
+	});
 
 export type MarketingEnv = z.infer<typeof marketingSchema>;
 
-export function validateMarketingEnv(env: NodeJS.ProcessEnv = process.env): MarketingEnv {
-  const result = validateEnv("marketing (Astro)", marketingSchema, env);
+export function validateMarketingEnv(
+	env: NodeJS.ProcessEnv = process.env,
+): MarketingEnv {
+	const result = validateEnv("marketing (Astro)", marketingSchema, env);
 
-  // Non-strict path: still log the bleed so it isn't silently ignored.
-  const onVercel = env.VERCEL === "1" || process.env.VERCEL === "1";
-  const strict =
-    env.MARKETING_STRICT_ENV_BLEED === "1" ||
-    env.MARKETING_STRICT_ENV_BLEED === "true";
-  if (onVercel && !strict) {
-    const bleed = detectEnvBleed(env as unknown as Record<string, string | undefined>, env);
-    if (bleed.length > 0) {
-      console.warn(
-        `[marketing (Astro)] env-bleed: ${bleed.join(", ")} ${
-          bleed.length === 1 ? "is" : "are"
-        } set on this build. If you run the 3-Vercel-project split (marketing / web-viewer / lighthouse), remove these from the marketing project. If you run a single Vercel project, this warning is informational — set MARKETING_STRICT_ENV_BLEED=1 to fail the build loudly instead.`,
-      );
-    }
-  }
+	// Non-strict path: still log the bleed so it isn't silently ignored.
+	const onVercel = env.VERCEL === "1" || process.env.VERCEL === "1";
+	const strict =
+		env.MARKETING_STRICT_ENV_BLEED === "1" ||
+		env.MARKETING_STRICT_ENV_BLEED === "true";
+	if (onVercel && !strict) {
+		const bleed = detectEnvBleed(
+			env as unknown as Record<string, string | undefined>,
+			env,
+		);
+		if (bleed.length > 0) {
+			console.warn(
+				`[marketing (Astro)] env-bleed: ${bleed.join(", ")} ${
+					bleed.length === 1 ? "is" : "are"
+				} set on this build. If you run the 3-Vercel-project split (marketing / web-viewer / lighthouse), remove these from the marketing project. If you run a single Vercel project, this warning is informational — set MARKETING_STRICT_ENV_BLEED=1 to fail the build loudly instead.`,
+			);
+		}
+	}
 
-  return result;
+	return result;
 }
 
 export { marketingSchema };

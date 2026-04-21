@@ -1,41 +1,46 @@
 ---
-import { Image } from 'astro:assets';
-import Layout from '../../layouts/Layout.astro';
-import { showcaseItems } from '../../data/showcase';
-import { releases } from '../../data/releases';
-import { buildBlogPostingSchema } from '../../lib/seo';
+import { Image } from "astro:assets";
+import { releases } from "../../data/releases";
+import { showcaseItems } from "../../data/showcase";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
-const project = showcaseItems.find((item) => item.caseStudySlug === 'the-long-beach-handyman')!;
-const release = releases.find((item) => item.url === '/portfolio/the-long-beach-handyman')!;
+const project = showcaseItems.find(
+	(item) => item.caseStudySlug === "the-long-beach-handyman",
+)!;
+const release = releases.find(
+	(item) => item.url === "/portfolio/the-long-beach-handyman",
+)!;
 
 const caseStudySchema = buildBlogPostingSchema({
-  headline: release.title,
-  description: release.excerpt,
-  path: '/portfolio/the-long-beach-handyman',
-  image: project.image!,
-  datePublished: release.publishedTime,
-  articleSection: 'Case Study',
-  keywords: [
-    'handyman website',
-    'client build',
-    'custom web design',
-    'Long Beach CA',
-    'Storyblok CMS',
-    'lead generation website',
-    'local SEO',
-    'contractor website',
-  ],
+	headline: release.title,
+	description: release.excerpt,
+	path: "/portfolio/the-long-beach-handyman",
+	image: project.image!,
+	datePublished: release.publishedTime,
+	articleSection: "Case Study",
+	keywords: [
+		"handyman website",
+		"client build",
+		"custom web design",
+		"Long Beach CA",
+		"Storyblok CMS",
+		"lead generation website",
+		"local SEO",
+		"contractor website",
+	],
 });
 
 const footerCta = {
-  eyebrow: 'Want a Site Like This?',
-  title: 'See where your current site stands first.',
-  description:
-    'Run the free audit for an instant baseline, then book a short call if you want a direct recommendation.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
+	eyebrow: "Want a Site Like This?",
+	title: "See where your current site stands first.",
+	description:
+		"Run the free audit for an instant baseline, then book a short call if you want a direct recommendation.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
 };
 ---
 

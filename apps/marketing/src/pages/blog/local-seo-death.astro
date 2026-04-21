@@ -1,42 +1,47 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const localSeoPostSources = [
-  {
-    ...evidenceLinks.googleMobileFirst,
-    note: 'Google uses the mobile version of a page for indexing.',
-  },
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'Structured data can help Google understand business details such as hours and departments.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google recommends good Core Web Vitals and strong mobile usability as part of page experience.',
-  },
-  {
-    ...evidenceLinks.astroWhy,
-    note: 'Astro is designed for content-driven websites with less client-side JavaScript.',
-  },
+	{
+		...evidenceLinks.googleMobileFirst,
+		note: "Google uses the mobile version of a page for indexing.",
+	},
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Structured data can help Google understand business details such as hours and departments.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google recommends good Core Web Vitals and strong mobile usability as part of page experience.",
+	},
+	{
+		...evidenceLinks.astroWhy,
+		note: "Astro is designed for content-driven websites with less client-side JavaScript.",
+	},
 ];
 
-const articleImage = '/images/local_seo_visibility_cover.png';
-const publishedTime = '2026-02-28T09:00:00-05:00';
+const articleImage = "/images/local_seo_visibility_cover.png";
+const publishedTime = "2026-02-28T09:00:00-05:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Technical Local SEO for Utica & Central NY Service Businesses',
-  description:
-    'A local SEO guide for Utica, Rome, Syracuse, and Central New York service businesses covering structure, mobile-first SEO, schema, and Map Pack gains.',
-  path: '/blog/local-seo-death',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'SEO',
-  keywords: ['Local SEO', 'Structured data', 'Mobile-first indexing', 'Technical SEO'],
+	headline: "Technical Local SEO for Utica & Central NY Service Businesses",
+	description:
+		"A local SEO guide for Utica, Rome, Syracuse, and Central New York service businesses covering structure, mobile-first SEO, schema, and Map Pack gains.",
+	path: "/blog/local-seo-death",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "SEO",
+	keywords: [
+		"Local SEO",
+		"Structured data",
+		"Mobile-first indexing",
+		"Technical SEO",
+	],
 });
 ---
 <Layout

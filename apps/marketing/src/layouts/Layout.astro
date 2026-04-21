@@ -1,167 +1,176 @@
 ---
-import { Image } from 'astro:assets';
-import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import Analytics from '@vercel/analytics/astro';
-import SpeedInsights from '@vercel/speed-insights/astro';
-import FooterCTA from '../components/FooterCTA.astro';
-import SiteFooter from '../components/SiteFooter.astro';
-import iconLogo from '../assets/IconLogo.png';
-import interLatinNormalWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import { Image } from "astro:assets";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import interLatinNormalWoff2 from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
+import iconLogo from "../assets/IconLogo.png";
+import FooterCTA from "../components/FooterCTA.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 
-import '@fontsource-variable/outfit/wght.css';
-import outfitLatinWoff2 from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
-import '@fontsource-variable/fraunces';
-import '@fontsource/abril-fatface/latin-400.css';
-import abrilFatfaceLatinWoff2 from '@fontsource/abril-fatface/files/abril-fatface-latin-400-normal.woff2?url';
-import '@dba/theme/dba-global.css';
-import { MONTHLY_LOCAL_SEO_PRICE } from '../lib/offers';
-import StreamChatWidget from '../components/StreamChatWidget.astro';
+import "@fontsource-variable/outfit/wght.css";
+import outfitLatinWoff2 from "@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url";
+import "@fontsource-variable/fraunces";
+import "@fontsource/abril-fatface/latin-400.css";
+import abrilFatfaceLatinWoff2 from "@fontsource/abril-fatface/files/abril-fatface-latin-400-normal.woff2?url";
+import "@dba/theme/dba-global.css";
+import StreamChatWidget from "../components/StreamChatWidget.astro";
+import { MONTHLY_LOCAL_SEO_PRICE } from "../lib/offers";
 import {
-  DEFAULT_SOCIAL_IMAGE,
-  GA_MEASUREMENT_ID,
-  ORGANIZATION_ID,
-  WEBSITE_ID,
-  buildAgencyOsSoftwareApplicationSchema,
-  buildBaseOrganizationSchema,
-  buildFounderPersonSchema,
-  buildBaseWebsiteSchema,
-  buildBreadcrumbSchema,
-  buildBreadcrumbs,
-  buildImageObject,
-  businessProfile,
-  normalizePath,
-  stripSiteSuffix,
-  toAbsoluteUrl,
-  type SchemaValue,
-} from '../lib/seo';
+	buildAgencyOsSoftwareApplicationSchema,
+	buildBaseOrganizationSchema,
+	buildBaseWebsiteSchema,
+	buildBreadcrumbSchema,
+	buildBreadcrumbs,
+	buildFounderPersonSchema,
+	buildImageObject,
+	businessProfile,
+	DEFAULT_SOCIAL_IMAGE,
+	GA_MEASUREMENT_ID,
+	normalizePath,
+	ORGANIZATION_ID,
+	type SchemaValue,
+	stripSiteSuffix,
+	toAbsoluteUrl,
+	WEBSITE_ID,
+} from "../lib/seo";
 
 export interface Props {
-  title: string;
-  description: string;
-  image?: string;
-  socialImage?: string;
-  ogType?: 'website' | 'article';
-  pageType?: string;
-  breadcrumbLabel?: string;
-  hideBreadcrumbs?: boolean;
-  minimalChrome?: boolean;
-  noindex?: boolean;
-  schema?: SchemaValue | SchemaValue[];
-  publishedTime?: string;
-  modifiedTime?: string;
-  articleSection?: string;
-  articleTags?: string[];
-  bodyClass?: string;
-  priorityAnalytics?: boolean;
-  hidePreFooterCTA?: boolean;
-  footerCta?: {
-    eyebrow: string;
-    title: string;
-    description: string;
-    primaryHref: string;
-    primaryLabel: string;
-    secondaryHref?: string;
-    secondaryLabel?: string;
-    note?: string;
-  };
+	title: string;
+	description: string;
+	image?: string;
+	socialImage?: string;
+	ogType?: "website" | "article";
+	pageType?: string;
+	breadcrumbLabel?: string;
+	hideBreadcrumbs?: boolean;
+	minimalChrome?: boolean;
+	noindex?: boolean;
+	schema?: SchemaValue | SchemaValue[];
+	publishedTime?: string;
+	modifiedTime?: string;
+	articleSection?: string;
+	articleTags?: string[];
+	bodyClass?: string;
+	priorityAnalytics?: boolean;
+	hidePreFooterCTA?: boolean;
+	footerCta?: {
+		eyebrow: string;
+		title: string;
+		description: string;
+		primaryHref: string;
+		primaryLabel: string;
+		secondaryHref?: string;
+		secondaryLabel?: string;
+		note?: string;
+	};
 }
 
 const {
-  title,
-  description,
-  image,
-  socialImage: customSocialImage,
-  ogType = 'website',
-  pageType = 'WebPage',
-  breadcrumbLabel,
-  hideBreadcrumbs = false,
-  minimalChrome = false,
-  noindex = false,
-  schema,
-  publishedTime,
-  modifiedTime,
-  articleSection,
-  articleTags = [],
-  bodyClass,
-  priorityAnalytics = false,
-  hidePreFooterCTA = false,
-  footerCta,
+	title,
+	description,
+	image,
+	socialImage: customSocialImage,
+	ogType = "website",
+	pageType = "WebPage",
+	breadcrumbLabel,
+	hideBreadcrumbs = false,
+	minimalChrome = false,
+	noindex = false,
+	schema,
+	publishedTime,
+	modifiedTime,
+	articleSection,
+	articleTags = [],
+	bodyClass,
+	priorityAnalytics = false,
+	hidePreFooterCTA = false,
+	footerCta,
 } = Astro.props;
 
 const pathname = normalizePath(Astro.url.pathname);
 const canonicalUrl = toAbsoluteUrl(pathname);
 const pageTitle = breadcrumbLabel ?? stripSiteSuffix(title);
-const socialImage = toAbsoluteUrl(customSocialImage ?? image ?? DEFAULT_SOCIAL_IMAGE);
+const socialImage = toAbsoluteUrl(
+	customSocialImage ?? image ?? DEFAULT_SOCIAL_IMAGE,
+);
 // Hash of bundled script — stable across builds when `site.js` is unchanged (deterministic HTML).
-const siteScriptVersion = createHash('sha256')
-  .update(readFileSync(join(process.cwd(), 'public/scripts/site.js')))
-  .digest('hex')
-  .slice(0, 12);
-const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent('Website inquiry — Designed by Anthony')}`;
+const siteScriptVersion = createHash("sha256")
+	.update(readFileSync(join(process.cwd(), "public/scripts/site.js")))
+	.digest("hex")
+	.slice(0, 12);
+const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
-const enableStreamChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === '1';
+const enableStreamChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === "1";
 
 const robotsContent = noindex
-  ? 'noindex, nofollow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
-const breadcrumbItems = hideBreadcrumbs ? [] : buildBreadcrumbs(pathname, pageTitle);
-const breadcrumbSchema = hideBreadcrumbs ? null : buildBreadcrumbSchema(pathname, breadcrumbItems);
+	? "noindex, nofollow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+	: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+const breadcrumbItems = hideBreadcrumbs
+	? []
+	: buildBreadcrumbs(pathname, pageTitle);
+const breadcrumbSchema = hideBreadcrumbs
+	? null
+	: buildBreadcrumbSchema(pathname, breadcrumbItems);
 const webPageSchema: SchemaValue = {
-  '@context': 'https://schema.org',
-  '@type': pageType,
-  '@id': `${canonicalUrl}#webpage`,
-  url: canonicalUrl,
-  name: pageTitle,
-  description,
-  isPartOf: {
-    '@id': WEBSITE_ID,
-  },
-  about: {
-    '@id': ORGANIZATION_ID,
-  },
-  primaryImageOfPage: buildImageObject(socialImage),
-  breadcrumb: breadcrumbSchema
-    ? {
-        '@id': `${canonicalUrl}#breadcrumb`,
-      }
-    : undefined,
-  inLanguage: 'en-US',
+	"@context": "https://schema.org",
+	"@type": pageType,
+	"@id": `${canonicalUrl}#webpage`,
+	url: canonicalUrl,
+	name: pageTitle,
+	description,
+	isPartOf: {
+		"@id": WEBSITE_ID,
+	},
+	about: {
+		"@id": ORGANIZATION_ID,
+	},
+	primaryImageOfPage: buildImageObject(socialImage),
+	breadcrumb: breadcrumbSchema
+		? {
+				"@id": `${canonicalUrl}#breadcrumb`,
+			}
+		: undefined,
+	inLanguage: "en-US",
 };
 const extraSchemas = Array.isArray(schema) ? schema : schema ? [schema] : [];
 const resolvedFooterCta =
-  footerCta ??
-  (ogType === 'article'
-    ? {
-        eyebrow: 'Apply This to Your Site',
-        title: 'Want a direct read on whether this applies to your website?',
-        description:
-          'Run the free Lighthouse audit to see your performance, accessibility, and SEO scores. If you want a second pair of eyes on what it means, I will reply with a practical next step.',
-        primaryHref: '/free-seo-audit',
-        primaryLabel: 'Run the Free Audit',
-        secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-        secondaryLabel: 'Book a 15-minute intro call',
-        note: 'Instant scores. A human reply within a business day if you ask for one.',
-      }
-    : undefined);
+	footerCta ??
+	(ogType === "article"
+		? {
+				eyebrow: "Apply This to Your Site",
+				title: "Want a direct read on whether this applies to your website?",
+				description:
+					"Run the free Lighthouse audit to see your performance, accessibility, and SEO scores. If you want a second pair of eyes on what it means, I will reply with a practical next step.",
+				primaryHref: "/free-seo-audit",
+				primaryLabel: "Run the Free Audit",
+				secondaryHref:
+					"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+				secondaryLabel: "Book a 15-minute intro call",
+				note: "Instant scores. A human reply within a business day if you ask for one.",
+			}
+		: undefined);
 const structuredData = [
-  buildBaseOrganizationSchema(),
-  buildFounderPersonSchema(),
-  buildBaseWebsiteSchema(),
-  buildAgencyOsSoftwareApplicationSchema(),
-  webPageSchema,
-  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
-  ...extraSchemas,
+	buildBaseOrganizationSchema(),
+	buildFounderPersonSchema(),
+	buildBaseWebsiteSchema(),
+	buildAgencyOsSoftwareApplicationSchema(),
+	webPageSchema,
+	...(breadcrumbSchema ? [breadcrumbSchema] : []),
+	...extraSchemas,
 ];
 
 /** Preconnect to Sentry ingest only when PUBLIC_SENTRY_DSN is set (never embed default DSNs). */
 const sentryDsnForOrigin = import.meta.env.PUBLIC_SENTRY_DSN?.trim();
 let sentryIngestOrigin: string | undefined;
 try {
-  sentryIngestOrigin = sentryDsnForOrigin ? new URL(sentryDsnForOrigin).origin : undefined;
+	sentryIngestOrigin = sentryDsnForOrigin
+		? new URL(sentryDsnForOrigin).origin
+		: undefined;
 } catch {
-  sentryIngestOrigin = undefined;
+	sentryIngestOrigin = undefined;
 }
 ---
 <!DOCTYPE html>

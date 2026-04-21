@@ -7,8 +7,8 @@
  * Creates anonymous guest sessions via the Stream Chat REST API.
  * Routes all messages to the agency inbox user.
  */
-const enableChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === '1';
-const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? '';
+const enableChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === "1";
+const apiKey = import.meta.env.PUBLIC_STREAM_CHAT_API_KEY ?? "";
 ---
 
 {enableChat && apiKey && (

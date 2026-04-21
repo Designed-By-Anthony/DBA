@@ -1,104 +1,108 @@
 ---
-import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
-import { buildServiceAreaSchema } from '../../lib/seo';
+import ServiceAreaPage from "../../components/ServiceAreaPage.astro";
+import { buildServiceAreaSchema } from "../../lib/seo";
 
-const pageTitle = 'Syracuse Web Design Company | Designed by Anthony';
+const pageTitle = "Syracuse Web Design Company | Designed by Anthony";
 const pageDescription =
-  'A Syracuse, NY web design company building custom websites, local SEO, and managed hosting for service businesses competing across Central New York.';
+	"A Syracuse, NY web design company building custom websites, local SEO, and managed hosting for service businesses competing across Central New York.";
 
 const areaSchema = buildServiceAreaSchema({
-  name: 'Web Design and Hosting Services in Syracuse, New York',
-  description: pageDescription,
-  path: '/service-areas/syracuse',
-  areaServed: 'Syracuse, New York',
-  serviceType: 'Web design, hosting, and local SEO',
-  cityName: 'Syracuse',
-  regionName: 'New York',
-  regionAbbr: 'NY',
-  geo: { latitude: 43.0481, longitude: -76.1474 },
+	name: "Web Design and Hosting Services in Syracuse, New York",
+	description: pageDescription,
+	path: "/service-areas/syracuse",
+	areaServed: "Syracuse, New York",
+	serviceType: "Web design, hosting, and local SEO",
+	cityName: "Syracuse",
+	regionName: "New York",
+	regionAbbr: "NY",
+	geo: { latitude: 43.0481, longitude: -76.1474 },
 });
 
 const blocks = [
-  {
-    level: 'h2' as const,
-    title: 'Why Syracuse needs a more competitive local page strategy',
-    paragraphs: [
-      'Syracuse is a bigger, denser, and more competitive market than the Mohawk Valley towns to the east. Businesses are not only competing against local independents. They are also competing against larger regional brands, franchises, and long-established companies that already have stronger digital visibility.',
-      'That means your website has to work harder. It needs a clearer offer, better mobile speed, stronger local SEO signals, and page structure that helps Google understand where you fit in the market.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'One page is rarely enough for the Syracuse metro',
-    paragraphs: [
-      'Customers in Syracuse search with neighborhood and suburb context all the time. A business serving Fayetteville, Liverpool, Camillus, DeWitt, and Syracuse proper usually needs a more segmented page strategy than a single city page can provide. The goal is not to create doorway pages. It is to build useful, specific pages where the market differences are real.',
-    ],
-  },
-  {
-    level: 'h4' as const,
-    title: 'Search competition punishes vague messaging',
-    paragraphs: [
-      'When multiple businesses offer similar services, the site that wins attention is usually the one that explains its value more clearly and removes more hesitation. Sharp copy and fast performance matter because they help people decide faster.',
-    ],
-  },
-  {
-    level: 'h5' as const,
-    title: 'Specific pages beat broad claims in bigger markets',
-    paragraphs: [
-      'The larger the metro gets, the less effective generic city copy becomes. Focused structure gives both Google and the visitor a cleaner reason to trust the page.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Website rescues for Syracuse businesses that need a stronger foundation',
-    paragraphs: [
-      'Plenty of Syracuse businesses already have decent brand awareness but weak digital infrastructure. The site may be old, hard to update, overloaded with plugins, or simply not built for the kind of mobile-heavy traffic the market produces.',
-      'A rescue project rebuilds that foundation around performance, usability, and local search relevance. That gives the business a site that can support future campaigns instead of quietly undermining them.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Protecting existing authority while improving performance',
-    paragraphs: [
-      'If the current site already has backlinks, rankings, and city-specific visibility, the rebuild has to preserve that equity. Redirect discipline, metadata continuity, and service-page clarity are what keep a better site from causing avoidable search volatility.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Hosting and SEO for larger service areas around Syracuse',
-    paragraphs: [
-      'Syracuse service businesses often cover a wider map, which makes strong hosting and page organization more important. Your site needs to stay fast for every visitor while still giving each priority market enough specificity to feel relevant.',
-      'That usually means a dependable hosting setup, targeted service pages, and selective location pages where the opportunity is strong enough to justify the extra depth. Done well, that structure gives the business a more scalable lead system instead of one overloaded city page.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'When Syracuse is the right expansion market',
-    paragraphs: [
-      'For businesses based in Rome, Utica, or elsewhere in Central New York, Syracuse can be a worthwhile expansion page if the business is truly ready to compete there. If not, the better move is often to dominate the home market first with tighter local pages and better conversion flow.',
-    ],
-  },
+	{
+		level: "h2" as const,
+		title: "Why Syracuse needs a more competitive local page strategy",
+		paragraphs: [
+			"Syracuse is a bigger, denser, and more competitive market than the Mohawk Valley towns to the east. Businesses are not only competing against local independents. They are also competing against larger regional brands, franchises, and long-established companies that already have stronger digital visibility.",
+			"That means your website has to work harder. It needs a clearer offer, better mobile speed, stronger local SEO signals, and page structure that helps Google understand where you fit in the market.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "One page is rarely enough for the Syracuse metro",
+		paragraphs: [
+			"Customers in Syracuse search with neighborhood and suburb context all the time. A business serving Fayetteville, Liverpool, Camillus, DeWitt, and Syracuse proper usually needs a more segmented page strategy than a single city page can provide. The goal is not to create doorway pages. It is to build useful, specific pages where the market differences are real.",
+		],
+	},
+	{
+		level: "h4" as const,
+		title: "Search competition punishes vague messaging",
+		paragraphs: [
+			"When multiple businesses offer similar services, the site that wins attention is usually the one that explains its value more clearly and removes more hesitation. Sharp copy and fast performance matter because they help people decide faster.",
+		],
+	},
+	{
+		level: "h5" as const,
+		title: "Specific pages beat broad claims in bigger markets",
+		paragraphs: [
+			"The larger the metro gets, the less effective generic city copy becomes. Focused structure gives both Google and the visitor a cleaner reason to trust the page.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title:
+			"Website rescues for Syracuse businesses that need a stronger foundation",
+		paragraphs: [
+			"Plenty of Syracuse businesses already have decent brand awareness but weak digital infrastructure. The site may be old, hard to update, overloaded with plugins, or simply not built for the kind of mobile-heavy traffic the market produces.",
+			"A rescue project rebuilds that foundation around performance, usability, and local search relevance. That gives the business a site that can support future campaigns instead of quietly undermining them.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Protecting existing authority while improving performance",
+		paragraphs: [
+			"If the current site already has backlinks, rankings, and city-specific visibility, the rebuild has to preserve that equity. Redirect discipline, metadata continuity, and service-page clarity are what keep a better site from causing avoidable search volatility.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Hosting and SEO for larger service areas around Syracuse",
+		paragraphs: [
+			"Syracuse service businesses often cover a wider map, which makes strong hosting and page organization more important. Your site needs to stay fast for every visitor while still giving each priority market enough specificity to feel relevant.",
+			"That usually means a dependable hosting setup, targeted service pages, and selective location pages where the opportunity is strong enough to justify the extra depth. Done well, that structure gives the business a more scalable lead system instead of one overloaded city page.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "When Syracuse is the right expansion market",
+		paragraphs: [
+			"For businesses based in Rome, Utica, or elsewhere in Central New York, Syracuse can be a worthwhile expansion page if the business is truly ready to compete there. If not, the better move is often to dominate the home market first with tighter local pages and better conversion flow.",
+		],
+	},
 ];
 
 const relatedMarkets = [
-  {
-    title: 'Website Design, Hosting & SEO in Utica, NY',
-    href: '/service-areas/utica',
-    description: 'Useful for businesses splitting Central New York coverage between the Utica and Syracuse markets.',
-    tag: 'Utica',
-  },
-  {
-    title: 'Rome NY Website Designer',
-    href: '/service-areas/rome',
-    description: 'A tighter local page for businesses that still need strong Mohawk Valley coverage alongside Syracuse.',
-    tag: 'Rome',
-  },
-  {
-    title: 'North Country NY Web Design',
-    href: '/service-areas/north-country',
-    description: 'Helpful when the service area stretches north into Watertown, Fort Drum, or other wider rural coverage zones.',
-    tag: 'North Country',
-  },
+	{
+		title: "Website Design, Hosting & SEO in Utica, NY",
+		href: "/service-areas/utica",
+		description:
+			"Useful for businesses splitting Central New York coverage between the Utica and Syracuse markets.",
+		tag: "Utica",
+	},
+	{
+		title: "Rome NY Website Designer",
+		href: "/service-areas/rome",
+		description:
+			"A tighter local page for businesses that still need strong Mohawk Valley coverage alongside Syracuse.",
+		tag: "Rome",
+	},
+	{
+		title: "North Country NY Web Design",
+		href: "/service-areas/north-country",
+		description:
+			"Helpful when the service area stretches north into Watertown, Fort Drum, or other wider rural coverage zones.",
+		tag: "North Country",
+	},
 ];
 ---
 

@@ -9,8 +9,8 @@ import {
 	getActivePortalCacheKey,
 	getCachedPortalTickets,
 	getPendingPortalTicketCount,
-	queuePortalTicket,
 	type PortalTicketThread,
+	queuePortalTicket,
 } from "@/lib/offline/portal-offline";
 
 const statusColors: Record<string, string> = {
@@ -35,14 +35,17 @@ export default function PortalTicketsPage() {
 	const [showForm, setShowForm] = useState(false);
 	const [success, setSuccess] = useState("");
 
-	const refreshQueuedTicketCount = useCallback(async (resolvedKey?: string | null) => {
-		const key = resolvedKey ?? cacheKey ?? (await getActivePortalCacheKey());
-		if (!key) {
-			setQueuedTicketCount(0);
-			return;
-		}
-		setQueuedTicketCount(await getPendingPortalTicketCount(key));
-	}, [cacheKey]);
+	const refreshQueuedTicketCount = useCallback(
+		async (resolvedKey?: string | null) => {
+			const key = resolvedKey ?? cacheKey ?? (await getActivePortalCacheKey());
+			if (!key) {
+				setQueuedTicketCount(0);
+				return;
+			}
+			setQueuedTicketCount(await getPendingPortalTicketCount(key));
+		},
+		[cacheKey],
+	);
 
 	const load = useCallback(async () => {
 		try {
@@ -60,13 +63,15 @@ export default function PortalTicketsPage() {
 				tickets?: PortalTicketThread[];
 			};
 			const nextCacheKey =
-				payload.offlineCacheKey ?? cacheKey ?? (await getActivePortalCacheKey());
+				payload.offlineCacheKey ??
+				cacheKey ??
+				(await getActivePortalCacheKey());
 			const nextTickets = payload.tickets || [];
 
 			setTickets(nextTickets);
 			setSelected((current) =>
 				current
-					? nextTickets.find((ticket) => ticket.id === current.id) ?? null
+					? (nextTickets.find((ticket) => ticket.id === current.id) ?? null)
 					: null,
 			);
 			setCacheKey(nextCacheKey);
@@ -88,8 +93,9 @@ export default function PortalTicketsPage() {
 						setTickets(refreshedTickets);
 						setSelected((current) =>
 							current
-								? refreshedTickets.find((ticket) => ticket.id === current.id) ??
-										null
+								? (refreshedTickets.find(
+										(ticket) => ticket.id === current.id,
+									) ?? null)
 								: null,
 						);
 						await cachePortalTickets(nextCacheKey, refreshedTickets);
@@ -107,7 +113,7 @@ export default function PortalTicketsPage() {
 				setTickets(cachedTickets);
 				setSelected((current) =>
 					current
-						? cachedTickets.find((ticket) => ticket.id === current.id) ?? null
+						? (cachedTickets.find((ticket) => ticket.id === current.id) ?? null)
 						: null,
 				);
 				setCacheKey(resolvedKey);
@@ -220,7 +226,9 @@ export default function PortalTicketsPage() {
 
 			{(offlineNotice || queuedTicketCount > 0) && (
 				<div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-					<p>{offlineNotice || "Offline support queue active on this device."}</p>
+					<p>
+						{offlineNotice || "Offline support queue active on this device."}
+					</p>
 					{queuedTicketCount > 0 && (
 						<p className="mt-1 text-xs text-amber-200/90">
 							{queuedTicketCount} pending ticket

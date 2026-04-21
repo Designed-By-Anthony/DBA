@@ -1,5 +1,5 @@
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { sql } from "drizzle-orm";
+import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "../schema";
 
@@ -12,42 +12,45 @@ let _pool: pg.Pool | null = null;
 
 /** Postgres + driver codes for dropped / recycled connections (Neon suspend, PgBouncer, admin SIGTERM). */
 function isTransientConnectionError(err: unknown): boolean {
-  if (!err || typeof err !== "object") return false;
-  const e = err as { code?: string; message?: string };
-  const code = e.code;
-  if (
-    code === "57P01" ||
-    code === "57P02" ||
-    code === "57P03" ||
-    code === "08006" ||
-    code === "08003" ||
-    code === "08000"
-  ) {
-    return true;
-  }
-  const msg = String(e.message ?? err);
-  return /terminating connection|connection terminated|server closed the connection|ECONNRESET|EPIPE|Connection terminated unexpectedly/i.test(
-    msg,
-  );
+	if (!err || typeof err !== "object") return false;
+	const e = err as { code?: string; message?: string };
+	const code = e.code;
+	if (
+		code === "57P01" ||
+		code === "57P02" ||
+		code === "57P03" ||
+		code === "08006" ||
+		code === "08003" ||
+		code === "08000"
+	) {
+		return true;
+	}
+	const msg = String(e.message ?? err);
+	return /terminating connection|connection terminated|server closed the connection|ECONNRESET|EPIPE|Connection terminated unexpectedly/i.test(
+		msg,
+	);
 }
 
-async function runWithTransientRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
-  try {
-    return await fn();
-  } catch (first) {
-    if (!isTransientConnectionError(first)) throw first;
-    try {
-      return await fn();
-    } catch (second) {
-      if (isTransientConnectionError(second)) {
-        throw new Error(
-          `${label}: database connection dropped after retry (${(second as Error).message})`,
-          { cause: second },
-        );
-      }
-      throw second;
-    }
-  }
+async function runWithTransientRetry<T>(
+	label: string,
+	fn: () => Promise<T>,
+): Promise<T> {
+	try {
+		return await fn();
+	} catch (first) {
+		if (!isTransientConnectionError(first)) throw first;
+		try {
+			return await fn();
+		} catch (second) {
+			if (isTransientConnectionError(second)) {
+				throw new Error(
+					`${label}: database connection dropped after retry (${(second as Error).message})`,
+					{ cause: second },
+				);
+			}
+			throw second;
+		}
+	}
 }
 
 /**
@@ -67,35 +70,43 @@ async function runWithTransientRetry<T>(label: string, fn: () => Promise<T>): Pr
  * so `pg` picks up the CA.
  */
 function resolveSslConfig(url: string): pg.PoolConfig["ssl"] {
-  const raw = process.env.DATABASE_SSL?.trim().toLowerCase();
-  const explicitOn = raw === "true" || raw === "1";
-  const explicitOff = raw === "false" || raw === "0";
+	const raw = process.env.DATABASE_SSL?.trim().toLowerCase();
+	const explicitOn = raw === "true" || raw === "1";
+	const explicitOff = raw === "false" || raw === "0";
 
-  let sslmode: string | undefined;
-  try {
-    const parsed = new URL(url);
-    sslmode = parsed.searchParams.get("sslmode")?.toLowerCase() ?? undefined;
-  } catch {
-    sslmode = undefined;
-  }
+	let sslmode: string | undefined;
+	try {
+		const parsed = new URL(url);
+		sslmode = parsed.searchParams.get("sslmode")?.toLowerCase() ?? undefined;
+	} catch {
+		sslmode = undefined;
+	}
 
-  if (explicitOff && !sslmode) return undefined;
-  if (sslmode === "disable") return undefined;
+	if (explicitOff && !sslmode) return undefined;
+	if (sslmode === "disable") return undefined;
 
-  if (sslmode === "verify-full" || sslmode === "verify-ca") {
-    return { rejectUnauthorized: true };
-  }
+	if (sslmode === "verify-full" || sslmode === "verify-ca") {
+		return { rejectUnauthorized: true };
+	}
 
-  if (explicitOn || sslmode === "require" || sslmode === "prefer" || sslmode === "allow") {
-    return { rejectUnauthorized: true };
-  }
+	if (
+		explicitOn ||
+		sslmode === "require" ||
+		sslmode === "prefer" ||
+		sslmode === "allow"
+	) {
+		return { rejectUnauthorized: true };
+	}
 
-  // Production default — public Postgres endpoints require SSL.
-  if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
-    return { rejectUnauthorized: true };
-  }
+	// Production default — public Postgres endpoints require SSL.
+	if (
+		process.env.NODE_ENV === "production" ||
+		process.env.VERCEL_ENV === "production"
+	) {
+		return { rejectUnauthorized: true };
+	}
 
-  return undefined;
+	return undefined;
 }
 
 /**
@@ -108,23 +119,28 @@ function resolveSslConfig(url: string): pg.PoolConfig["ssl"] {
  * WebSocket driver.
  */
 export function getDb(): Database | null {
-  const url = (process.env.DATABASE_URL ?? process.env.DATABASE_URL_UNPOOLED)?.trim();
-  if (!url) return null;
+	const url = (
+		process.env.DATABASE_URL ?? process.env.DATABASE_URL_UNPOOLED
+	)?.trim();
+	if (!url) return null;
 
-  if (!_db) {
-    _pool = new Pool({
-      connectionString: url,
-      max: 10,
-      ssl: resolveSslConfig(url),
-    });
-    // Required by node-postgres: idle clients killed by the server (Neon scale-down,
-    // pooler rotation, 57P01) emit `error` on the pool — unhandled, this crashes Node.
-    _pool.on("error", (err) => {
-      console.error("[@dba/database] pg Pool error (idle client):", err.message);
-    });
-    _db = drizzle(_pool, { schema });
-  }
-  return _db;
+	if (!_db) {
+		_pool = new Pool({
+			connectionString: url,
+			max: 10,
+			ssl: resolveSslConfig(url),
+		});
+		// Required by node-postgres: idle clients killed by the server (Neon scale-down,
+		// pooler rotation, 57P01) emit `error` on the pool — unhandled, this crashes Node.
+		_pool.on("error", (err) => {
+			console.error(
+				"[@dba/database] pg Pool error (idle client):",
+				err.message,
+			);
+		});
+		_db = drizzle(_pool, { schema });
+	}
+	return _db;
 }
 
 /**
@@ -139,10 +155,13 @@ export function getDb(): Database | null {
  *   await setTenantContext(db, tenantId);
  *   // Now run queries with tenant isolation
  */
-export async function setTenantContext(db: Database, tenantId: string): Promise<void> {
-  await db.execute(
-    sql`SELECT set_config('app.current_tenant_id', ${tenantId}, false)`
-  );
+export async function setTenantContext(
+	db: Database,
+	tenantId: string,
+): Promise<void> {
+	await db.execute(
+		sql`SELECT set_config('app.current_tenant_id', ${tenantId}, false)`,
+	);
 }
 
 /**
@@ -150,16 +169,18 @@ export async function setTenantContext(db: Database, tenantId: string): Promise<
  * This is safe for connection pools and prevents cross-tenant data leaks.
  */
 export async function withTenantContext<T>(
-  db: Database,
-  tenantId: string,
-  fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
+	db: Database,
+	tenantId: string,
+	fn: (tx: Parameters<Parameters<Database["transaction"]>[0]>[0]) => Promise<T>,
 ): Promise<T> {
-  return runWithTransientRetry("withTenantContext", () =>
-    db.transaction(async (tx) => {
-      await tx.execute(sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`);
-      return fn(tx);
-    }),
-  );
+	return runWithTransientRetry("withTenantContext", () =>
+		db.transaction(async (tx) => {
+			await tx.execute(
+				sql`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`,
+			);
+			return fn(tx);
+		}),
+	);
 }
 
 /**
@@ -167,15 +188,15 @@ export async function withTenantContext<T>(
  * Use this EXTREMELY CAREFULLY, primarily for webhooks or system jobs.
  */
 export async function withBypassRls<T>(
-  db: Database,
-  fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
+	db: Database,
+	fn: (tx: Parameters<Parameters<Database["transaction"]>[0]>[0]) => Promise<T>,
 ): Promise<T> {
-  return runWithTransientRetry("withBypassRls", () =>
-    db.transaction(async (tx) => {
-      await tx.execute(sql`SELECT set_config('app.bypass_rls', 'on', true)`);
-      return fn(tx);
-    }),
-  );
+	return runWithTransientRetry("withBypassRls", () =>
+		db.transaction(async (tx) => {
+			await tx.execute(sql`SELECT set_config('app.bypass_rls', 'on', true)`);
+			return fn(tx);
+		}),
+	);
 }
 
 /**
@@ -185,18 +206,20 @@ export async function withBypassRls<T>(
  * must be called to set the tenant context before queries run.
  */
 export function getDbForTenant(tenantId: string): Database {
-  const db = getDb();
-  if (!db) {
-    throw new Error("Database not initialized. DATABASE_URL or DATABASE_URL_UNPOOLED must be set.");
-  }
-  return db;
+	const db = getDb();
+	if (!db) {
+		throw new Error(
+			"Database not initialized. DATABASE_URL or DATABASE_URL_UNPOOLED must be set.",
+		);
+	}
+	return db;
 }
 
 /** Test / shutdown hooks */
 export async function closeDbPool(): Promise<void> {
-  if (_pool) {
-    await _pool.end();
-    _pool = null;
-    _db = null;
-  }
+	if (_pool) {
+		await _pool.end();
+		_pool = null;
+		_db = null;
+	}
 }

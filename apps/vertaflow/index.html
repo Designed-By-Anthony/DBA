@@ -216,7 +216,7 @@
   <link rel="dns-prefetch" href="https://admin.vertaflow.io">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    window.__vfRequestTurnstileOk = function (token) {
+    window.__vfRequestTurnstileOk = (token) => {
       var f = document.getElementById("requestForm");
       if (f && typeof f.__vfResolve === "function") {
         var r = f.__vfResolve;
@@ -224,7 +224,7 @@
         r(token || "");
       }
     };
-    window.__vfRequestTurnstileErr = function () {
+    window.__vfRequestTurnstileErr = () => {
       var f = document.getElementById("requestForm");
       if (f && typeof f.__vfResolve === "function") {
         var r = f.__vfResolve;

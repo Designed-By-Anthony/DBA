@@ -1,35 +1,38 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import FeedSubscribeCluster from '../components/FeedSubscribeCluster.astro';
-import { buildItemListSchema } from '../lib/seo';
-import { blogPosts } from '../data/blogPosts';
+import FeedSubscribeCluster from "../components/FeedSubscribeCluster.astro";
+import { blogPosts } from "../data/blogPosts";
+import Layout from "../layouts/Layout.astro";
+import { buildItemListSchema } from "../lib/seo";
 
 const sortedBlogPosts = [...blogPosts].sort(
-  (a, b) => new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
+	(a, b) =>
+		new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
 );
 
 const blogSchema = buildItemListSchema({
-  name: 'The Main Street Blog',
-  description: 'Insights, updates, and technical deep-dives on web design for Main Street America.',
-  path: '/blog',
-  items: sortedBlogPosts.map((post) => ({
-    name: post.title,
-    url: post.url,
-    description: post.excerpt,
-    image: post.image,
-  })),
+	name: "The Main Street Blog",
+	description:
+		"Insights, updates, and technical deep-dives on web design for Main Street America.",
+	path: "/blog",
+	items: sortedBlogPosts.map((post) => ({
+		name: post.title,
+		url: post.url,
+		description: post.excerpt,
+		image: post.image,
+	})),
 });
 
 const blogFooterCta = {
-  eyebrow: 'See How Your Site Stacks Up',
-  title: 'Run our free Lighthouse audit and see your scores instantly.',
-  description:
-    'Enter any URL into our in-house scanner and get instant performance, accessibility, best practices, and SEO scores. No signup. No waiting.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
-  note: 'Instant results and direct guidance when you want a second opinion.',
+	eyebrow: "See How Your Site Stacks Up",
+	title: "Run our free Lighthouse audit and see your scores instantly.",
+	description:
+		"Enter any URL into our in-house scanner and get instant performance, accessibility, best practices, and SEO scores. No signup. No waiting.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
+	note: "Instant results and direct guidance when you want a second opinion.",
 };
 ---
 

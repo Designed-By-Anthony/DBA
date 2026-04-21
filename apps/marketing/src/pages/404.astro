@@ -1,6 +1,6 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { SITE_URL } from '../lib/seo';
+import Layout from "../layouts/Layout.astro";
+import { SITE_URL } from "../lib/seo";
 
 const siteHost = new URL(SITE_URL).hostname;
 const siteSearchUrl = `https://www.google.com/search?q=site%3A${encodeURIComponent(siteHost)}`;

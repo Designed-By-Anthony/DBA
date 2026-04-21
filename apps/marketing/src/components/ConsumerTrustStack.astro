@@ -4,32 +4,32 @@
  * Outcome-first copy; brand names support credibility without a spec sheet.
  */
 interface Props {
-  variant?: 'default' | 'compact';
+	variant?: "default" | "compact";
 }
 
-const { variant = 'default' } = Astro.props;
+const { variant = "default" } = Astro.props;
 
 const items = [
-  {
-    brand: 'Neon',
-    headline: 'Data you can count on',
-    body: 'Your leads and records sit in reliable cloud Postgres — built to stay fast, consistent, and ready when you need them.',
-  },
-  {
-    brand: 'Vercel',
-    headline: 'Speed everywhere',
-    body: 'Your marketing site is delivered worldwide on a modern edge network so first impressions feel instant — especially on phones.',
-  },
-  {
-    brand: 'Cloudflare',
-    headline: 'Protection in front of your business',
-    body: 'Extra shielding against bots, spam, and abuse — so junk stops before it floods your inbox or your forms.',
-  },
-  {
-    brand: 'Next.js CRM',
-    headline: 'Pipeline clarity',
-    body: 'When it is time to track follow-ups and client work, the experience is a polished Next.js app — quick, responsive, and built for real teams.',
-  },
+	{
+		brand: "Neon",
+		headline: "Data you can count on",
+		body: "Your leads and records sit in reliable cloud Postgres — built to stay fast, consistent, and ready when you need them.",
+	},
+	{
+		brand: "Vercel",
+		headline: "Speed everywhere",
+		body: "Your marketing site is delivered worldwide on a modern edge network so first impressions feel instant — especially on phones.",
+	},
+	{
+		brand: "Cloudflare",
+		headline: "Protection in front of your business",
+		body: "Extra shielding against bots, spam, and abuse — so junk stops before it floods your inbox or your forms.",
+	},
+	{
+		brand: "Next.js CRM",
+		headline: "Pipeline clarity",
+		body: "When it is time to track follow-ups and client work, the experience is a polished Next.js app — quick, responsive, and built for real teams.",
+	},
 ];
 ---
 

@@ -1,92 +1,95 @@
 ---
-import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
-import { buildServiceAreaSchema } from '../../lib/seo';
+import ServiceAreaPage from "../../components/ServiceAreaPage.astro";
+import { buildServiceAreaSchema } from "../../lib/seo";
 
-const pageTitle = 'Miami Web Design Company | Designed by Anthony';
+const pageTitle = "Miami Web Design Company | Designed by Anthony";
 const pageDescription =
-  'Custom web design, website rescue, managed hosting, and local SEO for Miami service businesses competing across Miami-Dade.';
+	"Custom web design, website rescue, managed hosting, and local SEO for Miami service businesses competing across Miami-Dade.";
 
 const areaSchema = buildServiceAreaSchema({
-  name: 'Web Design and Hosting Services in Miami, Florida',
-  description: pageDescription,
-  path: '/service-areas/miami',
-  areaServed: 'Miami, Florida',
-  serviceType: 'Web design, website rescue, managed hosting, and local SEO',
-  cityName: 'Miami',
-  regionName: 'Florida',
-  regionAbbr: 'FL',
-  geo: { latitude: 25.7617, longitude: -80.1918 },
+	name: "Web Design and Hosting Services in Miami, Florida",
+	description: pageDescription,
+	path: "/service-areas/miami",
+	areaServed: "Miami, Florida",
+	serviceType: "Web design, website rescue, managed hosting, and local SEO",
+	cityName: "Miami",
+	regionName: "Florida",
+	regionAbbr: "FL",
+	geo: { latitude: 25.7617, longitude: -80.1918 },
 });
 
 const blocks = [
-  {
-    level: 'h2' as const,
-    title: "Why Miami service businesses need speed and clarity right away",
-    paragraphs: [
-      "Miami is a fast-moving market where buyers make impression calls quickly. If the site feels generic, slow, or confusing on a phone, the business looks less credible before the visitor even compares price.",
-      "A strong Miami page has to feel sharp without feeling overbuilt. It needs clean messaging, strong mobile performance, and service-area coverage that matches how South Florida customers actually search.",
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Neighborhood and nearby-city intent changes the page structure',
-    paragraphs: [
-      'Search behavior in Miami splits across places like Brickell, Coral Gables, Wynwood, Kendall, and surrounding Miami-Dade communities. A page strategy that treats Miami as one generic label usually leaves valuable local relevance on the table.',
-    ],
-  },
-  {
-    level: 'h4' as const,
-    title: "Mobile-first design matters in Miami's real-world browsing conditions",
-    paragraphs: [
-      'People browse in traffic, between stops, and on variable connections. The site has to stay easy to trust on a real phone in a real South Florida search session, not just on a perfect desktop connection.',
-    ],
-  },
-  {
-    level: 'h5' as const,
-    title: 'Visual trust signals still have to stay fast',
-    paragraphs: [
-      'A lot of Miami businesses rely on photography, project work, or premium presentation. The page can absolutely feel polished, but the images and layout still have to load quickly enough to keep the customer from bouncing.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Website rescues for Miami businesses that outgrew their first build',
-    paragraphs: [
-      'A lot of Miami businesses already have a site, but it no longer matches the level of trust they need to sell. The design may feel dated, the structure may be messy, or the mobile experience may be quietly costing them calls.',
-      'A rescue fixes that without throwing away the useful authority the domain already has. The goal is to preserve what still works while replacing the clutter and weak positioning that are dragging the site down.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Keep local authority while modernizing the site',
-    paragraphs: [
-      'If the current site already has useful branded search, backlinks, or service pages, the rebuild has to protect that value. Strong redirects, tighter metadata, and cleaner internal links are part of the rescue work, not an afterthought.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Managed hosting and local SEO for Miami-Dade coverage',
-    paragraphs: [
-      'Miami businesses need a site that stays fast, stays secure, and stays easy to update when services, locations, or offers change. Managed hosting handles the technical side while local SEO work keeps the service pages and service-area coverage aligned.',
-      'That setup gives the business a cleaner growth path than trying to cram every neighborhood and every service variation into a single broad page.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'When Miami and nearby market pages should split',
-    paragraphs: [
-      'If the business actively competes in Miami, Coral Gables, Kendall, or another nearby area with distinct search behavior, separate pages can help. The page count is not the strategy. The strategy is only building the pages that reflect real service-area demand.',
-    ],
-  },
+	{
+		level: "h2" as const,
+		title: "Why Miami service businesses need speed and clarity right away",
+		paragraphs: [
+			"Miami is a fast-moving market where buyers make impression calls quickly. If the site feels generic, slow, or confusing on a phone, the business looks less credible before the visitor even compares price.",
+			"A strong Miami page has to feel sharp without feeling overbuilt. It needs clean messaging, strong mobile performance, and service-area coverage that matches how South Florida customers actually search.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Neighborhood and nearby-city intent changes the page structure",
+		paragraphs: [
+			"Search behavior in Miami splits across places like Brickell, Coral Gables, Wynwood, Kendall, and surrounding Miami-Dade communities. A page strategy that treats Miami as one generic label usually leaves valuable local relevance on the table.",
+		],
+	},
+	{
+		level: "h4" as const,
+		title:
+			"Mobile-first design matters in Miami's real-world browsing conditions",
+		paragraphs: [
+			"People browse in traffic, between stops, and on variable connections. The site has to stay easy to trust on a real phone in a real South Florida search session, not just on a perfect desktop connection.",
+		],
+	},
+	{
+		level: "h5" as const,
+		title: "Visual trust signals still have to stay fast",
+		paragraphs: [
+			"A lot of Miami businesses rely on photography, project work, or premium presentation. The page can absolutely feel polished, but the images and layout still have to load quickly enough to keep the customer from bouncing.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title:
+			"Website rescues for Miami businesses that outgrew their first build",
+		paragraphs: [
+			"A lot of Miami businesses already have a site, but it no longer matches the level of trust they need to sell. The design may feel dated, the structure may be messy, or the mobile experience may be quietly costing them calls.",
+			"A rescue fixes that without throwing away the useful authority the domain already has. The goal is to preserve what still works while replacing the clutter and weak positioning that are dragging the site down.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Keep local authority while modernizing the site",
+		paragraphs: [
+			"If the current site already has useful branded search, backlinks, or service pages, the rebuild has to protect that value. Strong redirects, tighter metadata, and cleaner internal links are part of the rescue work, not an afterthought.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Managed hosting and local SEO for Miami-Dade coverage",
+		paragraphs: [
+			"Miami businesses need a site that stays fast, stays secure, and stays easy to update when services, locations, or offers change. Managed hosting handles the technical side while local SEO work keeps the service pages and service-area coverage aligned.",
+			"That setup gives the business a cleaner growth path than trying to cram every neighborhood and every service variation into a single broad page.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "When Miami and nearby market pages should split",
+		paragraphs: [
+			"If the business actively competes in Miami, Coral Gables, Kendall, or another nearby area with distinct search behavior, separate pages can help. The page count is not the strategy. The strategy is only building the pages that reflect real service-area demand.",
+		],
+	},
 ];
 
 const relatedMarkets = [
-  {
-    title: 'Naples FL Web Design & Local SEO',
-    href: '/service-areas/naples',
-    description: 'A Southwest Florida companion page for premium service businesses targeting Naples, Marco Island, and nearby seasonal demand.',
-    tag: 'Naples',
-  },
+	{
+		title: "Naples FL Web Design & Local SEO",
+		href: "/service-areas/naples",
+		description:
+			"A Southwest Florida companion page for premium service businesses targeting Naples, Marco Island, and nearby seasonal demand.",
+		tag: "Naples",
+	},
 ];
 ---
 

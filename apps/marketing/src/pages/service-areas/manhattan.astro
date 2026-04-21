@@ -1,82 +1,82 @@
 ---
-import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
-import { buildServiceAreaSchema } from '../../lib/seo';
+import ServiceAreaPage from "../../components/ServiceAreaPage.astro";
+import { buildServiceAreaSchema } from "../../lib/seo";
 
-const pageTitle = 'Manhattan NY Web Design for Trades | Designed by Anthony';
+const pageTitle = "Manhattan NY Web Design for Trades | Designed by Anthony";
 const pageDescription =
-  'Custom web design, website rescue, managed hosting, and local SEO for Manhattan service businesses that need stronger trust signals and faster mobile pages.';
+	"Custom web design, website rescue, managed hosting, and local SEO for Manhattan service businesses that need stronger trust signals and faster mobile pages.";
 
 const areaSchema = buildServiceAreaSchema({
-  name: 'Web Design and Hosting Services in Manhattan, New York',
-  description: pageDescription,
-  path: '/service-areas/manhattan',
-  areaServed: 'Manhattan, New York',
-  serviceType: 'Web design, website rescue, managed hosting, and local SEO',
-  cityName: 'Manhattan',
-  regionName: 'New York',
-  regionAbbr: 'NY',
-  geo: { latitude: 40.7831, longitude: -73.9712 },
+	name: "Web Design and Hosting Services in Manhattan, New York",
+	description: pageDescription,
+	path: "/service-areas/manhattan",
+	areaServed: "Manhattan, New York",
+	serviceType: "Web design, website rescue, managed hosting, and local SEO",
+	cityName: "Manhattan",
+	regionName: "New York",
+	regionAbbr: "NY",
+	geo: { latitude: 40.7831, longitude: -73.9712 },
 });
 
 const blocks = [
-  {
-    level: 'h2' as const,
-    title: 'Why Manhattan service businesses need sharper service pages',
-    paragraphs: [
-      'Manhattan is one of the hardest places in the country to look average online and still win. Buyers compare quickly, expect clean mobile performance, and notice weak messaging immediately because the market gives them too many alternatives.',
-      'That means the page has to feel specific, current, and easy to trust from the first few seconds. A generic builder site or a vague agency-style pitch is not enough here.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Neighborhood-level search intent matters in Manhattan',
-    paragraphs: [
-      'Search behavior in Manhattan is unusually granular. Midtown, the Upper East Side, SoHo, Tribeca, Chelsea, and FiDi all carry their own context. Even when the business serves the whole borough, the page still needs enough specificity to feel like it understands how people actually search.',
-    ],
-  },
-  {
-    level: 'h4' as const,
-    title: 'Fast mobile performance is the minimum, not the differentiator',
-    paragraphs: [
-      'People browse Manhattan results on the move all day long. A site that feels sluggish or unstable gets interpreted as lower quality immediately, even before the user reads the details of the offer.',
-    ],
-  },
-  {
-    level: 'h5' as const,
-    title: 'Cleaner structure helps in a crowded search result',
-    paragraphs: [
-      'In a dense search landscape, clear service framing, cleaner headings, and stronger internal links can do more for trust and relevance than adding more decorative design.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Website rescues for established Manhattan businesses',
-    paragraphs: [
-      'A lot of Manhattan businesses already have years of brand recognition, backlinks, and search history tied to sites that no longer feel competitive. A rescue keeps that authority in place while rebuilding the design, copy, and technical layer that the customer actually sees.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Preserving domain authority during a rebuild matters more here',
-    paragraphs: [
-      'If the current domain already carries local recognition, the rebuild cannot be careless. Redirect planning, page continuity, and better metadata are what keep the improved site from sacrificing the authority the business already earned.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Managed hosting and local SEO for Manhattan competition',
-    paragraphs: [
-      'Manhattan businesses need a site that stays clean, fast, and easy to update while local SEO work keeps the service pages, location signals, and business details aligned. The goal is not to flood the site with keywords. The goal is to make the business easier for both buyers and search engines to understand.',
-      'That usually means one strong Manhattan page supported by sharper service pages, not a pile of low-value neighborhood pages that all say nearly the same thing.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'When one Manhattan page is enough and when it is not',
-    paragraphs: [
-      'If the business serves the borough broadly and the customer mainly cares about trust and speed, one strong page can do a lot of work. If the business has truly different offices, services, or audiences across neighborhoods, that is when separate pages start to make sense.',
-    ],
-  },
+	{
+		level: "h2" as const,
+		title: "Why Manhattan service businesses need sharper service pages",
+		paragraphs: [
+			"Manhattan is one of the hardest places in the country to look average online and still win. Buyers compare quickly, expect clean mobile performance, and notice weak messaging immediately because the market gives them too many alternatives.",
+			"That means the page has to feel specific, current, and easy to trust from the first few seconds. A generic builder site or a vague agency-style pitch is not enough here.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Neighborhood-level search intent matters in Manhattan",
+		paragraphs: [
+			"Search behavior in Manhattan is unusually granular. Midtown, the Upper East Side, SoHo, Tribeca, Chelsea, and FiDi all carry their own context. Even when the business serves the whole borough, the page still needs enough specificity to feel like it understands how people actually search.",
+		],
+	},
+	{
+		level: "h4" as const,
+		title: "Fast mobile performance is the minimum, not the differentiator",
+		paragraphs: [
+			"People browse Manhattan results on the move all day long. A site that feels sluggish or unstable gets interpreted as lower quality immediately, even before the user reads the details of the offer.",
+		],
+	},
+	{
+		level: "h5" as const,
+		title: "Cleaner structure helps in a crowded search result",
+		paragraphs: [
+			"In a dense search landscape, clear service framing, cleaner headings, and stronger internal links can do more for trust and relevance than adding more decorative design.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Website rescues for established Manhattan businesses",
+		paragraphs: [
+			"A lot of Manhattan businesses already have years of brand recognition, backlinks, and search history tied to sites that no longer feel competitive. A rescue keeps that authority in place while rebuilding the design, copy, and technical layer that the customer actually sees.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Preserving domain authority during a rebuild matters more here",
+		paragraphs: [
+			"If the current domain already carries local recognition, the rebuild cannot be careless. Redirect planning, page continuity, and better metadata are what keep the improved site from sacrificing the authority the business already earned.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Managed hosting and local SEO for Manhattan competition",
+		paragraphs: [
+			"Manhattan businesses need a site that stays clean, fast, and easy to update while local SEO work keeps the service pages, location signals, and business details aligned. The goal is not to flood the site with keywords. The goal is to make the business easier for both buyers and search engines to understand.",
+			"That usually means one strong Manhattan page supported by sharper service pages, not a pile of low-value neighborhood pages that all say nearly the same thing.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "When one Manhattan page is enough and when it is not",
+		paragraphs: [
+			"If the business serves the borough broadly and the customer mainly cares about trust and speed, one strong page can do a lot of work. If the business has truly different offices, services, or audiences across neighborhoods, that is when separate pages start to make sense.",
+		],
+	},
 ];
 ---
 

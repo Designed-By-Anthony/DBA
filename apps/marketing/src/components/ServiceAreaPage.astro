@@ -1,89 +1,104 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LinkClusterSection, { type LinkClusterItem } from './LinkClusterSection.astro';
-import { PUBLIC_PRICING_PILL } from '../lib/offers';
-import type { SchemaValue } from '../lib/seo';
+import Layout from "../layouts/Layout.astro";
+import { PUBLIC_PRICING_PILL } from "../lib/offers";
+import type { SchemaValue } from "../lib/seo";
+import LinkClusterSection, {
+	type LinkClusterItem,
+} from "./LinkClusterSection.astro";
 
 interface ContentBlock {
-  level: 'h2' | 'h3' | 'h4' | 'h5';
-  title: string;
-  paragraphs: string[];
+	level: "h2" | "h3" | "h4" | "h5";
+	title: string;
+	paragraphs: string[];
 }
 
 export interface Props {
-  title: string;
-  description: string;
-  breadcrumbLabel: string;
-  schema: SchemaValue | SchemaValue[];
-  eyebrow: string;
-  heroTitlePrefix: string;
-  heroHighlight: string;
-  heroDescription: string;
-  blocks: ContentBlock[];
-  ctaLabel: string;
-  ctaTitle?: string;
-  heroPills?: string[];
-  relatedMarkets?: LinkClusterItem[];
+	title: string;
+	description: string;
+	breadcrumbLabel: string;
+	schema: SchemaValue | SchemaValue[];
+	eyebrow: string;
+	heroTitlePrefix: string;
+	heroHighlight: string;
+	heroDescription: string;
+	blocks: ContentBlock[];
+	ctaLabel: string;
+	ctaTitle?: string;
+	heroPills?: string[];
+	relatedMarkets?: LinkClusterItem[];
 }
 
 const {
-  title,
-  description,
-  breadcrumbLabel,
-  schema,
-  eyebrow,
-  heroTitlePrefix,
-  heroHighlight,
-  heroDescription,
-  blocks,
-  ctaLabel,
-  ctaTitle,
-  heroPills = ['Custom web design', 'Managed hosting support', 'Local SEO strategy', PUBLIC_PRICING_PILL],
-  relatedMarkets = [],
+	title,
+	description,
+	breadcrumbLabel,
+	schema,
+	eyebrow,
+	heroTitlePrefix,
+	heroHighlight,
+	heroDescription,
+	blocks,
+	ctaLabel,
+	ctaTitle,
+	heroPills = [
+		"Custom web design",
+		"Managed hosting support",
+		"Local SEO strategy",
+		PUBLIC_PRICING_PILL,
+	],
+	relatedMarkets = [],
 } = Astro.props;
 
-const resolvedCtaTitle = ctaTitle ?? `Your competitors in ${heroHighlight} are already showing up on Google. Are you?`;
+const resolvedCtaTitle =
+	ctaTitle ??
+	`Your competitors in ${heroHighlight} are already showing up on Google. Are you?`;
 
 const relatedServices = [
-  {
-    title: 'Custom Web Design',
-    href: '/services/custom-web-design',
-    description: 'Build a custom website that feels credible fast and gives each service a clearer sales pitch.',
-    tag: 'Service',
-  },
-  {
-    title: 'Local SEO and Search Visibility',
-    href: '/services/local-seo',
-    description: 'Support this market page with cleaner local structure, schema, and service-area targeting.',
-    tag: 'Service',
-  },
-  {
-    title: 'Website Rescues and Mobile Optimization',
-    href: '/services/website-rescue',
-    description: 'Keep the authority you already have while fixing mobile usability, speed, and trust issues.',
-    tag: 'Service',
-  },
+	{
+		title: "Custom Web Design",
+		href: "/services/custom-web-design",
+		description:
+			"Build a custom website that feels credible fast and gives each service a clearer sales pitch.",
+		tag: "Service",
+	},
+	{
+		title: "Local SEO and Search Visibility",
+		href: "/services/local-seo",
+		description:
+			"Support this market page with cleaner local structure, schema, and service-area targeting.",
+		tag: "Service",
+	},
+	{
+		title: "Website Rescues and Mobile Optimization",
+		href: "/services/website-rescue",
+		description:
+			"Keep the authority you already have while fixing mobile usability, speed, and trust issues.",
+		tag: "Service",
+	},
 ];
 
 const relatedArticles = [
-  {
-    title: 'The Hidden Code That Gets Local Businesses Ranked',
-    href: '/blog/local-business-schema',
-    description: 'See how structured data helps Google understand your services, entity details, and markets.',
-    tag: 'SEO',
-  },
-  {
-    title: 'Is Local SEO Dead? What Actually Works in 2025',
-    href: '/blog/local-seo-death',
-    description: 'Understand why thin service pages fail and what a stronger local SEO system looks like now.',
-    tag: 'SEO',
-  },
-  {
-    title: 'How Site Speed Impacts Revenue',
-    href: '/blog/site-speed-conversion',
-    description: 'Faster pages change trust, conversions, and how your business feels the second someone lands.',
-    tag: 'Performance',
-  },
+	{
+		title: "The Hidden Code That Gets Local Businesses Ranked",
+		href: "/blog/local-business-schema",
+		description:
+			"See how structured data helps Google understand your services, entity details, and markets.",
+		tag: "SEO",
+	},
+	{
+		title: "Is Local SEO Dead? What Actually Works in 2025",
+		href: "/blog/local-seo-death",
+		description:
+			"Understand why thin service pages fail and what a stronger local SEO system looks like now.",
+		tag: "SEO",
+	},
+	{
+		title: "How Site Speed Impacts Revenue",
+		href: "/blog/site-speed-conversion",
+		description:
+			"Faster pages change trust, conversions, and how your business feels the second someone lands.",
+		tag: "Performance",
+	},
 ];
 ---
 

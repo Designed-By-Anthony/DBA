@@ -22,19 +22,19 @@ export const planSuiteSchema = z.enum(["starter", "full"]);
  * ingest endpoint.
  */
 export const globalLeadCoreSchema = z
-  .object({
-    firstName: z.string().trim().min(1).max(120).optional(),
-    lastName: z.string().trim().min(1).max(120).optional(),
-    /** Optional; server will synthesize from first+last if omitted. */
-    name: z.string().trim().min(1).max(240).optional(),
-    email: z.string().email("Invalid email"),
-    phone: z.string().trim().min(3).max(40).optional(),
-    source: z.string().trim().min(1).max(80).optional(),
-  })
-  .refine((v) => Boolean(v.name || v.firstName || v.lastName), {
-    message: "name, firstName, or lastName is required",
-    path: ["name"],
-  });
+	.object({
+		firstName: z.string().trim().min(1).max(120).optional(),
+		lastName: z.string().trim().min(1).max(120).optional(),
+		/** Optional; server will synthesize from first+last if omitted. */
+		name: z.string().trim().min(1).max(240).optional(),
+		email: z.string().email("Invalid email"),
+		phone: z.string().trim().min(3).max(40).optional(),
+		source: z.string().trim().min(1).max(80).optional(),
+	})
+	.refine((v) => Boolean(v.name || v.firstName || v.lastName), {
+		message: "name, firstName, or lastName is required",
+		path: ["name"],
+	});
 
 /**
  * Body for `POST /api/leads/ingest` — the Global Ingest Engine.
@@ -47,32 +47,32 @@ export const globalLeadCoreSchema = z
  *   `x-webhook-secret` / `x-lead-secret` headers).
  */
 export const globalLeadIngestBodySchema = globalLeadCoreSchema
-  .innerType()
-  .extend({
-    tenantId: z.string().trim().min(1).max(120).optional(),
-    /** Honeypot — must be absent or empty. */
-    _hp: z.string().optional(),
-    /** Shared secret (body fallback; headers preferred). */
-    secret: z.string().optional(),
-    /** Everything else lands in `leads.metadata` JSONB. */
-    metadata: z.record(z.string(), z.unknown()).default({}),
-  })
-  .passthrough();
+	.innerType()
+	.extend({
+		tenantId: z.string().trim().min(1).max(120).optional(),
+		/** Honeypot — must be absent or empty. */
+		_hp: z.string().optional(),
+		/** Shared secret (body fallback; headers preferred). */
+		secret: z.string().optional(),
+		/** Everything else lands in `leads.metadata` JSONB. */
+		metadata: z.record(z.string(), z.unknown()).default({}),
+	})
+	.passthrough();
 
 export type GlobalLeadIngestBody = z.infer<typeof globalLeadIngestBodySchema>;
 
 const GLOBAL_CORE_KEYS = new Set([
-  "firstName",
-  "lastName",
-  "name",
-  "email",
-  "phone",
-  "source",
-  "tenantId",
-  "agencyId",
-  "secret",
-  "metadata",
-  "_hp",
+	"firstName",
+	"lastName",
+	"name",
+	"email",
+	"phone",
+	"source",
+	"tenantId",
+	"agencyId",
+	"secret",
+	"metadata",
+	"_hp",
 ]);
 
 /**
@@ -86,71 +86,81 @@ const GLOBAL_CORE_KEYS = new Set([
  *   are supplied.
  */
 export function parseGlobalLeadIngestBody(input: unknown): {
-  core: {
-    firstName?: string;
-    lastName?: string;
-    name: string;
-    email: string;
-    phone?: string;
-    source?: string;
-  };
-  metadata: Record<string, unknown>;
-  tenantId?: string;
-  secret?: string;
-  _hp?: string;
+	core: {
+		firstName?: string;
+		lastName?: string;
+		name: string;
+		email: string;
+		phone?: string;
+		source?: string;
+	};
+	metadata: Record<string, unknown>;
+	tenantId?: string;
+	secret?: string;
+	_hp?: string;
 } {
-  const raw = globalLeadIngestBodySchema.parse(input) as Record<string, unknown>;
+	const raw = globalLeadIngestBodySchema.parse(input) as Record<
+		string,
+		unknown
+	>;
 
-  const firstName = typeof raw.firstName === "string" ? raw.firstName.trim() : undefined;
-  const lastName = typeof raw.lastName === "string" ? raw.lastName.trim() : undefined;
-  const explicitName = typeof raw.name === "string" ? raw.name.trim() : undefined;
-  const name =
-    explicitName ||
-    [firstName, lastName].filter(Boolean).join(" ").trim() ||
-    undefined;
-  if (!name) {
-    throw new z.ZodError([
-      { code: z.ZodIssueCode.custom, path: ["name"], message: "name, firstName, or lastName is required" },
-    ]);
-  }
+	const firstName =
+		typeof raw.firstName === "string" ? raw.firstName.trim() : undefined;
+	const lastName =
+		typeof raw.lastName === "string" ? raw.lastName.trim() : undefined;
+	const explicitName =
+		typeof raw.name === "string" ? raw.name.trim() : undefined;
+	const name =
+		explicitName ||
+		[firstName, lastName].filter(Boolean).join(" ").trim() ||
+		undefined;
+	if (!name) {
+		throw new z.ZodError([
+			{
+				code: z.ZodIssueCode.custom,
+				path: ["name"],
+				message: "name, firstName, or lastName is required",
+			},
+		]);
+	}
 
-  const email = String(raw.email);
-  const phone = typeof raw.phone === "string" ? raw.phone.trim() : undefined;
-  const source = typeof raw.source === "string" ? raw.source.trim() : undefined;
-  const tenantId =
-    typeof raw.tenantId === "string"
-      ? raw.tenantId.trim()
-      : typeof raw.agencyId === "string"
-        ? (raw.agencyId as string).trim()
-        : undefined;
-  const secret = typeof raw.secret === "string" ? raw.secret : undefined;
-  const _hp = typeof raw._hp === "string" ? raw._hp : undefined;
+	const email = String(raw.email);
+	const phone = typeof raw.phone === "string" ? raw.phone.trim() : undefined;
+	const source = typeof raw.source === "string" ? raw.source.trim() : undefined;
+	const tenantId =
+		typeof raw.tenantId === "string"
+			? raw.tenantId.trim()
+			: typeof raw.agencyId === "string"
+				? (raw.agencyId as string).trim()
+				: undefined;
+	const secret = typeof raw.secret === "string" ? raw.secret : undefined;
+	const _hp = typeof raw._hp === "string" ? raw._hp : undefined;
 
-  // Seed metadata with whatever was already under `metadata`, then fold in
-  // any unknown top-level fields (so `{ email, party_size: 4 }` works).
-  const metadata: Record<string, unknown> = {
-    ...((raw.metadata as Record<string, unknown>) ?? {}),
-  };
-  for (const [k, v] of Object.entries(raw)) {
-    if (GLOBAL_CORE_KEYS.has(k)) continue;
-    if (v == null) continue;
-    metadata[k] = v;
-  }
+	// Seed metadata with whatever was already under `metadata`, then fold in
+	// any unknown top-level fields (so `{ email, party_size: 4 }` works).
+	const metadata: Record<string, unknown> = {
+		...((raw.metadata as Record<string, unknown>) ?? {}),
+	};
+	for (const [k, v] of Object.entries(raw)) {
+		if (GLOBAL_CORE_KEYS.has(k)) continue;
+		if (v == null) continue;
+		metadata[k] = v;
+	}
 
-  return {
-    core: {
-      firstName: firstName || undefined,
-      lastName: lastName || undefined,
-      name,
-      email,
-      phone: phone || undefined,
-      source: source || undefined,
-    },
-    metadata,
-    tenantId: tenantId || undefined,
-    secret,
-    _hp,
-  };
+	return {
+		core: {
+			firstName: firstName || undefined,
+			lastName: lastName || undefined,
+			name,
+			email,
+			phone: phone || undefined,
+			source: source || undefined,
+		},
+		metadata,
+		tenantId: tenantId || undefined,
+		secret,
+		_hp,
+	};
 }
 
 /**
@@ -158,27 +168,30 @@ export function parseGlobalLeadIngestBody(input: unknown): {
  * the Global Ingest route so we don't leak credential shape via timing.
  */
 export function constantTimeEqual(a: string, b: string): boolean {
-  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
-  let out = 0;
-  for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return out === 0;
+	if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length)
+		return false;
+	let out = 0;
+	for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
+	return out === 0;
 }
 
 export const publicLeadMarketingMetaSchema = z
-  .object({
-    ctaSource: z.string().trim().optional(),
-    pageContext: z.string().trim().optional(),
-    offerType: z.string().trim().optional(),
-    leadSource: z.string().trim().optional(),
-    pageUrl: z.string().trim().optional(),
-    referrerUrl: z.string().trim().optional(),
-    pageTitle: z.string().trim().optional(),
-    sourcePage: z.string().trim().optional(),
-    gaClientId: z.string().trim().optional(),
-  })
-  .strict();
+	.object({
+		ctaSource: z.string().trim().optional(),
+		pageContext: z.string().trim().optional(),
+		offerType: z.string().trim().optional(),
+		leadSource: z.string().trim().optional(),
+		pageUrl: z.string().trim().optional(),
+		referrerUrl: z.string().trim().optional(),
+		pageTitle: z.string().trim().optional(),
+		sourcePage: z.string().trim().optional(),
+		gaClientId: z.string().trim().optional(),
+	})
+	.strict();
 
-export type PublicLeadMarketingMeta = z.infer<typeof publicLeadMarketingMetaSchema>;
+export type PublicLeadMarketingMeta = z.infer<
+	typeof publicLeadMarketingMetaSchema
+>;
 
 const aliasString = z.string().optional();
 
@@ -191,74 +204,77 @@ const aliasString = z.string().optional();
  * resolve to a normalized `PublicLeadIngestBody`.
  */
 export const publicLeadIngestBodySchema = z
-  .object({
-    name: aliasString,
-    first_name: aliasString,
-    firstName: aliasString,
-    full_name: aliasString,
-    email: z.string().email("Invalid email"),
-    phone: aliasString,
-    company: aliasString,
-    website: aliasString,
-    websiteUrl: aliasString,
-    source: aliasString,
-    message: aliasString,
-    biggest_issue: aliasString,
-    projectRequirements: aliasString,
-    auditUrl: aliasString,
-    auditReportUrl: aliasString,
-    agencyId: aliasString,
-    _hp: aliasString,
-    cfTurnstileResponse: aliasString,
-    "cf-turnstile-response": aliasString,
-    turnstileToken: aliasString,
+	.object({
+		name: aliasString,
+		first_name: aliasString,
+		firstName: aliasString,
+		full_name: aliasString,
+		email: z.string().email("Invalid email"),
+		phone: aliasString,
+		company: aliasString,
+		website: aliasString,
+		websiteUrl: aliasString,
+		source: aliasString,
+		message: aliasString,
+		biggest_issue: aliasString,
+		projectRequirements: aliasString,
+		auditUrl: aliasString,
+		auditReportUrl: aliasString,
+		agencyId: aliasString,
+		_hp: aliasString,
+		cfTurnstileResponse: aliasString,
+		"cf-turnstile-response": aliasString,
+		turnstileToken: aliasString,
 
-    ctaSource: aliasString,
-    cta_source: aliasString,
-    pageContext: aliasString,
-    page_context: aliasString,
-    offerType: aliasString,
-    offer_type: aliasString,
-    leadSource: aliasString,
-    lead_source: aliasString,
-    pageUrl: aliasString,
-    page_url: aliasString,
-    referrerUrl: aliasString,
-    referrer_url: aliasString,
-    pageTitle: aliasString,
-    page_title: aliasString,
-    sourcePage: aliasString,
-    source_page: aliasString,
-    gaClientId: aliasString,
-    ga_client_id: aliasString,
-  })
-  .passthrough();
+		ctaSource: aliasString,
+		cta_source: aliasString,
+		pageContext: aliasString,
+		page_context: aliasString,
+		offerType: aliasString,
+		offer_type: aliasString,
+		leadSource: aliasString,
+		lead_source: aliasString,
+		pageUrl: aliasString,
+		page_url: aliasString,
+		referrerUrl: aliasString,
+		referrer_url: aliasString,
+		pageTitle: aliasString,
+		page_title: aliasString,
+		sourcePage: aliasString,
+		source_page: aliasString,
+		gaClientId: aliasString,
+		ga_client_id: aliasString,
+	})
+	.passthrough();
 
 /** Canonical body for `POST /api/lead` (JSON). Aliases are normalized server-side. */
 export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  website?: string;
-  source?: string;
-  message?: string;
-  auditUrl?: string;
-  agencyId?: string;
-  /** Honeypot — must be empty */
-  _hp?: string;
-  /** Cloudflare Turnstile token (optional if CRM verifies client-side path) */
-  cfTurnstileResponse?: string;
+	name: string;
+	email: string;
+	phone?: string;
+	company?: string;
+	website?: string;
+	source?: string;
+	message?: string;
+	auditUrl?: string;
+	agencyId?: string;
+	/** Honeypot — must be empty */
+	_hp?: string;
+	/** Cloudflare Turnstile token (optional if CRM verifies client-side path) */
+	cfTurnstileResponse?: string;
 };
 
-function firstNonEmpty(obj: Record<string, unknown>, keys: string[]): string | undefined {
-  for (const k of keys) {
-    const v = obj[k];
-    if (v == null) continue;
-    const s = String(v).trim();
-    if (s !== "") return s;
-  }
-  return undefined;
+function firstNonEmpty(
+	obj: Record<string, unknown>,
+	keys: string[],
+): string | undefined {
+	for (const k of keys) {
+		const v = obj[k];
+		if (v == null) continue;
+		const s = String(v).trim();
+		if (s !== "") return s;
+	}
+	return undefined;
 }
 
 /**
@@ -266,143 +282,169 @@ function firstNonEmpty(obj: Record<string, unknown>, keys: string[]): string | u
  * Throws `ZodError` on invalid input (caller should return HTTP 400).
  * Returns a canonical `PublicLeadIngestBody` with camelCase keys only.
  */
-export function parsePublicLeadIngestBody(input: unknown): PublicLeadIngestBody {
-  const raw = publicLeadIngestBodySchema.parse(input) as Record<string, unknown>;
+export function parsePublicLeadIngestBody(
+	input: unknown,
+): PublicLeadIngestBody {
+	const raw = publicLeadIngestBodySchema.parse(input) as Record<
+		string,
+		unknown
+	>;
 
-  const name = firstNonEmpty(raw, ["name", "first_name", "firstName", "full_name"]);
-  const email = firstNonEmpty(raw, ["email"]);
-  if (!name) {
-    throw new z.ZodError([
-      { code: z.ZodIssueCode.custom, path: ["name"], message: "Name is required" },
-    ]);
-  }
-  if (!email) {
-    throw new z.ZodError([
-      { code: z.ZodIssueCode.custom, path: ["email"], message: "Email is required" },
-    ]);
-  }
+	const name = firstNonEmpty(raw, [
+		"name",
+		"first_name",
+		"firstName",
+		"full_name",
+	]);
+	const email = firstNonEmpty(raw, ["email"]);
+	if (!name) {
+		throw new z.ZodError([
+			{
+				code: z.ZodIssueCode.custom,
+				path: ["name"],
+				message: "Name is required",
+			},
+		]);
+	}
+	if (!email) {
+		throw new z.ZodError([
+			{
+				code: z.ZodIssueCode.custom,
+				path: ["email"],
+				message: "Email is required",
+			},
+		]);
+	}
 
-  const meta = publicLeadMarketingMetaSchema.parse({
-    ctaSource: firstNonEmpty(raw, ["ctaSource", "cta_source"]),
-    pageContext: firstNonEmpty(raw, ["pageContext", "page_context"]),
-    offerType: firstNonEmpty(raw, ["offerType", "offer_type"]),
-    leadSource: firstNonEmpty(raw, ["leadSource", "lead_source"]),
-    pageUrl: firstNonEmpty(raw, ["pageUrl", "page_url"]),
-    referrerUrl: firstNonEmpty(raw, ["referrerUrl", "referrer_url"]),
-    pageTitle: firstNonEmpty(raw, ["pageTitle", "page_title"]),
-    sourcePage: firstNonEmpty(raw, ["sourcePage", "source_page"]),
-    gaClientId: firstNonEmpty(raw, ["gaClientId", "ga_client_id"]),
-  });
+	const meta = publicLeadMarketingMetaSchema.parse({
+		ctaSource: firstNonEmpty(raw, ["ctaSource", "cta_source"]),
+		pageContext: firstNonEmpty(raw, ["pageContext", "page_context"]),
+		offerType: firstNonEmpty(raw, ["offerType", "offer_type"]),
+		leadSource: firstNonEmpty(raw, ["leadSource", "lead_source"]),
+		pageUrl: firstNonEmpty(raw, ["pageUrl", "page_url"]),
+		referrerUrl: firstNonEmpty(raw, ["referrerUrl", "referrer_url"]),
+		pageTitle: firstNonEmpty(raw, ["pageTitle", "page_title"]),
+		sourcePage: firstNonEmpty(raw, ["sourcePage", "source_page"]),
+		gaClientId: firstNonEmpty(raw, ["gaClientId", "ga_client_id"]),
+	});
 
-  return {
-    ...meta,
-    name,
-    email,
-    phone: firstNonEmpty(raw, ["phone"]),
-    company: firstNonEmpty(raw, ["company"]),
-    website: firstNonEmpty(raw, ["website", "websiteUrl"]),
-    source: firstNonEmpty(raw, ["source"]),
-    message: firstNonEmpty(raw, ["message", "biggest_issue", "projectRequirements"]),
-    auditUrl: firstNonEmpty(raw, ["auditUrl", "auditReportUrl"]),
-    agencyId: firstNonEmpty(raw, ["agencyId"]),
-    _hp: typeof raw._hp === "string" ? raw._hp : undefined,
-    cfTurnstileResponse: firstNonEmpty(raw, [
-      "cfTurnstileResponse",
-      "cf-turnstile-response",
-      "turnstileToken",
-    ]),
-  };
+	return {
+		...meta,
+		name,
+		email,
+		phone: firstNonEmpty(raw, ["phone"]),
+		company: firstNonEmpty(raw, ["company"]),
+		website: firstNonEmpty(raw, ["website", "websiteUrl"]),
+		source: firstNonEmpty(raw, ["source"]),
+		message: firstNonEmpty(raw, [
+			"message",
+			"biggest_issue",
+			"projectRequirements",
+		]),
+		auditUrl: firstNonEmpty(raw, ["auditUrl", "auditReportUrl"]),
+		agencyId: firstNonEmpty(raw, ["agencyId"]),
+		_hp: typeof raw._hp === "string" ? raw._hp : undefined,
+		cfTurnstileResponse: firstNonEmpty(raw, [
+			"cfTurnstileResponse",
+			"cf-turnstile-response",
+			"turnstileToken",
+		]),
+	};
 }
 
 function trim(s: unknown): string {
-  return s == null ? "" : String(s).trim();
+	return s == null ? "" : String(s).trim();
 }
 
 /**
  * Build the JSON body for CRM from the marketing AuditForm fields (FormData-compatible keys).
  */
 export function buildPublicLeadPayloadFromFormFields(fields: {
-  first_name?: string;
-  email?: string;
-  company?: string;
-  website?: string;
-  biggest_issue?: string;
-  phone?: string;
-  cta_source?: string;
-  page_context?: string;
-  offer_type?: string;
-  lead_source?: string;
-  page_url?: string;
-  referrer_url?: string;
-  page_title?: string;
-  source_page?: string;
-  ga_client_id?: string;
-  _hp?: string;
-  "cf-turnstile-response"?: string;
+	first_name?: string;
+	email?: string;
+	company?: string;
+	website?: string;
+	biggest_issue?: string;
+	phone?: string;
+	cta_source?: string;
+	page_context?: string;
+	offer_type?: string;
+	lead_source?: string;
+	page_url?: string;
+	referrer_url?: string;
+	page_title?: string;
+	source_page?: string;
+	ga_client_id?: string;
+	_hp?: string;
+	"cf-turnstile-response"?: string;
 }): PublicLeadIngestBody {
-  const name = trim(fields.first_name);
-  const email = trim(fields.email);
-  const website = trim(fields.website);
-  const message = trim(fields.biggest_issue);
-  const phone = trim(fields.phone);
-  const company = trim(fields.company);
-  const turnstile = trim(fields["cf-turnstile-response"]);
+	const name = trim(fields.first_name);
+	const email = trim(fields.email);
+	const website = trim(fields.website);
+	const message = trim(fields.biggest_issue);
+	const phone = trim(fields.phone);
+	const company = trim(fields.company);
+	const turnstile = trim(fields["cf-turnstile-response"]);
 
-  const meta: PublicLeadMarketingMeta = {
-    ctaSource: trim(fields.cta_source) || undefined,
-    pageContext: trim(fields.page_context) || undefined,
-    offerType: trim(fields.offer_type) || undefined,
-    leadSource: trim(fields.lead_source) || undefined,
-    pageUrl: trim(fields.page_url) || undefined,
-    referrerUrl: trim(fields.referrer_url) || undefined,
-    pageTitle: trim(fields.page_title) || undefined,
-    sourcePage: trim(fields.source_page) || undefined,
-    gaClientId: trim(fields.ga_client_id) || undefined,
-  };
+	const meta: PublicLeadMarketingMeta = {
+		ctaSource: trim(fields.cta_source) || undefined,
+		pageContext: trim(fields.page_context) || undefined,
+		offerType: trim(fields.offer_type) || undefined,
+		leadSource: trim(fields.lead_source) || undefined,
+		pageUrl: trim(fields.page_url) || undefined,
+		referrerUrl: trim(fields.referrer_url) || undefined,
+		pageTitle: trim(fields.page_title) || undefined,
+		sourcePage: trim(fields.source_page) || undefined,
+		gaClientId: trim(fields.ga_client_id) || undefined,
+	};
 
-  const sourceBits = [
-    meta.leadSource && `lead:${meta.leadSource}`,
-    meta.ctaSource && `cta:${meta.ctaSource}`,
-    meta.pageContext && `ctx:${meta.pageContext}`,
-    meta.offerType && `offer:${meta.offerType}`,
-  ].filter(Boolean);
+	const sourceBits = [
+		meta.leadSource && `lead:${meta.leadSource}`,
+		meta.ctaSource && `cta:${meta.ctaSource}`,
+		meta.pageContext && `ctx:${meta.pageContext}`,
+		meta.offerType && `offer:${meta.offerType}`,
+	].filter(Boolean);
 
-  const source = sourceBits.length ? `marketing|${sourceBits.join("|")}` : "marketing_site";
+	const source = sourceBits.length
+		? `marketing|${sourceBits.join("|")}`
+		: "marketing_site";
 
-  return {
-    ...meta,
-    name,
-    email,
-    website,
-    message,
-    phone: phone || undefined,
-    company: company || undefined,
-    source,
-    _hp: trim(fields._hp),
-    cfTurnstileResponse: turnstile || undefined,
-  };
+	return {
+		...meta,
+		name,
+		email,
+		website,
+		message,
+		phone: phone || undefined,
+		company: company || undefined,
+		source,
+		_hp: trim(fields._hp),
+		cfTurnstileResponse: turnstile || undefined,
+	};
 }
 
 /** Convenience: read named fields from a browser `FormData` (AuditForm). */
-export function buildPublicLeadPayloadFromFormData(fd: FormData): PublicLeadIngestBody {
-  const get = (name: string) => String(fd.get(name) ?? "");
-  return buildPublicLeadPayloadFromFormFields({
-    first_name: get("first_name"),
-    email: get("email"),
-    company: get("company"),
-    website: get("website"),
-    biggest_issue: get("biggest_issue"),
-    phone: get("phone"),
-    cta_source: get("cta_source"),
-    page_context: get("page_context"),
-    offer_type: get("offer_type"),
-    lead_source: get("lead_source"),
-    page_url: get("page_url"),
-    referrer_url: get("referrer_url"),
-    page_title: get("page_title"),
-    source_page: get("source_page"),
-    ga_client_id: get("ga_client_id"),
-    _hp: get("_hp"),
-    "cf-turnstile-response": get("cf-turnstile-response"),
-  });
+export function buildPublicLeadPayloadFromFormData(
+	fd: FormData,
+): PublicLeadIngestBody {
+	const get = (name: string) => String(fd.get(name) ?? "");
+	return buildPublicLeadPayloadFromFormFields({
+		first_name: get("first_name"),
+		email: get("email"),
+		company: get("company"),
+		website: get("website"),
+		biggest_issue: get("biggest_issue"),
+		phone: get("phone"),
+		cta_source: get("cta_source"),
+		page_context: get("page_context"),
+		offer_type: get("offer_type"),
+		lead_source: get("lead_source"),
+		page_url: get("page_url"),
+		referrer_url: get("referrer_url"),
+		page_title: get("page_title"),
+		source_page: get("source_page"),
+		ga_client_id: get("ga_client_id"),
+		_hp: get("_hp"),
+		"cf-turnstile-response": get("cf-turnstile-response"),
+	});
 }

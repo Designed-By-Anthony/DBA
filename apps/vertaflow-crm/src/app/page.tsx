@@ -16,18 +16,15 @@ export const dynamic = "force-static";
 const showcaseCards = [
 	{
 		title: "Adaptive workspace",
-		copy:
-			"Sidebars, pipelines, and labels reshape around your vertical so your team sees language that already makes sense.",
+		copy: "Sidebars, pipelines, and labels reshape around your vertical so your team sees language that already makes sense.",
 	},
 	{
 		title: "Client-ready portal",
-		copy:
-			"Send magic-link access for invoices, approvals, documents, and updates without handing clients a bloated internal dashboard.",
+		copy: "Send magic-link access for invoices, approvals, documents, and updates without handing clients a bloated internal dashboard.",
 	},
 	{
 		title: "Ops without duct tape",
-		copy:
-			"Automations, follow-up flows, billing, and visibility live in one stack instead of six tabs and a spreadsheet.",
+		copy: "Automations, follow-up flows, billing, and visibility live in one stack instead of six tabs and a spreadsheet.",
 	},
 ];
 
@@ -36,20 +33,37 @@ const pricingTiers = [
 		name: "CRM Core",
 		price: "$29",
 		description: "Pipelines, contacts, tasks, and tenant-scoped workflows.",
-		items: ["Custom stages", "Smart dashboard", "Team activity", "Mobile-ready PWA"],
+		items: [
+			"Custom stages",
+			"Smart dashboard",
+			"Team activity",
+			"Mobile-ready PWA",
+		],
 	},
 	{
 		name: "Professional",
 		price: "$49",
-		description: "Adds automations, portal flows, billing visibility, and stronger reporting.",
-		items: ["Email sequences", "Client portal", "Revenue tracking", "Priority support"],
+		description:
+			"Adds automations, portal flows, billing visibility, and stronger reporting.",
+		items: [
+			"Email sequences",
+			"Client portal",
+			"Revenue tracking",
+			"Priority support",
+		],
 		featured: true,
 	},
 	{
 		name: "Full Stack",
 		price: "$79",
-		description: "For operators who want the whole system wrapped into one operating layer.",
-		items: ["Advanced workflows", "Ops extensions", "Industry skinning", "White-glove onboarding"],
+		description:
+			"For operators who want the whole system wrapped into one operating layer.",
+		items: [
+			"Advanced workflows",
+			"Ops extensions",
+			"Industry skinning",
+			"White-glove onboarding",
+		],
 	},
 ];
 
@@ -80,20 +94,17 @@ const proofPoints = [
 	{
 		icon: LayoutDashboard,
 		title: "One front door",
-		copy:
-			"Marketing, product story, and login now live in one place so the handoff from interest to usage feels intentional.",
+		copy: "Marketing, product story, and login now live in one place so the handoff from interest to usage feels intentional.",
 	},
 	{
 		icon: ChartNoAxesCombined,
 		title: "A different CRM philosophy",
-		copy:
-			"VertaFlow bends toward the operator instead of forcing the operator to bend toward the software.",
+		copy: "VertaFlow bends toward the operator instead of forcing the operator to bend toward the software.",
 	},
 	{
 		icon: ShieldCheck,
 		title: "Zero-trust tenant scoping",
-		copy:
-			"Every serious workflow remains organization-scoped so growth does not come at the expense of isolation.",
+		copy: "Every serious workflow remains organization-scoped so growth does not come at the expense of isolation.",
 	},
 ];
 
@@ -159,13 +170,14 @@ export default function LandingPage() {
 								One CRM. Every vertical. Your way.
 							</div>
 							<h1 className="max-w-4xl font-[family-name:var(--font-display)] text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl">
-								VertaFlow lands where the work starts, not where the marketing ends.
+								VertaFlow lands where the work starts, not where the marketing
+								ends.
 							</h1>
 							<p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--color-text-gray)] md:text-xl">
-								This is the restored VertaFlow front door: a product-led landing page
-								on the same app that powers the CRM. Operators can understand the
-								approach, compare the model, and jump straight into login without
-								leaving the experience.
+								This is the restored VertaFlow front door: a product-led landing
+								page on the same app that powers the CRM. Operators can
+								understand the approach, compare the model, and jump straight
+								into login without leaving the experience.
 							</p>
 							<div className="mt-8 flex flex-col gap-3 sm:flex-row">
 								<a
@@ -196,7 +208,8 @@ export default function LandingPage() {
 										Multi-vertical
 									</p>
 									<p className="mt-2 text-sm text-[var(--color-text-muted)]">
-										Pipelines and language shift to fit the business instead of the reverse.
+										Pipelines and language shift to fit the business instead of
+										the reverse.
 									</p>
 								</div>
 								<div>
@@ -225,20 +238,24 @@ export default function LandingPage() {
 										<p className="font-[family-name:var(--font-display)] text-sm font-semibold text-white">
 											VertaFlow
 										</p>
-										{["Pipeline", "Inbox", "Billing", "Portal", "Automations"].map(
-											(item, index) => (
-												<div
-													key={item}
-													className={`rounded-xl px-3 py-2 text-xs ${
-														index === 0
-															? "bg-emerald-400/12 text-emerald-300"
-															: "bg-white/4 text-[var(--color-text-muted)]"
-													}`}
-												>
-													{item}
-												</div>
-											),
-										)}
+										{[
+											"Pipeline",
+											"Inbox",
+											"Billing",
+											"Portal",
+											"Automations",
+										].map((item, index) => (
+											<div
+												key={item}
+												className={`rounded-xl px-3 py-2 text-xs ${
+													index === 0
+														? "bg-emerald-400/12 text-emerald-300"
+														: "bg-white/4 text-[var(--color-text-muted)]"
+												}`}
+											>
+												{item}
+											</div>
+										))}
 									</div>
 
 									<div className="space-y-4">
@@ -295,7 +312,9 @@ export default function LandingPage() {
 													key={card.title}
 													className="rounded-2xl border border-white/6 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(255,255,255,0.03))] p-4"
 												>
-													<p className="text-sm font-semibold text-white">{card.title}</p>
+													<p className="text-sm font-semibold text-white">
+														{card.title}
+													</p>
 													<p className="mt-2 text-sm leading-6 text-[var(--color-text-gray)]">
 														{card.body}
 													</p>
@@ -309,7 +328,10 @@ export default function LandingPage() {
 					</div>
 				</section>
 
-				<section id="product" className="border-t border-white/8 px-4 py-18 md:px-6 md:py-24">
+				<section
+					id="product"
+					className="border-t border-white/8 px-4 py-18 md:px-6 md:py-24"
+				>
 					<div className="mx-auto max-w-7xl">
 						<div className="max-w-3xl">
 							<p className="text-sm font-semibold uppercase tracking-[0.26em] text-emerald-300">
@@ -319,9 +341,9 @@ export default function LandingPage() {
 								The version you had before, back where it belongs.
 							</h2>
 							<p className="mt-5 text-lg leading-8 text-[var(--color-text-gray)]">
-								The landing is no longer a redirect accident. It now explains the
-								product, shows the operating model, and still hands people cleanly into
-								the live CRM.
+								The landing is no longer a redirect accident. It now explains
+								the product, shows the operating model, and still hands people
+								cleanly into the live CRM.
 							</p>
 						</div>
 
@@ -346,7 +368,10 @@ export default function LandingPage() {
 					</div>
 				</section>
 
-				<section id="pricing" className="border-t border-white/8 bg-white/[0.02] px-4 py-18 md:px-6 md:py-24">
+				<section
+					id="pricing"
+					className="border-t border-white/8 bg-white/[0.02] px-4 py-18 md:px-6 md:py-24"
+				>
 					<div className="mx-auto max-w-7xl">
 						<div className="max-w-3xl">
 							<p className="text-sm font-semibold uppercase tracking-[0.26em] text-emerald-300">
@@ -387,12 +412,17 @@ export default function LandingPage() {
 										<span className="font-[family-name:var(--font-display)] text-5xl font-semibold text-white">
 											{tier.price}
 										</span>
-										<span className="pb-2 text-sm text-[var(--color-text-muted)]">/mo</span>
+										<span className="pb-2 text-sm text-[var(--color-text-muted)]">
+											/mo
+										</span>
 									</div>
 
 									<ul className="mt-8 space-y-3">
 										{tier.items.map((item) => (
-											<li key={item} className="flex items-start gap-3 text-sm text-[var(--color-text-gray)]">
+											<li
+												key={item}
+												className="flex items-start gap-3 text-sm text-[var(--color-text-gray)]"
+											>
 												<CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
 												<span>{item}</span>
 											</li>
@@ -404,19 +434,24 @@ export default function LandingPage() {
 					</div>
 				</section>
 
-				<section id="why" className="border-t border-white/8 px-4 py-18 md:px-6 md:py-24">
+				<section
+					id="why"
+					className="border-t border-white/8 px-4 py-18 md:px-6 md:py-24"
+				>
 					<div className="mx-auto grid max-w-7xl gap-10 xl:grid-cols-[0.95fr_1.05fr]">
 						<div>
 							<p className="text-sm font-semibold uppercase tracking-[0.26em] text-emerald-300">
 								Why this approach hits differently
 							</p>
 							<h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-semibold tracking-tight md:text-5xl">
-								We did not want another generic CRM with your logo pasted on top.
+								We did not want another generic CRM with your logo pasted on
+								top.
 							</h2>
 							<p className="mt-5 text-lg leading-8 text-[var(--color-text-gray)]">
-								VertaFlow is built around the idea that software should adopt the
-								operator&apos;s mental model. That means less translation, faster
-								throughput, and a product story you can actually feel in the interface.
+								VertaFlow is built around the idea that software should adopt
+								the operator&apos;s mental model. That means less translation,
+								faster throughput, and a product story you can actually feel in
+								the interface.
 							</p>
 
 							<div className="mt-8 space-y-4">
@@ -471,7 +506,9 @@ export default function LandingPage() {
 									>
 										<div className="pr-4 text-white">{row.label}</div>
 										<div className="pr-4 text-emerald-300">{row.vertaflow}</div>
-										<div className="text-[var(--color-text-gray)]">{row.legacy}</div>
+										<div className="text-[var(--color-text-gray)]">
+											{row.legacy}
+										</div>
 									</div>
 								))}
 							</div>
@@ -480,8 +517,8 @@ export default function LandingPage() {
 								<div className="flex items-start gap-3">
 									<MessageSquareQuote className="mt-1 h-5 w-5 text-emerald-300" />
 									<p className="text-sm leading-7 text-emerald-100/90">
-										The point is not to look different for the sake of it. The point is
-										to remove friction the minute someone logs in.
+										The point is not to look different for the sake of it. The
+										point is to remove friction the minute someone logs in.
 									</p>
 								</div>
 							</div>
@@ -498,8 +535,9 @@ export default function LandingPage() {
 							VertaFlow is back on VertaFlow.
 						</h2>
 						<p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-emerald-50/85">
-							The landing is restored, the CRM is still right behind it, and login is
-							one click away. That&apos;s the clean version of the story.
+							The landing is restored, the CRM is still right behind it, and
+							login is one click away. That&apos;s the clean version of the
+							story.
 						</p>
 						<div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 							<a

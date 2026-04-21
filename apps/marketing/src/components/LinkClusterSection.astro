@@ -1,28 +1,21 @@
 ---
 export interface LinkClusterItem {
-  title: string;
-  href: string;
-  description: string;
-  tag?: string;
+	title: string;
+	href: string;
+	description: string;
+	tag?: string;
 }
 
 interface Props {
-  eyebrow: string;
-  title: string;
-  intro?: string;
-  items: LinkClusterItem[];
-  ctaHref?: string;
-  ctaLabel?: string;
+	eyebrow: string;
+	title: string;
+	intro?: string;
+	items: LinkClusterItem[];
+	ctaHref?: string;
+	ctaLabel?: string;
 }
 
-const {
-  eyebrow,
-  title,
-  intro,
-  items,
-  ctaHref,
-  ctaLabel,
-} = Astro.props;
+const { eyebrow, title, intro, items, ctaHref, ctaLabel } = Astro.props;
 ---
 
 {

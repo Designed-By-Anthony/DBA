@@ -8,17 +8,17 @@ import { defineConfig } from "drizzle-kit";
  * Falls back to DATABASE_URL as-is.
  */
 function resolveUrl(): string {
-  const url = process.env.DATABASE_URL ?? "";
-  // Neon pooler URLs contain `-pooler.` — drizzle-kit must use the direct endpoint.
-  return url.replace("-pooler.", ".");
+	const url = process.env.DATABASE_URL ?? "";
+	// Neon pooler URLs contain `-pooler.` — drizzle-kit must use the direct endpoint.
+	return url.replace("-pooler.", ".");
 }
 
 export default defineConfig({
-  schema: "./schema.ts",
-  out: "./drizzle",
-  dialect: "postgresql",
-  dbCredentials: {
-    url: resolveUrl(),
-    ssl: { rejectUnauthorized: false },
-  },
+	schema: "./schema.ts",
+	out: "./drizzle",
+	dialect: "postgresql",
+	dbCredentials: {
+		url: resolveUrl(),
+		ssl: { rejectUnauthorized: false },
+	},
 });

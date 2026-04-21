@@ -1,37 +1,43 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { Image } from 'astro:assets';
-import FeedSubscribeCluster from '../components/FeedSubscribeCluster.astro';
-import { showcaseExampleItems, showcaseInProgressItems } from '../data/showcase';
-import { PUBLIC_PRICING_PILL, PUBLIC_SITE_SOCIAL_IMAGE } from '../lib/offers';
-import { buildItemListSchema } from '../lib/seo';
-import { releases } from '../data/releases';
+import { Image } from "astro:assets";
+import FeedSubscribeCluster from "../components/FeedSubscribeCluster.astro";
+import { releases } from "../data/releases";
+import {
+	showcaseExampleItems,
+	showcaseInProgressItems,
+} from "../data/showcase";
+import Layout from "../layouts/Layout.astro";
+import { PUBLIC_PRICING_PILL, PUBLIC_SITE_SOCIAL_IMAGE } from "../lib/offers";
+import { buildItemListSchema } from "../lib/seo";
 
 const sortedReleases = [...releases].sort(
-  (a, b) => new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
+	(a, b) =>
+		new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
 );
 
 const portfolioSchema = buildItemListSchema({
-  name: 'Portfolio and Example Sites',
-  description: 'Finished example builds that show how Designed by Anthony approaches trust, clarity, and conversion.',
-  path: '/portfolio',
-  items: showcaseExampleItems.map((item) => ({
-    name: item.name,
-    url: item.href,
-    description: `${item.problem} ${item.solution}`,
-    image: item.image,
-  })),
+	name: "Portfolio and Example Sites",
+	description:
+		"Finished example builds that show how Designed by Anthony approaches trust, clarity, and conversion.",
+	path: "/portfolio",
+	items: showcaseExampleItems.map((item) => ({
+		name: item.name,
+		url: item.href,
+		description: `${item.problem} ${item.solution}`,
+		image: item.image,
+	})),
 });
 
 const portfolioFooterCta = {
-  eyebrow: 'Free Instant Audit',
-  title: 'Want your site to perform like these examples?',
-  description:
-    'Run our in-house Lighthouse scanner against your URL and see how you compare. Instant performance, accessibility, best practices, and SEO scores.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: 'https://calendly.com/anthony-designedbyanthony/web-design-consult',
-  secondaryLabel: 'Book a 15-minute intro call',
+	eyebrow: "Free Instant Audit",
+	title: "Want your site to perform like these examples?",
+	description:
+		"Run our in-house Lighthouse scanner against your URL and see how you compare. Instant performance, accessibility, best practices, and SEO scores.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref:
+		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
+	secondaryLabel: "Book a 15-minute intro call",
 };
 ---
 

@@ -1,104 +1,108 @@
 ---
-import ServiceAreaPage from '../../components/ServiceAreaPage.astro';
-import { buildServiceAreaSchema } from '../../lib/seo';
+import ServiceAreaPage from "../../components/ServiceAreaPage.astro";
+import { buildServiceAreaSchema } from "../../lib/seo";
 
-const pageTitle = 'North Country NY Web Design & SEO | Designed by Anthony';
+const pageTitle = "North Country NY Web Design & SEO | Designed by Anthony";
 const pageDescription =
-  'Web design, local SEO, and hosting for North Country NY service businesses — Watertown, Fort Drum, Lowville, Carthage — covering wide rural service areas.';
+	"Web design, local SEO, and hosting for North Country NY service businesses — Watertown, Fort Drum, Lowville, Carthage — covering wide rural service areas.";
 
 const areaSchema = buildServiceAreaSchema({
-  name: 'Web Design and Hosting Services in the North Country, New York',
-  description: pageDescription,
-  path: '/service-areas/north-country',
-  areaServed: 'North Country, New York',
-  serviceType: 'Web design, hosting, and local SEO',
-  cityName: 'Watertown',
-  regionName: 'New York',
-  regionAbbr: 'NY',
-  geo: { latitude: 43.9748, longitude: -75.9108 },
+	name: "Web Design and Hosting Services in the North Country, New York",
+	description: pageDescription,
+	path: "/service-areas/north-country",
+	areaServed: "North Country, New York",
+	serviceType: "Web design, hosting, and local SEO",
+	cityName: "Watertown",
+	regionName: "New York",
+	regionAbbr: "NY",
+	geo: { latitude: 43.9748, longitude: -75.9108 },
 });
 
 const blocks = [
-  {
-    level: 'h2' as const,
-    title: 'Why North Country businesses need clearer service-area pages',
-    paragraphs: [
-      'The North Country works differently than a compact city market. Businesses often cover long travel distances, serve multiple towns, and depend on customers who search from phones while on the move. That changes what the website has to do.',
-      'Instead of trying to feel broad and impressive, the site needs to feel clear and dependable. Customers want to know where you serve, how to reach you, and whether you are the kind of business that actually shows up when needed.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Wide territories make vague copy more expensive',
-    paragraphs: [
-      'If a business serves Watertown, Lowville, Carthage, Fort Drum, or smaller surrounding towns, the site has to explain coverage cleanly. A vague regional claim leaves too much doubt. People hesitate when they are not sure whether you truly serve their area.',
-    ],
-  },
-  {
-    level: 'h4' as const,
-    title: 'Mobile reliability matters more in rural search behavior',
-    paragraphs: [
-      'North Country customers are often dealing with weaker connections, faster decision cycles, and more practical intent. Fast pages, obvious calls to action, and simple contact paths outperform heavy designs that assume perfect bandwidth.',
-    ],
-  },
-  {
-    level: 'h5' as const,
-    title: 'Coverage clarity lowers friction in wide service territories',
-    paragraphs: [
-      'When travel radius is part of the buying decision, the page needs to make service coverage feel obvious so people do not hesitate or guess wrong.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Website rescues for businesses operating across rural and small-city markets',
-    paragraphs: [
-      'A lot of North Country businesses have websites that were built mainly to have something online. Over time those sites become hard to trust: they look outdated, bury the service area information, or make the customer work too hard to figure out what happens next.',
-      'A rescue rebuilds the site around clarity. That means cleaner service descriptions, stronger proof, better mobile behavior, and a structure that matches how customers in a spread-out market actually buy.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'Seasonality changes the way these pages should work',
-    paragraphs: [
-      'Businesses in the North Country often deal with weather-driven urgency, tourism swings, and strong seasonal demand shifts. A solid page structure makes it easier to highlight seasonal services, update priority offers, and keep the site aligned with the work that matters most at different times of year.',
-    ],
-  },
-  {
-    level: 'h2' as const,
-    title: 'Hosting and SEO for businesses with long travel radiuses',
-    paragraphs: [
-      'Managed hosting helps by keeping the experience fast and stable no matter where the visitor is coming from. That is especially helpful for service businesses that rely on quick trust from a user who may only spend a few seconds deciding whether to call.',
-      'SEO strategy in the North Country usually works best when it balances one strong regional page with a few carefully chosen town pages where demand is real. That creates clarity without blowing up into a long list of low-value location pages.',
-    ],
-  },
-  {
-    level: 'h3' as const,
-    title: 'When the regional page should stay broad',
-    paragraphs: [
-      'If your business truly serves a wide area and customers mostly care about coverage and responsiveness, a well-built North Country page can do a lot of work on its own. The key is making the page specific enough to feel credible, even while it covers a larger territory.',
-    ],
-  },
+	{
+		level: "h2" as const,
+		title: "Why North Country businesses need clearer service-area pages",
+		paragraphs: [
+			"The North Country works differently than a compact city market. Businesses often cover long travel distances, serve multiple towns, and depend on customers who search from phones while on the move. That changes what the website has to do.",
+			"Instead of trying to feel broad and impressive, the site needs to feel clear and dependable. Customers want to know where you serve, how to reach you, and whether you are the kind of business that actually shows up when needed.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Wide territories make vague copy more expensive",
+		paragraphs: [
+			"If a business serves Watertown, Lowville, Carthage, Fort Drum, or smaller surrounding towns, the site has to explain coverage cleanly. A vague regional claim leaves too much doubt. People hesitate when they are not sure whether you truly serve their area.",
+		],
+	},
+	{
+		level: "h4" as const,
+		title: "Mobile reliability matters more in rural search behavior",
+		paragraphs: [
+			"North Country customers are often dealing with weaker connections, faster decision cycles, and more practical intent. Fast pages, obvious calls to action, and simple contact paths outperform heavy designs that assume perfect bandwidth.",
+		],
+	},
+	{
+		level: "h5" as const,
+		title: "Coverage clarity lowers friction in wide service territories",
+		paragraphs: [
+			"When travel radius is part of the buying decision, the page needs to make service coverage feel obvious so people do not hesitate or guess wrong.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title:
+			"Website rescues for businesses operating across rural and small-city markets",
+		paragraphs: [
+			"A lot of North Country businesses have websites that were built mainly to have something online. Over time those sites become hard to trust: they look outdated, bury the service area information, or make the customer work too hard to figure out what happens next.",
+			"A rescue rebuilds the site around clarity. That means cleaner service descriptions, stronger proof, better mobile behavior, and a structure that matches how customers in a spread-out market actually buy.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "Seasonality changes the way these pages should work",
+		paragraphs: [
+			"Businesses in the North Country often deal with weather-driven urgency, tourism swings, and strong seasonal demand shifts. A solid page structure makes it easier to highlight seasonal services, update priority offers, and keep the site aligned with the work that matters most at different times of year.",
+		],
+	},
+	{
+		level: "h2" as const,
+		title: "Hosting and SEO for businesses with long travel radiuses",
+		paragraphs: [
+			"Managed hosting helps by keeping the experience fast and stable no matter where the visitor is coming from. That is especially helpful for service businesses that rely on quick trust from a user who may only spend a few seconds deciding whether to call.",
+			"SEO strategy in the North Country usually works best when it balances one strong regional page with a few carefully chosen town pages where demand is real. That creates clarity without blowing up into a long list of low-value location pages.",
+		],
+	},
+	{
+		level: "h3" as const,
+		title: "When the regional page should stay broad",
+		paragraphs: [
+			"If your business truly serves a wide area and customers mostly care about coverage and responsiveness, a well-built North Country page can do a lot of work on its own. The key is making the page specific enough to feel credible, even while it covers a larger territory.",
+		],
+	},
 ];
 
 const relatedMarkets = [
-  {
-    title: 'Syracuse Web Design Company',
-    href: '/service-areas/syracuse',
-    description: 'Useful when the business wants separate coverage for Syracuse instead of folding that demand into one broad regional page.',
-    tag: 'Syracuse',
-  },
-  {
-    title: 'Website Design, Hosting & SEO in Utica, NY',
-    href: '/service-areas/utica',
-    description: 'A stronger fit for businesses that also need a dedicated page for the Utica market and surrounding towns.',
-    tag: 'Utica',
-  },
-  {
-    title: 'Rome NY Website Designer',
-    href: '/service-areas/rome',
-    description: 'Helpful for businesses that serve both the North Country and the Rome side of Central New York.',
-    tag: 'Rome',
-  },
+	{
+		title: "Syracuse Web Design Company",
+		href: "/service-areas/syracuse",
+		description:
+			"Useful when the business wants separate coverage for Syracuse instead of folding that demand into one broad regional page.",
+		tag: "Syracuse",
+	},
+	{
+		title: "Website Design, Hosting & SEO in Utica, NY",
+		href: "/service-areas/utica",
+		description:
+			"A stronger fit for businesses that also need a dedicated page for the Utica market and surrounding towns.",
+		tag: "Utica",
+	},
+	{
+		title: "Rome NY Website Designer",
+		href: "/service-areas/rome",
+		description:
+			"Helpful for businesses that serve both the North Country and the Rome side of Central New York.",
+		tag: "Rome",
+	},
 ];
 ---
 

@@ -3,11 +3,11 @@
  * https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
  */
 
-const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export interface TurnstileResult {
-  success: boolean;
-  errorCodes: string[];
+	success: boolean;
+	errorCodes: string[];
 }
 
 /**
@@ -18,49 +18,52 @@ export interface TurnstileResult {
  * @returns      Verification result with success flag and any error codes.
  */
 export async function verifyTurnstileToken(
-  token: string,
-  ip?: string
+	token: string,
+	ip?: string,
 ): Promise<TurnstileResult> {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+	const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
-  if (!secretKey) {
-    console.error('TURNSTILE_SECRET_KEY is not configured');
-    return { success: false, errorCodes: ['missing-secret-key'] };
-  }
+	if (!secretKey) {
+		console.error("TURNSTILE_SECRET_KEY is not configured");
+		return { success: false, errorCodes: ["missing-secret-key"] };
+	}
 
-  if (!token || typeof token !== 'string' || !token.trim()) {
-    return { success: false, errorCodes: ['missing-input-response'] };
-  }
+	if (!token || typeof token !== "string" || !token.trim()) {
+		return { success: false, errorCodes: ["missing-input-response"] };
+	}
 
-  try {
-    const body: Record<string, string> = {
-      secret: secretKey,
-      response: token,
-    };
+	try {
+		const body: Record<string, string> = {
+			secret: secretKey,
+			response: token,
+		};
 
-    if (ip) {
-      body.remoteip = ip;
-    }
+		if (ip) {
+			body.remoteip = ip;
+		}
 
-    const response = await fetch(VERIFY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(body).toString(),
-    });
+		const response = await fetch(VERIFY_URL, {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams(body).toString(),
+		});
 
-    if (!response.ok) {
-      console.error(`Turnstile verify returned HTTP ${response.status}`);
-      return { success: false, errorCodes: [`http-${response.status}`] };
-    }
+		if (!response.ok) {
+			console.error(`Turnstile verify returned HTTP ${response.status}`);
+			return { success: false, errorCodes: [`http-${response.status}`] };
+		}
 
-    const data = await response.json();
+		const data = await response.json();
 
-    return {
-      success: Boolean(data.success),
-      errorCodes: Array.isArray(data['error-codes']) ? data['error-codes'] : [],
-    };
-  } catch (err) {
-    console.error('Turnstile verification failed:', err instanceof Error ? err.message : err);
-    return { success: false, errorCodes: ['network-error'] };
-  }
+		return {
+			success: Boolean(data.success),
+			errorCodes: Array.isArray(data["error-codes"]) ? data["error-codes"] : [],
+		};
+	} catch (err) {
+		console.error(
+			"Turnstile verification failed:",
+			err instanceof Error ? err.message : err,
+		);
+		return { success: false, errorCodes: ["network-error"] };
+	}
 }

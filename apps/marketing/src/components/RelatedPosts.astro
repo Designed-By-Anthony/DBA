@@ -1,19 +1,19 @@
 ---
 export interface RelatedPost {
-  title: string;
-  href: string;
-  description: string;
-  image?: string;
-  imageAlt?: string;
-  tag?: string;
+	title: string;
+	href: string;
+	description: string;
+	image?: string;
+	imageAlt?: string;
+	tag?: string;
 }
 
 interface Props {
-  posts: RelatedPost[];
-  heading?: string;
+	posts: RelatedPost[];
+	heading?: string;
 }
 
-const { posts, heading = 'Keep Reading' } = Astro.props;
+const { posts, heading = "Keep Reading" } = Astro.props;
 ---
 
 <section class="related-posts-section">

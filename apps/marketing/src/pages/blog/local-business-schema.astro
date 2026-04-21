@@ -1,35 +1,41 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const schemaSources = [
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: "Google specifically instructs using LocalBusiness structured data to claim knowledge panels and improve local map pack presence.",
-  },
-  {
-    ...evidenceLinks.astroIslands,
-    note: "Astro allows us to flawlessly integrate data-heavy structures like schema without compromising page load speeds.",
-  },
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Google specifically instructs using LocalBusiness structured data to claim knowledge panels and improve local map pack presence.",
+	},
+	{
+		...evidenceLinks.astroIslands,
+		note: "Astro allows us to flawlessly integrate data-heavy structures like schema without compromising page load speeds.",
+	},
 ];
 
-const articleImage =
-  '/images/local_schema_cover_v2.png';
-const publishedTime = '2026-03-27T09:00:00-04:00';
+const articleImage = "/images/local_schema_cover_v2.png";
+const publishedTime = "2026-03-27T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'The Hidden Code That Gets Local Businesses Ranked',
-  description:
-    'Structured data is the secret language of search engines. Learn how LocalBusiness schema directly influences visibility.',
-  path: '/blog/local-business-schema',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'SEO',
-  keywords: ['Schema markup', 'Local SEO', 'LocalBusiness', 'Web design', 'Syracuse web design', 'Miami web design'],
+	headline: "The Hidden Code That Gets Local Businesses Ranked",
+	description:
+		"Structured data is the secret language of search engines. Learn how LocalBusiness schema directly influences visibility.",
+	path: "/blog/local-business-schema",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "SEO",
+	keywords: [
+		"Schema markup",
+		"Local SEO",
+		"LocalBusiness",
+		"Web design",
+		"Syracuse web design",
+		"Miami web design",
+	],
 });
 ---
 <Layout

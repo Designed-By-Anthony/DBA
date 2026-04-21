@@ -19,21 +19,21 @@ export const BRAND_SITE_URL = "https://designedbyanthony.com";
 
 /** Public URL paths served by every app. Absolute-from-root (`/brand/...`). */
 export const BRAND_ASSETS = {
-  /** Horizontal brand lockup (full-width logo). */
-  logo: "/brand/logo.png",
-  /** Horizontal brand lockup, larger source (for retina/print). */
-  logoFull: "/brand/logo-full.png",
-  /** Square/icon mark — used in dense UI chrome (sidebars, PWA). */
-  mark: "/brand/mark.webp",
+	/** Horizontal brand lockup (full-width logo). */
+	logo: "/brand/logo.png",
+	/** Horizontal brand lockup, larger source (for retina/print). */
+	logoFull: "/brand/logo-full.png",
+	/** Square/icon mark — used in dense UI chrome (sidebars, PWA). */
+	mark: "/brand/mark.webp",
 } as const;
 
 export type BrandAssetKey = keyof typeof BRAND_ASSETS;
 
 /** Build an absolute URL for a brand asset (for OG images, JSON-LD, etc.). */
 export function brandAssetUrl(
-  key: BrandAssetKey,
-  siteUrl: string = BRAND_SITE_URL,
+	key: BrandAssetKey,
+	siteUrl: string = BRAND_SITE_URL,
 ): string {
-  const base = siteUrl.replace(/\/$/, "");
-  return `${base}${BRAND_ASSETS[key]}`;
+	const base = siteUrl.replace(/\/$/, "");
+	return `${base}${BRAND_ASSETS[key]}`;
 }

@@ -1,6 +1,6 @@
 ---
-import { getTurnstileSiteKey } from '../lib/turnstile';
-import { normalizePath } from '../lib/seo';
+import { normalizePath } from "../lib/seo";
+import { getTurnstileSiteKey } from "../lib/turnstile";
 
 const turnstileSiteKey = getTurnstileSiteKey();
 
@@ -11,87 +11,90 @@ const turnstileSiteKey = getTurnstileSiteKey();
  * deploys that still point at `/api/lead`.
  */
 const defaultFormEndpoint =
-  import.meta.env.PUBLIC_INGEST_URL ||
-  import.meta.env.PUBLIC_CRM_LEAD_URL ||
-  'https://admin.vertaflow.io/api/v1/ingest';
+	import.meta.env.PUBLIC_INGEST_URL ||
+	import.meta.env.PUBLIC_CRM_LEAD_URL ||
+	"https://admin.vertaflow.io/api/v1/ingest";
 
 /** Clerk org id (tenant) for this marketing build — threaded through the `X-Tenant-Id` header. */
-const tenantId = import.meta.env.PUBLIC_TENANT_ID || '';
+const tenantId = import.meta.env.PUBLIC_TENANT_ID || "";
 
 export interface Props {
-  ctaSource: string;
-  pageContext: string;
-  pageTitle?: string;
-  formEndpoint?: string;
-  /** Stable key for backend/CRM; every form should set this so leads are traceable. */
-  offerType?: string;
-  subjectLine?: string;
-  successLinkHref?: string;
-  successLinkLabel?: string;
-  successMode?: 'inline' | 'redirect';
-  successRedirect?: string;
-  successTag?: string;
-  successTitle?: string;
-  successMessage?: string;
-  successPoints?: string[];
-  submitLabel?: string;
-  metaMessage?: string;
-  websiteLabel?: string;
-  websitePlaceholder?: string;
-  websiteRequired?: boolean;
-  issueLabel?: string;
-  issuePlaceholder?: string;
-  issueRequired?: boolean;
-  showPhoneField?: boolean;
-  /** Textarea height; use 2–3 for compact inline forms. */
-  issueRows?: number;
+	ctaSource: string;
+	pageContext: string;
+	pageTitle?: string;
+	formEndpoint?: string;
+	/** Stable key for backend/CRM; every form should set this so leads are traceable. */
+	offerType?: string;
+	subjectLine?: string;
+	successLinkHref?: string;
+	successLinkLabel?: string;
+	successMode?: "inline" | "redirect";
+	successRedirect?: string;
+	successTag?: string;
+	successTitle?: string;
+	successMessage?: string;
+	successPoints?: string[];
+	submitLabel?: string;
+	metaMessage?: string;
+	websiteLabel?: string;
+	websitePlaceholder?: string;
+	websiteRequired?: boolean;
+	issueLabel?: string;
+	issuePlaceholder?: string;
+	issueRequired?: boolean;
+	showPhoneField?: boolean;
+	/** Textarea height; use 2–3 for compact inline forms. */
+	issueRows?: number;
 }
 
 const {
-  ctaSource,
-  pageContext,
-  pageTitle = 'Designed by Anthony',
-  formEndpoint = defaultFormEndpoint,
-  offerType = 'free_website_audit',
-  subjectLine = `Free Website Audit Request - ${pageTitle}`,
-  successLinkHref = '/portfolio',
-  successLinkLabel = 'See Example Builds',
-  successMode = 'inline',
-  successRedirect = '/thank-you?offer=audit',
-  successTag = 'Audit Requested',
-  successTitle = 'Audit request received',
-  successMessage = 'Anthony will review your submission and reach out within 24 hours with the clearest next step.',
-  successPoints = [
-    'I run the BuiltWith stack scan and Lighthouse test.',
-    'I compile the clearest issues and likely gains into one report.',
-    'You will hear from Anthony within 24 hours with a practical next step.',
-  ],
-  submitLabel = 'Send My Audit Request',
-  metaMessage = 'No spam. Just a BuiltWith scan, a Lighthouse test, and a direct follow-up within 24 hours.',
-  websiteLabel = 'Website URL',
-  websitePlaceholder = 'yourwebsite.com',
-  websiteRequired = true,
-  issueLabel = 'What feels off right now?',
-  issuePlaceholder = 'Low-quality leads, not enough calls, weak local rankings, dated design, slow mobile experience...',
-  issueRequired = true,
-  showPhoneField = true,
-  issueRows = 5,
+	ctaSource,
+	pageContext,
+	pageTitle = "Designed by Anthony",
+	formEndpoint = defaultFormEndpoint,
+	offerType = "free_website_audit",
+	subjectLine = `Free Website Audit Request - ${pageTitle}`,
+	successLinkHref = "/portfolio",
+	successLinkLabel = "See Example Builds",
+	successMode = "inline",
+	successRedirect = "/thank-you?offer=audit",
+	successTag = "Audit Requested",
+	successTitle = "Audit request received",
+	successMessage = "Anthony will review your submission and reach out within 24 hours with the clearest next step.",
+	successPoints = [
+		"I run the BuiltWith stack scan and Lighthouse test.",
+		"I compile the clearest issues and likely gains into one report.",
+		"You will hear from Anthony within 24 hours with a practical next step.",
+	],
+	submitLabel = "Send My Audit Request",
+	metaMessage = "No spam. Just a BuiltWith scan, a Lighthouse test, and a direct follow-up within 24 hours.",
+	websiteLabel = "Website URL",
+	websitePlaceholder = "yourwebsite.com",
+	websiteRequired = true,
+	issueLabel = "What feels off right now?",
+	issuePlaceholder = "Low-quality leads, not enough calls, weak local rankings, dated design, slow mobile experience...",
+	issueRequired = true,
+	showPhoneField = true,
+	issueRows = 5,
 } = Astro.props;
 
 const sourcePath = normalizePath(Astro.url.pathname);
 
 /** Human-readable origin for emails/CRM; posted as `lead_source` alongside `offer_type`. */
 const LEAD_SOURCE_LABELS: Record<string, string> = {
-  home_page_contact: 'Home page contact',
-  contact_page: 'Contact page',
-  facebook_growth_offer: 'Facebook growth offer',
-  free_website_audit: 'Free website audit',
-  general_inquiry: 'Contact page',
-  quick_contact_home: 'Home page contact',
+	home_page_contact: "Home page contact",
+	contact_page: "Contact page",
+	facebook_growth_offer: "Facebook growth offer",
+	free_website_audit: "Free website audit",
+	general_inquiry: "Contact page",
+	quick_contact_home: "Home page contact",
 };
 
 function leadSourceLabelForOfferType(ot: string): string {
-  return LEAD_SOURCE_LABELS[ot] ?? ot.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+	return (
+		LEAD_SOURCE_LABELS[ot] ??
+		ot.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+	);
 }
 
 const leadSourceLabel = leadSourceLabelForOfferType(offerType);

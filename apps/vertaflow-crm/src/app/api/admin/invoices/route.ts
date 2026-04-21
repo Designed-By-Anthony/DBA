@@ -1,11 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import "@dba/env/web-viewer-aliases";
 import { auth } from "@clerk/nextjs/server";
-import {
-	getDb,
-	invoices,
-	withTenantContext,
-} from "@dba/database";
+import { getDb, invoices, withTenantContext } from "@dba/database";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { apiError } from "@/lib/api-error";

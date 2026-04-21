@@ -1,23 +1,18 @@
 ---
 interface SourceItem {
-  label: string;
-  note?: string;
-  url: string;
+	label: string;
+	note?: string;
+	url: string;
 }
 
 interface Props {
-  title?: string;
-  intro?: string;
-  items: SourceItem[];
-  compact?: boolean;
+	title?: string;
+	intro?: string;
+	items: SourceItem[];
+	compact?: boolean;
 }
 
-const {
-  title = "Sources",
-  intro,
-  items = [],
-  compact = false,
-} = Astro.props;
+const { title = "Sources", intro, items = [], compact = false } = Astro.props;
 ---
 
 {

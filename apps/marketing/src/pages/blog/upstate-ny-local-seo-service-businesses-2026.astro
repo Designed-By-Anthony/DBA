@@ -1,52 +1,52 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const postSources = [
-  {
-    ...evidenceLinks.googleBusinessProfileLocalRanking,
-    note: 'Google outlines how relevance, distance, and prominence affect local results.',
-  },
-  {
-    ...evidenceLinks.googleMobileFirst,
-    note: 'Google uses the mobile version of a page for indexing.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Core Web Vitals and usability factor into how Google thinks about page experience.',
-  },
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'Structured data can help Google understand business details such as hours and service area.',
-  },
-  {
-    ...evidenceLinks.astroWhy,
-    note: 'Astro keeps marketing sites lean so pages stay fast and easier to maintain.',
-  },
+	{
+		...evidenceLinks.googleBusinessProfileLocalRanking,
+		note: "Google outlines how relevance, distance, and prominence affect local results.",
+	},
+	{
+		...evidenceLinks.googleMobileFirst,
+		note: "Google uses the mobile version of a page for indexing.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Core Web Vitals and usability factor into how Google thinks about page experience.",
+	},
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Structured data can help Google understand business details such as hours and service area.",
+	},
+	{
+		...evidenceLinks.astroWhy,
+		note: "Astro keeps marketing sites lean so pages stay fast and easier to maintain.",
+	},
 ];
 
-const articleImage = '/images/upstate_local_seo_cover.png';
-const publishedTime = '2026-04-13T09:00:00-04:00';
+const articleImage = "/images/upstate_local_seo_cover.png";
+const publishedTime = "2026-04-13T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Upstate NY Local SEO for Service Businesses in 2026',
-  description:
-    'How plumbers, HVAC, landscapers, and contractors across Albany, Syracuse, Rochester, Buffalo, and the Capital Region can win Google Maps and local search without NYC-sized budgets.',
-  path: '/blog/upstate-ny-local-seo-service-businesses-2026',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Local SEO',
-  keywords: [
-    'Local SEO',
-    'Upstate New York',
-    'Google Business Profile',
-    'Service businesses',
-    'Google Maps',
-  ],
+	headline: "Upstate NY Local SEO for Service Businesses in 2026",
+	description:
+		"How plumbers, HVAC, landscapers, and contractors across Albany, Syracuse, Rochester, Buffalo, and the Capital Region can win Google Maps and local search without NYC-sized budgets.",
+	path: "/blog/upstate-ny-local-seo-service-businesses-2026",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Local SEO",
+	keywords: [
+		"Local SEO",
+		"Upstate New York",
+		"Google Business Profile",
+		"Service businesses",
+		"Google Maps",
+	],
 });
 ---
 <Layout

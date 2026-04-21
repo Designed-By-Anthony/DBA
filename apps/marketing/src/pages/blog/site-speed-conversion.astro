@@ -1,43 +1,50 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const speedSources = [
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google says Core Web Vitals are used by its ranking systems and are part of page experience.',
-  },
-  {
-    ...evidenceLinks.astroPrerender,
-    note: 'Astro prerenders static HTML by default for routes that do not need server logic.',
-  },
-  {
-    ...evidenceLinks.wixThirdPartyCode,
-    note: 'Wix documents that third-party code can affect loading time and performance.',
-  },
-  {
-    ...evidenceLinks.dudaCoreWebVitals,
-    note: 'Duda notes that some default platform code cannot be removed.',
-  },
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google says Core Web Vitals are used by its ranking systems and are part of page experience.",
+	},
+	{
+		...evidenceLinks.astroPrerender,
+		note: "Astro prerenders static HTML by default for routes that do not need server logic.",
+	},
+	{
+		...evidenceLinks.wixThirdPartyCode,
+		note: "Wix documents that third-party code can affect loading time and performance.",
+	},
+	{
+		...evidenceLinks.dudaCoreWebVitals,
+		note: "Duda notes that some default platform code cannot be removed.",
+	},
 ];
 
-const articleImage =
-  '/images/speed_conversion_cover.png';
-const publishedTime = '2026-03-15T09:00:00-04:00';
+const articleImage = "/images/speed_conversion_cover.png";
+const publishedTime = "2026-03-15T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Why Site Speed Still Affects Conversion — From Central NY to Houston',
-  description:
-    'A practical look at why page speed still costs service businesses real money — with examples from Houston, Miami, and Central New York.',
-  path: '/blog/site-speed-conversion',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Performance',
-  keywords: ['Site speed', 'Core Web Vitals', 'Conversion', 'Houston web design', 'Miami web design', 'Central NY web design'],
+	headline:
+		"Why Site Speed Still Affects Conversion — From Central NY to Houston",
+	description:
+		"A practical look at why page speed still costs service businesses real money — with examples from Houston, Miami, and Central New York.",
+	path: "/blog/site-speed-conversion",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Performance",
+	keywords: [
+		"Site speed",
+		"Core Web Vitals",
+		"Conversion",
+		"Houston web design",
+		"Miami web design",
+		"Central NY web design",
+	],
 });
 ---
 <Layout

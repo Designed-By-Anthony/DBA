@@ -1,57 +1,61 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 import {
-  ACCOUNTS_PORTAL_URL,
-  AGENCY_OS_APP_URL,
-  AGENCY_OS_CAPTURE_LABEL,
-  AGENCY_OS_CAPTURE_MONTHLY,
-  AGENCY_OS_SUITE_LABEL,
-  AGENCY_OS_SUITE_MONTHLY,
-  ENTERPRISE_WEBSITE_STARTING_PRICE,
-  FOUNDING_PARTNER_BUILD_SLOTS,
-  FOUNDING_PARTNER_SEO_LABEL,
-  FOUNDING_PARTNER_SEO_MONTHLY,
-  GBP_FULL_PROGRAM_MONTHLY_PRICE,
-  MONTHLY_LOCAL_SEO_PRICE,
-  PUBLIC_PAYMENT_STRUCTURE_COPY,
-  STANDARD_WEBSITE_STARTING_PRICE,
-  STANDARD_WEBSITE_TYPICAL_RANGE,
-} from '../lib/offers';
+	ACCOUNTS_PORTAL_URL,
+	AGENCY_OS_APP_URL,
+	AGENCY_OS_CAPTURE_LABEL,
+	AGENCY_OS_CAPTURE_MONTHLY,
+	AGENCY_OS_SUITE_LABEL,
+	AGENCY_OS_SUITE_MONTHLY,
+	ENTERPRISE_WEBSITE_STARTING_PRICE,
+	FOUNDING_PARTNER_BUILD_SLOTS,
+	FOUNDING_PARTNER_SEO_LABEL,
+	FOUNDING_PARTNER_SEO_MONTHLY,
+	GBP_FULL_PROGRAM_MONTHLY_PRICE,
+	MONTHLY_LOCAL_SEO_PRICE,
+	PUBLIC_PAYMENT_STRUCTURE_COPY,
+	STANDARD_WEBSITE_STARTING_PRICE,
+	STANDARD_WEBSITE_TYPICAL_RANGE,
+} from "../lib/offers";
 import {
-  buildFaqPageSchema,
-  buildPricingOfferCatalogSchema,
-  type FaqEntry,
-} from '../lib/seo';
+	buildFaqPageSchema,
+	buildPricingOfferCatalogSchema,
+	type FaqEntry,
+} from "../lib/seo";
 
 const faqEntries: FaqEntry[] = [
-  {
-    question: 'What is the difference between Agency OS Capture and Suite?',
-    answer:
-      'Capture is for teams that need website leads, scheduling, and a clear pipeline without the full client portal yet. Suite is the full Agency OS experience: client portal (magic link), deeper CRM, and the automation roadmap we are actively shipping. Both run on the same product — Suite unlocks everything we are building.',
-  },
-  {
-    question: `Why is the Growth Plan ${FOUNDING_PARTNER_SEO_MONTHLY}/month when Suite alone is ${AGENCY_OS_SUITE_MONTHLY}/month?`,
-    answer:
-      'Growth Plan is the bundled stack for website clients: Google Cloud hosting, security hardening, ongoing local SEO care, and Agency OS Suite-level access. It is priced as an operating partnership, not software alone. If you only need CRM without our hosting and SEO, list prices for Capture and Suite apply.',
-  },
-  {
-    question: 'Are these prices the same for Upstate New York and national clients?',
-    answer:
-      'List prices are the same. Founding partner pilot spots are limited and fit is confirmed on a short call — local service businesses in Central NY and our published service areas are the primary focus.',
-  },
+	{
+		question: "What is the difference between Agency OS Capture and Suite?",
+		answer:
+			"Capture is for teams that need website leads, scheduling, and a clear pipeline without the full client portal yet. Suite is the full Agency OS experience: client portal (magic link), deeper CRM, and the automation roadmap we are actively shipping. Both run on the same product — Suite unlocks everything we are building.",
+	},
+	{
+		question: `Why is the Growth Plan ${FOUNDING_PARTNER_SEO_MONTHLY}/month when Suite alone is ${AGENCY_OS_SUITE_MONTHLY}/month?`,
+		answer:
+			"Growth Plan is the bundled stack for website clients: Google Cloud hosting, security hardening, ongoing local SEO care, and Agency OS Suite-level access. It is priced as an operating partnership, not software alone. If you only need CRM without our hosting and SEO, list prices for Capture and Suite apply.",
+	},
+	{
+		question:
+			"Are these prices the same for Upstate New York and national clients?",
+		answer:
+			"List prices are the same. Founding partner pilot spots are limited and fit is confirmed on a short call — local service businesses in Central NY and our published service areas are the primary focus.",
+	},
 ];
 
-const pricingSchema = [buildPricingOfferCatalogSchema(), buildFaqPageSchema(faqEntries)];
+const pricingSchema = [
+	buildPricingOfferCatalogSchema(),
+	buildFaqPageSchema(faqEntries),
+];
 
 const pricingFooterCta = {
-  eyebrow: 'Not sure what to pick?',
-  title: 'Start with a free audit — then we map the smallest right next step.',
-  description:
-    'No pressure to buy a bundle. If Capture, Suite, Growth Plan, or a straight website build is the fit, you will get a clear recommendation.',
-  primaryHref: '/free-seo-audit',
-  primaryLabel: 'Run the Free Audit',
-  secondaryHref: '/contact',
-  secondaryLabel: 'Message the founder',
+	eyebrow: "Not sure what to pick?",
+	title: "Start with a free audit — then we map the smallest right next step.",
+	description:
+		"No pressure to buy a bundle. If Capture, Suite, Growth Plan, or a straight website build is the fit, you will get a clear recommendation.",
+	primaryHref: "/free-seo-audit",
+	primaryLabel: "Run the Free Audit",
+	secondaryHref: "/contact",
+	secondaryLabel: "Message the founder",
 };
 ---
 

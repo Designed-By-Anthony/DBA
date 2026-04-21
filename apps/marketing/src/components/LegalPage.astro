@@ -1,21 +1,21 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import type { SchemaValue } from '../lib/seo';
+import Layout from "../layouts/Layout.astro";
+import type { SchemaValue } from "../lib/seo";
 
 export interface Props {
-  title: string;
-  description: string;
-  lastUpdated: string;
-  pageType?: string;
-  schema?: SchemaValue | SchemaValue[];
+	title: string;
+	description: string;
+	lastUpdated: string;
+	pageType?: string;
+	schema?: SchemaValue | SchemaValue[];
 }
 
 const {
-  title,
-  description,
-  lastUpdated,
-  pageType = 'WebPage',
-  schema,
+	title,
+	description,
+	lastUpdated,
+	pageType = "WebPage",
+	schema,
 } = Astro.props;
 ---
 

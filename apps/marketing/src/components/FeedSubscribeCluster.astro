@@ -1,24 +1,24 @@
 ---
 export interface Props {
-  eyebrow: string;
-  title: string;
-  description: string;
-  primaryHref: string;
-  primaryLabel: string;
-  secondaryHref: string;
-  secondaryLabel: string;
-  note?: string;
+	eyebrow: string;
+	title: string;
+	description: string;
+	primaryHref: string;
+	primaryLabel: string;
+	secondaryHref: string;
+	secondaryLabel: string;
+	note?: string;
 }
 
 const {
-  eyebrow,
-  title,
-  description,
-  primaryHref,
-  primaryLabel,
-  secondaryHref,
-  secondaryLabel,
-  note = 'Heads up: RSS links open raw XML in a new tab (best used with a feed reader).',
+	eyebrow,
+	title,
+	description,
+	primaryHref,
+	primaryLabel,
+	secondaryHref,
+	secondaryLabel,
+	note = "Heads up: RSS links open raw XML in a new tab (best used with a feed reader).",
 } = Astro.props;
 
 const isRawXmlLink = (href: string): boolean => /\.xml(?:$|[?#])/.test(href);

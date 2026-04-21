@@ -1,33 +1,41 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const postSources = [
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'Google rewards businesses that frequently update seasonal operating hours and localized schema.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Sustained user engagement through targeted content helps mitigate off-peak traffic drops.',
-  }
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Google rewards businesses that frequently update seasonal operating hours and localized schema.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Sustained user engagement through targeted content helps mitigate off-peak traffic drops.",
+	},
 ];
 
-const articleImage = '/images/seasonal_seo_cover.png';
-const publishedTime = '2026-04-15T09:00:00-05:00';
+const articleImage = "/images/seasonal_seo_cover.png";
+const publishedTime = "2026-04-15T09:00:00-05:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Seasonal SEO in Central New York',
-  description: 'How seasonal businesses in Central New York can use local SEO, content planning, and profile updates to stay visible year-round.',
-  path: '/blog/seasonal-business-seo',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Local SEO Strategy',
-  keywords: ['Seasonal business SEO', 'Local SEO', 'Central New York', 'Google Business Profile', 'Naples FL', 'Snowbird market'],
+	headline: "Seasonal SEO in Central New York",
+	description:
+		"How seasonal businesses in Central New York can use local SEO, content planning, and profile updates to stay visible year-round.",
+	path: "/blog/seasonal-business-seo",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Local SEO Strategy",
+	keywords: [
+		"Seasonal business SEO",
+		"Local SEO",
+		"Central New York",
+		"Google Business Profile",
+		"Naples FL",
+		"Snowbird market",
+	],
 });
 ---
 <Layout

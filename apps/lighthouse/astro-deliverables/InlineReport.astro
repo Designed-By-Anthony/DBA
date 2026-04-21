@@ -10,133 +10,143 @@
 // response's `results` object and the report GET endpoint).
 
 interface PrioritizedAction {
-  priority: number;
-  action: string;
-  impact: 'high' | 'medium' | 'low';
-  effort: 'high' | 'medium' | 'low';
+	priority: number;
+	action: string;
+	impact: "high" | "medium" | "low";
+	effort: "high" | "medium" | "low";
 }
 
 interface AiInsight {
-  executiveSummary?: string;
-  conversionScore?: number;
-  strengths?: string[];
-  weaknesses?: string[];
-  prioritizedActions?: PrioritizedAction[];
-  copywritingAnalysis?: string;
+	executiveSummary?: string;
+	conversionScore?: number;
+	strengths?: string[];
+	weaknesses?: string[];
+	prioritizedActions?: PrioritizedAction[];
+	copywritingAnalysis?: string;
 }
 
 interface Props {
-  reportId: string;
-  lead: {
-    name?: string;
-    company?: string;
-    url: string;
-  };
-  scores: {
-    trustScore?: number;
-    performance: number;
-    accessibility: number;
-    bestPractices: number;
-    seo: number;
-    conversion?: number;
-  };
-  metrics: {
-    fcp: string;
-    lcp: string;
-    tbt: string;
-    cls: string;
-  };
-  diagnostics?: {
-    failedAuditCount: number;
-    criticalIssue: string;
-  };
-  aiInsight: AiInsight | string;
-  htmlSignals?: {
-    schemaTypes?: string[];
-    missingRecommendedSchema?: string[];
-    readabilityScore?: number | null;
-    readingLevel?: string | null;
-    ttfbMs?: number | null;
-    mixedContentCount?: number;
-    imgsWithLazyLoad?: number;
-    imgsWithDimensions?: number;
-    imgCount?: number;
-    wordCount?: number;
-  };
-  backlinks?: {
-    found?: boolean;
-    domainAuthority?: number | null;
-    spamScore?: number | null;
-    linkingRootDomains?: number | null;
-    externalBacklinks?: number | null;
-  };
-  sitewide?: {
-    sitemap?: { exists?: boolean; urlCount?: number };
-    robotsTxt?: { exists?: boolean; allowsCrawlers?: boolean };
-    redirectChain?: { httpRedirectsToHttps?: boolean };
-  };
-  indexCoverage?: {
-    estimatedIndexedPages?: number | null;
-  };
-  createdAt?: string | null;
-  showEmailButton?: boolean;
+	reportId: string;
+	lead: {
+		name?: string;
+		company?: string;
+		url: string;
+	};
+	scores: {
+		trustScore?: number;
+		performance: number;
+		accessibility: number;
+		bestPractices: number;
+		seo: number;
+		conversion?: number;
+	};
+	metrics: {
+		fcp: string;
+		lcp: string;
+		tbt: string;
+		cls: string;
+	};
+	diagnostics?: {
+		failedAuditCount: number;
+		criticalIssue: string;
+	};
+	aiInsight: AiInsight | string;
+	htmlSignals?: {
+		schemaTypes?: string[];
+		missingRecommendedSchema?: string[];
+		readabilityScore?: number | null;
+		readingLevel?: string | null;
+		ttfbMs?: number | null;
+		mixedContentCount?: number;
+		imgsWithLazyLoad?: number;
+		imgsWithDimensions?: number;
+		imgCount?: number;
+		wordCount?: number;
+	};
+	backlinks?: {
+		found?: boolean;
+		domainAuthority?: number | null;
+		spamScore?: number | null;
+		linkingRootDomains?: number | null;
+		externalBacklinks?: number | null;
+	};
+	sitewide?: {
+		sitemap?: { exists?: boolean; urlCount?: number };
+		robotsTxt?: { exists?: boolean; allowsCrawlers?: boolean };
+		redirectChain?: { httpRedirectsToHttps?: boolean };
+	};
+	indexCoverage?: {
+		estimatedIndexedPages?: number | null;
+	};
+	createdAt?: string | null;
+	showEmailButton?: boolean;
 }
 
 const {
-  reportId,
-  lead,
-  scores,
-  metrics,
-  diagnostics,
-  aiInsight,
-  htmlSignals,
-  backlinks,
-  sitewide,
-  indexCoverage,
-  createdAt,
-  showEmailButton = true,
+	reportId,
+	lead,
+	scores,
+	metrics,
+	diagnostics,
+	aiInsight,
+	htmlSignals,
+	backlinks,
+	sitewide,
+	indexCoverage,
+	createdAt,
+	showEmailButton = true,
 } = Astro.props;
 
-const ai: AiInsight = typeof aiInsight === 'string'
-  ? { executiveSummary: aiInsight }
-  : aiInsight || {};
+const ai: AiInsight =
+	typeof aiInsight === "string"
+		? { executiveSummary: aiInsight }
+		: aiInsight || {};
 
 function impactColor(impact: string): string {
-  if (impact === 'high') return '#ef4444';
-  if (impact === 'medium') return '#f59e0b';
-  return '#22c55e';
+	if (impact === "high") return "#ef4444";
+	if (impact === "medium") return "#f59e0b";
+	return "#22c55e";
 }
 
 function effortLabel(effort: string): string {
-  if (effort === 'low') return 'Quick win';
-  if (effort === 'medium') return 'Moderate';
-  return 'Major project';
+	if (effort === "low") return "Quick win";
+	if (effort === "medium") return "Moderate";
+	return "Major project";
 }
 
 // Public env var — set PUBLIC_API_BASE in your Astro .env
 // e.g. PUBLIC_API_BASE=https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app
-const API_BASE = import.meta.env.PUBLIC_API_BASE || '';
+const API_BASE = import.meta.env.PUBLIC_API_BASE || "";
 
 const calendarUrl =
-  'https://calendar.app.google/c1CaLZJQkbTAs9abA?utm_source=report_page&utm_medium=web&utm_campaign=audit_report';
+	"https://calendar.app.google/c1CaLZJQkbTAs9abA?utm_source=report_page&utm_medium=web&utm_campaign=audit_report";
 
 // Score coloring thresholds match Lighthouse's own conventions
 function scoreColor(score: number): string {
-  if (score >= 90) return '#0cce6b'; // green
-  if (score >= 50) return '#ffa400'; // amber
-  return '#ff4e42'; // red
+	if (score >= 90) return "#0cce6b"; // green
+	if (score >= 50) return "#ffa400"; // amber
+	return "#ff4e42"; // red
 }
 
 function formatDate(iso: string | null | undefined): string {
-  if (!iso) return new Date().toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
-  });
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
-  });
+	if (!iso)
+		return new Date().toLocaleString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+			hour: "numeric",
+			minute: "2-digit",
+		});
+	return new Date(iso).toLocaleString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
+	});
 }
 
-const displayUrl = lead.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+const displayUrl = lead.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 const companyDisplay = lead.company || displayUrl;
 ---
 

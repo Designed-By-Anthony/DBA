@@ -1,49 +1,56 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
 import {
-  FOUNDING_PARTNER_BUILD_SLOTS,
-  FOUNDING_PARTNER_SEO_LABEL,
-  FOUNDING_PARTNER_SEO_MONTHLY,
-  MONTHLY_LOCAL_SEO_PRICE,
-  STANDARD_WEBSITE_STARTING_PRICE,
-} from '../../lib/offers';
+	FOUNDING_PARTNER_BUILD_SLOTS,
+	FOUNDING_PARTNER_SEO_LABEL,
+	FOUNDING_PARTNER_SEO_MONTHLY,
+	MONTHLY_LOCAL_SEO_PRICE,
+	STANDARD_WEBSITE_STARTING_PRICE,
+} from "../../lib/offers";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const costSources = [
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google says page experience — including Core Web Vitals and mobile usability — matters to how pages are evaluated.',
-  },
-  {
-    ...evidenceLinks.googleMobileFirst,
-    note: 'Google predominantly uses the mobile version of content for indexing and ranking.',
-  },
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'LocalBusiness structured data helps Google understand business details more clearly.',
-  },
-  {
-    ...evidenceLinks.googleBusinessProfileLocalRanking,
-    note: 'Google says local ranking is shaped by relevance, distance, and prominence.',
-  },
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google says page experience — including Core Web Vitals and mobile usability — matters to how pages are evaluated.",
+	},
+	{
+		...evidenceLinks.googleMobileFirst,
+		note: "Google predominantly uses the mobile version of content for indexing and ranking.",
+	},
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "LocalBusiness structured data helps Google understand business details more clearly.",
+	},
+	{
+		...evidenceLinks.googleBusinessProfileLocalRanking,
+		note: "Google says local ranking is shaped by relevance, distance, and prominence.",
+	},
 ];
 
-const articleImage = '/images/website_cost_cover.png';
-const publishedTime = '2026-04-03T09:00:00-04:00';
+const articleImage = "/images/website_cost_cover.png";
+const publishedTime = "2026-04-03T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'How Much Does a Website Cost in 2026?',
-  description:
-    'A transparent breakdown of website costs in 2026, with real price ranges and what small businesses usually get at each level.',
-  path: '/blog/website-cost',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Web Design',
-  keywords: ['Website cost', 'Web design pricing', 'Small business website', 'Miami web design', 'Houston web design', 'Columbus web design'],
+	headline: "How Much Does a Website Cost in 2026?",
+	description:
+		"A transparent breakdown of website costs in 2026, with real price ranges and what small businesses usually get at each level.",
+	path: "/blog/website-cost",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Web Design",
+	keywords: [
+		"Website cost",
+		"Web design pricing",
+		"Small business website",
+		"Miami web design",
+		"Houston web design",
+		"Columbus web design",
+	],
 });
 ---
 <Layout

@@ -1,30 +1,39 @@
 ---
-import AuditForm from '../components/AuditForm.astro';
-import PortableEmbedShowcase from '../components/PortableEmbedShowcase.astro';
-import Layout from '../layouts/Layout.astro';
-import { FOUNDING_PARTNER_SEO_LABEL, MONTHLY_LOCAL_SEO_PRICE } from '../lib/offers';
-import { ORGANIZATION_ID, businessProfile, toAbsoluteUrl, type SchemaValue } from '../lib/seo';
+import AuditForm from "../components/AuditForm.astro";
+import PortableEmbedShowcase from "../components/PortableEmbedShowcase.astro";
+import Layout from "../layouts/Layout.astro";
+import {
+	FOUNDING_PARTNER_SEO_LABEL,
+	MONTHLY_LOCAL_SEO_PRICE,
+} from "../lib/offers";
+import {
+	businessProfile,
+	ORGANIZATION_ID,
+	type SchemaValue,
+	toAbsoluteUrl,
+} from "../lib/seo";
 
 const contactSchema: SchemaValue = {
-  '@context': 'https://schema.org',
-  '@type': 'ContactPage',
-  '@id': `${toAbsoluteUrl('/contact')}#contact`,
-  url: toAbsoluteUrl('/contact'),
-  name: 'Contact Anthony Jones About Web Design and SEO | Designed by Anthony',
-  description: 'Get in touch with Designed by Anthony for custom web design, local SEO, managed hosting, or website rescue projects.',
-  mainEntity: {
-    '@id': ORGANIZATION_ID,
-  },
-  contactPoint: [
-    {
-      '@type': 'ContactPoint',
-      contactType: 'sales',
-      email: businessProfile.email,
-      telephone: businessProfile.telephone,
-      areaServed: 'US',
-      availableLanguage: ['en-US'],
-    },
-  ],
+	"@context": "https://schema.org",
+	"@type": "ContactPage",
+	"@id": `${toAbsoluteUrl("/contact")}#contact`,
+	url: toAbsoluteUrl("/contact"),
+	name: "Contact Anthony Jones About Web Design and SEO | Designed by Anthony",
+	description:
+		"Get in touch with Designed by Anthony for custom web design, local SEO, managed hosting, or website rescue projects.",
+	mainEntity: {
+		"@id": ORGANIZATION_ID,
+	},
+	contactPoint: [
+		{
+			"@type": "ContactPoint",
+			contactType: "sales",
+			email: businessProfile.email,
+			telephone: businessProfile.telephone,
+			areaServed: "US",
+			availableLanguage: ["en-US"],
+		},
+	],
 };
 ---
 

@@ -1,35 +1,42 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const mobileSources = [
-  {
-    ...evidenceLinks.googleMobileFirst,
-    note: "Google's direct guidance that they use the mobile version of the content for indexing and ranking.",
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: "Core Web Vitals and mobile usability directly impact page experience.",
-  },
+	{
+		...evidenceLinks.googleMobileFirst,
+		note: "Google's direct guidance that they use the mobile version of the content for indexing and ranking.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Core Web Vitals and mobile usability directly impact page experience.",
+	},
 ];
 
-const articleImage =
-  '/images/mobile_first_seo_cover.png';
-const publishedTime = '2026-03-28T09:00:00-04:00';
+const articleImage = "/images/mobile_first_seo_cover.png";
+const publishedTime = "2026-03-28T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Mobile-First SEO — Why Speed Wins Calls From Naples to the North Country',
-  description:
-    'Google indexes the mobile version of your site first. Slow mobile pages hurt rankings and calls—from FL and OH to Upstate NY.',
-  path: '/blog/mobile-first-seo',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'SEO',
-  keywords: ['Mobile-first indexing', 'Mobile SEO', 'Naples web design', 'Columbus web design', 'North Country web design', 'Core Web Vitals'],
+	headline:
+		"Mobile-First SEO — Why Speed Wins Calls From Naples to the North Country",
+	description:
+		"Google indexes the mobile version of your site first. Slow mobile pages hurt rankings and calls—from FL and OH to Upstate NY.",
+	path: "/blog/mobile-first-seo",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "SEO",
+	keywords: [
+		"Mobile-first indexing",
+		"Mobile SEO",
+		"Naples web design",
+		"Columbus web design",
+		"North Country web design",
+		"Core Web Vitals",
+	],
 });
 ---
 <Layout

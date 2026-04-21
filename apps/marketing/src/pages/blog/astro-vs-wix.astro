@@ -1,37 +1,47 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
-import RelatedPosts from '../../components/RelatedPosts.astro';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const postSources = [
-  {
-    ...evidenceLinks.astroWhy,
-    note: 'Astro emphasizes minimal client-side JavaScript for optimal speed.',
-  },
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google strongly recommends meeting Core Web Vitals thresholds for ranking.',
-  },
-  {
-    ...evidenceLinks.wixThirdPartyCode,
-    note: 'Wix pages warn about the performance impact of heavy third-party code and bundled tools.',
-  }
+	{
+		...evidenceLinks.astroWhy,
+		note: "Astro emphasizes minimal client-side JavaScript for optimal speed.",
+	},
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google strongly recommends meeting Core Web Vitals thresholds for ranking.",
+	},
+	{
+		...evidenceLinks.wixThirdPartyCode,
+		note: "Wix pages warn about the performance impact of heavy third-party code and bundled tools.",
+	},
 ];
 
-const articleImage = '/images/astro_vs_wix_cover.png';
-const publishedTime = '2026-04-05T09:00:00-05:00';
+const articleImage = "/images/astro_vs_wix_cover.png";
+const publishedTime = "2026-04-05T09:00:00-05:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: 'Astro vs Wix — Why Service Businesses in NY, Florida & Texas Choose Custom',
-  description: 'A practical comparison of Astro and Wix for SEO, page speed, and long-term flexibility — with examples from Naples, Houston, and Central NY.',
-  path: '/blog/astro-vs-wix',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Web Performance',
-  keywords: ['Astro', 'Wix', 'SEO', 'Naples web design', 'Houston web design', 'Core Web Vitals', 'Small business websites'],
+	headline:
+		"Astro vs Wix — Why Service Businesses in NY, Florida & Texas Choose Custom",
+	description:
+		"A practical comparison of Astro and Wix for SEO, page speed, and long-term flexibility — with examples from Naples, Houston, and Central NY.",
+	path: "/blog/astro-vs-wix",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Web Performance",
+	keywords: [
+		"Astro",
+		"Wix",
+		"SEO",
+		"Naples web design",
+		"Houston web design",
+		"Core Web Vitals",
+		"Small business websites",
+	],
 });
 ---
 <Layout

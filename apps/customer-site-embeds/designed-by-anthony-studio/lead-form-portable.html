@@ -72,7 +72,7 @@
 </div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-  (function () {
+  (() => {
     var CRM = "REPLACE_CRM_ORIGIN/api/lead";
     var AGENCY = "REPLACE_AGENCY_ID";
     var form = document.getElementById("dba-portable-form");
@@ -107,32 +107,32 @@
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       })
-        .then(function (r) {
+        .then((r) => {
           if (!r.ok) throw new Error("HTTP " + r.status);
           st.textContent = "Sent — Anthony will follow up shortly.";
           form.reset();
         })
-        .catch(function () {
+        .catch(() => {
           st.textContent = "Could not send right now. Email hello@designedbyanthony.com.";
         })
-        .finally(function () {
+        .finally(() => {
           btn.disabled = false;
           var el = form.querySelector(".cf-turnstile");
           var ts = window.turnstile;
           if (ts && el) try { ts.reset(el); } catch (e) {}
         });
     }
-    window.__dbaPortableTurnstileOk = function (token) {
+    window.__dbaPortableTurnstileOk = (token) => {
       var cb = form.__dbaPortableNext;
       form.__dbaPortableNext = undefined;
       if (typeof cb === "function") cb(token || "");
     };
-    window.__dbaPortableTurnstileErr = function () {
+    window.__dbaPortableTurnstileErr = () => {
       var cb = form.__dbaPortableNext;
       form.__dbaPortableNext = undefined;
       if (typeof cb === "function") cb("");
     };
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       var st = document.getElementById("dba-portable-status");
       var el = form.querySelector(".cf-turnstile");
@@ -147,7 +147,7 @@
         return;
       }
       st.textContent = "Verifying…";
-      form.__dbaPortableNext = function (token) {
+      form.__dbaPortableNext = (token) => {
         if (!token) {
           st.textContent = "Security check failed. Refresh and try again.";
           return;

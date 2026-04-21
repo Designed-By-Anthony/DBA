@@ -1,197 +1,205 @@
 ---
-import ConsumerTrustStack from '../../components/ConsumerTrustStack.astro';
-import ServiceDetailPage from '../../components/ServiceDetailPage.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { MONTHLY_LOCAL_SEO_PRICE } from '../../lib/offers';
-import { buildServiceSchema } from '../../lib/seo';
+import ConsumerTrustStack from "../../components/ConsumerTrustStack.astro";
+import ServiceDetailPage from "../../components/ServiceDetailPage.astro";
+import { evidenceLinks } from "../../data/evidence";
+import { MONTHLY_LOCAL_SEO_PRICE } from "../../lib/offers";
+import { buildServiceSchema } from "../../lib/seo";
 
 const hostingSources = [
-  {
-    ...evidenceLinks.astroPrerender,
-    note: 'Astro prerenders static HTML by default, which pairs well with CDN deployment.',
-  },
-  {
-    ...evidenceLinks.wordpressUpdates,
-    note: 'WordPress documents ongoing plugin and theme update management.',
-  },
-  {
-    ...evidenceLinks.wordpressHardening,
-    note: 'WordPress security guidance frames security as risk reduction that requires ongoing precautions.',
-  },
+	{
+		...evidenceLinks.astroPrerender,
+		note: "Astro prerenders static HTML by default, which pairs well with CDN deployment.",
+	},
+	{
+		...evidenceLinks.wordpressUpdates,
+		note: "WordPress documents ongoing plugin and theme update management.",
+	},
+	{
+		...evidenceLinks.wordpressHardening,
+		note: "WordPress security guidance frames security as risk reduction that requires ongoing precautions.",
+	},
 ];
 
 const serviceImage =
-  'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2034&auto=format&fit=crop';
+	"https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2034&auto=format&fit=crop";
 const serviceSchema = buildServiceSchema({
-  name: 'Managed Hosting and VIP Support',
-  description:
-    'Managed hosting and website support that keep custom small business sites fast, secure, and easy to maintain.',
-  path: '/services/managed-hosting',
-  image: serviceImage,
-  serviceType: 'Managed hosting and website support',
+	name: "Managed Hosting and VIP Support",
+	description:
+		"Managed hosting and website support that keep custom small business sites fast, secure, and easy to maintain.",
+	path: "/services/managed-hosting",
+	image: serviceImage,
+	serviceType: "Managed hosting and website support",
 });
 
 const detailBlocks = [
-  {
-    title: 'Your site loads fast from anywhere',
-    paragraphs: [
-      'Your site is hosted on a worldwide network of fast servers, so it loads quickly whether someone is visiting from Rome, Miami, or somewhere in between. That gives every visitor the same sharp, professional experience no matter where they are.',
-    ],
-    supporting: [
-      {
-        level: 'h4' as const,
-        title: 'The hosting should match the build',
-        paragraphs: [
-          'A lean site deserves lean infrastructure. Static-first hosting avoids the drag that comes with plugin-heavy stacks and overloaded shared servers.',
-        ],
-      },
-      {
-        level: 'h5' as const,
-        title: 'Better hosting protects the first impression',
-        paragraphs: [
-          'Speed is not just a technical metric. It changes how modern, stable, and professional the business feels the second someone lands on the page.',
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Less to break, less to worry about',
-    paragraphs: [
-      'No plugins to update, no security patches to install, no theme conflicts to troubleshoot. Our sites are built lean so there is less that can go wrong after launch.',
-    ],
-    supporting: [
-      {
-        level: 'h4' as const,
-        title: 'Lean systems are easier to support',
-        paragraphs: [
-          'When the stack is simpler, fixes happen faster and routine maintenance becomes lighter. That is better for uptime and better for your stress level.',
-        ],
-      },
-      {
-        level: 'h5' as const,
-        title: 'Security improves when the surface area shrinks',
-        paragraphs: [
-          'Fewer moving parts means fewer things to patch, fewer things to monitor, and fewer points where a small issue can become a bigger problem.',
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Need something changed? Just ask.',
-    paragraphs: [
-      'Need a photo swapped, hours updated, or a new service added to your site? Send the note and we handle it. You stay focused on running the business instead of learning your website backend.',
-    ],
-    supporting: [
-      {
-        level: 'h4' as const,
-        title: 'Support should feel direct and practical',
-        paragraphs: [
-          'Managed hosting is not just where the files live. It is the peace of mind that someone is actually watching the site and keeping it current.',
-        ],
-      },
-      {
-        level: 'h5' as const,
-        title: 'Updates stay aligned with the bigger strategy',
-        paragraphs: [
-          'Because the same team understands the design, SEO, and hosting setup, small edits do not accidentally weaken the page or slow it down.',
-        ],
-      },
-    ],
-  },
+	{
+		title: "Your site loads fast from anywhere",
+		paragraphs: [
+			"Your site is hosted on a worldwide network of fast servers, so it loads quickly whether someone is visiting from Rome, Miami, or somewhere in between. That gives every visitor the same sharp, professional experience no matter where they are.",
+		],
+		supporting: [
+			{
+				level: "h4" as const,
+				title: "The hosting should match the build",
+				paragraphs: [
+					"A lean site deserves lean infrastructure. Static-first hosting avoids the drag that comes with plugin-heavy stacks and overloaded shared servers.",
+				],
+			},
+			{
+				level: "h5" as const,
+				title: "Better hosting protects the first impression",
+				paragraphs: [
+					"Speed is not just a technical metric. It changes how modern, stable, and professional the business feels the second someone lands on the page.",
+				],
+			},
+		],
+	},
+	{
+		title: "Less to break, less to worry about",
+		paragraphs: [
+			"No plugins to update, no security patches to install, no theme conflicts to troubleshoot. Our sites are built lean so there is less that can go wrong after launch.",
+		],
+		supporting: [
+			{
+				level: "h4" as const,
+				title: "Lean systems are easier to support",
+				paragraphs: [
+					"When the stack is simpler, fixes happen faster and routine maintenance becomes lighter. That is better for uptime and better for your stress level.",
+				],
+			},
+			{
+				level: "h5" as const,
+				title: "Security improves when the surface area shrinks",
+				paragraphs: [
+					"Fewer moving parts means fewer things to patch, fewer things to monitor, and fewer points where a small issue can become a bigger problem.",
+				],
+			},
+		],
+	},
+	{
+		title: "Need something changed? Just ask.",
+		paragraphs: [
+			"Need a photo swapped, hours updated, or a new service added to your site? Send the note and we handle it. You stay focused on running the business instead of learning your website backend.",
+		],
+		supporting: [
+			{
+				level: "h4" as const,
+				title: "Support should feel direct and practical",
+				paragraphs: [
+					"Managed hosting is not just where the files live. It is the peace of mind that someone is actually watching the site and keeping it current.",
+				],
+			},
+			{
+				level: "h5" as const,
+				title: "Updates stay aligned with the bigger strategy",
+				paragraphs: [
+					"Because the same team understands the design, SEO, and hosting setup, small edits do not accidentally weaken the page or slow it down.",
+				],
+			},
+		],
+	},
 ];
 
 const pricingSection = {
-  title: 'Simple, straightforward pricing',
-  intro: 'Pick the support level that matches how involved you want us to be after launch.',
-  cards: [
-    {
-      label: 'Hosting Only',
-      amount: '$40',
-      period: '/year',
-      description: 'A lean hosting setup for businesses that just need the site to stay online and secure.',
-      features: [
-        'Fast worldwide hosting',
-        'SSL certificate included',
-        'Uptime monitoring',
-        'Email support',
-      ],
-    },
-    {
-      label: 'SEO Maintenance',
-      amount: MONTHLY_LOCAL_SEO_PRICE,
-      period: '/month',
-      badge: 'Recommended',
-      description: 'Hosting plus ongoing visibility, content, and support work for businesses that want the site to keep improving.',
-      features: [
-        'Hosting included at no extra cost',
-        'Ongoing SEO monitoring and updates',
-        'Content updates when you need them',
-        'Priority support',
-        'Monthly performance reports',
-      ],
-      recommended: true,
-    },
-  ],
+	title: "Simple, straightforward pricing",
+	intro:
+		"Pick the support level that matches how involved you want us to be after launch.",
+	cards: [
+		{
+			label: "Hosting Only",
+			amount: "$40",
+			period: "/year",
+			description:
+				"A lean hosting setup for businesses that just need the site to stay online and secure.",
+			features: [
+				"Fast worldwide hosting",
+				"SSL certificate included",
+				"Uptime monitoring",
+				"Email support",
+			],
+		},
+		{
+			label: "SEO Maintenance",
+			amount: MONTHLY_LOCAL_SEO_PRICE,
+			period: "/month",
+			badge: "Recommended",
+			description:
+				"Hosting plus ongoing visibility, content, and support work for businesses that want the site to keep improving.",
+			features: [
+				"Hosting included at no extra cost",
+				"Ongoing SEO monitoring and updates",
+				"Content updates when you need them",
+				"Priority support",
+				"Monthly performance reports",
+			],
+			recommended: true,
+		},
+	],
 };
 
 const faqEntries = [
-  {
-    question: 'What is included in managed hosting?',
-    answer:
-      'Managed hosting includes the infrastructure that keeps the site online, fast, and secure, plus direct help when you need updates. Instead of logging into a backend, updating plugins, or troubleshooting issues yourself, you send the request and we handle it.',
-  },
-  {
-    question: 'How much does managed hosting cost?',
-    answer:
-      `Hosting on its own is $40 per year. If you are on the ${MONTHLY_LOCAL_SEO_PRICE} per month SEO maintenance plan, hosting is included at no extra cost. That gives you the technical side plus the ongoing visibility and content support that most businesses eventually need.`,
-  },
-  {
-    question: 'Why use this instead of cheap shared hosting?',
-    answer:
-      'Cheap hosting often comes with slower performance, more moving parts, and more maintenance work on your side. This setup is built to match a lean custom-built site, so the page stays faster, simpler to support, and less likely to break because of plugin or theme conflicts.',
-  },
+	{
+		question: "What is included in managed hosting?",
+		answer:
+			"Managed hosting includes the infrastructure that keeps the site online, fast, and secure, plus direct help when you need updates. Instead of logging into a backend, updating plugins, or troubleshooting issues yourself, you send the request and we handle it.",
+	},
+	{
+		question: "How much does managed hosting cost?",
+		answer: `Hosting on its own is $40 per year. If you are on the ${MONTHLY_LOCAL_SEO_PRICE} per month SEO maintenance plan, hosting is included at no extra cost. That gives you the technical side plus the ongoing visibility and content support that most businesses eventually need.`,
+	},
+	{
+		question: "Why use this instead of cheap shared hosting?",
+		answer:
+			"Cheap hosting often comes with slower performance, more moving parts, and more maintenance work on your side. This setup is built to match a lean custom-built site, so the page stays faster, simpler to support, and less likely to break because of plugin or theme conflicts.",
+	},
 ];
 
 const relatedAreas = [
-  {
-    title: 'Web Design in Rome, NY',
-    href: '/service-areas/rome',
-    description: 'See how lean hosting supports a local market that values trust, clarity, and quick updates.',
-    tag: 'Rome',
-  },
-  {
-    title: 'Web Design in Naples, FL',
-    href: '/service-areas/naples',
-    description: 'Look at how performance and upkeep matter in a premium market where polish is expected.',
-    tag: 'Naples',
-  },
-  {
-    title: 'Web Design in Houston, TX',
-    href: '/service-areas/houston',
-    description: 'Explore why strong hosting matters when a business serves a large, high-intent metro area.',
-    tag: 'Houston',
-  },
+	{
+		title: "Web Design in Rome, NY",
+		href: "/service-areas/rome",
+		description:
+			"See how lean hosting supports a local market that values trust, clarity, and quick updates.",
+		tag: "Rome",
+	},
+	{
+		title: "Web Design in Naples, FL",
+		href: "/service-areas/naples",
+		description:
+			"Look at how performance and upkeep matter in a premium market where polish is expected.",
+		tag: "Naples",
+	},
+	{
+		title: "Web Design in Houston, TX",
+		href: "/service-areas/houston",
+		description:
+			"Explore why strong hosting matters when a business serves a large, high-intent metro area.",
+		tag: "Houston",
+	},
 ];
 
 const relatedArticles = [
-  {
-    title: 'How Site Speed Impacts Revenue',
-    href: '/blog/site-speed-conversion',
-    description: 'See why faster infrastructure protects trust and conversion rate the moment the page loads.',
-    tag: 'Performance',
-  },
-  {
-    title: 'Mobile-First SEO Is the Only SEO That Matters Now',
-    href: '/blog/mobile-first-seo',
-    description: 'Learn why the hosting and delivery setup has to support mobile performance first.',
-    tag: 'Mobile SEO',
-  },
-  {
-    title: 'Why Astro Is the Best Tech Stack for a Small Business Website',
-    href: '/blog/astro-tech-stack',
-    description: 'Understand why a lean stack reduces maintenance headaches and long-term support drag.',
-    tag: 'Tech Stack',
-  },
+	{
+		title: "How Site Speed Impacts Revenue",
+		href: "/blog/site-speed-conversion",
+		description:
+			"See why faster infrastructure protects trust and conversion rate the moment the page loads.",
+		tag: "Performance",
+	},
+	{
+		title: "Mobile-First SEO Is the Only SEO That Matters Now",
+		href: "/blog/mobile-first-seo",
+		description:
+			"Learn why the hosting and delivery setup has to support mobile performance first.",
+		tag: "Mobile SEO",
+	},
+	{
+		title: "Why Astro Is the Best Tech Stack for a Small Business Website",
+		href: "/blog/astro-tech-stack",
+		description:
+			"Understand why a lean stack reduces maintenance headaches and long-term support drag.",
+		tag: "Tech Stack",
+	},
 ];
 ---
 

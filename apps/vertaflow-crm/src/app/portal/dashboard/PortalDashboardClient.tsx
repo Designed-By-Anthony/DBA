@@ -9,8 +9,8 @@ import {
 	getActivePortalCacheKey,
 	getCachedPortalData,
 	getPendingPortalTicketCount,
-	queuePortalTicket,
 	type PortalData,
+	queuePortalTicket,
 } from "@/lib/offline/portal-offline";
 import { brandConfig } from "@/lib/theme.config";
 
@@ -64,14 +64,17 @@ export default function PortalDashboard() {
 		"desktop" | "tablet" | "mobile"
 	>("desktop");
 
-	const refreshQueuedTicketCount = useCallback(async (resolvedKey?: string | null) => {
-		const key = resolvedKey ?? cacheKey ?? (await getActivePortalCacheKey());
-		if (!key) {
-			setQueuedTicketCount(0);
-			return;
-		}
-		setQueuedTicketCount(await getPendingPortalTicketCount(key));
-	}, [cacheKey]);
+	const refreshQueuedTicketCount = useCallback(
+		async (resolvedKey?: string | null) => {
+			const key = resolvedKey ?? cacheKey ?? (await getActivePortalCacheKey());
+			if (!key) {
+				setQueuedTicketCount(0);
+				return;
+			}
+			setQueuedTicketCount(await getPendingPortalTicketCount(key));
+		},
+		[cacheKey],
+	);
 
 	const hydrateFromCache = useCallback(
 		async (resolvedKey?: string | null) => {
@@ -103,7 +106,9 @@ export default function PortalDashboard() {
 
 			const payload = (await res.json()) as PortalData;
 			const nextCacheKey =
-				payload.offlineCacheKey ?? cacheKey ?? (await getActivePortalCacheKey());
+				payload.offlineCacheKey ??
+				cacheKey ??
+				(await getActivePortalCacheKey());
 			setData(payload);
 			setCacheKey(nextCacheKey);
 			setOfflineNotice("");
@@ -215,8 +220,7 @@ export default function PortalDashboard() {
 			setOfflineNotice(
 				"Ticket saved offline. It will send automatically when the connection comes back.",
 			);
-		}
-		finally {
+		} finally {
 			setSubmittingTicket(false);
 		}
 	};

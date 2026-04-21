@@ -1,38 +1,45 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import BlogBackButton from '../../components/BlogBackButton.astro';
-import BlogBridgeLinks from '../../components/BlogBridgeLinks.astro';
-import SourceList from '../../components/SourceList.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import { evidenceLinks } from '../../data/evidence';
-import { buildBlogPostingSchema } from '../../lib/seo';
+import BlogBackButton from "../../components/BlogBackButton.astro";
+import BlogBridgeLinks from "../../components/BlogBridgeLinks.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import SourceList from "../../components/SourceList.astro";
+import { evidenceLinks } from "../../data/evidence";
+import Layout from "../../layouts/Layout.astro";
+import { buildBlogPostingSchema } from "../../lib/seo";
 
 const articleSources = [
-  {
-    ...evidenceLinks.googlePageExperience,
-    note: 'Google ties page speed and mobile usability directly to how it evaluates page experience.',
-  },
-  {
-    ...evidenceLinks.googleMobileFirst,
-    note: 'Google uses the mobile version of your site for indexing and ranking.',
-  },
-  {
-    ...evidenceLinks.googleLocalBusiness,
-    note: 'Structured data helps Google understand your business and show it in local results.',
-  },
+	{
+		...evidenceLinks.googlePageExperience,
+		note: "Google ties page speed and mobile usability directly to how it evaluates page experience.",
+	},
+	{
+		...evidenceLinks.googleMobileFirst,
+		note: "Google uses the mobile version of your site for indexing and ranking.",
+	},
+	{
+		...evidenceLinks.googleLocalBusiness,
+		note: "Structured data helps Google understand your business and show it in local results.",
+	},
 ];
 
-const articleImage = '/images/contractor_mistakes_cover.png';
-const publishedTime = '2026-03-31T09:00:00-04:00';
+const articleImage = "/images/contractor_mistakes_cover.png";
+const publishedTime = "2026-03-31T09:00:00-04:00";
 const articleSchema = buildBlogPostingSchema({
-  headline: '5 Common Contractor Website Mistakes — From Utica to Houston',
-  description:
-    'The most common website problems that cost contractors leads — with real examples from Utica, Rome, Columbus, Houston, and the North Country.',
-  path: '/blog/contractor-website-mistakes',
-  image: articleImage,
-  datePublished: publishedTime,
-  articleSection: 'Web Design',
-  keywords: ['Contractor websites', 'Web design mistakes', 'Local SEO', 'Houston web design', 'Columbus web design', 'North Country NY'],
+	headline: "5 Common Contractor Website Mistakes — From Utica to Houston",
+	description:
+		"The most common website problems that cost contractors leads — with real examples from Utica, Rome, Columbus, Houston, and the North Country.",
+	path: "/blog/contractor-website-mistakes",
+	image: articleImage,
+	datePublished: publishedTime,
+	articleSection: "Web Design",
+	keywords: [
+		"Contractor websites",
+		"Web design mistakes",
+		"Local SEO",
+		"Houston web design",
+		"Columbus web design",
+		"North Country NY",
+	],
 });
 ---
 <Layout

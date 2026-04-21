@@ -1,27 +1,28 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import GbpRoiCalculator from '../components/GbpRoiCalculator.astro';
-import LighthouseAudit from '../components/LighthouseAudit.astro';
+import GbpRoiCalculator from "../components/GbpRoiCalculator.astro";
+import LighthouseAudit from "../components/LighthouseAudit.astro";
+import Layout from "../layouts/Layout.astro";
 import {
-  toAbsoluteUrl,
-  ORGANIZATION_ID,
-  buildLighthouseSoftwareApplicationSchema,
-  type SchemaValue,
-} from '../lib/seo';
+	buildLighthouseSoftwareApplicationSchema,
+	ORGANIZATION_ID,
+	type SchemaValue,
+	toAbsoluteUrl,
+} from "../lib/seo";
 
 const pageSchema: SchemaValue = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  '@id': `${toAbsoluteUrl('/free-seo-audit')}#webpage`,
-  url: toAbsoluteUrl('/free-seo-audit'),
-  name: 'Free Instant Website Audit | Designed by Anthony',
-  description: 'Run a free Lighthouse performance, accessibility, and SEO audit on any website instantly. Built in-house by Designed by Anthony.',
-  isPartOf: {
-    '@id': `${toAbsoluteUrl('/')}#website`,
-  },
-  provider: {
-    '@id': ORGANIZATION_ID,
-  },
+	"@context": "https://schema.org",
+	"@type": "WebPage",
+	"@id": `${toAbsoluteUrl("/free-seo-audit")}#webpage`,
+	url: toAbsoluteUrl("/free-seo-audit"),
+	name: "Free Instant Website Audit | Designed by Anthony",
+	description:
+		"Run a free Lighthouse performance, accessibility, and SEO audit on any website instantly. Built in-house by Designed by Anthony.",
+	isPartOf: {
+		"@id": `${toAbsoluteUrl("/")}#website`,
+	},
+	provider: {
+		"@id": ORGANIZATION_ID,
+	},
 };
 ---
 

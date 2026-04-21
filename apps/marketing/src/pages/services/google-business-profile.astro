@@ -1,72 +1,75 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { GBP_FULL_PROGRAM_MONTHLY_PRICE, MONTHLY_LOCAL_SEO_PRICE } from '../../lib/offers';
+import Layout from "../../layouts/Layout.astro";
 import {
-  businessProfile,
-  buildFaqPageSchema,
-  buildLighthouseSoftwareApplicationSchema,
-  buildServiceSchema,
-  toAbsoluteUrl,
-  type SchemaValue,
-} from '../../lib/seo';
+	GBP_FULL_PROGRAM_MONTHLY_PRICE,
+	MONTHLY_LOCAL_SEO_PRICE,
+} from "../../lib/offers";
+import {
+	buildFaqPageSchema,
+	buildLighthouseSoftwareApplicationSchema,
+	buildServiceSchema,
+	businessProfile,
+	type SchemaValue,
+	toAbsoluteUrl,
+} from "../../lib/seo";
 
-const heroImage = '/images/gbp-deck/1-d6f4eaf4-bb9d-40b3-8966-a06134fa1d7c.png';
+const heroImage = "/images/gbp-deck/1-d6f4eaf4-bb9d-40b3-8966-a06134fa1d7c.png";
 /** Short loop (MP4) — ranking movement; poster keeps LCP fast before decode. */
-const rankingImprovementVideo = '/images/gbp-deck/ranking-improvement.mp4';
-const studioReelVideo = '/media/designed-by-anthony-showreel.mp4';
+const rankingImprovementVideo = "/images/gbp-deck/ranking-improvement.mp4";
+const studioReelVideo = "/media/designed-by-anthony-showreel.mp4";
 const heroW = 1024;
 const heroH = 576;
 
 const serviceSchema = buildServiceSchema({
-  name: 'Google Business Profile & Local Marketing',
-  description:
-    'Complete local marketing for Google Business Profile, reviews, citations, AI visibility, and website alignment — Designed by Anthony, Merchynt agency partner.',
-  path: '/services/google-business-profile',
-  image: heroImage,
-  serviceType: 'Google Business Profile',
+	name: "Google Business Profile & Local Marketing",
+	description:
+		"Complete local marketing for Google Business Profile, reviews, citations, AI visibility, and website alignment — Designed by Anthony, Merchynt agency partner.",
+	path: "/services/google-business-profile",
+	image: heroImage,
+	serviceType: "Google Business Profile",
 });
 
 const pageSchema: SchemaValue = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  '@id': `${toAbsoluteUrl('/services/google-business-profile')}#webpage`,
-  url: toAbsoluteUrl('/services/google-business-profile'),
-  name: 'Managed GBP & Local Marketing | Designed by Anthony',
-  description:
-    'Managed Google Business Profile with reviews, citations, reporting, and website alignment. Merchynt agency partner.',
-  isPartOf: {
-    '@id': `${toAbsoluteUrl('/')}#website`,
-  },
+	"@context": "https://schema.org",
+	"@type": "WebPage",
+	"@id": `${toAbsoluteUrl("/services/google-business-profile")}#webpage`,
+	url: toAbsoluteUrl("/services/google-business-profile"),
+	name: "Managed GBP & Local Marketing | Designed by Anthony",
+	description:
+		"Managed Google Business Profile with reviews, citations, reporting, and website alignment. Merchynt agency partner.",
+	isPartOf: {
+		"@id": `${toAbsoluteUrl("/")}#website`,
+	},
 };
 
 const gbpFaqEntries = [
-  {
-    question: 'What is included in managed Google Business Profile work?',
-    answer:
-      'Ongoing profile optimization, review requesting and responses, posting where it helps, citation alignment, visibility reporting, and recommendations that keep your website and profile aligned.',
-  },
-  {
-    question: 'How long does it take to see local ranking movement?',
-    answer:
-      'Most markets need steady execution; meaningful movement often shows within roughly ninety days, though competitive cities can take longer.',
-  },
-  {
-    question: 'What does the Merchynt agency partnership mean for my business?',
-    answer:
-      'We run the same class of structured local program Merchynt uses with agency partners — adapted to your service area, offers, and review cadence.',
-  },
-  {
-    question: 'Is this only for Google Search and Maps?',
-    answer:
-      'Google is the anchor, but the work considers your broader local footprint so business details stay consistent where customers find you.',
-  },
+	{
+		question: "What is included in managed Google Business Profile work?",
+		answer:
+			"Ongoing profile optimization, review requesting and responses, posting where it helps, citation alignment, visibility reporting, and recommendations that keep your website and profile aligned.",
+	},
+	{
+		question: "How long does it take to see local ranking movement?",
+		answer:
+			"Most markets need steady execution; meaningful movement often shows within roughly ninety days, though competitive cities can take longer.",
+	},
+	{
+		question: "What does the Merchynt agency partnership mean for my business?",
+		answer:
+			"We run the same class of structured local program Merchynt uses with agency partners — adapted to your service area, offers, and review cadence.",
+	},
+	{
+		question: "Is this only for Google Search and Maps?",
+		answer:
+			"Google is the anchor, but the work considers your broader local footprint so business details stay consistent where customers find you.",
+	},
 ];
 
 const schemas = [
-  pageSchema,
-  serviceSchema,
-  buildFaqPageSchema(gbpFaqEntries),
-  buildLighthouseSoftwareApplicationSchema(),
+	pageSchema,
+	serviceSchema,
+	buildFaqPageSchema(gbpFaqEntries),
+	buildLighthouseSoftwareApplicationSchema(),
 ];
 ---
 

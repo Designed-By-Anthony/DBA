@@ -1,24 +1,27 @@
 ---
+import { getTurnstileSiteKey } from "../lib/turnstile";
 /**
  * LighthouseAudit.astro
  * Native audit form that calls the Lighthouse API directly.
  * Replaces the iframe embed for pixel-perfect design consistency.
  */
-import InlineReport from './InlineReport.astro';
-import { getTurnstileSiteKey } from '../lib/turnstile';
+import InlineReport from "./InlineReport.astro";
 
-const API_ENDPOINT = (import.meta.env.PUBLIC_API_URL || 'https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app') + '/api/audit';
+const API_ENDPOINT =
+	(import.meta.env.PUBLIC_API_URL ||
+		"https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app") +
+	"/api/audit";
 const turnstileSiteKey = getTurnstileSiteKey();
 
 const LOADING_MESSAGES = [
-  'Connecting to Google PageSpeed Insights...',
-  'Analyzing First Contentful Paint (FCP)...',
-  'Did you know? 53% of visits are abandoned if a mobile site takes longer than 3 seconds to load.',
-  'Checking for render-blocking third-party scripts...',
-  'Reviewing SEO Meta Tags and semantic HTML...',
-  'Fact: Secure, fast-loading sites run by service businesses rank significantly higher on local Google Search.',
-  'Scanning for unoptimized images and heavy payloads...',
-  'Compiling final diagnostic and running AI analysis...',
+	"Connecting to Google PageSpeed Insights...",
+	"Analyzing First Contentful Paint (FCP)...",
+	"Did you know? 53% of visits are abandoned if a mobile site takes longer than 3 seconds to load.",
+	"Checking for render-blocking third-party scripts...",
+	"Reviewing SEO Meta Tags and semantic HTML...",
+	"Fact: Secure, fast-loading sites run by service businesses rank significantly higher on local Google Search.",
+	"Scanning for unoptimized images and heavy payloads...",
+	"Compiling final diagnostic and running AI analysis...",
 ];
 ---
 

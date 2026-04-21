@@ -80,7 +80,7 @@
 </div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-  (function () {
+  (() => {
     var CRM = "REPLACE_CRM_ORIGIN/api/lead";
     var AGENCY = "REPLACE_AGENCY_ID";
     var form = document.getElementById("vf-portable-form");
@@ -116,32 +116,32 @@
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       })
-        .then(function (r) {
+        .then((r) => {
           if (!r.ok) throw new Error("HTTP " + r.status);
           st.textContent = "Sent — we will follow up shortly.";
           form.reset();
         })
-        .catch(function () {
+        .catch(() => {
           st.textContent = "Could not send right now. Try again or visit vertaflow.io.";
         })
-        .finally(function () {
+        .finally(() => {
           btn.disabled = false;
           var el = form.querySelector(".cf-turnstile");
           var ts = window.turnstile;
           if (ts && el) try { ts.reset(el); } catch (e) {}
         });
     }
-    window.__vfPortableTurnstileOk = function (token) {
+    window.__vfPortableTurnstileOk = (token) => {
       var cb = form.__vfPortableNext;
       form.__vfPortableNext = undefined;
       if (typeof cb === "function") cb(token || "");
     };
-    window.__vfPortableTurnstileErr = function () {
+    window.__vfPortableTurnstileErr = () => {
       var cb = form.__vfPortableNext;
       form.__vfPortableNext = undefined;
       if (typeof cb === "function") cb("");
     };
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       var st = document.getElementById("vf-portable-status");
       var el = form.querySelector(".cf-turnstile");
@@ -156,7 +156,7 @@
         return;
       }
       st.textContent = "Verifying…";
-      form.__vfPortableNext = function (token) {
+      form.__vfPortableNext = (token) => {
         if (!token) {
           st.textContent = "Security check failed. Refresh and try again.";
           return;

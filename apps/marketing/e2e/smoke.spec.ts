@@ -1,71 +1,93 @@
-import { test, expect } from '@playwright/test';
-import { dismissCookieConsentIfPresent } from './helpers';
+import { expect, test } from "@playwright/test";
+import { dismissCookieConsentIfPresent } from "./helpers";
 
-test.describe('Launch Smoke', () => {
-  test('homepage shows primary launch CTAs', async ({ page }) => {
-    const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
-    expect(response?.status()).toBe(200);
+test.describe("Launch Smoke", () => {
+	test("homepage shows primary launch CTAs", async ({ page }) => {
+		const response = await page.goto("/", { waitUntil: "domcontentloaded" });
+		expect(response?.status()).toBe(200);
 
-    await dismissCookieConsentIfPresent(page);
-    // Scope to hero: dev tooling (e.g. Sentry Spotlight) can inject extra h1s outside main.
-    await expect(page.locator('.page-hero--home h1')).toBeVisible();
-    await expect(page.locator('.site-banner-link')).toContainText(/launch pilot/i);
-    await expect(page.locator('#hero-founder-btn')).toHaveAttribute('href', /calendly\.com/);
-    await expect(page.locator('#hero-run-audit-btn')).toHaveAttribute('href', /\/free-seo-audit/);
-  });
+		await dismissCookieConsentIfPresent(page);
+		// Scope to hero: dev tooling (e.g. Sentry Spotlight) can inject extra h1s outside main.
+		await expect(page.locator(".page-hero--home h1")).toBeVisible();
+		await expect(page.locator(".site-banner-link")).toContainText(
+			/launch pilot/i,
+		);
+		await expect(page.locator("#hero-founder-btn")).toHaveAttribute(
+			"href",
+			/calendly\.com/,
+		);
+		await expect(page.locator("#hero-run-audit-btn")).toHaveAttribute(
+			"href",
+			/\/free-seo-audit/,
+		);
+	});
 
-  test('critical money pages return 200', async ({ request }) => {
-    for (const path of ['/services', '/services/custom-web-design', '/free-seo-audit', '/contact']) {
-      const response = await request.get(path);
-      expect(response?.status(), `${path} should return 200`).toBe(200);
-    }
-  });
+	test("critical money pages return 200", async ({ request }) => {
+		for (const path of [
+			"/services",
+			"/services/custom-web-design",
+			"/free-seo-audit",
+			"/contact",
+		]) {
+			const response = await request.get(path);
+			expect(response?.status(), `${path} should return 200`).toBe(200);
+		}
+	});
 
-  test('contact page form and calendar trigger render', async ({ page }) => {
-    await page.goto('/contact', { waitUntil: 'domcontentloaded' });
-    await dismissCookieConsentIfPresent(page);
-    await expect(page.locator('[data-audit-form]')).toBeVisible();
-    await expect(page.locator('[data-form-submit]')).toBeVisible();
+	test("contact page form and calendar trigger render", async ({ page }) => {
+		await page.goto("/contact", { waitUntil: "domcontentloaded" });
+		await dismissCookieConsentIfPresent(page);
+		await expect(page.locator("[data-audit-form]")).toBeVisible();
+		await expect(page.locator("[data-form-submit]")).toBeVisible();
 
-    await page.locator('#calendlyOpenBtn').scrollIntoViewIfNeeded();
-    await page.locator('#calendlyOpenBtn').click();
-    await expect(page.locator('#calendlyModal')).toBeVisible();
-    await expect(page.locator('#calendlyModalBody iframe')).toHaveAttribute('src', /calendly\.com/);
-  });
+		await page.locator("#calendlyOpenBtn").scrollIntoViewIfNeeded();
+		await page.locator("#calendlyOpenBtn").click();
+		await expect(page.locator("#calendlyModal")).toBeVisible();
+		await expect(page.locator("#calendlyModalBody iframe")).toHaveAttribute(
+			"src",
+			/calendly\.com/,
+		);
+	});
 
-  test('audit page renders intake form', async ({ page }) => {
-    await page.goto('/free-seo-audit', { waitUntil: 'domcontentloaded' });
-    await dismissCookieConsentIfPresent(page);
-    await expect(page.locator('[data-lh-form]')).toBeVisible();
-    await expect(page.locator('#lh-url')).toBeVisible();
-    await expect(page.locator('[data-lh-submit]')).toContainText(/run free audit/i);
-  });
+	test("audit page renders intake form", async ({ page }) => {
+		await page.goto("/free-seo-audit", { waitUntil: "domcontentloaded" });
+		await dismissCookieConsentIfPresent(page);
+		await expect(page.locator("[data-lh-form]")).toBeVisible();
+		await expect(page.locator("#lh-url")).toBeVisible();
+		await expect(page.locator("[data-lh-submit]")).toContainText(
+			/run free audit/i,
+		);
+	});
 
-  test('robots.txt and llms.txt are reachable', async ({ request }) => {
-    for (const path of ['/robots.txt', '/llms.txt']) {
-      const response = await request.get(path);
-      expect(response.ok(), `${path} should be reachable`).toBeTruthy();
-    }
-  });
+	test("robots.txt and llms.txt are reachable", async ({ request }) => {
+		for (const path of ["/robots.txt", "/llms.txt"]) {
+			const response = await request.get(path);
+			expect(response.ok(), `${path} should be reachable`).toBeTruthy();
+		}
+	});
 
-  test('sitemap index is reachable when site is built', async ({ request }) => {
-    // Dev server can briefly reset connections (e.g. Vite dependency re-optimize); retry a few times.
-    let response: Awaited<ReturnType<typeof request.get>> | undefined;
-    const attempts = 4;
-    for (let i = 0; i < attempts; i++) {
-      try {
-        response = await request.get('/sitemap-index.xml');
-        break;
-      } catch {
-        if (i === attempts - 1) throw new Error('GET /sitemap-index.xml failed after retries');
-        await new Promise((r) => setTimeout(r, 120 * (i + 1)));
-      }
-    }
-    if (!response) throw new Error('No response from /sitemap-index.xml');
-    test.skip(
-      response.status() === 404,
-      'Sitemap is generated by `npm run build`; use `astro preview`, production, or default Playwright webServer (build + preview).',
-    );
-    expect(response.ok(), '/sitemap-index.xml should be reachable after build').toBeTruthy();
-  });
+	test("sitemap index is reachable when site is built", async ({ request }) => {
+		// Dev server can briefly reset connections (e.g. Vite dependency re-optimize); retry a few times.
+		let response: Awaited<ReturnType<typeof request.get>> | undefined;
+		const attempts = 4;
+		for (let i = 0; i < attempts; i++) {
+			try {
+				response = await request.get("/sitemap-index.xml");
+				break;
+			} catch {
+				if (i === attempts - 1)
+					throw new Error("GET /sitemap-index.xml failed after retries");
+				await new Promise((r) => setTimeout(r, 120 * (i + 1)));
+			}
+		}
+		if (!response) throw new Error("No response from /sitemap-index.xml");
+		test.skip(
+			response.status() === 404,
+			"Sitemap is generated by `npm run build`; use `astro preview`, production, or default Playwright webServer (build + preview).",
+		);
+		expect(
+			response.ok(),
+			"/sitemap-index.xml should be reachable after build",
+		).toBeTruthy();
+	});
 });
