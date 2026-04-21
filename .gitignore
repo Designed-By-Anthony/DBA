@@ -16,3 +16,4 @@ apps/*/package-lock.json
 cloud-sql-proxy
 dba-website-prod-*.json
 apps/web-viewer/zapier-platform-example-app-github/
+.env*.local

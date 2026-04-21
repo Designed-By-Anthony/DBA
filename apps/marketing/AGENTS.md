@@ -92,4 +92,4 @@ GitHub Actions **CI** workflow runs `astro check`, `npm run test:api`, then **Pl
 
 **Remove from marketing (pull into Agency OS or Lighthouse only):** `CLERK_SECRET_KEY`, `DATABASE_URL`, `STRIPE_*`, `LEAD_WEBHOOK_SECRET`, `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` — these trigger strict env-bleed failure when the three-app split is active.
 
-**Google Workspace:** Marketing does **not** host Workspace credentials. Docs/Drive/OAuth for contracts and client workflows stay on **Agency OS** (`apps/web-viewer/.env.local` — see `GOOGLE_*` / service account vars there). Lighthouse holds **audit** APIs (PageSpeed, Places, Gemini) in its own env file.
+**Google Workspace:** Marketing does **not** host Workspace credentials. Docs/Drive/OAuth for contracts and client workflows stay on **VertaFlow CRM** (`apps/vertaflow-crm/.env.local` — see `GOOGLE_*` / service account vars there). Lighthouse holds **audit** APIs (PageSpeed, Places, Gemini) in its own env file.

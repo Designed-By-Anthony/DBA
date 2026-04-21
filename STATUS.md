@@ -1,5 +1,11 @@
 # Migration Status Report
 
+## VertaFlow apex routing triage (2026-04-20)
+
+- Added root regression test `middleware.test.mjs` to assert `vertaflow.io` and `www.vertaflow.io` rewrite to `VERTAFLOW_UPSTREAM_URL` instead of falling through to the Designed by Anthony marketing app.
+- Local middleware simulation confirms the repo logic is correct; the live regression is in Vercel project/domain wiring, not the TypeScript gateway branch.
+- Current Vercel account state shows no separate linked project for `apps/vertaflow`, so restore a dedicated VertaFlow marketing project/root directory and point the apex gateway project's `VERTAFLOW_UPSTREAM_URL` at that deployment.
+
 ## Ship to `main` — portable embeds + VertaFlow marketing hardening (2026-04-20)
 
 - Merged `codex/vercel-build-sanitize` to **`main`** and pushed (`b71a6a9`): customer-site embed pack, `POST /api/lead` optional `agencyId`, VertaFlow PWA/SEO/Sentry/tests, marketing contact embed showcase, changelog updates.

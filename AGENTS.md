@@ -21,13 +21,12 @@
 - **Auth:** Clerk-managed. `orgId` maps to `tenants.clerkOrgId`.
 - **Routing:** Handled by root `middleware.ts`.
 - **Apps:**
-  - `admin.designedbyanthony.com` -> `apps/web-viewer`
-  - `accounts.designedbyanthony.com` -> `apps/web-viewer/accounts`
-  - `designedbyanthony.com` -> `apps/marketing`
+  - `designedbyanthony.com` -> `apps/marketing` (studio marketing only)
+  - `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` -> **308** to `admin.vertaflow.io` / `accounts.vertaflow.io` (CRM no longer served on DBA subdomains)
   - `vertaflow.io` -> `apps/vertaflow` (Vite marketing)
-  - `admin.vertaflow.io` -> `apps/web-viewer` (CRM admin)
-  - `accounts.vertaflow.io` -> `apps/web-viewer/portal`
-  - `login.vertaflow.io` -> `apps/web-viewer/sign-in`
+  - `admin.vertaflow.io` -> `apps/vertaflow-crm` (CRM admin)
+  - `accounts.vertaflow.io` -> `apps/vertaflow-crm/portal`
+  - `login.vertaflow.io` -> `apps/vertaflow-crm/sign-in`
 
 ## Compliance bar — DoD / HIPAA-oriented engineering
 
@@ -75,7 +74,7 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 ├── turbo.json       # pipeline + globalEnv/globalDependencies
 ├── apps/
 │   ├── marketing/   # Astro v6 — designedbyanthony.com (apex + www)
-│   ├── web-viewer/  # Next.js 16 — admin.* + accounts.* (Agency OS / CRM)
+│   ├── vertaflow-crm/  # Next.js 16 — VertaFlow CRM (admin.* / accounts.* / login.* on vertaflow.io)
 │   ├── lighthouse/  # Next.js 16 — lighthouse.* (audit tool)
 │   └── vertaflow/   # Vite — vertaflow.io (VertaFlow SaaS marketing)
 └── packages/
@@ -87,7 +86,7 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 Per-app agent rules (read these before editing inside an app):
 
 - `apps/marketing/AGENTS.md` — Astro site, Playwright projects, IndexNow, static parity headers for E2E, Spotlight gotcha.
-- `apps/web-viewer/AGENTS.md` — Next.js 16 (read `node_modules/next/dist/docs/` before coding; APIs differ from training data).
+- `apps/vertaflow-crm/AGENTS.md` — Next.js 16 (read `node_modules/next/dist/docs/` before coding; APIs differ from training data).
 - `apps/lighthouse/AGENTS.md` — Same Next.js 16 caveat.
 
 Operator playbook with deployment + env notes: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`. Migration state: `STATUS.md`.
@@ -106,25 +105,25 @@ pnpm dev:lighthouse                # Lighthouse (Next) on :3100
 pnpm db:push                       # drizzle-kit push (needs DATABASE_URL)
 pnpm db:seed:master                # seeds agency_master tenant
 
-pnpm test:e2e                      # marketing + lighthouse + web-viewer Playwright
+pnpm test:e2e                      # marketing + lighthouse + vertaflow-crm Playwright
 pnpm test:e2e:marketing            # individually
 pnpm test:e2e:lighthouse
 pnpm test:e2e:web
 ```
 
-Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter dba-agency-os run lint`). Workspace names live in each `package.json` (`dba-agency-os`, `dba-lighthouse-audit`, `dbastudio-315`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
+Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter vertaflow-crm run lint`). Workspace names live in each `package.json` (`vertaflow-crm`, `dba-lighthouse-audit`, `dbastudio-315`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
 
 ### Host-based routing — Vercel Routing Middleware
 
 Root `middleware.ts` is Vercel Routing Middleware that runs on the apex (marketing) Vercel project and rewrites by `Host`. Do not rename this root file to `proxy.ts`; `proxy.ts` is the Next.js 16 convention used inside Next apps, while this root file belongs to the non-Next apex gateway.
 
-- `admin.designedbyanthony.com/*` → `$ADMIN_UPSTREAM_URL/*` (web-viewer)
-- `accounts.designedbyanthony.com/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (web-viewer)
+- `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
+- `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`
 - `lighthouse.designedbyanthony.com/*` → `$LIGHTHOUSE_UPSTREAM_URL/*` (lighthouse)
 - `vertaflow.io/*` → `$VERTAFLOW_UPSTREAM_URL/*` (vertaflow marketing)
-- `admin.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/admin/*` (web-viewer)
-- `accounts.vertaflow.io/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (web-viewer)
-- `login.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/sign-in/*` (web-viewer)
+- `admin.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/admin/*` (vertaflow-crm)
+- `accounts.vertaflow.io/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (vertaflow-crm)
+- `login.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL` (sign-in + CRM; vertaflow-crm)
 - everything else → Astro marketing (fallthrough via `next()`)
 
 Notes:
@@ -149,7 +148,7 @@ When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update 
 - Tenant-scoped tables include `tenants`, `sites`, `leads`, `automations`, `tickets`, plus portal token/session tables.
 - **Clerk vs CRM records:** Clerk identifies **signed-in agency users** and **org boundaries** (`tenants.clerk_org_id`). **Prospects/leads** live in `leads` only—outreach and tracking do **not** require a Clerk user per prospect; optional client portal uses magic links, not Clerk end-user accounts.
 - Tenant key in SQL is `clerk_org_id` (column) / `tenantId` (Drizzle field) / `agencyId` (guardrail wording). Every query **must** filter on it — see **Zero-Trust Multi-Tenancy**.
-- Agency OS reads `DATABASE_URL` (and optional `DATABASE_SSL=true`) from `apps/web-viewer/.env.local`.
+- VertaFlow CRM reads `DATABASE_URL` (and optional `DATABASE_SSL=true`) from `apps/vertaflow-crm/.env.local`.
 - Validate all API inputs and JSONB payloads with Zod — see **Strict Typing** in the purge rules.
 
 ### Lead intake (CRM is source of truth)
@@ -164,7 +163,7 @@ When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update 
 Four Vercel projects pointing at this repo, each with a different Root Directory:
 
 - `apps/marketing` — apex project; also serves the root `middleware.ts`.
-- `apps/web-viewer` — admin + accounts.
+- `apps/vertaflow-crm` — admin + accounts + login (vertaflow.io hostnames).
 - `apps/lighthouse` — lighthouse.
 - `apps/vertaflow` — VertaFlow SaaS marketing (Vite).
 

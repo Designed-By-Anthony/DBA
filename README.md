@@ -7,7 +7,7 @@ Designed by Anthony — monorepo (Agency OS, Lighthouse, marketing, packages).
 | App             | Path                | Framework | Hostname                                    |
 | --------------- | ------------------- | --------- | ------------------------------------------- |
 | Marketing site  | `apps/marketing`    | Astro     | `designedbyanthony.com` (apex + `www`)      |
-| Agency OS (CRM) | `apps/web-viewer`   | Next.js   | `admin.designedbyanthony.com`, `accounts.…` |
+| Agency OS (CRM) | `apps/vertaflow-crm` | Next.js   | `admin.vertaflow.io`, `accounts.vertaflow.io`, `login.vertaflow.io` |
 | Lighthouse      | `apps/lighthouse`   | Next.js   | `lighthouse.designedbyanthony.com`          |
 
 ## Host-based routing — Vercel Routing Middleware
@@ -15,8 +15,11 @@ Designed by Anthony — monorepo (Agency OS, Lighthouse, marketing, packages).
 The root [`middleware.ts`](./middleware.ts) is **Vercel Routing Middleware** for the apex Astro project. Current Next.js apps use `proxy.ts`; this root file is different platform middleware that Vercel still expects to be named `middleware.ts`. It reads the `Host` header on the apex deployment and rewrites traffic to the correct upstream Vercel project.
 
 ```
-admin.designedbyanthony.com/*       →  $ADMIN_UPSTREAM_URL/admin/*       (apps/web-viewer)
-accounts.designedbyanthony.com/*    →  $ACCOUNTS_UPSTREAM_URL/portal/*   (apps/web-viewer)
+admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*
+accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
+admin.vertaflow.io/*                →  $ADMIN_UPSTREAM_URL/admin/*       (apps/vertaflow-crm)
+accounts.vertaflow.io/*             →  $ACCOUNTS_UPSTREAM_URL/portal/*   (apps/vertaflow-crm)
+login.vertaflow.io/*                →  $ADMIN_UPSTREAM_URL (sign-in + app)
 lighthouse.designedbyanthony.com/*  →  $LIGHTHOUSE_UPSTREAM_URL/*        (apps/lighthouse)
 * (everything else)                 →  apps/marketing (Astro, fallthrough)
 ```
@@ -44,7 +47,7 @@ If an upstream URL is unset in production, the middleware returns a loud `502` i
 Running `pnpm turbo run build` (or just `pnpm build`) at the repo root builds:
 
 1. `@dba/lead-form-contract`, `@dba/theme`, and other shared packages (topologically first via `dependsOn: ["^build"]`)
-2. `dbastudio-315` (Astro), `dba-agency-os` (Next.js), `dba-lighthouse-audit` (Next.js), and `vertaflow-marketing` (Vite) — in parallel
+2. `dbastudio-315` (Astro), `vertaflow-crm` (Next.js), `dba-lighthouse-audit` (Next.js), and `vertaflow-marketing` (Vite) — in parallel
 
 Cache keys include the root [`middleware.ts`](./middleware.ts), [`tsconfig.json`](./tsconfig.json), and app-local `vercel.json` files (see `turbo.json` → `globalDependencies`) so a change to the gateway or project config invalidates app builds.
 

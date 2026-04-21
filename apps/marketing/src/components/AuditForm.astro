@@ -13,7 +13,7 @@ const turnstileSiteKey = getTurnstileSiteKey();
 const defaultFormEndpoint =
   import.meta.env.PUBLIC_INGEST_URL ||
   import.meta.env.PUBLIC_CRM_LEAD_URL ||
-  'https://admin.designedbyanthony.com/api/v1/ingest';
+  'https://admin.vertaflow.io/api/v1/ingest';
 
 /** Clerk org id (tenant) for this marketing build — threaded through the `X-Tenant-Id` header. */
 const tenantId = import.meta.env.PUBLIC_TENANT_ID || '';

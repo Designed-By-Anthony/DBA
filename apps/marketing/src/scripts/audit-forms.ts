@@ -6,9 +6,9 @@ import { pushAnalyticsEvent, requestGaClientId } from './analytics';
  *   1. `PUBLIC_INGEST_URL` — the new versioned `POST /api/v1/ingest` route.
  *   2. `PUBLIC_CRM_LEAD_URL` — legacy browser-safe `/api/lead`; kept for
  *      backward compatibility with older deploys.
- *   3. Baked default: `https://admin.designedbyanthony.com/api/v1/ingest`.
+ *   3. Baked default: `https://admin.vertaflow.io/api/v1/ingest`.
  */
-const DEFAULT_FORM_ENDPOINT = 'https://admin.designedbyanthony.com/api/v1/ingest';
+const DEFAULT_FORM_ENDPOINT = 'https://admin.vertaflow.io/api/v1/ingest';
 
 export interface AuditFormError {
   field?: string;

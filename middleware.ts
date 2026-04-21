@@ -10,7 +10,7 @@
  * Deploy model (see `ANTHONYS_INSTRUCTIONS.txt`):
  *   - apps/marketing  — deployed as a standalone Vercel project; also
  *     serves this middleware. Hostname: designedbyanthony.com.
- *   - apps/web-viewer — deployed as a separate Vercel project; the
+ *   - apps/vertaflow-crm — deployed as a separate Vercel project; the
  *     admin and accounts surfaces both live here. Hostname:
  *     $ADMIN_UPSTREAM_URL / $ACCOUNTS_UPSTREAM_URL.
  *   - apps/lighthouse — deployed as its own Vercel project. Hostname:
@@ -35,7 +35,7 @@ const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
 
-// VertaFlow subdomains (same web-viewer upstream, separate marketing site)
+// VertaFlow subdomains (same CRM upstream, separate marketing site)
 const VF_ADMIN_HOST = `admin.${VERTAFLOW_DOMAIN}`;
 const VF_LOGIN_HOST = `login.${VERTAFLOW_DOMAIN}`;
 const VF_ACCOUNTS_HOST = `accounts.${VERTAFLOW_DOMAIN}`;
@@ -114,14 +114,14 @@ function isProduction(): boolean {
 /**
  * Cross-project Vercel rewrites present the upstream deployment's own
  * hostname to the downstream app (the origin `admin.` / `accounts.` host
- * is only visible via `x-forwarded-host`). So the web-viewer `proxy.ts`
+ * is only visible via `x-forwarded-host`). So the CRM `proxy.ts`
  * host-based `/admin` + `/portal` prefixing does NOT fire in production
  * — it only runs on `*.localhost` during local dev. The apex gateway
  * therefore has to pre-prefix the path itself, otherwise:
  *   - `admin.<apex>/`     → serves the public root landing (wrong page)
  *   - `accounts.<apex>/`  → 404 (no `/accounts` route exists)
  *
- * `/api/...` paths are pass-through because the web-viewer API routes
+ * `/api/...` paths are pass-through because the CRM API routes
  * live at `/api/*` (not `/admin/api/*` or `/portal/api/*`).
  */
 function needsAppPrefix(pathname: string, prefix: string): boolean {
@@ -134,28 +134,30 @@ function needsAppPrefix(pathname: string, prefix: string): boolean {
 	return true;
 }
 
+/** 308 permanent redirect — preserve path + query; move legacy DBA CRM hosts to vertaflow.io */
+function redirectToVertaflowHost(
+	request: Request,
+	targetHost: string,
+): Response {
+	const target = new URL(request.url);
+	target.hostname = targetHost;
+	target.protocol = "https:";
+	target.port = "";
+	return Response.redirect(target.toString(), 308);
+}
+
 export default function middleware(request: Request) {
 	const host = hostnameOf(request);
 	const url = new URL(request.url);
 	const { pathname, search } = url;
 
+	// Legacy Designed by Anthony CRM subdomains → VertaFlow (CRM now lives on vertaflow.io only).
 	if (host === ADMIN_HOST) {
-		const upstream = process.env.ADMIN_UPSTREAM_URL;
-		if (!upstream) return isProduction() ? misconfigured("admin") : next();
-		// Admin dashboard lives under /admin in web-viewer; /api/* is a sibling.
-		const prefix = needsAppPrefix(pathname, "/admin") ? "/admin" : "";
-		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+		return redirectToVertaflowHost(request, VF_ADMIN_HOST);
 	}
 
 	if (host === ACCOUNTS_HOST) {
-		const upstream =
-			process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
-		if (!upstream) return isProduction() ? misconfigured("accounts") : next();
-		// The "accounts" subdomain is the client portal surface of web-viewer,
-		// which is implemented under /portal. Keep /api/* un-prefixed so
-		// `accounts.designedbyanthony.com/api/portal/branding` still resolves.
-		const prefix = needsAppPrefix(pathname, "/portal") ? "/portal" : "";
-		return rewrite(buildUpstream(upstream, pathname, search, prefix));
+		return redirectToVertaflowHost(request, VF_ACCOUNTS_HOST);
 	}
 
 	if (host === LIGHTHOUSE_HOST) {
@@ -165,7 +167,7 @@ export default function middleware(request: Request) {
 	}
 
 	// ─── VertaFlow CRM subdomains ───
-	// admin.vertaflow.io + login.vertaflow.io → same web-viewer upstream as DBA admin
+	// admin.vertaflow.io + login.vertaflow.io → CRM upstream (apps/vertaflow-crm)
 	if (host === VF_ADMIN_HOST || host === VF_LOGIN_HOST) {
 		const upstream = process.env.ADMIN_UPSTREAM_URL;
 		if (!upstream) return isProduction() ? misconfigured("vf-admin") : next();
@@ -173,7 +175,7 @@ export default function middleware(request: Request) {
 		return rewrite(buildUpstream(upstream, pathname, search, prefix));
 	}
 
-	// accounts.vertaflow.io → client portal surface of web-viewer
+	// accounts.vertaflow.io → client portal surface (CRM /portal routes)
 	if (host === VF_ACCOUNTS_HOST) {
 		const upstream =
 			process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
@@ -202,7 +204,7 @@ export default function middleware(request: Request) {
 			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://www.googletagmanager.com https://vercel.live; " +
 			"style-src 'self' 'unsafe-inline'; " +
 			"img-src 'self' data: blob: https://images.unsplash.com https://american-operator-assets-public.s3.us-east-1.amazonaws.com https://astro.badg.es; " +
-			"connect-src 'self' https://*.designedbyanthony.com https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
+			"connect-src 'self' https://*.designedbyanthony.com https://admin.vertaflow.io https://accounts.vertaflow.io https://*.vertaflow.io https://api.stripe.com https://www.google-analytics.com wss://ws-mt1.pusher.com; " +
 			"frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
 			"worker-src 'self' blob:; " +
 			"frame-ancestors 'none'; " +

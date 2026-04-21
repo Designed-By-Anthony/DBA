@@ -1,49 +1,49 @@
 {
-  "name": "designed-by-anthony-monorepo",
-  "private": true,
-  "packageManager": "pnpm@10.12.1",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@clerk/shared",
-      "@sentry/cli",
-      "@swc/core",
-      "esbuild",
-      "protobufjs",
-      "re2",
-      "sharp",
-      "unrs-resolver"
-    ],
-    "overrides": {
-      "drizzle-orm": "^0.45.2",
-      "yaml@<2.8.3": "^2.8.3"
-    }
-  },
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "scripts": {
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "dev": "turbo run dev",
-    "dev:web": "pnpm --filter dba-agency-os dev",
-    "dev:web:test": "pnpm --filter dba-agency-os dev:test",
-    "dev:lighthouse": "pnpm --filter dba-lighthouse-audit dev",
-    "dev:marketing": "pnpm --filter dbastudio-315 dev",
-    "db:push": "pnpm --filter @dba/database exec drizzle-kit push",
-    "db:seed:master": "pnpm --filter @dba/database run db:seed:master",
-    "test:e2e": "pnpm run test:e2e:marketing && pnpm run test:e2e:lighthouse && pnpm run test:e2e:web",
-    "test:e2e:marketing": "pnpm --filter dbastudio-315 run test:release",
-    "test:e2e:lighthouse": "pnpm --filter dba-lighthouse-audit run test",
-    "test:e2e:web": "pnpm --filter dba-agency-os run test"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
-    "@types/node": "^22.10.2",
-    "turbo": "^2.9.6",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@browserbasehq/stagehand": "^3.2.1",
-    "@vercel/functions": "^3.4.3"
-  }
+	"name": "designed-by-anthony-monorepo",
+	"private": true,
+	"packageManager": "pnpm@10.12.1",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@clerk/shared",
+			"@sentry/cli",
+			"@swc/core",
+			"esbuild",
+			"protobufjs",
+			"re2",
+			"sharp",
+			"unrs-resolver"
+		],
+		"overrides": {
+			"drizzle-orm": "^0.45.2",
+			"yaml@<2.8.3": "^2.8.3"
+		}
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"build": "turbo run build",
+		"lint": "turbo run lint",
+		"dev": "turbo run dev",
+		"dev:web": "pnpm --filter vertaflow-crm dev",
+		"dev:web:test": "pnpm --filter vertaflow-crm dev:test",
+		"dev:lighthouse": "pnpm --filter dba-lighthouse-audit dev",
+		"dev:marketing": "pnpm --filter dbastudio-315 dev",
+		"db:push": "pnpm --filter @dba/database exec drizzle-kit push",
+		"db:seed:master": "pnpm --filter @dba/database run db:seed:master",
+		"test:e2e": "pnpm run test:e2e:marketing && pnpm run test:e2e:lighthouse && pnpm run test:e2e:web",
+		"test:e2e:marketing": "pnpm --filter dbastudio-315 run test:release",
+		"test:e2e:lighthouse": "pnpm --filter dba-lighthouse-audit run test",
+		"test:e2e:web": "pnpm --filter vertaflow-crm run test"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.12",
+		"@types/node": "^22.10.2",
+		"turbo": "^2.9.6",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@browserbasehq/stagehand": "^3.2.1",
+		"@vercel/functions": "^3.4.3"
+	}
 }

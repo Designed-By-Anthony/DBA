@@ -35,7 +35,7 @@ export const FOUNDING_PARTNER_SEO_MONTHLY = '$149';
 export const FOUNDING_PARTNER_SEO_LABEL = 'Growth Plan';
 
 /** Public CRM / admin app URL (Clerk sign-in). Used in schema and positioning copy—not a crawl-first landing page. */
-export const AGENCY_OS_APP_URL = 'https://admin.designedbyanthony.com';
+export const AGENCY_OS_APP_URL = 'https://admin.vertaflow.io';
 /** Client portal (magic-link access); paired with Agency OS in Growth Plan positioning. */
 export const ACCOUNTS_PORTAL_URL = 'https://accounts.designedbyanthony.com';
 

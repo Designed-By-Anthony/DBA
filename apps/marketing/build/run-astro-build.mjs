@@ -71,10 +71,22 @@ async function releaseLock() {
 function runAstroBuild() {
   return new Promise((resolve, reject) => {
     const command = process.platform === 'win32' ? 'astro.cmd' : 'astro';
+    const nodeOptions = String(process.env.NODE_OPTIONS ?? '').trim();
+    const env = { ...process.env };
+
+    // Astro can be terminated by the OS in this workspace when it uses the
+    // default heap size. Give builds a safer default unless the caller already
+    // pinned a heap limit explicitly.
+    if (!nodeOptions.includes('--max-old-space-size=')) {
+      env.NODE_OPTIONS = [nodeOptions, '--max-old-space-size=8192']
+        .filter(Boolean)
+        .join(' ');
+    }
+
     const child = spawn(command, ['build'], {
       cwd: process.cwd(),
       stdio: 'inherit',
-      env: process.env,
+      env,
     });
 
     child.on('error', reject);

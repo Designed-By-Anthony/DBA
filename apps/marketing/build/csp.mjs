@@ -9,8 +9,8 @@
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
 const LIGHTHOUSE_AUDIT_API_ORIGIN = 'https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app';
 
-/** Agency OS public lead ingest (`POST /api/lead`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
-const AGENCY_OS_VIEWER_ORIGIN = 'https://admin.designedbyanthony.com';
+/** VertaFlow CRM public lead ingest (`POST /api/lead`, `/api/v1/ingest`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
+const VERTAFLOW_CRM_ORIGIN = 'https://admin.vertaflow.io';
 
 /** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC =
@@ -49,7 +49,7 @@ const DIRECTIVES = {
     'https://www.gstatic.com',
     'https://*.googleapis.com',
     LIGHTHOUSE_AUDIT_API_ORIGIN,
-    AGENCY_OS_VIEWER_ORIGIN,
+    VERTAFLOW_CRM_ORIGIN,
     'https://challenges.cloudflare.com',
     'https://*.ingest.us.sentry.io',
     'https://*.ingest.de.sentry.io',
@@ -67,7 +67,7 @@ const DIRECTIVES = {
   'base-uri': "'self'",
   'frame-ancestors': "'self'",
   /** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-  'form-action': `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${AGENCY_OS_VIEWER_ORIGIN}`,
+  'form-action': `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
   /**
    * Trusted Types: mitigates DOM XSS sinks. Keep `require-trusted-types-for` enabled,
    * but allow third-party scripts (GA4 / Turnstile / Sentry) to register their own policies.

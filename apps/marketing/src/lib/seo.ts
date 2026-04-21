@@ -747,7 +747,7 @@ export function buildAgencyOsSoftwareApplicationSchema(): SchemaValue {
     name: 'Agency OS',
     alternateName: 'Designed by Anthony Agency OS',
     description:
-      'CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Admin at admin.designedbyanthony.com; client-facing tools via accounts.designedbyanthony.com.',
+      'CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Admin at admin.vertaflow.io; client-facing tools via accounts.vertaflow.io.',
     applicationCategory: 'BusinessApplication',
     applicationSubCategory: 'CRM',
     operatingSystem: 'Web',

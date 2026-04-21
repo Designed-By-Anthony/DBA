@@ -11,7 +11,7 @@ import { hydrateWebViewerEnvAliases } from "./web-viewer-aliases";
  * Auth env alias hydration lives in `web-viewer-aliases.ts` (Vercel may use
  * `admin_*` / `NEXT_PUBLIC_admin_*` names — they map to canonical keys before Zod).
  *
- * Agency OS (`apps/web-viewer`) — admin.* + accounts.* (Next.js 16).
+ * VertaFlow CRM (`apps/vertaflow-crm`) — admin.* + accounts.* (Next.js 16).
  *
  * Required for the admin surface to function:
  *   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` (auth).
