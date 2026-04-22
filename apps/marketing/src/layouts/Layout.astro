@@ -103,8 +103,6 @@ const siteScriptVersion = createHash("sha256")
 	.slice(0, 12);
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
-const enableStreamChat = import.meta.env.PUBLIC_ENABLE_STREAM_CHAT === "1";
-
 const robotsContent = noindex
 	? "noindex, nofollow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
 	: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";

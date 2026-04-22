@@ -1,5 +1,12 @@
 # Migration Status Report
 
+## Marketing security-header parity on Vercel (2026-04-22)
+
+- Fixed a production gap where `apps/marketing/build/csp.mjs` + `static-headers.json` defined a full CSP, HSTS preload, COOP, Referrer-Policy, X-Content-Type-Options, X-Frame-Options, Permissions-Policy, and per-path X-Robots-Tag — but Vercel never read them (`static-headers.json` is Firebase-style, only consumed by the Playwright static-parity harness on :5500). Live `designedbyanthony.com` responses only carried Vercel's default HSTS.
+- Extended `apps/marketing/build/sync-static-headers.mjs` to generate `apps/marketing/vercel.json` `headers` from the same `csp.mjs` source of truth, so the test harness and production can never drift. Baseline security headers apply to `/(.*)`; per-path `X-Robots-Tag: noindex, nofollow` applies to `/thank-you`, `/facebook-offer`, `/404`, `/report`, `/report/:path*`.
+- Removed two unused-variable hints flagged by `astro check`: `compose` in `StreamChatWidget.astro` and `enableStreamChat` in `Layout.astro` (AGENTS "no unused imports").
+- Verified with `pnpm turbo run build --filter=dbastudio-315` (green) and `node build/sync-static-headers.mjs`. Full live verification (curl headers) happens after Vercel auto-deploys `main`.
+
 ## VertaFlow portal offline cache + PWA hardening (2026-04-21)
 
 - Added a Dexie-backed offline layer in `apps/vertaflow-crm/src/lib/offline/portal-offline.ts` so the client portal now persists the latest dashboard snapshot, support ticket history, and queued ticket drafts on-device.
