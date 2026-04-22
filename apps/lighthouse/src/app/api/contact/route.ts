@@ -33,9 +33,6 @@ function buildCorsHeaders(origin: string | null): Record<string, string> {
 	};
 }
 
-/** Agency OS public lead ingest — CRM is the sole source of truth for marketing leads. */
-const DEFAULT_CRM_LEAD_URL = "https://admin.designedbyanthony.com/api/lead";
-
 export async function OPTIONS(request: Request) {
 	return NextResponse.json(
 		{},
@@ -109,8 +106,23 @@ export async function POST(request: Request) {
 			"cf-turnstile-response": turnstileToken,
 		});
 
-		const crmUrl =
-			process.env.AGENCY_OS_LEAD_INGEST_URL || DEFAULT_CRM_LEAD_URL;
+		const crmUrl = process.env.AGENCY_OS_LEAD_INGEST_URL;
+		if (!crmUrl) {
+			console.error(
+				"[contact] AGENCY_OS_LEAD_INGEST_URL is not configured; rejecting lead",
+			);
+			return NextResponse.json(
+				{
+					errors: [
+						{
+							message:
+								"Lead ingest is not configured on this deployment. Please try again later.",
+						},
+					],
+				},
+				{ status: 503, headers: corsHeaders },
+			);
+		}
 
 		const crmRes = await fetch(crmUrl, {
 			method: "POST",

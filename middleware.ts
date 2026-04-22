@@ -35,11 +35,9 @@ const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 const LIGHTHOUSE_HOST = `lighthouse.${APEX_DOMAIN}`;
 
-// VertaFlow subdomains (same CRM upstream, separate marketing site)
+// VertaFlow subdomains
 const VF_ADMIN_HOST = `admin.${VERTAFLOW_DOMAIN}`;
-const VF_LOGIN_HOST = `login.${VERTAFLOW_DOMAIN}`;
 const VF_ACCOUNTS_HOST = `accounts.${VERTAFLOW_DOMAIN}`;
-const VF_APEX_HOSTS = [VERTAFLOW_DOMAIN, `www.${VERTAFLOW_DOMAIN}`];
 
 /**
  * Matcher — run the gateway for all user-facing paths, including static
@@ -80,13 +78,7 @@ function isAppAssetPath(pathname: string): boolean {
 	return /\.[a-z0-9]{2,8}$/i.test(pathname);
 }
 
-function isSharedAppRoute(pathname: string): boolean {
-	return (
-		pathname === "/offline" ||
-		pathname === "/sign-in" ||
-		pathname.startsWith("/sign-in/")
-	);
-}
+
 
 /**
  * In production the apex Vercel project OWNS the canonical subdomains
@@ -111,28 +103,7 @@ function isProduction(): boolean {
 	return process.env.VERCEL_ENV === "production";
 }
 
-/**
- * Cross-project Vercel rewrites present the upstream deployment's own
- * hostname to the downstream app (the origin `admin.` / `accounts.` host
- * is only visible via `x-forwarded-host`). So the CRM `proxy.ts`
- * host-based `/admin` + `/portal` prefixing does NOT fire in production
- * — it only runs on `*.localhost` during local dev. The apex gateway
- * therefore has to pre-prefix the path itself, otherwise:
- *   - `admin.<apex>/`     → serves the public root landing (wrong page)
- *   - `accounts.<apex>/`  → 404 (no `/accounts` route exists)
- *
- * `/api/...` paths are pass-through because the CRM API routes
- * live at `/api/*` (not `/admin/api/*` or `/portal/api/*`).
- */
-function needsAppPrefix(pathname: string, prefix: string): boolean {
-	if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return false;
-	if (pathname.startsWith("/api/")) return false;
-	if (isSharedAppRoute(pathname)) return false;
-	if (isAppAssetPath(pathname)) return false;
-	// Sentry tunnel MUST hit the root of the upstream Next.js app
-	if (pathname === "/monitoring") return false;
-	return true;
-}
+
 
 /** 308 permanent redirect — preserve path + query; move legacy DBA CRM hosts to vertaflow.io */
 function redirectToVertaflowHost(
@@ -166,31 +137,7 @@ export default function middleware(request: Request) {
 		return rewrite(buildUpstream(upstream, pathname, search));
 	}
 
-	// ─── VertaFlow CRM subdomains ───
-	// admin.vertaflow.io + login.vertaflow.io → CRM upstream (apps/vertaflow-crm)
-	if (host === VF_ADMIN_HOST || host === VF_LOGIN_HOST) {
-		const upstream = process.env.ADMIN_UPSTREAM_URL;
-		if (!upstream) return isProduction() ? misconfigured("vf-admin") : next();
-		const prefix = needsAppPrefix(pathname, "/admin") ? "/admin" : "";
-		return rewrite(buildUpstream(upstream, pathname, search, prefix));
-	}
 
-	// accounts.vertaflow.io → client portal surface (CRM /portal routes)
-	if (host === VF_ACCOUNTS_HOST) {
-		const upstream =
-			process.env.ACCOUNTS_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL;
-		if (!upstream)
-			return isProduction() ? misconfigured("vf-accounts") : next();
-		const prefix = needsAppPrefix(pathname, "/portal") ? "/portal" : "";
-		return rewrite(buildUpstream(upstream, pathname, search, prefix));
-	}
-
-	// vertaflow.io / www.vertaflow.io → VertaFlow marketing site
-	if (VF_APEX_HOSTS.includes(host)) {
-		const upstream = process.env.VERTAFLOW_UPSTREAM_URL;
-		if (!upstream) return isProduction() ? misconfigured("vertaflow") : next();
-		return rewrite(buildUpstream(upstream, pathname, search));
-	}
 
 	// Apex + www + previews → fall through to Astro marketing site.
 	const res = next();

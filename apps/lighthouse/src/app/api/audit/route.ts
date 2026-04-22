@@ -772,41 +772,43 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Dispatch to the central Agency OS Webhook (CRM) to capture the Lead fully natively
-			const osWebhook =
-				process.env.AGENCY_OS_WEBHOOK_URL ||
-				"https://admin.designedbyanthony.com/api/webhooks/lead";
-			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET || "testing123";
+			// Dispatch to the central Agency OS Webhook (CRM) to capture the Lead fully natively.
+			// No-op when the webhook env vars are not configured (e.g. preview deploys or
+			// deployments without a CRM target) — do NOT fall back to a hard-coded URL.
+			const osWebhook = process.env.AGENCY_OS_WEBHOOK_URL;
+			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET;
 			const reportPublicBase = (
 				process.env.REPORT_PUBLIC_BASE_URL || "https://designedbyanthony.com"
 			).replace(/\/$/, "");
 
-			tasks.push(
-				fetchWithTimeout(
-					osWebhook,
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Accept: "application/json",
-							"x-lead-secret": osSecret,
+			if (osWebhook && osSecret) {
+				tasks.push(
+					fetchWithTimeout(
+						osWebhook,
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Accept: "application/json",
+								"x-lead-secret": osSecret,
+							},
+							body: JSON.stringify({
+								email,
+								name,
+								company,
+								websiteUrl: url,
+								source: "audit",
+								auditReportUrl: `${reportPublicBase}/report/${reportId}`,
+								trustScore,
+								performanceScore,
+							}),
 						},
-						body: JSON.stringify({
-							email,
-							name,
-							company,
-							websiteUrl: url,
-							source: "audit",
-							auditReportUrl: `${reportPublicBase}/report/${reportId}`,
-							trustScore,
-							performanceScore,
-						}),
-					},
-					10_000,
-				).catch((formError) => {
-					console.error("Agency OS Webhook submission failed:", formError);
-				}),
-			);
+						10_000,
+					).catch((formError) => {
+						console.error("Agency OS Webhook submission failed:", formError);
+					}),
+				);
+			}
 
 			// Create project-level Google Sheet for this lead
 			await createProjectSheet({

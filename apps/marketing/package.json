@@ -17,17 +17,7 @@
 		"prepreview": "pnpm run build:site-script",
 		"preview": "astro preview",
 		"astro": "astro",
-		"test:e2e": "playwright test",
-		"test:e2e:hosting": "playwright test -c playwright.hosting.config.ts",
-		"test:security-headers": "playwright test -c playwright.hosting.config.ts --project=5-hosting",
-		"test:release:hosting": "pnpm run test:api && playwright test -c playwright.hosting.config.ts",
-		"test:smoke": "playwright test e2e/smoke.spec.ts",
-		"test:smoke:local": "playwright test --project=smoke",
-		"test:api": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test --project=7-api",
-		"test:release": "pnpm run test:api && pnpm run test:e2e",
-		"test:smoke:live": "BASE_URL=https://designedbyanthony.com PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test e2e/smoke-live.spec.ts --workers=1",
-		"test:seo": "playwright test --project=4-seo",
-		"test:seo:live": "BASE_URL=https://designedbyanthony.com PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test e2e/seo-live.spec.ts --workers=1"
+		"test:e2e": "echo 'Run pnpm test:cypress from repo root'"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.8",
@@ -55,7 +45,6 @@
 		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.59.1",
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
 		"esbuild": "^0.28.0",

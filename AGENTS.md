@@ -2,50 +2,19 @@
 
 ## Architectural Guardrails
 - **Root-Only Execution:** All builds and installs must run from the root `./`.
-- **Absolute Monorepo Paths:** Never use relative imports like `../../packages`. Always use workspace protocols: `@dba/database`, `@dba/theme`, `@dba/ui`.
-- **Zero-Trust Multi-Tenancy:** Every database query MUST be scoped with `agencyId`. If a function lacks a tenant filter, it is a critical security bug.
-- **SQL-First:** Any new feature must use Drizzle + Postgres (production: **Neon**). Do not add Firebase or other legacy BaaS client SDKs.
 - **Git-to-Vercel Only:** NEVER deploy directly to Vercel. All deployments flow through Git → GitHub → Vercel auto-deploy. No `vercel deploy`, no `vercel --prod`, no manual uploads. If code isn't on `main`, it doesn't ship.
 - **Lockfile Integrity:** After ANY change to `package.json` (root or workspace), you MUST run `pnpm install` and commit the updated `pnpm-lock.yaml` in the **same commit**. Verify with `pnpm install --frozen-lockfile` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
-## VERBATIM SYSTEM MAPPING
-- **Sales Term:** "Agency" or "Agency OS"
-- **Database Table:** `tenants`
-- **Security Key (SQL):** `tenant_id` (UUID) or `clerk_org_id` (Text)
-- **UI Logic:** Use `tenant.vertical` to drive the "Chameleon" skinning.
-
-**Note to Agent:** While the user may refer to "Agency ID," all Drizzle queries MUST use the schema-defined `tenant_id` or `clerk_org_id` to maintain Postgres 18 integrity.
-
 ## Infrastructure Context
-- **Database:** **Neon** Postgres (connection string in `DATABASE_URL` / `DATABASE_URL_UNPOOLED`). `@dba/database` uses `pg` + Drizzle with interactive transactions for tenant RLS (`withTenantContext`).
-- **Auth:** Clerk-managed. `orgId` maps to `tenants.clerkOrgId`.
 - **Routing:** Handled by root `middleware.ts`.
 - **Apps:**
-  - `designedbyanthony.com` -> `apps/marketing` (studio marketing only)
-  - `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` -> **308** to `admin.vertaflow.io` / `accounts.vertaflow.io` (CRM no longer served on DBA subdomains)
-  - `vertaflow.io` -> `apps/vertaflow` (Vite marketing)
-  - `admin.vertaflow.io` -> `apps/vertaflow-crm` (CRM admin)
-  - `accounts.vertaflow.io` -> `apps/vertaflow-crm/portal`
-  - `login.vertaflow.io` -> `apps/vertaflow-crm/sign-in`
-
-## Compliance bar — DoD / HIPAA-oriented engineering
-
-Treat **regulated-data expectations** as the default for this monorepo (even when a given deploy is not under a formal BAA yet). Agents should align with **NIST 800-53 / HIPAA Security Rule** themes: confidentiality, integrity, availability, and **minimum necessary** disclosure.
-
-- **No secrets in source:** Never commit real API keys, DSNs, connection strings, webhook signing secrets, or tokens. Use env vars and `.env.example` placeholders only; client bundles must not embed operator-only credentials.
-- **PHI / PII handling:** Assume CRM, portal, and lead payloads may include **protected health information** or sensitive PII. Do not log full bodies, tokens, or session identifiers at info level; redact or omit in client-visible errors. Prefer **generic** API error messages; log details server-side only.
-- **Observability:** Error reporting (e.g. Sentry) must use **env-provided DSNs** only; keep `sendDefaultPii` off unless Legal/Security explicitly approves a BAA and scrubbing. Session Replay / full DOM capture is **opt-in** (it can capture PHI in the page).
-- **Encryption in transit:** Postgres and external APIs use TLS in production; do not weaken SSL verification to “make it work.”
-- **Tenant isolation:** Every data path remains **tenant-scoped** (`tenant_id` / `clerk_org_id`); no cross-tenant reads or “debug” shortcuts in production.
-- **Audit mindset:** Favor explicit authz checks, rate limits, and structured server logging for security-relevant events.
-
-When in doubt, choose the option that **discloses less** to clients and third parties.
+  - `designedbyanthony.com` -> `apps/marketing` (studio marketing)
+  - `lighthouse.designedbyanthony.com` -> `apps/lighthouse` (Lighthouse SEO audit tool)
 
 ## Code Quality & Purge Rules
 - **Search Before Write:** Before adding a feature, check if a legacy or duplicate implementation exists. If it does, delete it first.
 - **Cleanup Duty:** After every feature completion, search for and remove unused imports and `console.log` statements.
-- **Strict Typing:** No `any`. Use Zod for schema validation on all API inputs and JSONB columns.
-- **Update the Changelog:** As you update or add CRM functions and vertical features, you MUST flow that information into `CHANGELOG.md`. Keep the changelog up to date with new capabilities.
+- **Strict Typing:** No `any`. Use Zod for schema validation on all API inputs.
 
 ## Communication Preferences
 - **Conciseness:** Keep responses under 1000 characters.
@@ -55,7 +24,7 @@ When in doubt, choose the option that **discloses less** to clients and third pa
 ## Definition of Done
 A task is only **Done** when all three are true:
 1. It passes `pnpm turbo build` (a.k.a. `pnpm build`) from the repo root with zero errors.
-2. It has been audited by BugBot (self-review pass: tenant scoping, Zod on inputs, no `any`, no stray `console.log`, no unused imports).
+2. It has been audited by BugBot (self-review pass: no `any`, no stray `console.log`, no unused imports).
 3. The logo / branding renders **unbroken** on every affected surface — `/brand/logo.png` and `/brand/mark.webp` resolve, `@dba/theme` tokens are intact, and no subdomain is serving a fallback mark.
 
 ---
@@ -70,28 +39,24 @@ Turborepo + pnpm workspaces. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packa
 
 ```
 /                    # apex Vercel project (Astro marketing) + root middleware
-├── middleware.ts    # Vercel Routing Middleware "Chameleon" host-based router (see README.md)
+├── middleware.ts    # Vercel Routing Middleware "Chameleon" host-based router
 ├── turbo.json       # pipeline + globalEnv/globalDependencies
 ├── apps/
 │   ├── marketing/   # Astro v6 — designedbyanthony.com (apex + www)
-│   ├── vertaflow-crm/  # Next.js 16 — VertaFlow CRM (admin.* / accounts.* / login.* on vertaflow.io)
-│   ├── lighthouse/  # Next.js 16 — lighthouse.* (audit tool)
-│   └── vertaflow/   # Vite — vertaflow.io (VertaFlow SaaS marketing)
+│   └── lighthouse/  # Next.js 16 — lighthouse.* (audit tool)
 └── packages/
     ├── dba-theme/           # @dba/theme — global CSS tokens + brand assets
-    ├── lead-form-contract/  # @dba/lead-form-contract — shared lead payload schema
-    └── database/            # @dba/database — Drizzle schema + Postgres client (`pg`)
+    └── lead-form-contract/  # @dba/lead-form-contract — shared lead payload schema
 ```
 
 Per-app agent rules (read these before editing inside an app):
 
 - `apps/marketing/AGENTS.md` — Astro site, Playwright projects, IndexNow, static parity headers for E2E, Spotlight gotcha.
-- `apps/vertaflow-crm/AGENTS.md` — Next.js 16 (read `node_modules/next/dist/docs/` before coding; APIs differ from training data).
-- `apps/lighthouse/AGENTS.md` — Same Next.js 16 caveat.
+- `apps/lighthouse/AGENTS.md` — Next.js 16 (read `node_modules/next/dist/docs/` before coding; APIs differ from training data).
 
-Operator playbook with deployment + env notes: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`. Migration state: `STATUS.md`.
+Operator playbook with deployment + env notes: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`.
 
-### Common commands (run from repo root — see **Root-Only Execution** guardrail)
+### Common commands (run from repo root)
 
 ```bash
 corepack enable && pnpm install   # first-time setup
@@ -99,39 +64,23 @@ corepack enable && pnpm install   # first-time setup
 pnpm build                         # turbo run build (all apps + packages)
 pnpm lint                          # turbo run lint
 pnpm dev:marketing                 # Astro on :4321
-pnpm dev:web                       # Agency OS (Next) on :3000
 pnpm dev:lighthouse                # Lighthouse (Next) on :3100
 
-pnpm db:push                       # drizzle-kit push (needs DATABASE_URL)
-pnpm db:seed:master                # seeds agency_master tenant
-
-pnpm test:e2e                      # marketing + lighthouse + vertaflow-crm Playwright
+pnpm test:e2e                      # marketing + lighthouse Playwright
 pnpm test:e2e:marketing            # individually
 pnpm test:e2e:lighthouse
-pnpm test:e2e:web
 ```
 
-Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter vertaflow-crm run lint`). Workspace names live in each `package.json` (`vertaflow-crm`, `dba-lighthouse-audit`, `dbastudio-315`, `@dba/theme`, `@dba/database`, `@dba/lead-form-contract`).
+Use `pnpm --filter <pkg-name>` to scope a command to a single workspace (e.g. `pnpm --filter dba-lighthouse-audit run lint`).
 
 ### Host-based routing — Vercel Routing Middleware
 
-Root `middleware.ts` is Vercel Routing Middleware that runs on the apex (marketing) Vercel project and rewrites by `Host`. Do not rename this root file to `proxy.ts`; `proxy.ts` is the Next.js 16 convention used inside Next apps, while this root file belongs to the non-Next apex gateway.
+Root `middleware.ts` is Vercel Routing Middleware that runs on the apex (marketing) Vercel project and rewrites by `Host`.
 
 - `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
 - `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`
 - `lighthouse.designedbyanthony.com/*` → `$LIGHTHOUSE_UPSTREAM_URL/*` (lighthouse)
-- `vertaflow.io/*` → `$VERTAFLOW_UPSTREAM_URL/*` (vertaflow marketing)
-- `admin.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL/admin/*` (vertaflow-crm)
-- `accounts.vertaflow.io/*` → `$ACCOUNTS_UPSTREAM_URL/portal/*` (vertaflow-crm)
-- `login.vertaflow.io/*` → `$ADMIN_UPSTREAM_URL` (sign-in + CRM; vertaflow-crm)
 - everything else → Astro marketing (fallthrough via `next()`)
-
-Notes:
-
-- The matcher only excludes `_vercel`; app subdomain assets like `/_next/static/*`, `/manifest.webmanifest`, `/serwist/*`, and `/brand/*` must pass through the gateway so they resolve from the correct upstream project.
-- If an upstream env var is unset in production, the middleware returns a visible `502`; preview/local builds fall through for easier development.
-- `vercel.json` intentionally only holds framework/build/output config; do **not** add `rewrites` there (they run before middleware and conflict with the Chameleon rules).
-- `turbo.json` → `globalDependencies` includes `middleware.ts`, so changes invalidate every app's build cache.
 
 ### Theme + brand (single source of truth)
 
@@ -142,41 +91,17 @@ Notes:
 
 When changing tokens: edit `apps/marketing/src/styles/theme.css` **and** update `packages/dba-theme/tokens.css` to match (same variable names + values). Brand verification is part of **Definition of Done**.
 
-### Data layer — `@dba/database`
-
-- Drizzle ORM against Neon Postgres (see **Infrastructure Context**). Schema in `packages/database/schema.ts`.
-- Tenant-scoped tables include `tenants`, `sites`, `leads`, `automations`, `tickets`, plus portal token/session tables.
-- **Clerk vs CRM records:** Clerk identifies **signed-in agency users** and **org boundaries** (`tenants.clerk_org_id`). **Prospects/leads** live in `leads` only—outreach and tracking do **not** require a Clerk user per prospect; optional client portal uses magic links, not Clerk end-user accounts.
-- Tenant key in SQL is `clerk_org_id` (column) / `tenantId` (Drizzle field) / `agencyId` (guardrail wording). Every query **must** filter on it — see **Zero-Trust Multi-Tenancy**.
-- VertaFlow CRM reads `DATABASE_URL` (and optional `DATABASE_SSL=true`) from `apps/vertaflow-crm/.env.local`.
-- Validate all API inputs and JSONB payloads with Zod — see **Strict Typing** in the purge rules.
-
-### Lead intake (CRM is source of truth)
-
-- Marketing audit/contact forms POST JSON to Agency OS `POST /api/lead` (not Lighthouse `/api/contact`).
-- Marketing build env: `PUBLIC_CRM_LEAD_URL` (full URL) and `PUBLIC_API_URL` (Lighthouse base for `/api/audit` + report viewer).
-- Shared payload contract: `packages/lead-form-contract/src/index.ts`.
-- Org product tier: `org_settings.planSuite` = `starter` | `full` (default `full`); `starter` hides Automations, Sequences, Billing, Price Book in the admin sidebar.
-
 ### Vercel deploy model
 
-Four Vercel projects pointing at this repo, each with a different Root Directory:
+Two Vercel projects pointing at this repo, each with a different Root Directory:
 
 - `apps/marketing` — apex project; also serves the root `middleware.ts`.
-- `apps/vertaflow-crm` — admin + accounts + login (vertaflow.io hostnames).
 - `apps/lighthouse` — lighthouse.
-- `apps/vertaflow` — VertaFlow SaaS marketing (Vite).
 
-Apex project requires `ADMIN_UPSTREAM_URL`, `ACCOUNTS_UPSTREAM_URL`, `LIGHTHOUSE_UPSTREAM_URL`, `VERTAFLOW_UPSTREAM_URL` (also declared in `turbo.json` → `globalEnv`). All other secrets are per-app; the full allow-list is in `turbo.json` → `tasks.build.env`.
-
-**Deployment rule:** All deploys happen via Git push → Vercel auto-build. Never use `vercel deploy` or `vercel --prod` directly. After any `package.json` change, always commit the updated `pnpm-lock.yaml` in the same commit and verify with `pnpm install --frozen-lockfile` before pushing.
-
-### Migration / cleanup notes
-
-`STATUS.md` tracks migration and security work. Data layer is Drizzle + Postgres only; do not reintroduce Firebase or other legacy BaaS client SDKs to app bundles.
+Apex project requires `LIGHTHOUSE_UPSTREAM_URL` (also declared in `turbo.json` → `globalEnv`). All other secrets are per-app.
 
 ### Cursor Cloud specific instructions
 
 - The cloud agent VM ships with pnpm + Node 22; run `pnpm install` at the repo root before any build/test if `node_modules` is missing.
-- Per-app `AGENTS.md` files contain additional Cursor-Cloud-specific testing notes (especially `apps/marketing/AGENTS.md` for Playwright and the static parity server on `127.0.0.1:5500`).
+- Per-app `AGENTS.md` files contain additional Cursor-Cloud-specific testing notes.
 - Branch + PR conventions for cloud agents: create branches as `cursor/<descriptive-name>-<suffix>`, commit small logical changes, and open a PR per branch.

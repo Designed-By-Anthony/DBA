@@ -19,4 +19,9 @@ export default {
 			LIGHTHOUSE_URL: "http://localhost:3100",
 		},
 	},
+	component: {
+		devServer: {
+			bundler: "webpack",
+		},
+	},
 };

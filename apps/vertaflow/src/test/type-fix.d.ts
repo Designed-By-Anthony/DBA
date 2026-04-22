@@ -1,1 +1,0 @@
-type RequestInfo = Request | string;

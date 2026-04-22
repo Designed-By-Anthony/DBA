@@ -6,10 +6,7 @@
 		"apps/*/vercel.json"
 	],
 	"globalEnv": [
-		"ADMIN_UPSTREAM_URL",
-		"ACCOUNTS_UPSTREAM_URL",
 		"LIGHTHOUSE_UPSTREAM_URL",
-		"VERTAFLOW_UPSTREAM_URL",
 		"NODE_ENV",
 		"VERCEL",
 		"VERCEL_ENV",
