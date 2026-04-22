@@ -1,7 +1,6 @@
 ---
 import { Image } from "astro:assets";
 import AuditForm from "../components/AuditForm.astro";
-import ConsumerTrustStack from "../components/ConsumerTrustStack.astro";
 import FoundingPartnerSection from "../components/FoundingPartnerSection.astro";
 import PremiumPitchStrip from "../components/PremiumPitchStrip.astro";
 import { showcaseFeaturedItems } from "../data/showcase";
@@ -187,6 +186,10 @@ const homeFooterCta = {
     </div>
     <div class="page-hero-inner">
       <div class="hero-copy">
+        <p class="hero-place-marker" aria-label="Area codes three one five and five one eight">
+          <span class="hero-place-marker__rule" aria-hidden="true"></span>
+          <span class="hero-place-marker__text">315 &middot; 518</span>
+        </p>
         <p class="page-eyebrow page-eyebrow--rule" data-hero-eyebrow>Mohawk Valley Web Design Studio · Utica · Rome · Syracuse · CNY</p>
         <div class="hero-launch-pill" role="status">
           <span class="hero-launch-dot" aria-hidden="true"></span>
@@ -200,12 +203,12 @@ const homeFooterCta = {
           Most local rebuilds land in the <strong>{STANDARD_WEBSITE_TYPICAL_RANGE}</strong> range. Founding-partner pilot pairs a <strong>complimentary build</strong> with a {FOUNDING_PARTNER_SEO_MONTHLY}/mo {FOUNDING_PARTNER_SEO_LABEL} while any of the {FOUNDING_PARTNER_BUILD_SLOTS} launch spots remain. Simple single-service sites still start at {STANDARD_WEBSITE_STARTING_PRICE}.
         </p>
         <div class="hero-actions">
-          <a href="/free-seo-audit" class="btn btn-primary-audit hero-cta-glow" id="hero-run-audit-btn">
+          <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary-book hero-cta-glow" id="hero-founder-btn" data-calendar-link>
             <span class="hero-cta-glow-halo" aria-hidden="true"></span>
-            Run the Free 60-Second Audit
+            Book a 15-minute intro call
           </a>
-          <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary-book" id="hero-founder-btn" data-calendar-link>
-            Or book a 15-minute intro call
+          <a href="/free-seo-audit" class="btn btn-primary-audit" id="hero-run-audit-btn">
+            Or run the free 60-second audit
           </a>
         </div>
         <div class="hero-trust-strip reveal-up">
@@ -215,8 +218,8 @@ const homeFooterCta = {
           </div>
           <span class="hero-trust-sep" aria-hidden="true"></span>
           <div class="hero-trust-badge">
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2l1.5 4.5H16l-3.7 2.7 1.4 4.3L10 11l-3.7 2.5 1.4-4.3L4 6.5h4.5L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            <span>98+ Lighthouse Scores</span>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5c-3 0-5.5 2.4-5.5 5.4 0 4.1 5.5 9.6 5.5 9.6s5.5-5.5 5.5-9.6c0-3-2.5-5.4-5.5-5.4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="7.9" r="1.9" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>Built in Rome, NY</span>
           </div>
           <span class="hero-trust-sep" aria-hidden="true"></span>
           <div class="hero-trust-badge">
@@ -230,10 +233,6 @@ const homeFooterCta = {
 
   <section class="section-shell section-shell--premium-pitch">
     <PremiumPitchStrip variant="home" />
-  </section>
-
-  <section class="section-shell section-shell--wash">
-    <ConsumerTrustStack />
   </section>
 
   <section class="section-shell section-shell--proof command-shell">
@@ -548,6 +547,53 @@ const homeFooterCta = {
     --hero-spot-y: 22%;
   }
 
+  /* Editorial typography dial: ~10% down from the global hero clamp, with a touch more leading. */
+  .page-hero--home h1 {
+    font-size: clamp(2.55rem, 5.85vw, 4.85rem);
+    line-height: 1.08;
+    /* Override the font-swap CLS reservation in theme.css so it tracks the
+       scoped font-size + line-height. theme.css reserves
+       calc(4 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (mobile, 4 lines) and
+       calc(3 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (≥900px, 3 lines) —
+       both explicitly derived from the global values, so they leave a
+       visible gap below the smaller homepage H1. Re-derive against the
+       dialed values here (desktop override follows below). */
+    min-height: calc(4 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
+  }
+
+  @media (min-width: 900px) {
+    .page-hero--home h1 {
+      min-height: calc(3 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
+    }
+  }
+
+  /* Boutique place marker: tiny brass area-code tag above the eyebrow. */
+  .hero-place-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 0.85rem;
+    padding: 0;
+    font-family: var(--font-serif, var(--font-display));
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(201, 168, 108, 0.92);
+  }
+
+  .hero-place-marker__rule {
+    display: inline-block;
+    width: 1.75rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201, 168, 108, 0.85) 60%, rgba(201, 168, 108, 0.15));
+  }
+
+  .hero-place-marker__text {
+    display: inline-block;
+    padding-top: 1px;
+  }
+
   .page-hero--home::before {
     background:
       radial-gradient(560px 300px at var(--hero-spot-x) var(--hero-spot-y), rgba(125, 181, 255, 0.22), transparent 62%),
@@ -704,8 +750,8 @@ const homeFooterCta = {
     border-radius: inherit;
     pointer-events: none;
     box-shadow:
-      0 22px 40px -22px rgba(37, 99, 235, 0.95),
-      0 0 26px 2px rgba(147, 197, 253, 0.2);
+      0 22px 40px -22px rgba(145, 112, 56, 0.95),
+      0 0 26px 2px rgba(222, 196, 146, 0.28);
     opacity: 0.55;
     animation: hero-cta-glow-ring 4s ease-in-out infinite;
   }

@@ -1,5 +1,28 @@
 # Migration Status Report
 
+## Marketing SEO polish — LocalBusiness GeoCircle, robots.txt, OG compression, theme-color split (2026-04-22)
+
+- Enriched the LocalBusiness JSON-LD in `src/lib/seo.ts` with a dual-shape `serviceArea`: a `GeoCircle` (80467m ≈ 50-mile radius) anchored at the Rome, NY home-base coords now leads the list, followed by the existing named `Place` entries. Google's LocalBusiness guidance prefers `GeoCircle` for service-area businesses without a public storefront, and this ties the Utica / Rome / Syracuse / Mohawk Valley coverage to real geography instead of name matching alone.
+- Hardened `public/robots.txt` with explicit `Disallow: /report`, `/report/`, `/thank-you`, `/facebook-offer`, and `/404` (belt-and-suspenders alongside the `X-Robots-Tag: noindex, nofollow` that PR 1 added in `vercel.json`). Saves crawl budget so bots don't spend it on thank-you / error / offer shells before the header noindex kicks in.
+- Compressed both OG preview images in place with `pngquant --quality=70-85`: `og-site-premium.png` 1.91 MB → 338 KB (~82% reduction), `og-facebook-offer-premium.png` 1.91 MB → 355 KB (~81% reduction). Same 2400×1260 dimensions and `image/png` MIME — Facebook / LinkedIn / X card consumers see the same image, just faster, which also helps first-share crawls that time out on > 1 MB previews.
+- Split `<meta name="theme-color">` in `src/layouts/Layout.astro` into dark/light `prefers-color-scheme` variants (both currently `#0f1218` since the site is dark-mode locked via `color-scheme: dark`). Explicit media declarations keep Safari / Android Chrome from guessing on browsers that honour both, and give us a single place to dial the light-mode address bar tint later without breaking dark.
+- Verified with `pnpm turbo run build --filter=dbastudio-315` (green) and `npx astro check` (0 err, 0 warn, 8 hints — unchanged from baseline). No schema, routing, or headers regressions.
+
+## Marketing homepage editorial pass — place marker, localized trust strip, merged section (2026-04-22)
+
+- Added a subtle `315 · 518` brass place-marker line above the hero eyebrow on the homepage (`src/pages/index.astro` hero + new `.hero-place-marker` CSS). Ties the "Upstate craft" side of the brand to the hero without changing positioning or copy below it.
+- Localized the middle chit of the hero trust strip from `98+ Lighthouse Scores` to `Built in Rome, NY` (map-pin SVG replacing the star). Keeps the strip boutique and hyper-local; Lighthouse proof is already covered by the dedicated proof section further down the page.
+- Merged the "Peace of mind" + "Why our sites feel different" sections on the homepage by removing the `ConsumerTrustStack` block from `src/pages/index.astro` (still rendered on `/ouredge` and `/services/managed-hosting`, both reachable from the nav). The remaining `why-astro-shell` section tells the technical-proof story once instead of twice, tightening the scroll rhythm.
+- Editorial type dial on the homepage hero H1 only: `font-size: clamp(2.55rem, 5.85vw, 4.85rem)` (~10% down from the global `5.4rem` cap) and `line-height: 1.08` (up from `1.05`). Scoped to `.page-hero--home h1` so inner pages are untouched; min-height reservation from `theme.css` still prevents Abril-Fatface swap CLS.
+- Verified with `pnpm turbo run build --filter=dbastudio-315` (green) and `npx astro check` (0 err, 0 warn). No changes to mobile drawer, security headers, or sticky-pill gating.
+
+## Marketing hero CTA swap + 6-item nav + sticky-pill gating (2026-04-22)
+
+- Fixed the audit finding that the floating "Get in touch" pill was clipping the H1 word `books` at ~1024×768 on the marketing homepage. The pill is now hidden on page load and only reveals after the hero scrolls out of view (IntersectionObserver on `.page-hero` with a `scrollY > 400px` fallback for browsers without IO).
+- Promoted the Calendly "Book a 15-minute intro call" CTA to the primary position in the hero (`btn-primary-book` + brass halo); the "/free-seo-audit" CTA becomes the blue secondary action with updated copy "Or run the free 60-second audit" — matches the boutique 5th-Ave-for-Upstate direction (one confident primary action, not two competing ones).
+- Collapsed the desktop nav from 9 links + CTA to **6 links + CTA** (`Our Edge, Services, Portfolio, Pricing, About, Contact` + `Book a Free Call`). `Service Areas`, `FAQ`, and `Blog` are intentionally dropped from the top bar; they remain reachable from the footer and deep pages.
+- Verified locally with `pnpm turbo run build --filter=dbastudio-315` (green) and `npx astro check` (0 errors, 0 warnings). Runtime verified against the built `.vercel/output/static` at 992×639 and 1280×800: sticky hidden on load, reveals after 1680px scroll, hides again on scroll back, CTA order + halo + nav-count assertions all pass.
+
 ## Marketing security-header parity on Vercel (2026-04-22)
 
 - Fixed a production gap where `apps/marketing/build/csp.mjs` + `static-headers.json` defined a full CSP, HSTS preload, COOP, Referrer-Policy, X-Content-Type-Options, X-Frame-Options, Permissions-Policy, and per-path X-Robots-Tag — but Vercel never read them (`static-headers.json` is Firebase-style, only consumed by the Playwright static-parity harness on :5500). Live `designedbyanthony.com` responses only carried Vercel's default HSTS.

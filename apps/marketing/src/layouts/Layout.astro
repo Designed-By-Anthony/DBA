@@ -225,7 +225,8 @@ try {
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="msapplication-TileColor" content="#0f1218" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
-    <meta name="theme-color" content="#0f1218" />
+    <meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: light)" />
     <meta name="color-scheme" content="dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta property="og:title" content={title} />
@@ -336,7 +337,7 @@ try {
   <body
     class:list={[bodyClass]}
     data-priority-analytics={priorityAnalytics ? 'true' : undefined}
-    data-reach-out-sticky={!minimalChrome ? 'true' : undefined}
+    data-reach-out-sticky={!minimalChrome ? 'hidden' : undefined}
   >
     {!minimalChrome && <div id="reading-progress-bar" aria-hidden="true"></div>}
 
@@ -368,12 +369,9 @@ try {
                 <nav class="nav nav-desktop">
                   <a href="/ouredge" data-astro-prefetch>Our Edge</a>
                   <a href="/services" data-astro-prefetch>Services</a>
-                  <a href="/pricing" data-astro-prefetch>Pricing</a>
-                  <a href="/service-areas" data-astro-prefetch>Service Areas</a>
                   <a href="/portfolio" data-astro-prefetch>Portfolio</a>
+                  <a href="/pricing" data-astro-prefetch>Pricing</a>
                   <a href="/about" data-astro-prefetch>About</a>
-                  <a href="/faq" data-astro-prefetch>FAQ</a>
-                  <a href="/blog" data-astro-prefetch>Blog</a>
                   <a href="/contact" class="nav-contact-link" data-astro-prefetch>Contact</a>
                   <a href="https://calendly.com/anthony-designedbyanthony/web-design-consult" class="btn btn-primary btn-sm nav-book-btn" id="nav-book-call-btn" data-calendar-link>
                     Book a Free Call
@@ -736,6 +734,54 @@ try {
           show();
         };
         applyStored();
+      })();
+    </script>
+
+    <script is:inline>
+      /**
+       * Reveal the "Get in touch" sticky pill only after the reader has scrolled
+       * past the page hero. Fixes a bug where the pill overlapped the H1 on
+       * ~1024×768 viewports, and is a boutique touch (no nagging on landing).
+       */
+      (function () {
+        var sticky = document.getElementById('reachOutSticky');
+        if (!sticky) return;
+        var sentinel = document.querySelector('.page-hero') || document.querySelector('.hero-actions');
+        var body = document.body;
+        function show() {
+          sticky.classList.add('reach-out-sticky--visible');
+          if (body.hasAttribute('data-reach-out-sticky')) {
+            body.setAttribute('data-reach-out-sticky', 'visible');
+          }
+        }
+        function hide() {
+          sticky.classList.remove('reach-out-sticky--visible');
+          if (body.hasAttribute('data-reach-out-sticky')) {
+            body.setAttribute('data-reach-out-sticky', 'hidden');
+          }
+        }
+        if (!sentinel || typeof IntersectionObserver === 'undefined') {
+          if (window.scrollY > 400) show();
+          window.addEventListener(
+            'scroll',
+            function () {
+              if (window.scrollY > 400) show();
+              else hide();
+            },
+            { passive: true },
+          );
+          return;
+        }
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) hide();
+              else show();
+            });
+          },
+          { threshold: 0.05 },
+        );
+        io.observe(sentinel);
       })();
     </script>
 
@@ -1408,7 +1454,7 @@ try {
   }
 
   /* ── Sticky “Get in touch” bar + modal ── */
-  body[data-reach-out-sticky='true'] {
+  body[data-reach-out-sticky='visible'] {
     padding-bottom: calc(4.35rem + env(safe-area-inset-bottom));
   }
 
@@ -1423,23 +1469,24 @@ try {
     padding: 0.65rem var(--container-gutter);
     padding-bottom: calc(0.65rem + env(safe-area-inset-bottom));
     pointer-events: none;
-    animation: reach-out-slide-up 0.45s ease-out forwards;
+    transform: translateY(110%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 0.4s ease-out,
+      opacity 0.3s ease-out,
+      visibility 0.4s;
   }
 
-  @keyframes reach-out-slide-up {
-    from {
-      transform: translateY(100%);
-      opacity: 0.85;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+  .reach-out-sticky--visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .reach-out-sticky {
-      animation: none;
+      transition: none;
     }
   }
 

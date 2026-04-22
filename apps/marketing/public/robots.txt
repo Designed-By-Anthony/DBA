@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
 
+# Belt-and-suspenders: these paths also set X-Robots-Tag: noindex, nofollow
+# via vercel.json. Explicit Disallow here avoids spending crawl budget
+# on them in the first place.
+Disallow: /report
+Disallow: /report/
+Disallow: /thank-you
+Disallow: /facebook-offer
+Disallow: /404
+
 Sitemap: https://designedbyanthony.com/sitemap-index.xml

@@ -669,7 +669,26 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 		},
 		foundingLocation: toPlace(businessProfile.homeBase),
 		areaServed: businessProfile.areaServed.map(toPlace),
-		serviceArea: businessProfile.areaServed.map(toPlace),
+		/**
+		 * Dual-shape serviceArea: a 50-mile GeoCircle anchored at the Rome, NY home base
+		 * (covers Utica / Rome / Syracuse / greater Mohawk Valley) plus the named
+		 * place list for broader markets. Google's LocalBusiness guidance prefers
+		 * GeoCircle for service-area businesses without a public storefront.
+		 */
+		serviceArea: [
+			{
+				"@type": "GeoCircle",
+				geoMidpoint: {
+					"@type": "GeoCoordinates",
+					latitude: businessProfile.geo.latitude,
+					longitude: businessProfile.geo.longitude,
+				},
+				geoRadius: "80467",
+				description:
+					"50-mile service radius from Rome, NY — covers Utica, Rome, Syracuse, and the greater Mohawk Valley / Central New York region.",
+			},
+			...businessProfile.areaServed.map(toPlace),
+		],
 		brand: {
 			"@type": "Brand",
 			name: SITE_NAME,
