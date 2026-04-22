@@ -12,15 +12,6 @@ const LOADING_MESSAGES = [
 	"Compiling Final Diagnostic...",
 ];
 
-type TurnstileApi = {
-	render: (
-		container: string | HTMLElement,
-		options: Record<string, unknown>,
-	) => string | undefined;
-	execute: (widgetId: string | HTMLElement) => void;
-	reset: (widgetId: string | HTMLElement) => void;
-	remove?: (widgetId: string | HTMLElement) => void;
-};
 
 export function AuditForm() {
 	const [url, setUrl] = useState("");
@@ -47,6 +38,7 @@ export function AuditForm() {
 					container: string | HTMLElement,
 					options: Record<string, unknown>,
 				) => string;
+				remove: (widgetId: string) => void;
 			};
 			__lighthouseTurnstileOnSuccess?: (token: string) => void;
 			__lighthouseTurnstileOnExpired?: () => void;
@@ -66,10 +58,13 @@ export function AuditForm() {
 		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) return;
 
+		let widgetId: string | undefined;
+
 		const mount = () => {
 			const host = document.getElementById("lighthouse-turnstile");
-			if (!host || !anyWindow.turnstile || host.childElementCount > 0) return;
-			anyWindow.turnstile.render(host, {
+			if (!host || !anyWindow.turnstile || widgetId) return;
+			
+			widgetId = anyWindow.turnstile.render(host, {
 				sitekey: siteKey,
 				theme: "dark",
 				callback: "__lighthouseTurnstileOnSuccess",
@@ -79,9 +74,19 @@ export function AuditForm() {
 		};
 
 		mount();
-		const interval = window.setInterval(mount, 250);
+		const interval = window.setInterval(() => {
+			if (!widgetId) {
+				mount();
+			} else {
+				window.clearInterval(interval);
+			}
+		}, 250);
+
 		return () => {
 			window.clearInterval(interval);
+			if (widgetId && anyWindow.turnstile && anyWindow.turnstile.remove) {
+				anyWindow.turnstile.remove(widgetId);
+			}
 			anyWindow.__lighthouseTurnstileOnSuccess = undefined;
 			anyWindow.__lighthouseTurnstileOnExpired = undefined;
 			anyWindow.__lighthouseTurnstileOnError = undefined;
