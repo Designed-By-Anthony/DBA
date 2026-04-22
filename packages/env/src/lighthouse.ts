@@ -32,6 +32,16 @@ const lighthouseSchema = z
 		AGENCY_OS_WEBHOOK_SECRET: z.string().trim().optional(),
 		REPORT_PUBLIC_BASE_URL: optionalUrl,
 
+		/**
+		 * Interim lead-email bridge (`/api/lead-email`). Active until the
+		 * VertaFlow CRM tenant is wired and marketing's `PUBLIC_INGEST_URL`
+		 * is flipped back to the CRM ingest route. All three are optional at
+		 * build time so local/dev deploys without a Resend key still validate.
+		 */
+		RESEND_API_KEY: z.string().trim().optional(),
+		RESEND_FROM_EMAIL: z.string().trim().email().optional(),
+		LEAD_EMAIL_TO: z.string().trim().email().optional(),
+
 		NEXT_PUBLIC_SENTRY_DSN: optionalUrl,
 		SENTRY_DSN: optionalUrl,
 		SENTRY_AUTH_TOKEN: z.string().trim().optional(),

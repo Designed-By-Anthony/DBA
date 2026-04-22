@@ -1,5 +1,13 @@
 # Migration Status Report
 
+## Marketing lead-email bridge — interim Resend handler until VertaFlow CRM tenant is live (2026-04-22)
+
+- Added `apps/lighthouse/src/app/api/lead-email/route.ts` — a new POST handler that accepts the existing `AuditForm` `FormData` contract (no marketing markup changes), honors the same Turnstile verification + honeypot that `/api/contact` uses, composes a plain-text + HTML lead summary, and ships it to `LEAD_EMAIL_TO` (default `anthony@designedbyanthony.com`) via the Resend REST API. Same CORS allowlist as `/api/contact` (apex + `*.designedbyanthony.com` + local dev).
+- Swapped the `AuditForm.astro` default endpoint from the VertaFlow CRM ingest URL (which is offline while the tenant is still being provisioned) to the new Lighthouse `/api/lead-email` route. `PUBLIC_INGEST_URL` still wins when set, so flipping marketing back to the CRM once it's live is a single env-var change with no redeploy of marketing.
+- Extended the marketing CSP (`apps/marketing/build/csp.mjs`) with `https://lighthouse.designedbyanthony.com` in both `connect-src` and `form-action`. Synced via `pnpm run sync:static-headers` so `static-headers.json` + `vercel.json` stay in lockstep.
+- Added three new optional env vars to the Lighthouse schema (`packages/env/src/lighthouse.ts`) + `.env.example`: `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (defaults to `anthony@designedbyanthony.com`), `LEAD_EMAIL_TO` (defaults to the same). No new npm deps — uses native `fetch` to `https://api.resend.com/emails`.
+- Verified with `pnpm turbo run build --filter=dbastudio-315 --filter=dba-lighthouse-audit` (green, 45s), `pnpm --filter dba-lighthouse-audit lint` (1 pre-existing warning), and `cd apps/marketing && npx astro check` (0/0/8, unchanged).
+
 ## Marketing SEO polish — LocalBusiness GeoCircle, robots.txt, OG compression, theme-color split (2026-04-22)
 
 - Enriched the LocalBusiness JSON-LD in `src/lib/seo.ts` with a dual-shape `serviceArea`: a `GeoCircle` (80467m ≈ 50-mile radius) anchored at the Rome, NY home-base coords now leads the list, followed by the existing named `Place` entries. Google's LocalBusiness guidance prefers `GeoCircle` for service-area businesses without a public storefront, and this ties the Utica / Rome / Syracuse / Mohawk Valley coverage to real geography instead of name matching alone.

@@ -13,6 +13,15 @@ const LIGHTHOUSE_AUDIT_API_ORIGIN =
 /** VertaFlow CRM public lead ingest (`POST /api/lead`, `/api/v1/ingest`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
 const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
 
+/**
+ * Lighthouse subdomain on Vercel — hosts the audit UI, the `/api/contact`
+ * legacy lead endpoint, and the interim `/api/lead-email` bridge that ships
+ * marketing lead submissions to Anthony's inbox until the VertaFlow CRM
+ * tenant is provisioned. Required in `connect-src` + `form-action` because
+ * the browser posts cross-origin from `designedbyanthony.com` to this host.
+ */
+const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
+
 /** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC =
 	"'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com";
@@ -50,6 +59,7 @@ const DIRECTIVES = {
 		"https://www.gstatic.com",
 		"https://*.googleapis.com",
 		LIGHTHOUSE_AUDIT_API_ORIGIN,
+		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
 		VERTAFLOW_CRM_ORIGIN,
 		"https://challenges.cloudflare.com",
 		"https://*.ingest.us.sentry.io",
@@ -68,7 +78,7 @@ const DIRECTIVES = {
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
+	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
 	/**
 	 * Trusted Types: mitigates DOM XSS sinks. Keep `require-trusted-types-for` enabled,
 	 * but allow third-party scripts (GA4 / Turnstile / Sentry) to register their own policies.

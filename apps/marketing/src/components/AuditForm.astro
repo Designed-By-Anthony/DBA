@@ -5,15 +5,22 @@ import { getTurnstileSiteKey } from "../lib/turnstile";
 const turnstileSiteKey = getTurnstileSiteKey();
 
 /**
- * Augusta Global Ingest Protocol — public leads POST to the versioned CRM
- * route `POST /api/v1/ingest`. `PUBLIC_INGEST_URL` is the new primary env;
- * `PUBLIC_CRM_LEAD_URL` is kept for backward compatibility with older
- * deploys that still point at `/api/lead`.
+ * Lead endpoint resolution.
+ *
+ * Priority:
+ *   1. `PUBLIC_INGEST_URL` — VertaFlow CRM `POST /api/v1/ingest` (primary once
+ *      the tenant is provisioned; flip this env var back to the admin host to
+ *      retire the interim email bridge).
+ *   2. `PUBLIC_CRM_LEAD_URL` — legacy `/api/lead` on the CRM; kept for backward
+ *      compatibility with older deploys.
+ *   3. Interim fallback: the Lighthouse `/api/lead-email` bridge, which emails
+ *      every submission to Anthony via Resend until the CRM tenant is live.
+ *      This keeps marketing forms alive during the VertaFlow CRM build-out.
  */
 const defaultFormEndpoint =
 	import.meta.env.PUBLIC_INGEST_URL ||
 	import.meta.env.PUBLIC_CRM_LEAD_URL ||
-	"https://admin.vertaflow.io/api/v1/ingest";
+	"https://lighthouse.designedbyanthony.com/api/lead-email";
 
 /** Clerk org id (tenant) for this marketing build — threaded through the `X-Tenant-Id` header. */
 const tenantId = import.meta.env.PUBLIC_TENANT_ID || "";
