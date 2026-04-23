@@ -51,19 +51,20 @@ const lighthouseSchema = z
 	.superRefine((env, ctx) => {
 		// Only enforce on Vercel (`VERCEL=1`). Skip local/CI.
 		//
-		// `ADMIN_UPSTREAM_URL` is documented for the apex (marketing) project
-		// only — it is never set on the standalone lighthouse Vercel project.
-		// When it *is* present here, we are building lighthouse as part of a
-		// deployment that also ships the apex middleware (shared monorepo env with
-		// Agency OS) — skip to avoid false positives. When absent, this is an
-		// isolated lighthouse project: forbid CRM secrets (env-bleed guard).
+		// This repo ships one Next.js app (marketing + `/lighthouse`). That deploy
+		// often shares Vercel env with Agency OS secrets — same as
+		// `validateMarketingEnv` unified mode. Do **not** hard-fail here by default.
+		//
+		// Legacy: a **dedicated** Lighthouse-only Vercel project should set
+		// `LIGHTHOUSE_ISOLATED_PROJECT=1` so CRM secrets are rejected (env-bleed).
 		if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
-		const apexMiddlewareEnvPresent =
-			typeof (env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) ===
-				"string" &&
-			((env.ADMIN_UPSTREAM_URL ?? process.env.ADMIN_UPSTREAM_URL) as string)
-				.length > 0;
-		if (apexMiddlewareEnvPresent) return;
+
+		const isolated =
+			env.LIGHTHOUSE_ISOLATED_PROJECT === "1" ||
+			env.LIGHTHOUSE_ISOLATED_PROJECT === "true" ||
+			process.env.LIGHTHOUSE_ISOLATED_PROJECT === "1" ||
+			process.env.LIGHTHOUSE_ISOLATED_PROJECT === "true";
+		if (!isolated) return;
 
 		const forbidden = [
 			"CLERK_SECRET_KEY",
@@ -78,7 +79,7 @@ const lighthouseSchema = z
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					path: [key],
-					message: `${key} must not be set on the lighthouse project — it belongs to Agency OS (env-bleed detected).`,
+					message: `${key} must not be set on an isolated lighthouse project — it belongs to Agency OS (env-bleed detected).`,
 				});
 			}
 		}
