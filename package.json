@@ -1,10 +1,11 @@
 {
-	"name": "designed-by-anthony-monorepo",
+	"name": "designed-by-anthony",
+	"version": "0.0.1",
 	"private": true,
+	"type": "module",
 	"packageManager": "pnpm@10.12.1",
 	"pnpm": {
 		"onlyBuiltDependencies": [
-			"@clerk/shared",
 			"@sentry/cli",
 			"@swc/core",
 			"esbuild",
@@ -21,23 +22,45 @@
 		"node": ">=22.12.0"
 	},
 	"scripts": {
-		"build": "turbo run build",
-		"lint": "turbo run lint",
-		"dev": "turbo run dev",
-		"dev:lighthouse": "pnpm --filter dba-lighthouse-audit dev",
-		"dev:marketing": "pnpm --filter dbastudio-315 dev",
-		"test:e2e": "npx cypress run",
-		"test:cypress": "npx cypress run",
-		"test:cypress:open": "npx cypress open"
+		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
+		"sync:static-headers": "node build/sync-static-headers.mjs",
+		"prebuild": "pnpm run build:site-script && pnpm run sync:static-headers",
+		"dev": "pnpm run build:site-script && next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "biome check .",
+		"test:e2e": "cypress run",
+		"test:cypress": "cypress run",
+		"test:cypress:open": "cypress open"
+	},
+	"dependencies": {
+		"@fontsource-variable/fraunces": "^5.2.9",
+		"@fontsource-variable/inter": "^5.2.8",
+		"@fontsource-variable/outfit": "^5.2.8",
+		"@fontsource/abril-fatface": "^5.2.7",
+		"@google/genai": "^1.48.0",
+		"@sentry/nextjs": "^10.48.0",
+		"@vercel/analytics": "^2.0.1",
+		"@vercel/speed-insights": "^2.0.0",
+		"cheerio": "^1.0.0",
+		"googleapis": "^148.0.0",
+		"next": "16.2.3",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"sharp": "^0.34.5",
+		"stream-chat": "^9.41.1",
+		"stream-chat-react": "^14.0.1",
+		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
+		"@tailwindcss/postcss": "^4",
 		"@types/node": "^22.10.2",
+		"@types/react": "^19.2.0",
+		"@types/react-dom": "^19.2.0",
 		"cypress": "^15.14.0",
-		"turbo": "^2.9.6",
+		"esbuild": "^0.28.0",
+		"tailwindcss": "^4",
 		"typescript": "^5.9.3"
-	},
-	"dependencies": {
-		"@vercel/functions": "^3.4.3"
 	}
 }

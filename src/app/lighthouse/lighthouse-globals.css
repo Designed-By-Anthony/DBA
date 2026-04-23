@@ -1,0 +1,45 @@
+@import "../../design-system/tokens.css";
+@import "../../design-system/tailwind-v4-bridge.css";
+@import "tailwindcss";
+
+@theme {
+	--font-sans: var(--font-inter);
+	--font-display: var(--font-outfit);
+
+	--color-background: transparent;
+	--color-primary-foreground: #ffffff;
+}
+
+@layer utilities {
+	.glass-card {
+		background: linear-gradient(
+			180deg,
+			rgba(13, 19, 32, 0.96) 0%,
+			rgba(17, 24, 39, 0.92) 100%
+		);
+		border: 1px solid rgba(96, 165, 250, 0.14);
+		border-radius: 1.4rem;
+		box-shadow: 0 28px 70px -38px rgba(15, 23, 42, 0.95);
+		backdrop-filter: blur(20px);
+	}
+	.text-glow {
+		text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+	}
+}
+
+@keyframes spin-slow {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+.animate-spin-slow {
+	animation: spin-slow 3s linear infinite;
+}
+
+.lighthouse-segment {
+	min-height: 100vh;
+	color: var(--color-foreground);
+}

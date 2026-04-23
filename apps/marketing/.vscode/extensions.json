@@ -1,4 +1,0 @@
-{
-	"recommendations": ["astro-build.astro-vscode", "ms-playwright.playwright"],
-	"unwantedRecommendations": []
-}

@@ -9,7 +9,7 @@ dist
 .turbo
 .vercel
 *.log
-# pnpm monorepo — npm lockfiles in workspace apps cause Vercel to use npm instead of pnpm
+# Stray npm lockfiles under legacy paths (Vercel may pick npm if present)
 apps/*/package-lock.json
 
 # Local tooling / secrets (never commit)
@@ -17,3 +17,6 @@ cloud-sql-proxy
 dba-website-prod-*.json
 apps/web-viewer/zapier-platform-example-app-github/
 .env*.local
+
+# Removed app; delete locally if present (some installs had root-owned node_modules):
+apps/lighthouse/

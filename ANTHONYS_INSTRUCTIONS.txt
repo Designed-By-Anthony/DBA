@@ -4,15 +4,15 @@ Designed by Anthony — monorepo manual checklist
 Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 
 Apps under apps/
-  • web-viewer     — Agency OS (Next.js CRM + portal)
-  • lighthouse     — Lighthouse audit tool (Next.js)
-  • marketing      — designedbyanthony.com (Astro)
+  • marketing      — designedbyanthony.com + Lighthouse audit (Next.js)
+  • vertaflow-crm  — VertaFlow (if present in tree)
+  • customer-site-embeds — client embed assets (no package workspace)
 
 Global theme (single source of truth)
 ---------------------------------------
 • Author ALL global theme changes in: apps/marketing/src/styles/theme.css
 • Next.js apps consume tokens via workspace package @dba/theme:
-  - packages/dba-theme/dba-global.css re-imports that file for Astro/layout use.
+  - packages/dba-theme/dba-global.css re-imports that file for shared layout CSS.
   - packages/dba-theme/tokens.css duplicates the :root block for Next + Tailwind.
 • When you change :root { ... } in theme.css, update packages/dba-theme/tokens.css
   to match (same variables/values), then run apps as usual.
@@ -26,9 +26,7 @@ First-time setup
 Development
 -----------
 From monorepo root:
-  pnpm dev:web          — Agency OS (port 3000)
-  pnpm dev:lighthouse   — Lighthouse app
-  pnpm dev:marketing    — Astro site
+  pnpm dev:marketing    — Marketing + Lighthouse (port 4321)
 
 Cursor / IDE
 ------------
@@ -36,10 +34,7 @@ Open the folder "Designed_By_Anthony" as the workspace root (not the old Web Vie
 
 Vercel (when ready)
 -------------------
-Create three projects pointing at the same repo with Root Directory:
-  apps/web-viewer
-  apps/lighthouse
-  apps/marketing
+Vercel: apex project Root Directory is typically `apps/marketing` (see your dashboard).
 
 Cloudflare / GCP / Clerk
 ------------------------

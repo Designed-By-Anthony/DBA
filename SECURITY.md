@@ -1,6 +1,6 @@
 # Security policy
 
-This document describes the security posture of the DBASTUDIO315 monorepo and the operational obligations that keep it that way.
+This document describes the security posture of the Designed by Anthony Next.js app and related operational obligations.
 
 ## Reporting a vulnerability
 
@@ -20,13 +20,12 @@ Only `main` and the currently deployed Vercel commits are supported. There is no
 
 ## Threat model (abbreviated)
 
-The product runs three user-facing surfaces:
+This repository ships the **public marketing + Lighthouse** Next.js surface on Vercel. Other products (e.g. Agency OS / web viewer) may live in separate repos; references below to `apps/web-viewer` describe that product’s layout when present in a combined workspace.
 
 | App | Audience | Auth |
 |---|---|---|
-| `apps/marketing` (Astro on Vercel) | Anonymous public | none |
-| `apps/lighthouse` (Next on Vercel) | Anonymous public submitting audit requests | Turnstile CAPTCHA, per-IP rate limit |
-| `apps/web-viewer` (Next on Vercel) | Tenant admins + portal clients | Clerk sessions for admins; `portal_session` cookie (hashed token) for clients |
+| This repo — marketing + Lighthouse (Next on Vercel) | Anonymous public; audit UI/API on same app | Turnstile where enabled; per-IP rate limit on audit routes |
+| Agency OS / web viewer (if applicable) | Tenant admins + portal clients | Clerk sessions for admins; `portal_session` cookie (hashed token) for clients |
 
 Trust boundaries the code must honor:
 
@@ -77,7 +76,7 @@ Production deployments refuse to start or fail closed at runtime when these are 
 
 - Run `pnpm audit --prod` before every release.
 - HIGH/CRITICAL advisories block the release until patched or justified.
-- MODERATE advisories on dev-only transitive deps (Astro type-checker, build plugins) may be tracked in an issue and patched on the next planned bump.
+- MODERATE advisories on dev-only transitive deps may be tracked in an issue and patched on the next planned bump.
 
 ### Cookie / session lifecycle
 
@@ -100,7 +99,6 @@ Upgrade path if abuse emerges: swap the in-memory counter in `src/lib/rate-limit
 
 ## Known-but-accepted risk
 
-- **`@astrojs/check` → `yaml@<2.8.3`** (GHSA-48c2-rrv3-qjmp, CWE-674 stack overflow). Dev-time dependency, does not run in production. Blocked on upstream Astro bump. Tracked in the dep-audit PR description.
 - **`AGENTIC_WEBHOOK_SECRET` / `IDX_WEBHOOK_SECRET` empty by default.** The routes are feature-flagged off via empty env; enabling them is an intentional op.
 - **Shared Cloudflare zone (`CLOUDFLARE_ZONE_ID`).** There is currently no per-tenant zone model. The admin DNS / hostname routes that operated on this shared zone have been removed; re-introducing them requires either an allowlist gate (`assertApexOperator`) or a per-tenant zone mapping. Discussed in PR #24.
 - **Process-local rate limits.** A multi-instance Vercel deploy has one bucket per instance. This is accepted — the limiter is defense in depth, not a primary control.
@@ -115,12 +113,12 @@ Upgrade path if abuse emerges: swap the in-memory counter in `src/lib/rate-limit
 | Email HTML escaping + safe-URL guard | `apps/web-viewer/src/lib/email-utils.ts` |
 | Click-tracking HMAC sign/verify | `apps/web-viewer/src/lib/email-utils.ts` + `apps/web-viewer/src/app/api/track/click/[emailId]/route.ts` |
 | Error-response hygiene | `apps/web-viewer/src/lib/api-error.ts` |
-| Rate limiter | `apps/web-viewer/src/lib/rate-limit.ts` (plus `apps/lighthouse/src/lib/http.ts`) |
+| Rate limiter | `apps/web-viewer/src/lib/rate-limit.ts` when present (plus `src/lighthouse/lib/http.ts` for audit routes in this repo) |
 | Request body size limit | `apps/web-viewer/src/lib/body-limit.ts` |
 | Portal session hash | `apps/web-viewer/src/lib/portal-auth.ts` |
 | Apex-operator allowlist | `apps/web-viewer/src/lib/admin-allowlist.ts` |
 | Postgres row-level security policies | `packages/database/sql/enable_rls.sql` |
-| Security response headers | `apps/web-viewer/next.config.ts`, `apps/lighthouse/next.config.ts`, `apps/marketing/static-headers.json` (edge parity; synced from `build/csp.mjs`) |
+| Security response headers | `next.config.ts`, `vercel.json` / `static-headers.json` (CSP synced from `build/csp.mjs` via `pnpm run sync:static-headers`) |
 
 ## Audit log for this document
 
