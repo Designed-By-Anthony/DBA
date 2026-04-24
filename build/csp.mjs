@@ -80,12 +80,11 @@ const DIRECTIVES = {
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
 	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
 	/**
-	 * Trusted Types: mitigates DOM XSS sinks. Keep `require-trusted-types-for` enabled,
-	 * but allow third-party scripts (GA4 / Turnstile / Sentry) to register their own policies.
-	 * The marketing layout still creates the permissive `default` policy first (inline bootstrap).
+	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
+	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that
+	 * still break under enforced Trusted Types even with a permissive `default` policy
+	 * registered from `MarketingChrome`. Re-enable only after framework support is proven.
 	 */
-	"trusted-types": "* 'allow-duplicates'",
-	"require-trusted-types-for": "'script'",
 };
 
 const REPORT_TO_GROUP = "csp-endpoint";
