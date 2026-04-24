@@ -7,7 +7,14 @@ export function initMagneticLinks(): void {
 
 	const targets = Array.from(
 		document.querySelectorAll<HTMLElement>(
-			"#nav-book-call-btn, .site-banner-link, .nav-contact-link",
+			[
+				"#nav-book-call-btn",
+				".site-banner-link",
+				".nav-contact-link",
+				".hero-cta-glow",
+				".nav-rail-link--book",
+				".nav-rail-link--audit",
+			].join(", "),
 		),
 	);
 	if (targets.length === 0) return;

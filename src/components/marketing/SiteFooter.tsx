@@ -7,7 +7,11 @@ export function SiteFooter() {
 	return (
 		<footer className="footer" id="contact">
 			<div className="footer-container">
-				<Link href="/" className="footer-logo-link" aria-label="Designed by Anthony home">
+				<Link
+					href="/"
+					className="footer-logo-link reveal-up"
+					aria-label="Designed by Anthony home"
+				>
 					<Image
 						src={BRAND_ASSETS.mark}
 						alt="Designed by Anthony Logo"
@@ -17,7 +21,7 @@ export function SiteFooter() {
 					/>
 				</Link>
 
-				<div className="footer-link-column">
+				<div className="footer-link-column reveal-up">
 					<p className="footer-heading">Explore</p>
 					<div className="footer-link-list">
 						<Link href="/services">Services</Link>
@@ -28,7 +32,7 @@ export function SiteFooter() {
 					</div>
 				</div>
 
-				<div className="footer-link-column">
+				<div className="footer-link-column reveal-up">
 					<p className="footer-heading">Reach Out</p>
 					<div className="footer-link-list">
 						<Link href="/contact">Contact</Link>
@@ -45,7 +49,9 @@ export function SiteFooter() {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<span className="sr-only">Google Business Profile (opens in new window)</span>
+							<span className="sr-only">
+								Google Business Profile (opens in new window)
+							</span>
 							Google
 						</a>
 						<a
@@ -53,7 +59,9 @@ export function SiteFooter() {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<span className="sr-only">Yelp Profile (opens in new window)</span>
+							<span className="sr-only">
+								Yelp Profile (opens in new window)
+							</span>
 							Yelp
 						</a>
 						<a
@@ -61,7 +69,9 @@ export function SiteFooter() {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<span className="sr-only">Facebook Profile (opens in new window)</span>
+							<span className="sr-only">
+								Facebook Profile (opens in new window)
+							</span>
 							Facebook
 						</a>
 						<a
@@ -69,7 +79,9 @@ export function SiteFooter() {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<span className="sr-only">Instagram Profile (opens in new window)</span>
+							<span className="sr-only">
+								Instagram Profile (opens in new window)
+							</span>
 							Instagram
 						</a>
 					</div>
@@ -79,7 +91,7 @@ export function SiteFooter() {
 					href="https://locallyownedandoperated.org/"
 					target="_blank"
 					rel="nofollow noopener noreferrer"
-					className="footer-badge-link"
+					className="footer-badge-link reveal-up"
 					aria-label="Locally Owned and Operated (opens in new window)"
 				>
 					<img
@@ -92,7 +104,7 @@ export function SiteFooter() {
 					<span>Locally Owned</span>
 				</a>
 
-				<div className="footer-bottom">
+				<div className="footer-bottom reveal-up">
 					<p>© {year} Designed by Anthony</p>
 					<span className="footer-sep">·</span>
 					<Link href="/privacy">Privacy</Link>
@@ -100,7 +112,11 @@ export function SiteFooter() {
 					<Link href="/cookie">Cookies</Link>
 					<Link href="/image-license">Image license</Link>
 					<span className="footer-sep">·</span>
-					<button type="button" className="footer-cookie-settings" data-cookie-settings>
+					<button
+						type="button"
+						className="footer-cookie-settings"
+						data-cookie-settings
+					>
 						Cookie settings
 					</button>
 					<span className="footer-sep">·</span>

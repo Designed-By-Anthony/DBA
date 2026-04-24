@@ -1,5 +1,6 @@
-import { ArticleBody } from "./ArticleBody";
-import { BlogArticleEnhancements } from "./BlogArticleEnhancements";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getArticleBlocksForSlug } from "@/data/blogArticleBlocks";
 import { blogPosts } from "@/data/blogPosts";
 import { homeFooterCta } from "@/data/home";
@@ -11,10 +12,9 @@ import {
 	PRIVATE_FACEBOOK_LABEL,
 } from "@/lib/offers";
 import { MARKETING_SERVICES } from "@/lib/seo";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { ArticleBody } from "./ArticleBody";
 import { AuditForm } from "./AuditForm";
+import { BlogArticleEnhancements } from "./BlogArticleEnhancements";
 import { MarketingChrome } from "./MarketingChrome";
 
 const STATIC_COPY: Record<
@@ -39,7 +39,8 @@ const STATIC_COPY: Record<
 	},
 	pricing: {
 		title: "Pricing",
-		description: "Transparent ranges for Mohawk Valley and Central NY website rebuilds.",
+		description:
+			"Transparent ranges for Mohawk Valley and Central NY website rebuilds.",
 		paragraphs: [
 			"Most local service-business rebuilds fall in a predictable band once scope is clear. Book a short intro call for a written estimate tailored to your pages, integrations, and SEO depth.",
 		],
@@ -60,7 +61,8 @@ const STATIC_COPY: Record<
 	},
 	ouredge: {
 		title: "Our Edge",
-		description: "Why our sites feel different — performance, structure, and long-term maintainability.",
+		description:
+			"Why our sites feel different — performance, structure, and long-term maintainability.",
 		paragraphs: [
 			"We build lean, fast marketing sites with modern tooling so you are not fighting plugins, template drift, or mystery bloat six months after launch.",
 		],
@@ -74,21 +76,24 @@ const STATIC_COPY: Record<
 	},
 	"free-seo-audit": {
 		title: "Free 60-Second Website Audit",
-		description: "Lighthouse-style scores and a clear snapshot of where your site stands.",
+		description:
+			"Lighthouse-style scores and a clear snapshot of where your site stands.",
 		paragraphs: [
 			"Drop your URL below. The check runs in the browser and Anthony follows up within 24 hours with the clearest next step — same workflow as the homepage audit module.",
 		],
 	},
 	privacy: {
 		title: "Privacy Policy",
-		description: "How Designed by Anthony handles information submitted through this site.",
+		description:
+			"How Designed by Anthony handles information submitted through this site.",
 		paragraphs: [
 			"This policy describes what we collect through contact and audit forms, how long we retain it, and how to request deletion. A full legal review copy can be expanded here; for now, treat submissions as operational email + CRM records used only to respond and deliver services.",
 		],
 	},
 	terms: {
 		title: "Terms of Service",
-		description: "Terms governing use of this website and engagement with Designed by Anthony.",
+		description:
+			"Terms governing use of this website and engagement with Designed by Anthony.",
 		paragraphs: [
 			"Use of this site does not create a client relationship until a written agreement is signed. Project scope, payment milestones, and deliverables are defined per engagement.",
 		],
@@ -102,7 +107,8 @@ const STATIC_COPY: Record<
 	},
 	"image-license": {
 		title: "Image License",
-		description: "Attribution and licensing for imagery used on this marketing site.",
+		description:
+			"Attribution and licensing for imagery used on this marketing site.",
 		paragraphs: [
 			"Self-hosted marketing imagery includes Unsplash-sourced assets used under the Unsplash License unless otherwise noted. Client project screenshots are used with permission.",
 		],
@@ -147,8 +153,8 @@ function ProseBlock({ paragraphs }: { paragraphs: string[] }) {
 	return (
 		<section className="section-shell">
 			<div className="section-container marketing-prose">
-				{paragraphs.map((p, i) => (
-					<p key={i} className="reveal-up">
+				{paragraphs.map((p) => (
+					<p key={p} className="reveal-up">
 						{p}
 					</p>
 				))}
@@ -169,7 +175,10 @@ function ServicesIndex() {
 					<ul className="marketing-link-grid">
 						{MARKETING_SERVICES.map((s) => (
 							<li key={s.path} className="reveal-up">
-								<Link href={s.path} className="surface-card marketing-service-card">
+								<Link
+									href={s.path}
+									className="surface-card marketing-service-card"
+								>
 									<h2>{s.name}</h2>
 									<p>{s.description}</p>
 									<span className="inline-link">Read more →</span>
@@ -199,11 +208,14 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 				]}
 			/>
 			{extra?.map((section) => (
-				<section key={section.heading} className="section-shell section-shell--wash">
+				<section
+					key={section.heading}
+					className="section-shell section-shell--wash"
+				>
 					<div className="section-container marketing-prose">
 						<h2 className="reveal-up">{section.heading}</h2>
-						{section.paragraphs.map((p, i) => (
-							<p key={i} className="reveal-up">
+						{section.paragraphs.map((p) => (
+							<p key={p} className="reveal-up">
 								{p}
 							</p>
 						))}
@@ -218,7 +230,7 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 				</section>
 			))}
 			<section className="section-shell section-shell--wash">
-				<div className="section-container marketing-cta-row">
+				<div className="section-container marketing-cta-row reveal-up">
 					<Link href="/contact" className="btn btn-primary-book">
 						Contact
 					</Link>
@@ -237,11 +249,17 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 function BlogIndex() {
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero title="Blog" subtitle="Local SEO, performance, and how we build marketing sites." />
+			<PageHero
+				title="Blog"
+				subtitle="Local SEO, performance, and how we build marketing sites."
+			/>
 			<section className="section-shell">
 				<div className="section-container blog-index-grid">
 					{blogPosts.map((post) => (
-						<article key={post.url} className="surface-card blog-index-card reveal-up">
+						<article
+							key={post.url}
+							className="surface-card blog-index-card reveal-up"
+						>
 							<Link
 								href={post.url}
 								className="blog-index-card__media"
@@ -266,7 +284,11 @@ function BlogIndex() {
 									</Link>
 								</h2>
 								<p>{post.excerpt}</p>
-								<Link href={post.url} className="inline-link" data-blog-post-link>
+								<Link
+									href={post.url}
+									className="inline-link"
+									data-blog-post-link
+								>
 									Read article →
 								</Link>
 							</div>
@@ -313,9 +335,12 @@ function BlogPostPage({ slug }: { slug: string }) {
 							<>
 								<p className="reveal-up">{post.excerpt}</p>
 								<p className="reveal-up">
-									Full editorial for this URL is being expanded in the Next.js site. If you
-									need the prior version on short notice, email{" "}
-									<a className="inline-link" href="mailto:anthony@designedbyanthony.com">
+									Full editorial for this URL is being expanded in the Next.js
+									site. If you need the prior version on short notice, email{" "}
+									<a
+										className="inline-link"
+										href="mailto:anthony@designedbyanthony.com"
+									>
 										anthony@designedbyanthony.com
 									</a>{" "}
 									and reference the headline above.
@@ -396,7 +421,7 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero title={item.name} subtitle={item.description} />
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<div className="section-container marketing-prose reveal-up">
 					<div className="blog-article-cover">
 						<Image
 							src={item.displayImage ?? item.image}
@@ -453,8 +478,11 @@ function StaticMarketingPage({ slug }: { slug: string }) {
 			<ProseBlock paragraphs={copy.paragraphs} />
 			{showFacebookCta ? (
 				<section className="section-shell section-shell--wash">
-					<div className="section-container marketing-cta-row">
-						<a className="btn btn-primary-book" href={FACEBOOK_OFFER_CALENDLY_WITH_UTM}>
+					<div className="section-container marketing-cta-row reveal-up">
+						<a
+							className="btn btn-primary-book"
+							href={FACEBOOK_OFFER_CALENDLY_WITH_UTM}
+						>
 							Book a strategy call (Facebook offer)
 						</a>
 						<Link href="/contact" className="btn btn-secondary-proof">
@@ -465,7 +493,7 @@ function StaticMarketingPage({ slug }: { slug: string }) {
 			) : null}
 			{showContactForm ? (
 				<section className="section-shell section-shell--wash">
-					<div className="section-container home-quick-lead__card surface-card">
+					<div className="section-container home-quick-lead__card surface-card reveal-up">
 						<h2 className="home-quick-lead__title">Send a message</h2>
 						<AuditForm
 							ctaSource="contact_page"
@@ -489,7 +517,7 @@ function StaticMarketingPage({ slug }: { slug: string }) {
 			) : null}
 			{showAuditForm ? (
 				<section className="section-shell section-shell--wash">
-					<div className="section-container surface-card home-quick-lead__card">
+					<div className="section-container surface-card home-quick-lead__card reveal-up">
 						<AuditForm
 							ctaSource="free_audit_page"
 							pageContext="free_seo_audit"
@@ -514,9 +542,11 @@ function ThankYouPage() {
 			<section className="section-shell">
 				<div className="section-container marketing-prose">
 					{base.paragraphs.map((p) => (
-						<p key={p}>{p}</p>
+						<p key={p} className="reveal-up">
+							{p}
+						</p>
 					))}
-					<p>
+					<p className="reveal-up">
 						<Link href="/" className="btn btn-secondary-proof">
 							Back to home
 						</Link>
