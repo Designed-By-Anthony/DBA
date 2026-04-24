@@ -74,7 +74,7 @@ Production deployments refuse to start or fail closed at runtime when these are 
 
 ### Dependency hygiene
 
-- Run `pnpm audit --prod` before every release.
+- Run `npm audit --omit=dev` before every release.
 - HIGH/CRITICAL advisories block the release until patched or justified.
 - MODERATE advisories on dev-only transitive deps may be tracked in an issue and patched on the next planned bump.
 
@@ -118,7 +118,7 @@ Upgrade path if abuse emerges: swap the in-memory counter in `src/lib/rate-limit
 | Portal session hash | `apps/web-viewer/src/lib/portal-auth.ts` |
 | Apex-operator allowlist | `apps/web-viewer/src/lib/admin-allowlist.ts` |
 | Postgres row-level security policies | `packages/database/sql/enable_rls.sql` |
-| Security response headers | `next.config.ts`, `vercel.json` / `static-headers.json` (CSP synced from `build/csp.mjs` via `pnpm run sync:static-headers`) |
+| Security response headers | `next.config.ts`, `vercel.json` / `static-headers.json` (CSP synced from `build/csp.mjs` via `npm run sync:static-headers`) |
 
 ## Audit log for this document
 

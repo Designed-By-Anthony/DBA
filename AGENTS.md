@@ -3,7 +3,7 @@
 ## Architectural Guardrails
 - **Root-Only Execution:** All builds and installs run from the repo root (`./`).
 - **Git-to-Vercel Only:** NEVER deploy directly to Vercel. All deployments flow through Git → GitHub → Vercel auto-deploy. No `vercel deploy`, no `vercel --prod`, no manual uploads. If code isn't on `main`, it doesn't ship.
-- **Lockfile Integrity:** After ANY change to `package.json`, run `pnpm install` and commit the updated `pnpm-lock.yaml` in the **same commit**. Verify with `pnpm install --frozen-lockfile` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
+- **Lockfile Integrity:** After ANY change to `package.json`, run `npm install` and commit the updated `package-lock.json` in the **same commit**. Verify with `npm ci` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## Infrastructure Context
 - **Routing (apex):** Handled by `src/middleware.ts` on the Vercel project.
@@ -21,7 +21,7 @@
 
 ## Definition of Done
 A task is only **Done** when all three are true:
-1. It passes `pnpm build` from the repo root with zero errors.
+1. It passes `npm run build` from the repo root with zero errors.
 2. It has been audited by BugBot (self-review pass: no `any`, no stray `console.log`, no unused imports).
 3. The logo / branding renders **unbroken** on every affected surface — `/brand/logo.png` and `/brand/mark.webp` resolve, design-system tokens are intact, and no subdomain is serving a fallback mark.
 
@@ -29,7 +29,7 @@ A task is only **Done** when all three are true:
 
 ## Repo orientation
 
-Single **Next.js 16** app at the repository root. Node `>=22.12.0`, pnpm `10.12.1` (pinned via `packageManager`).
+Single **Next.js 16** app at the repository root. Node `>=22.12.0`, **npm** (lockfile: `package-lock.json`).
 
 ```
 /                          # Next.js app root
@@ -48,12 +48,12 @@ Operator playbook: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`.
 ### Common commands
 
 ```bash
-corepack enable && pnpm install   # first-time setup
+npm install           # first-time setup
 
-pnpm dev              # build site bundle, then Next dev server (:3000)
-pnpm build            # prebuild (site script + sync headers) + next build
-pnpm lint             # Biome
-pnpm test:e2e         # Cypress (see cypress.config.ts)
+npm run dev           # build site bundle, then Next dev server (:3000)
+npm run build         # prebuild (site script + sync headers) + next build
+npm run lint          # Biome
+npm run test:e2e      # Cypress (see cypress.config.ts)
 ```
 
 ### Host-based routing — Next.js middleware
@@ -81,5 +81,5 @@ When changing tokens: edit `src/styles/theme.css` and keep `src/design-system/to
 
 ### Cursor Cloud specific instructions
 
-- The cloud agent VM ships with pnpm + Node 22; run `pnpm install` at the repo root before any build/test if `node_modules` is missing.
+- Run `npm install` (or `npm ci`) at the repo root before any build/test if `node_modules` is missing.
 - Branch + PR conventions for cloud agents: create branches as `cursor/<descriptive-name>-<suffix>`, commit small logical changes, and open a PR per branch.

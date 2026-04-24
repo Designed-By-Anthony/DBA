@@ -10,34 +10,10 @@ const nextConfig: NextConfig = {
 	trailingSlash: false,
 	reactStrictMode: true,
 	async headers() {
-		const isProd =
-			process.env.VERCEL_ENV === "production" ||
-			(process.env.NODE_ENV === "production" && process.env.VERCEL === "1");
-		const frameAncestors = [
-			"'self'",
-			"https://designedbyanthony.com",
-			"https://*.designedbyanthony.com",
-			...(isProd ? [] : ["http://localhost:3000", "http://localhost:4321"]),
-		].join(" ");
 		return [
 			{
 				source: "/(.*)",
 				headers: [
-					{
-						key: "Content-Security-Policy",
-						value:
-							"default-src 'self'; " +
-							`frame-ancestors ${frameAncestors}; ` +
-							"base-uri 'self'; " +
-							"object-src 'none'; " +
-							"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://www.googletagmanager.com https://vercel.live https://va.vercel-scripts.com; " +
-							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-							"img-src 'self' data: blob: https://images.unsplash.com https://american-operator-assets-public.s3.us-east-1.amazonaws.com; " +
-							"connect-src 'self' https://*.designedbyanthony.com https://admin.vertaflow.io https://accounts.vertaflow.io https://*.vertaflow.io https://vitals.vercel-insights.com https://va.vercel-scripts.com https://www.google-analytics.com https://*.google-analytics.com wss://ws-mt1.pusher.com https://chat.stream-io-api.com https://*.stream-io-api.com wss://chat.stream-io-api.com wss://*.stream-io-api.com; " +
-							"frame-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://challenges.cloudflare.com; " +
-							"worker-src 'self' blob:; " +
-							"require-trusted-types-for 'script';",
-					},
 					{
 						key: "Strict-Transport-Security",
 						value: "max-age=63072000; includeSubDomains; preload",

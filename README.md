@@ -22,9 +22,9 @@ lighthouse.designedbyanthony.com/*  →  same app by default; or $LIGHTHOUSE_UPS
 ## Build
 
 ```bash
-pnpm install
-pnpm dev       # :3000 (builds public/scripts/site.js first)
-pnpm build     # site script + sync static headers + next build
+npm install
+npm run dev       # :3000 (builds public/scripts/site.js first)
+npm run build     # site script + sync static headers + next build
 ```
 
 ## Global theme + brand

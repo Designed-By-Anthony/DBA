@@ -1,6 +1,6 @@
 /**
  * Single source of truth for marketing CSP-related headers (synced into static-headers.json).
- * Run `pnpm run sync:static-headers` after changing directives.
+ * Run `npm run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
  * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.

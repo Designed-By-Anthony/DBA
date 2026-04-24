@@ -2,17 +2,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Marketing: Astro dev",
+			"name": "Next.js: dev",
 			"type": "node-terminal",
 			"request": "launch",
-			"command": "pnpm --filter designed-by-anthony dev",
-			"cwd": "${workspaceFolder}"
-		},
-		{
-			"name": "Lighthouse: Next dev",
-			"type": "node-terminal",
-			"request": "launch",
-			"command": "pnpm --filter lighthouse-audit dev",
+			"command": "npm run dev",
 			"cwd": "${workspaceFolder}"
 		}
 	]

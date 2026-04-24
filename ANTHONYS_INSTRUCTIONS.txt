@@ -1,58 +1,49 @@
-Designed by Anthony — monorepo manual checklist
-===============================================
+Designed by Anthony — single Next.js app (root) — operator notes
+================================================================
 
 Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 
-Apps under apps/
-  • marketing      — designedbyanthony.com + Lighthouse audit (Next.js)
-  • vertaflow-crm  — VertaFlow (if present in tree)
-  • customer-site-embeds — client embed assets (no package workspace)
+Layout
+------
+• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `vercel.json`.
+• Supporting folders at root (not separate deploys from this repo): `customer-site-embeds/`, `vertaflow-crm/` stubs or assets as applicable — see README.
 
 Global theme (single source of truth)
----------------------------------------
-• Author ALL global theme changes in: apps/marketing/src/styles/theme.css
-• Next.js apps consume tokens via workspace package @dba/theme:
-  - packages/dba-theme/dba-global.css re-imports that file for shared layout CSS.
-  - packages/dba-theme/tokens.css duplicates the :root block for Next + Tailwind.
-• When you change :root { ... } in theme.css, update packages/dba-theme/tokens.css
-  to match (same variables/values), then run apps as usual.
+-------------------------------------
+• Author global tokens in: `src/styles/theme.css`
+• Keep in sync: `src/design-system/tokens.css` (same :root variables/values).
+• App CSS entry: `src/design-system/dba-global.css`
 
 First-time setup
 ----------------
 1. cd to Designed_By_Anthony
-2. corepack enable && pnpm install
-3. Copy env files: each app may need .env.local (see each app’s README or prior repo).
+2. npm install
+3. Copy `.env.example` → `.env` / `.env.local` as needed for local dev.
 
 Development
 -----------
-From monorepo root:
-  pnpm dev:marketing    — Marketing + Lighthouse (port 4321)
+From repo root:
+  npm run dev     — builds `public/scripts/site.js`, then Next on :3000
+  npm run build   — prebuild (site script + sync headers) + production build
 
 Cursor / IDE
 ------------
-Open the folder "Designed_By_Anthony" as the workspace root (not the old Web Viewer path).
+Open the folder "Designed_By_Anthony" as the workspace root.
 
-Vercel (when ready)
--------------------
-Vercel: apex project Root Directory is typically `apps/marketing` (see your dashboard).
+Vercel
+------
+• Root Directory: repository root (`.`).
+• Install / build: `npm ci` and `npm run build` (see `vercel.json`).
 
 Cloudflare / GCP / Clerk
 ------------------------
-Follow your platform blueprint separately; env vars are per app.
+Follow your platform blueprint; env vars are scoped per Vercel project.
 
-Neon Postgres + Drizzle (packages/database)
----------------------------------------------
-• Schema: packages/database/schema.ts — tenants (id, name, vertical enum, crm_config jsonb); sites (subdomain, content jsonb).
-• Push: `pnpm db:push` from repo root (needs DATABASE_URL; use Neon direct/unpooled URL for drizzle-kit when required).
-• Seed master tenant: `pnpm db:seed:master` — inserts agency_master / Designed By Anthony / agency + crm_config theme + features.
-• Agency OS: DATABASE_URL and optional DATABASE_SSL=true in apps/web-viewer/.env.local.
-• Clerk org sync: POST /api/webhooks/clerk — set CLERK_WEBHOOK_SIGNING_SECRET from Clerk Dashboard; subscribe to organization.* events.
+Neon / Agency OS (separate product)
+-----------------------------------
+• This repo’s public site may POST leads to Agency OS (`PUBLIC_CRM_LEAD_URL`, etc.). Database migrations and CRM app live in their own repos/deployments — not in this Next app’s `package.json` scripts unless you add them back.
 
 Public leads (CRM as source of truth)
 --------------------------------------
-• Marketing audit/contact forms POST JSON to Agency OS `POST /api/lead` (not Lighthouse `/api/contact`).
-• Env (marketing build): `PUBLIC_CRM_LEAD_URL` — full URL, default `https://admin.designedbyanthony.com/api/lead`.
-• Env (marketing): `PUBLIC_API_URL` — Lighthouse base for `/api/audit` and report viewer only.
-• Shared contract & env notes: `packages/lead-form-contract/src/index.ts`.
-• Org product tier: `planSuite` in org settings (`starter` | `full`, default `full`). Starter hides Automations, Sequences, Billing, Price Book in the admin sidebar.
-
+• Marketing audit/contact flows use env from `src/lib/env/marketing.ts` and related routes under `src/app/api/`.
+• Lead payload contract: `src/lib/lead-form-contract.ts`

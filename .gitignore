@@ -1,5 +1,4 @@
 node_modules
-.pnpm-store
 .env
 .env.*
 !.env.example
@@ -9,9 +8,6 @@ dist
 .turbo
 .vercel
 *.log
-# Stray npm lockfiles under legacy paths (Vercel may pick npm if present)
-apps/*/package-lock.json
-
 # Local tooling / secrets (never commit)
 cloud-sql-proxy
 dba-website-prod-*.json

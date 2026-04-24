@@ -1,5 +1,7 @@
 # Migration Status Report
 
+> **Note:** Entries below are historical (monorepo, pnpm, Astro paths). The current app is a **single root Next.js** project using **npm** and `package-lock.json` — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
+
 ## Marketing lead-email bridge — interim Resend handler until VertaFlow CRM tenant is live (2026-04-22)
 
 - Added `apps/lighthouse/src/app/api/lead-email/route.ts` — a new POST handler that accepts the existing `AuditForm` `FormData` contract (no marketing markup changes), honors the same Turnstile verification + honeypot that `/api/contact` uses, composes a plain-text + HTML lead summary, and ships it to `LEAD_EMAIL_TO` (default `anthony@designedbyanthony.com`) via the Resend REST API. Same CORS allowlist as `/api/contact` (apex + `*.designedbyanthony.com` + local dev).

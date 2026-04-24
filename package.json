@@ -3,29 +3,17 @@
 	"version": "0.0.1",
 	"private": true,
 	"type": "module",
-	"packageManager": "pnpm@10.12.1",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@sentry/cli",
-			"@swc/core",
-			"esbuild",
-			"protobufjs",
-			"re2",
-			"sharp",
-			"unrs-resolver"
-		],
-		"overrides": {
-			"yaml@<2.8.3": "^2.8.3"
-		}
-	},
 	"engines": {
 		"node": ">=22.12.0"
+	},
+	"overrides": {
+		"yaml@<2.8.3": "^2.8.3"
 	},
 	"scripts": {
 		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
 		"sync:static-headers": "node build/sync-static-headers.mjs",
-		"prebuild": "pnpm run build:site-script && pnpm run sync:static-headers",
-		"dev": "pnpm run build:site-script && next dev",
+		"prebuild": "npm run build:site-script && npm run sync:static-headers",
+		"dev": "npm run build:site-script && next dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome check .",

@@ -408,10 +408,11 @@ window.__dbaRevokeAnalyticsConsent = function () {
 })();`}
 			</Script>
 
-			<Script
-				src={`/scripts/site.js?v=${siteScriptVersion}`}
-				strategy="afterInteractive"
+			{/* Native deferred script avoids next/script preload + unused preload warnings for ESM bundles. */}
+			<script
+				defer
 				type="module"
+				src={`/scripts/site.js?v=${siteScriptVersion}`}
 			/>
 
 			<Script id="turnstile-lazy" strategy="afterInteractive">
