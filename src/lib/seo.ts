@@ -203,7 +203,8 @@ const businessOpeningHoursSpecification: SchemaValue[] = [
 	},
 ];
 
-const coreServiceCatalog = [
+/** Public service pages under `/services/*` — used by JSON-LD and the marketing catch-all router. */
+export const MARKETING_SERVICES = [
 	{
 		name: "Custom Web Design",
 		path: "/services/custom-web-design",
@@ -234,7 +235,19 @@ const coreServiceCatalog = [
 		description:
 			"Complete local marketing program around Google Business Profile, reviews, citations, AI visibility, and reporting — Merchynt agency partner.",
 	},
-];
+	{
+		name: "Google Workspace Setup",
+		path: "/services/workspace-setup",
+		description:
+			"Professional business email and workspace administration setup.",
+	},
+	{
+		name: "Custom Google AI Chatbots & Forms",
+		path: "/services/ai-automation",
+		description:
+			"Automated chatbots and smart forms for hands-free lead capture.",
+	},
+] as const;
 
 /** Builds a fully-attributed ImageObject for images owned by this site. */
 export function buildOwnedImageObject(url: string): SchemaValue {
@@ -385,7 +398,7 @@ function toPlace(name: string): SchemaValue {
 }
 
 function buildCoreServiceOffers(): SchemaValue[] {
-	return coreServiceCatalog.map((service) => {
+	return MARKETING_SERVICES.map((service) => {
 		const url = toAbsoluteUrl(service.path);
 
 		return {

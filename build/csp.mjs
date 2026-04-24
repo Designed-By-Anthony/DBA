@@ -22,12 +22,26 @@ const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
+/** Vercel Toolbar / Live feedback / Speed Insights (preview + production). */
+const VERCEL_PLATFORM_SCRIPT_ORIGINS = [
+	"https://vercel.live",
+	"https://va.vercel-scripts.com",
+];
+
 /** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
-const REPORT_ONLY_SCRIPT_SRC =
-	"'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com https://www.gstatic.com https://challenges.cloudflare.com";
+const REPORT_ONLY_SCRIPT_SRC = [
+	"'self'",
+	"'unsafe-inline'",
+	"https://www.googletagmanager.com",
+	"https://*.google-analytics.com",
+	"https://*.googletagmanager.com",
+	"https://www.gstatic.com",
+	"https://challenges.cloudflare.com",
+	...VERCEL_PLATFORM_SCRIPT_ORIGINS,
+].join(" ");
 
 /**
- * Enforcing script-src: same tag surface + data:/unsafe-eval for Astro client bundles.
+ * Enforcing script-src: same tag surface + data:/unsafe-eval for Next client bundles.
  */
 const SCRIPT_SRC_ENFORCING = [
 	"'self'",
@@ -39,6 +53,7 @@ const SCRIPT_SRC_ENFORCING = [
 	"https://*.googletagmanager.com",
 	"https://www.gstatic.com",
 	"https://challenges.cloudflare.com",
+	...VERCEL_PLATFORM_SCRIPT_ORIGINS,
 ].join(" ");
 
 const DIRECTIVES = {
@@ -69,6 +84,10 @@ const DIRECTIVES = {
 		"https://*.stream-io-api.com",
 		"wss://chat.stream-io-api.com",
 		"wss://*.stream-io-api.com",
+		/** @vercel/analytics, @vercel/speed-insights, Vercel Live / preview toolbar */
+		"https://vercel.live",
+		"https://va.vercel-scripts.com",
+		"https://vitals.vercel-insights.com",
 	].join(" "),
 	"frame-src":
 		"'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com",
