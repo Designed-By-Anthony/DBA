@@ -4,7 +4,7 @@ import { BRAND_NAME, BRAND_SITE_URL } from "@/design-system/brand";
 export function LighthouseHero() {
 	return (
 		<section
-			className="glass-card relative mb-10 overflow-hidden px-6 py-8 md:px-10 md:py-10"
+			className="glass-card relative mb-0 overflow-hidden px-6 py-9 md:px-11 md:py-11"
 			aria-labelledby="lighthouse-hero-heading"
 		>
 			<div
@@ -25,7 +25,7 @@ export function LighthouseHero() {
 				</p>
 				<h1
 					id="lighthouse-hero-heading"
-					className="font-display text-2xl font-bold tracking-tight text-white md:text-3xl"
+					className="font-display text-[1.65rem] font-bold tracking-tight text-white sm:text-3xl md:text-[2.1rem] md:leading-tight"
 				>
 					Lighthouse Scanner{" "}
 					<span className="text-glow bg-gradient-to-r from-sky-200 via-blue-200 to-amber-100/90 bg-clip-text text-transparent">

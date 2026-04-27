@@ -10,7 +10,7 @@
 - Cross-tenant data leakage is a critical failure.
 
 ## 3. Subdomain routing (this repo)
-- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to VertaFlow (see `src/middleware.ts`).
+- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to VertaFlow (see `src/proxy.ts`).
 - `designedbyanthony.com` / `www` / `lighthouse.*` → this Next.js app.
 
 ## 4. The Purge

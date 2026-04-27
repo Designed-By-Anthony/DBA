@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 	},
 };
 
-/** Served when middleware rewrites `/404` → `/page-not-found` (Next reserves `404` on catch-all). */
+/** Served when `src/proxy.ts` rewrites `/404` → `/page-not-found` (Next reserves `404` on catch-all). */
 export default function PageNotFoundMarketing() {
 	return <StaticMarketingPage slug="404" />;
 }

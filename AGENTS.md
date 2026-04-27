@@ -6,7 +6,7 @@
 - **Lockfile Integrity:** After ANY change to `package.json`, run `npm install` and commit the updated `package-lock.json` in the **same commit**. Verify with `npm ci` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## Infrastructure Context
-- **Routing (apex):** Handled by `src/middleware.ts` on the Netlify-hosted Next.js runtime.
+- **Routing (apex):** Handled by `src/proxy.ts` on the Netlify-hosted Next.js runtime.
 - **Public web:** Single Next.js app — apex + `www`. Lighthouse audit lives on the apex at `/lighthouse` (no subdomain).
 
 ## Code Quality & Purge Rules
@@ -56,9 +56,9 @@ npm run lint          # Biome
 npm run test:e2e      # Cypress (see cypress.config.ts)
 ```
 
-### Host-based routing — Next.js middleware
+### Host-based routing — Next.js proxy
 
-`src/middleware.ts` branches on `Host`.
+`src/proxy.ts` branches on `Host`.
 
 - `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
 - `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`

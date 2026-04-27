@@ -25,9 +25,9 @@ Security fixes land on **`main`** and deploy through the normal Netlify pipeline
 | Marketing routes | Public content under `src/app/(site)/` |
 | Lighthouse segment | `src/app/lighthouse/`, `src/lighthouse/*` |
 | App Router API | `src/app/api/*` (contact, audit, lead-email, report, stream-chat-token, etc.) |
-| Edge routing | `src/middleware.ts` (host-based redirects; optional `LIGHTHOUSE_UPSTREAM_URL`) |
+| Request routing | `src/proxy.ts` (host-based redirects; optional `LIGHTHOUSE_UPSTREAM_URL`) |
 
-**VertaFlow / Agency OS** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in middleware. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `src/`.
+**VertaFlow / Agency OS** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js proxy. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `src/`.
 
 ## Trust boundaries (what this app enforces)
 
@@ -46,7 +46,7 @@ Security fixes land on **`main`** and deploy through the normal Netlify pipeline
 
 | Concern | Location |
 |--------|----------|
-| Host-based redirects (admin / accounts / lighthouse) | `src/middleware.ts` |
+| Host-based redirects (admin / accounts / lighthouse) | `src/proxy.ts` |
 | Contact form CORS + Turnstile | `src/app/api/contact/route.ts` |
 | Audit pipeline + rate limit + optional CRM / Freshworks hooks | `src/app/api/audit/route.ts`, `src/lighthouse/lib/http.ts` |
 | Resend lead-email bridge (Turnstile + honeypot) | `src/app/api/lead-email/route.ts` |

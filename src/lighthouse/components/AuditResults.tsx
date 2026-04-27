@@ -67,10 +67,13 @@ export function AuditResults({
 	const diag = data.diagnostics;
 
 	return (
-		<div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
-			<div className="text-center mb-10 border-b border-white/10 pb-8">
-				<h2 className="text-3xl font-display font-medium mb-2">
-					Audit Complete
+		<div className="w-full max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-700 md:mx-auto">
+			<div className="mb-10 border-b border-white/[0.08] pb-8 text-center">
+				<p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300/85">
+					Scan complete
+				</p>
+				<h2 className="mb-2 font-display text-2xl font-bold tracking-tight text-white md:text-3xl">
+					Your results
 				</h2>
 				<a
 					href={data.url}
@@ -90,12 +93,12 @@ export function AuditResults({
 				) : null}
 			</div>
 
-			<div className="grid grid-cols-2 gap-8 mb-10 max-w-md mx-auto">
+			<div className="mx-auto mb-10 grid max-w-lg grid-cols-2 gap-8">
 				<ScoreRing score={data.trustScore} label="Trust score" />
 				<ScoreRing score={data.conversion} label="Conversion" />
 			</div>
 
-			<div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+			<div className="mb-12 grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
 				<ScoreRing score={data.performance} label="Performance" />
 				<ScoreRing score={data.accessibility} label="Accessibility" />
 				<ScoreRing score={data.bestPractices} label="Best Practices" />
@@ -103,8 +106,10 @@ export function AuditResults({
 			</div>
 
 			{data.aiInsight?.executiveSummary ? (
-				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-					<h3 className="text-xl font-display mb-4">Summary</h3>
+				<div className="lighthouse-result-panel mb-8 p-6 md:p-7">
+					<h3 className="mb-4 font-display text-xl font-semibold text-white">
+						Summary
+					</h3>
 					<p className="text-[rgba(255,255,255,0.88)] leading-relaxed whitespace-pre-wrap">
 						{data.aiInsight.executiveSummary}
 					</p>
@@ -112,8 +117,10 @@ export function AuditResults({
 			) : null}
 
 			{actions.length > 0 ? (
-				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-					<h3 className="text-xl font-display mb-4">Priority actions</h3>
+				<div className="lighthouse-result-panel mb-8 p-6 md:p-7">
+					<h3 className="mb-4 font-display text-xl font-semibold text-white">
+						Priority actions
+					</h3>
 					<ol className="space-y-3 list-decimal list-inside text-[rgba(255,255,255,0.88)]">
 						{actions.map((item) => (
 							<li
@@ -132,8 +139,8 @@ export function AuditResults({
 
 			{places?.found &&
 			(places.rating != null || places.userRatingCount > 0) ? (
-				<div className="rounded-xl p-4 mb-8 border border-white/10 bg-white/[0.03]">
-					<h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">
+				<div className="lighthouse-result-panel mb-8 p-5">
+					<h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-sky-200/70">
 						Local listing signal
 					</h3>
 					<p className="text-[rgba(255,255,255,0.88)]">
@@ -147,15 +154,15 @@ export function AuditResults({
 			) : null}
 
 			{diag?.criticalIssue ? (
-				<div className="rounded-xl p-4 mb-8 border border-warning/30 bg-warning/5 text-sm text-[rgba(255,255,255,0.85)]">
+				<div className="mb-8 rounded-xl border border-amber-500/35 bg-amber-950/25 p-4 text-sm text-[rgba(255,255,255,0.88)]">
 					<span className="font-medium text-warning">Notable issue: </span>
 					{diag.criticalIssue}
 				</div>
 			) : null}
 
 			{moz?.found ? (
-				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-					<h3 className="text-xl font-display mb-1">
+				<div className="lighthouse-result-panel mb-8 p-6 md:p-7">
+					<h3 className="mb-1 font-display text-xl font-semibold text-white">
 						Authority &amp; backlinks
 					</h3>
 					{moz.dataSource === "internal" ? (
@@ -202,8 +209,8 @@ export function AuditResults({
 			) : null}
 
 			{index?.found && index.estimatedIndexedPages != null ? (
-				<div className="rounded-xl p-4 mb-8 border border-white/10 bg-white/[0.03]">
-					<h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">
+				<div className="lighthouse-result-panel mb-8 p-5">
+					<h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-sky-200/70">
 						Index coverage (estimate)
 					</h3>
 					<p className="text-[rgba(255,255,255,0.88)]">
@@ -214,8 +221,8 @@ export function AuditResults({
 			) : null}
 
 			{sitewide ? (
-				<div className="rounded-xl p-4 mb-8 border border-white/10 bg-white/[0.03] text-sm">
-					<h3 className="font-semibold text-slate-400 uppercase tracking-wider mb-2">
+				<div className="lighthouse-result-panel mb-8 p-5 text-sm">
+					<h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-sky-200/70">
 						Site crawl signals
 					</h3>
 					<ul className="space-y-1 text-[rgba(255,255,255,0.78)]">
@@ -247,8 +254,10 @@ export function AuditResults({
 			) : null}
 
 			{data.competitors && data.competitors.length > 0 ? (
-				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-					<h3 className="text-xl font-display mb-4">Competitive snapshot</h3>
+				<div className="lighthouse-result-panel mb-8 p-6 md:p-7">
+					<h3 className="mb-4 font-display text-xl font-semibold text-white">
+						Competitive snapshot
+					</h3>
 					<ul className="space-y-2 text-sm text-[rgba(255,255,255,0.85)]">
 						{data.competitors.slice(0, 4).map((c) => (
 							<li
@@ -266,8 +275,10 @@ export function AuditResults({
 				</div>
 			) : null}
 
-			<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-				<h3 className="text-xl font-display mb-6">Key lab metrics</h3>
+			<div className="lighthouse-result-panel mb-8 p-6 md:p-7">
+				<h3 className="mb-6 font-display text-xl font-semibold text-white">
+					Key lab metrics
+				</h3>
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
 					<div>
 						<p className="text-slate-400 text-sm mb-1">
@@ -294,11 +305,11 @@ export function AuditResults({
 				</div>
 			</div>
 
-			<div className="bg-gradient-to-br from-emerald-500/15 to-cyan-500/10 rounded-xl p-6 mt-10 mb-6 border border-emerald-400/30">
-				<h3 className="text-xl font-display mb-2">
+			<div className="mt-10 mb-6 rounded-[1.15rem] border border-emerald-400/35 bg-gradient-to-br from-emerald-500/18 via-teal-500/8 to-cyan-900/20 p-6 md:p-7">
+				<h3 className="mb-2 font-display text-xl font-semibold text-white">
 					Want help fixing the highest-impact items?
 				</h3>
-				<p className="text-slate-300 mb-4">
+				<p className="mb-4 text-sm leading-relaxed text-white/65 md:text-[15px]">
 					Book a 15-minute call with Anthony — we'll walk through your report
 					together, prioritize what matters for revenue, and outline the fastest
 					path to results.
@@ -307,19 +318,19 @@ export function AuditResults({
 					href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 					target="_blank"
 					rel="noopener"
-					className="inline-block px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold rounded-full transition-all"
+					className="inline-block rounded-full bg-emerald-400 px-6 py-3 font-semibold text-slate-950 shadow-[0_16px_40px_-20px_rgba(52,211,153,0.65)] transition-[transform,background-color] hover:-translate-y-px hover:bg-emerald-300"
 				>
 					Book a 15-minute call →
 				</a>
 			</div>
 
-			<div className="flex justify-center mt-6">
+			<div className="mt-6 flex justify-center">
 				<button
 					type="button"
 					onClick={onReset}
-					className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-medium rounded-full transition-all border border-white/10"
+					className="rounded-full border border-white/12 bg-white/[0.06] px-6 py-3 font-medium text-white/90 transition-[background-color,transform] hover:bg-white/10"
 				>
-					Run Another Audit
+					Run another audit
 				</button>
 			</div>
 		</div>

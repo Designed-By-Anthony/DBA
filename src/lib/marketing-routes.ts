@@ -57,7 +57,7 @@ export function getAllMarketingPathnames(): string[] {
 		paths.add(`/portfolio/${slug}`);
 	}
 
-	/* `/lighthouse` returns 404 on the apex host by design (middleware); it lives on lighthouse.* */
+	/* `/lighthouse` returns 404 on the apex host by design (proxy); it lives on lighthouse.* */
 
 	return Array.from(paths).sort((a, b) => a.localeCompare(b));
 }

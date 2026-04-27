@@ -29,7 +29,7 @@ const marketingSchema = z
 		SENTRY_PROJECT: z.string().trim().optional(),
 
 		// Reserved for VertaFlow redirect targets if we ever need to override
-		// the hard-coded admin/accounts hostnames in `src/middleware.ts`.
+		// the hard-coded admin/accounts hostnames in `src/proxy.ts`.
 		ADMIN_UPSTREAM_URL: optionalUrl,
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,
 

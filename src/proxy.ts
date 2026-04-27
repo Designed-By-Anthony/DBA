@@ -26,7 +26,7 @@ function redirectToVertaflow(
  * `admin.*` and `accounts.*` redirect to VertaFlow; everything else is the
  * single Next.js marketing app (including `/lighthouse`).
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
 	const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
 	const { pathname } = request.nextUrl;
 
