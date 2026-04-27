@@ -30,20 +30,21 @@ Cursor / IDE
 ------------
 Open the folder "Designed_By_Anthony" as the workspace root.
 
-Vercel
-------
+Firebase App Hosting
+--------------------
 • Root Directory: repository root (`.`).
-• Install / build: `npm ci` and `npm run build` (see `netlify.toml`).
+• Install / build: `npm ci` and `npm run build` (see `package.json`; `netlify.toml` is generated for CSP sync only).
+• Connect the **GitHub** repo in Firebase console; set `LEAD_WEBHOOK_URL` and other env in App Hosting → Environment / Secrets.
 
-Cloudflare / GCP / Clerk
-------------------------
-Follow your platform blueprint; env vars are scoped per Vercel project.
+Cloudflare / GCP
+-----------------
+Follow your platform blueprint; env vars are scoped per backend.
 
-Neon / Agency OS (separate product)
------------------------------------
-• This repo’s public site may POST leads to Agency OS (`PUBLIC_CRM_LEAD_URL`, etc.). Database migrations and CRM app live in their own repos/deployments — not in this Next app’s `package.json` scripts unless you add them back.
+VertaFlow CRM (separate product)
+--------------------------------
+• Admin and accounts subdomains redirect to **vertaflow.io** from `src/proxy.ts`. This marketing app does not ship the CRM codebase.
 
-Public leads (CRM as source of truth)
---------------------------------------
-• Marketing audit/contact flows use env from `src/lib/env/marketing.ts` and related routes under `src/app/api/`.
+Public leads
+------------
+• Marketing forms POST to **`/api/contact`**, which forwards JSON to **`LEAD_WEBHOOK_URL`** (e.g. Convex → Slack). Env: `src/lib/env/marketing.ts`, routes under `src/app/api/`.
 • Lead payload contract: `src/lib/lead-form-contract.ts`

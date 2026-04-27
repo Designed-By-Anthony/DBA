@@ -25,7 +25,6 @@ export const metadata: Metadata = {
 	},
 	description:
 		"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
-	manifest: "/site.webmanifest",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
@@ -51,8 +50,20 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+	const leadWebhookDefault =
+		process.env.NEXT_PUBLIC_LEAD_WEBHOOK_URL?.trim() ?? "";
+	const recaptchaSiteKey =
+		process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+	const recaptchaAction =
+		process.env.NEXT_PUBLIC_RECAPTCHA_ACTION?.trim() || "contact_submit";
 	return (
-		<html lang="en" prefix="og: https://ogp.me/ns#">
+		<html
+			lang="en"
+			prefix="og: https://ogp.me/ns#"
+			data-lead-webhook={leadWebhookDefault || undefined}
+			data-recaptcha-site-key={recaptchaSiteKey || undefined}
+			data-recaptcha-action={recaptchaSiteKey ? recaptchaAction : undefined}
+		>
 			<body>
 				{children}
 				<CrispBootstrap />

@@ -323,7 +323,7 @@ export function PricingPage() {
 							<ul className="pricing-tier-features">
 								<li>Mobile-first responsive design</li>
 								<li>On-page SEO structure</li>
-								<li>Contact form with Turnstile</li>
+								<li>Contact form with reCAPTCHA Enterprise</li>
 								<li>Lighthouse performance tuning</li>
 								<li>Full source code handed to you at launch</li>
 							</ul>

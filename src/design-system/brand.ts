@@ -1,18 +1,23 @@
+import type { StaticImageData } from "next/image";
+import brandMarkImage from "./brand-mark.webp";
+
 /**
  * Designed by Anthony — brand asset constants.
  *
  * Single source of truth for logo paths served by each app.
  *
- * The app ships a mirrored copy of the canonical files under
- * `public/brand/...` so Next.js can serve them
- * from `/brand/logo.png`, `/brand/mark.webp`, and `/brand/logo-full.png`.
- * Source files also live under `src/design-system/`; `public/brand/` mirrors
- * them for static serving.
+ * Logos ship from `public/brand/...` at `/brand/logo.png` and
+ * `/brand/logo-full.png`. The square **mark** is also bundled from
+ * `./brand-mark.webp` so `<Image>` always resolves in hosts where
+ * `public/` statics are flaky; `/brand/mark.webp` remains for direct URLs.
  *
  * NEVER hardcode logo paths in individual components — import one of
  * the constants below so a rename touches a single file.
  */
 export const BRAND_NAME = "Designed by Anthony";
+
+/** Bundled mark for `next/image` (avoids 404 when `/public` statics mis-deploy). */
+export const BRAND_MARK_IMAGE: StaticImageData = brandMarkImage;
 
 /** Canonical public site URL (production). */
 export const BRAND_SITE_URL = "https://designedbyanthony.com";

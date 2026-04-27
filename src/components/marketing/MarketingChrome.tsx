@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
-import { BRAND_ASSETS } from "@/design-system/brand";
+import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile, GA_MEASUREMENT_ID } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
@@ -127,10 +127,10 @@ window.__dbaRevokeAnalyticsConsent = function () {
 					<div className="header-container">
 						<Link href="/" className="brand-lockup">
 							<Image
-								src={BRAND_ASSETS.mark}
+								src={BRAND_MARK_IMAGE}
 								alt="Designed by Anthony"
-								width={36}
-								height={27}
+								width={BRAND_MARK_IMAGE.width}
+								height={BRAND_MARK_IMAGE.height}
 								className="nav-icon"
 								priority
 							/>
@@ -254,10 +254,10 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				<div className="reach-out-dialog-panel splash-shell splash-shell--reach-out">
 					<div className="reach-out-dialog-header">
 						<Image
-							src={BRAND_ASSETS.mark}
+							src={BRAND_MARK_IMAGE}
 							alt="Designed by Anthony"
-							width={40}
-							height={30}
+							width={BRAND_MARK_IMAGE.width}
+							height={BRAND_MARK_IMAGE.height}
 							className="reach-out-dialog-logo"
 						/>
 						<button
@@ -433,15 +433,44 @@ window.__dbaRevokeAnalyticsConsent = function () {
 })();`}
 			</Script>
 
+			<Script id="recaptcha-enterprise-lazy" strategy="afterInteractive">
+				{`(function() {
+  function siteKey() {
+    return document.documentElement.getAttribute('data-recaptcha-site-key') || '';
+  }
+  var loaded = false;
+  function injectRecaptcha() {
+    var k = siteKey();
+    if (!k || loaded) return;
+    loaded = true;
+    if (document.getElementById('dba-recaptcha-enterprise-loader')) return;
+    var script = document.createElement('script');
+    script.id = 'dba-recaptcha-enterprise-loader';
+    script.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(k);
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+  function maybeLoad(target) {
+    if (!siteKey()) return;
+    if (!target || !(target instanceof Element)) return;
+    if (!target.closest('[data-audit-form]')) return;
+    injectRecaptcha();
+  }
+  function bind() {
+    if (!siteKey()) return;
+    document.addEventListener('focusin', function (e) { maybeLoad(e.target); }, { passive: true });
+    document.addEventListener('pointerdown', function (e) { maybeLoad(e.target); }, { passive: true });
+  }
+  document.addEventListener('DOMContentLoaded', bind, { once: true });
+  if (document.readyState !== 'loading') bind();
+})();`}
+			</Script>
+
 			<Script id="turnstile-lazy" strategy="afterInteractive">
 				{`(function() {
-  var TURNSTILE_TEST_SITEKEY = '1x00000000000000000000AA';
+  if (document.documentElement.getAttribute('data-recaptcha-site-key')) return;
   window.__dbaTurnstileError = function () { document.querySelectorAll('.cf-turnstile').forEach(function (w) { var form = w.closest('[data-audit-form]'); if (form) { var box = form.querySelector('[data-form-error]'); if (box) { box.textContent = 'Security check could not load. Refresh the page.'; box.removeAttribute('hidden'); } } }); };
-  function applyLoopbackTurnstileSiteKey() {
-    var h = location.hostname;
-    if (h !== 'localhost' && h !== '127.0.0.1') return;
-    document.querySelectorAll('.cf-turnstile').forEach(function (el) { el.setAttribute('data-sitekey', TURNSTILE_TEST_SITEKEY); });
-  }
   var turnstileLoaded = false;
   function injectTurnstileScript() {
     if (turnstileLoaded) return;
@@ -455,7 +484,6 @@ window.__dbaRevokeAnalyticsConsent = function () {
     document.body.appendChild(script);
   }
   function maybeLoadTurnstile(target) {
-    applyLoopbackTurnstileSiteKey();
     if (!document.querySelector('.cf-turnstile')) return;
     if (!target) return;
     var host = target instanceof Element ? target.closest('[data-audit-form]') : null;
@@ -464,7 +492,6 @@ window.__dbaRevokeAnalyticsConsent = function () {
   }
   var bound = false;
   function bind() {
-    applyLoopbackTurnstileSiteKey();
     if (bound) return;
     if (!document.querySelector('.cf-turnstile')) return;
     bound = true;

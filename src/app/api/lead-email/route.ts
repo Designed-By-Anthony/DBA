@@ -16,17 +16,17 @@
  * Contract match: responds with the same shape `AuditForm` already handles.
  *   - Success: 200 `{ ok: true }`
  *   - Validation: 400 `{ errors: [{ field?, message }] }`
- *   - Turnstile fail: 403 `{ errors: [{ message }] }`
+ *   - Bot check fail: 403 `{ errors: [{ message }] }`
  *   - Resend/config fail: 502/503 `{ errors: [{ message }] }`
  */
 
-import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
 	type PublicLeadIngestBody,
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
+import { verifyMarketingLeadBotProtection } from "@/lib/marketingBotVerification";
 
 const APEX_SUBDOMAIN_PATTERN =
 	/^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
@@ -38,6 +38,15 @@ const LOCAL_ORIGINS = new Set<string>([
 	"http://localhost:3100", // pragma: allowlist secret
 	"http://127.0.0.1:3100", // pragma: allowlist secret
 ]);
+
+function getClientIp(request: Request): string | null {
+	const xff = request.headers.get("x-forwarded-for");
+	if (xff) {
+		const first = xff.split(",")[0]?.trim();
+		if (first) return first;
+	}
+	return request.headers.get("x-real-ip");
+}
 
 function buildCorsHeaders(origin: string | null): Record<string, string> {
 	const isAllowed =
@@ -155,28 +164,16 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const turnstileToken = lead.cfTurnstileResponse ?? "";
-	const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-	if (turnstileSecret) {
-		if (!turnstileToken) {
-			return NextResponse.json(
-				{ errors: [{ message: "Security verification is required." }] },
-				{ status: 403, headers: corsHeaders },
-			);
-		}
-		const verifyRes = await verifyTurnstileToken(turnstileToken);
-		if (!verifyRes.success) {
-			return NextResponse.json(
-				{
-					errors: [
-						{
-							message: "Bot verification failed. Please refresh and try again.",
-						},
-					],
-				},
-				{ status: 403, headers: corsHeaders },
-			);
-		}
+	const bot = await verifyMarketingLeadBotProtection({
+		lead,
+		userAgent: request.headers.get("user-agent"),
+		userIpAddress: getClientIp(request),
+	});
+	if (!bot.ok) {
+		return NextResponse.json(
+			{ errors: [{ message: bot.message }] },
+			{ status: 403, headers: corsHeaders },
+		);
 	}
 
 	const resendApiKey = process.env.RESEND_API_KEY;

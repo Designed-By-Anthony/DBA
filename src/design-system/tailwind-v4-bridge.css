@@ -1,5 +1,5 @@
 /**
- * Maps DBA :root tokens to Tailwind v4 @theme names (Agency OS, Lighthouse).
+ * Maps DBA :root tokens to Tailwind v4 @theme names (marketing + Lighthouse).
  */
 @theme {
 	--color-bg-dark: var(--bg-dark);

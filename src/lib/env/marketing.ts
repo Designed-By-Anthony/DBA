@@ -5,7 +5,7 @@ import { optionalUrl, validateEnv } from "./shared";
  * Marketing site — designedbyanthony.com (Next.js).
  *
  * Single-deploy: marketing + Lighthouse + APIs all live in this one Next.js
- * app on Netlify. Schema validates the surface that this app actually reads;
+ * app (Firebase App Hosting primary). Schema validates the surface this app reads;
  * everything else passes through (`.passthrough()`). The legacy 3-project
  * env-bleed detector was removed when Lighthouse moved onto the apex.
  */
@@ -16,8 +16,26 @@ const marketingSchema = z
 		VERCEL: z.string().optional(),
 
 		PUBLIC_CRM_LEAD_URL: optionalUrl,
+		/** Server-side JSON POST target for `POST /api/contact` (Convex, etc.). */
+		LEAD_WEBHOOK_URL: optionalUrl,
+		/** Browser lead JSON POST default for `[data-audit-form]` (e.g. Convex HTTP webhook). */
+		NEXT_PUBLIC_LEAD_WEBHOOK_URL: optionalUrl,
 		PUBLIC_API_URL: optionalUrl,
 		PUBLIC_TURNSTILE_SITE_KEY: z.string().trim().optional(),
+		/** reCAPTCHA Enterprise — browser site key (Create Assessment must use the same key). */
+		NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().trim().optional(),
+		/** Action string passed to `grecaptcha.enterprise.execute` (must match server `RECAPTCHA_EXPECTED_ACTION` / default). */
+		NEXT_PUBLIC_RECAPTCHA_ACTION: z.string().trim().optional(),
+		/** Google Cloud API key with `recaptchaenterprise.assessments.create` (server-only). */
+		RECAPTCHA_ENTERPRISE_API_KEY: z.string().trim().optional(),
+		/** Optional override when different from `GOOGLE_CLOUD_PROJECT` (Lighthouse). */
+		RECAPTCHA_GOOGLE_CLOUD_PROJECT: z.string().trim().optional(),
+		/** Server-only site key if you do not expose it via `NEXT_PUBLIC_*` (unusual). */
+		RECAPTCHA_SITE_KEY: z.string().trim().optional(),
+		/** Must match the client `execute` action (defaults to `contact_submit`). */
+		RECAPTCHA_EXPECTED_ACTION: z.string().trim().optional(),
+		/** Minimum risk score (0–1); default 0.5 when `riskAnalysis.score` is present. */
+		RECAPTCHA_MIN_SCORE: z.string().trim().optional(),
 		PUBLIC_SENTRY_DSN: optionalUrl,
 
 		INDEXNOW_KEY: z.string().trim().optional(),

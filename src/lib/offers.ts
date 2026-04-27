@@ -29,7 +29,7 @@ export const PUBLIC_LAUNCH_BUNDLE_MONTHS = 3;
 /** Launch program: first N local partners — complimentary build with Growth Plan enrollment. */
 export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
 /**
- * Founding Growth Plan — hosting, security, SEO, and Agency OS (CRM + client portal + roadmap automations).
+ * Founding Growth Plan — hosting, security, SEO, and VertaFlow CRM (client portal + roadmap automations).
  * Set at $149/mo: below typical SMB CRM seat bundles ($15–75+/user/mo × tools) while reflecting bundled
  * web + local SEO + product value vs. standalone $100–300/mo hosting retainers.
  */
@@ -45,20 +45,20 @@ export const PUBLIC_LAUNCH_BUNDLE_COPY = `For the first ${PUBLIC_LAUNCH_BUNDLE_M
 /** Legacy single-line copy for anywhere that still expects one sentence (FAQ, process). */
 export const PUBLIC_PAYMENT_STRUCTURE_COPY = `${PUBLIC_STANDARD_PAYMENT_PLAN} ${PUBLIC_LAUNCH_BUNDLE_COPY}`;
 
-/** Public CRM / admin app URL (Clerk sign-in). Used in schema and positioning copy—not a crawl-first landing page. */
-export const AGENCY_OS_APP_URL = "https://admin.vertaflow.io";
-/** Client portal (magic-link access); paired with Agency OS in Growth Plan positioning. */
+/** VertaFlow admin (CRM). Used in schema and positioning copy—not a crawl-first landing page. */
+export const VERTAFLOW_CRM_APP_URL = "https://admin.vertaflow.io";
+/** Client portal (magic-link access); paired with VertaFlow in Growth Plan positioning. */
 export const ACCOUNTS_PORTAL_URL = "https://accounts.designedbyanthony.com";
 
 /**
- * Agency OS CRM — software-only list prices (per organization / month).
+ * VertaFlow CRM — software-only list prices (per organization / month).
  * Capture: leads + scheduling + light pipeline. Suite: full product (portal, automations roadmap, deeper CRM).
  * Growth Plan ($149) bundles Suite-level access with hosting + local SEO — better value than Suite alone for site clients.
  */
-export const AGENCY_OS_CAPTURE_LABEL = "Capture";
-export const AGENCY_OS_SUITE_LABEL = "Suite";
-export const AGENCY_OS_CAPTURE_MONTHLY = "$69";
-export const AGENCY_OS_SUITE_MONTHLY = "$179";
+export const VERTAFLOW_CAPTURE_LABEL = "Capture";
+export const VERTAFLOW_SUITE_LABEL = "Suite";
+export const VERTAFLOW_CAPTURE_MONTHLY = "$69";
+export const VERTAFLOW_SUITE_MONTHLY = "$179";
 
 /** Ongoing local SEO + hosting (lighter scope than the full GBP program). Same value as founding partner monthly. */
 export const MONTHLY_LOCAL_SEO_PRICE = FOUNDING_PARTNER_SEO_MONTHLY;

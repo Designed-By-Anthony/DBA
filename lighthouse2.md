@@ -1,6 +1,6 @@
 # Lighthouse Scanner — product description & operator guide
 
-This document is the **single source of truth** for how we **describe** the scanner (marketing, OG tags, splash copy) and what **you** configure on Netlify. Structure is inspired by common open-source SEO audit READMEs (for example [vchaitanyachowdari/seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator)) — clear feature blocks, stack, env, usage — adapted to **this repo’s real implementation**, not a generic SaaS template.
+This document is the **single source of truth** for how we **describe** the scanner (marketing, OG tags, splash copy) and what **you** configure in **Firebase App Hosting** / env. Structure is inspired by common open-source SEO audit READMEs (for example [vchaitanyachowdari/seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator)) — clear feature blocks, stack, env, usage — adapted to **this repo’s real implementation**, not a generic SaaS template.
 
 ---
 
@@ -22,7 +22,7 @@ This document is the **single source of truth** for how we **describe** the scan
 | **Conversion / UX** | “Trust + conversion lens” | AI **conversionScore** + CTA/schema/tel/form signals from HTML |
 | **AI report** | Plain-English executive summary + top fixes | **Gemini** (`generateAiInsight`) with fallback |
 | **Persistence** | Sharable report when storage works | Firestore report store when configured |
-| **CRM** | Optional lead sync | Freshworks / webhooks / Sheets — see `.env.example` and Agency OS vars |
+| **CRM / leads** | Optional | Convex webhooks, Sheets, Gmail — see `.env.example` (`AUDIT_LEAD_WEBHOOK_*`, `LEAD_WEBHOOK_URL`) |
 
 Do **not** claim: unlimited full-site crawl like Semrush/Ahrefs, JS-rendered crawl of every route, or “Moz DA” unless Moz is configured.
 
@@ -32,7 +32,7 @@ Do **not** claim: unlimited full-site crawl like Semrush/Ahrefs, JS-rendered cra
 
 Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator) lead with **stack badges**, **feature bullets** (SEO + CRO + AI), **install/env**, **usage**, and a **feature status table**. We should mirror that **shape** on the site and in docs:
 
-- Badges: optional later (Next.js, Netlify, TypeScript).
+- Badges: optional later (Next.js, Firebase App Hosting, TypeScript).
 - Bullets: use the table above, tightened for the hero.
 - Status table: use “Live / Planned / Needs API key” for transparency (splash-worthy *because* it is honest).
 
@@ -48,11 +48,11 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 | Bot protection | **Rate limiting** always; **Cloudflare Turnstile** only when `LIGHTHOUSE_STRICT_TURNSTILE=1` + `TURNSTILE_SECRET_KEY` (default: `/lighthouse` runs without Turnstile) |
 | AI | **Google Gemini** (API key or Vertex) |
 | Performance data | **Google PageSpeed Insights API** |
-| Deploy | **Netlify** (see `netlify.toml` from `npm run sync:static-headers`) |
+| Deploy | **Firebase App Hosting** (GitHub-connected; CSP still synced via `npm run sync:static-headers`) |
 
 ---
 
-## Your checklist (Netlify / keys)
+## Your checklist (env / keys)
 
 1. **`GOOGLE_PAGESPEED_API_KEY`** — required for meaningful lab scores.
 2. **`GEMINI_API_KEY`** or Vertex env — required for AI narrative (fallback exists but is thinner).
@@ -60,7 +60,7 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 4. **`GOOGLE_PLACES_API_KEY`** — optional; enriches local block.
 5. **`MOZ_API_CREDENTIALS`** (or token) — optional; omit if you dropped Moz subscription.
 6. **`REPORT_PUBLIC_BASE_URL`** — optional; defaults to apex site for `/report/:id` links.
-7. **CRM / webhooks / Sheets** — optional; see `.env.example` for `AGENCY_OS_*`, Freshworks, Gmail, Sheets.
+7. **Webhooks / Sheets** — optional; see `.env.example` for `AUDIT_LEAD_WEBHOOK_*`, `AUDIT_LOGGING_WEBHOOK_URL`, Gmail, Sheets.
 
 ---
 
@@ -135,9 +135,9 @@ Public documentation for category leaders describes stacks roughly like this:
 
 ### A. Google / APIs (required for a serious v2)
 
-1. **`GOOGLE_PAGESPEED_API_KEY`** — [Google Cloud Console](https://console.cloud.google.com/) → enable **PageSpeed Insights API** → create API key → restrict key to that API + your deploy hostnames if possible. Set this on Netlify with scope **Functions** (runtime) so audits can call Google. **`runPagespeed` is slow** (often 30–50s on heavy sites); the server waits up to **55s** and **retries once** on timeout or 5xx. If you still see errors, check Cloud **API quotas**, key restrictions (must allow the PageSpeed API), and that the audited URL is **publicly reachable** (no auth wall).
+1. **`GOOGLE_PAGESPEED_API_KEY`** — [Google Cloud Console](https://console.cloud.google.com/) → enable **PageSpeed Insights API** → create API key → restrict key to that API + your deploy hostnames if possible. Set this on your App Hosting backend (runtime) so audits can call Google. **`runPagespeed` is slow** (often 30–50s on heavy sites); the server waits up to **55s** and **retries once** on timeout or 5xx. If you still see errors, check Cloud **API quotas**, key restrictions (must allow the PageSpeed API), and that the audited URL is **publicly reachable** (no auth wall).
 2. **`GEMINI_API_KEY`** or Vertex — already used for the narrative; keep quota sane (monitor usage in Google AI Studio / Cloud).
-3. **`LIGHTHOUSE_STRICT_TURNSTILE`** — omit or `0` for default (**no** Turnstile on `POST /api/audit`). Set to **`1`** only if you want Cloudflare verification again; then pair **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** + **`TURNSTILE_SECRET_KEY`** ([Turnstile](https://developers.cloudflare.com/turnstile/)) and re-add a client widget that posts `turnstileToken` (hostname allowlist in Cloudflare still applies to previews). Marketing Freshworks forms keep their own Turnstile lazy-load where configured.
+3. **`LIGHTHOUSE_STRICT_TURNSTILE`** — omit or `0` for default (**no** Turnstile on `POST /api/audit`). Set to **`1`** only if you want Cloudflare verification again; then pair **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** + **`TURNSTILE_SECRET_KEY`** ([Turnstile](https://developers.cloudflare.com/turnstile/)) and re-add a client widget that posts `turnstileToken` (hostname allowlist in Cloudflare still applies to previews). Marketing contact forms prefer **reCAPTCHA Enterprise** when `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` + `RECAPTCHA_ENTERPRISE_API_KEY` + GCP project are set; otherwise optional Turnstile when `TURNSTILE_SECRET_KEY` is set.
 
 ### B. Optional but high leverage (competitor parity)
 
@@ -145,19 +145,15 @@ Public documentation for category leaders describes stacks roughly like this:
 5. **Google Search Console** — *You:* verify the site in GSC. For v2 “miracle” tier we can add **OAuth or a service account** with `webmasters.readonly` to pull impressions/clicks for the audited property (you must consent in GSC UI once).
 6. **`GOOGLE_PLACES_API_KEY`** — keeps local/maps block rich (already used for Places).
 
-### C. Freshworks CRM (leads from audits)
+### C. Ops / honesty
 
-7. **`FRESHWORKS_CRM_SYNC_ENABLED=1`**, **`FRESHWORKS_CRM_BASE_URL`**, **`FRESHWORKS_CRM_API_KEY`** — see `.env.example` and Freshsales **Profile → API settings**. Optional: create Lead custom fields and set **`FRESHWORKS_CRM_CUSTOM_FIELD_KEYS`**.
+7. **Decide max runtime and max URLs per audit** (e.g. 90s cap, 5 extra URLs) — tell the dev team so crawl depth stays predictable on serverless.
+8. **Privacy / marketing copy** — ensure `/privacy` mentions scanner logging, webhooks, and retention if you store IPs or full HTML snippets.
 
-### D. Ops / honesty
+### D. Git workflow (two tracks)
 
-8. **Decide max runtime and max URLs per audit** (e.g. 90s cap, 5 extra URLs) — tell the dev team so crawl depth stays predictable on Netlify.
-9. **Privacy / marketing copy** — ensure `/privacy` mentions scanner logging, CRM, and retention if you store IPs or full HTML snippets.
-
-### E. Git workflow (two tracks)
-
-10. **Lighthouse work:** branch `cursor/lighthouse2-no-moz-c943` — merge when audit pipeline + scanner UX are ready.
-11. **Marketing UI only:** branch `cursor/basic-ui-fixes-c943` — small CSS/React tweaks on the main site; **do not** mix large audit refactors here so previews stay fast.
+9. **Lighthouse work:** feature branches off `main` — merge when audit pipeline + scanner UX are ready.
+10. **Marketing UI only:** separate small branches — **do not** mix large audit refactors so previews stay fast.
 
 ---
 

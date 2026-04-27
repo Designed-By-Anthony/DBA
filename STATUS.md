@@ -2,9 +2,15 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## GitHub + Firebase / lead pipeline scrub (2026-04-27)
+
+- **Source of truth:** GitHub; **`.gitlab-ci.yml` removed**. Docs (`AGENTS.md`, `README.md`, `SECURITY.md`, `lighthouse2.md`, `.env.example`) now describe **Firebase App Hosting** + Convex webhooks instead of GitLab/Netlify-first, Freshworks, or legacy Agency OS ingest env names.
+- **Leads:** `POST /api/contact` uses **`LEAD_WEBHOOK_URL` only**. Audit optional forwarder uses **`AUDIT_LEAD_WEBHOOK_URL`** + **`AUDIT_LEAD_WEBHOOK_SECRET`**; Freshworks CRM module deleted.
+- **Copy / schema:** Public “Agency OS” strings moved to **VertaFlow** (`offers.ts`, `seo.ts`, `llms.txt`, cold email HTML). CSP dropped Freshworks domains.
+
 ## Consolidation branch `oh-my-hopefully-complete` (2026-04-28)
 
-- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`**; dropped **`src/middleware.ts`**. Current **`lighthouse-troubleshooting`**: Turnstile on audits is **opt-in** (`LIGHTHOUSE_STRICT_TURNSTILE`); segment no longer injects **`api.js`** by default. Audit form intro mentions **Freshworks** when CRM sync is enabled.
+- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`**; dropped **`src/middleware.ts`**. Current **`lighthouse-troubleshooting`**: Turnstile on audits is **opt-in** (`LIGHTHOUSE_STRICT_TURNSTILE`); segment no longer injects **`api.js`** by default.
 
 ## PageSpeed Insights reliability (`lighthouse-troubleshooting`, 2026-04-28)
 

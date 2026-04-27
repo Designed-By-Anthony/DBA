@@ -1,14 +1,14 @@
 /**
- * Single JSON contract for public leads → Agency OS `POST /api/lead`.
+ * Single JSON contract for public leads → server `POST /api/contact`, which
+ * forwards to `LEAD_WEBHOOK_URL` (e.g. Convex HTTP action → Slack).
  *
  * Marketing site:
- *   - `PUBLIC_CRM_LEAD_URL` — full URL, e.g. `https://admin.designedbyanthony.com/api/lead`
- *   - `PUBLIC_API_URL` — Lighthouse audit API base only (LighthouseAudit, report viewer); not used for lead forms.
+ *   - `NEXT_PUBLIC_LEAD_WEBHOOK_URL` — optional browser default for `[data-audit-form]`
+ *   - `PUBLIC_API_URL` — Lighthouse audit API base only; not used for lead forms.
  *
- * Agency OS (web-viewer):
- *   - `TURNSTILE_SECRET_KEY` — optional; when set, `cfTurnstileResponse` is verified server-side.
- *   - `LEAD_WEBHOOK_CORS_ORIGINS` — comma-separated browser `Origin` values allowed for POST.
- *   - `LEAD_WEBHOOK_DEFAULT_AGENCY_ID` — tenant when `agencyId` is omitted.
+ * Server:
+ *   - reCAPTCHA Enterprise: `RECAPTCHA_ENTERPRISE_API_KEY` + GCP project + site key — when set, `recaptchaToken` is verified.
+ *   - Turnstile (legacy): `TURNSTILE_SECRET_KEY` — when set and Enterprise is off, `cfTurnstileResponse` is verified.
  */
 import { z } from "zod";
 
@@ -200,7 +200,7 @@ const aliasString = z.string().optional();
  *
  * The schema is permissive about aliasing: it accepts canonical camelCase keys
  * plus the snake_case keys emitted by the marketing AuditForm (e.g. `first_name`,
- * `cta_source`, `cf-turnstile-response`). Use `parsePublicLeadIngestBody` to
+ * `cta_source`, `g-recaptcha-response`, `cf-turnstile-response`). Use `parsePublicLeadIngestBody` to
  * resolve to a normalized `PublicLeadIngestBody`.
  */
 export const publicLeadIngestBodySchema = z
@@ -225,6 +225,9 @@ export const publicLeadIngestBodySchema = z
 		cfTurnstileResponse: aliasString,
 		"cf-turnstile-response": aliasString,
 		turnstileToken: aliasString,
+		recaptchaToken: aliasString,
+		"g-recaptcha-response": aliasString,
+		gRecaptchaResponse: aliasString,
 
 		ctaSource: aliasString,
 		cta_source: aliasString,
@@ -260,8 +263,10 @@ export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
 	agencyId?: string;
 	/** Honeypot — must be empty */
 	_hp?: string;
-	/** Cloudflare Turnstile token (optional if CRM verifies client-side path) */
+	/** Cloudflare Turnstile token (legacy; used when Enterprise is not configured) */
 	cfTurnstileResponse?: string;
+	/** reCAPTCHA Enterprise token from `grecaptcha.enterprise.execute` */
+	recaptchaToken?: string;
 };
 
 function firstNonEmpty(
@@ -349,6 +354,11 @@ export function parsePublicLeadIngestBody(
 			"cf-turnstile-response",
 			"turnstileToken",
 		]),
+		recaptchaToken: firstNonEmpty(raw, [
+			"recaptchaToken",
+			"g-recaptcha-response",
+			"gRecaptchaResponse",
+		]),
 	};
 }
 
@@ -377,6 +387,7 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 	ga_client_id?: string;
 	_hp?: string;
 	"cf-turnstile-response"?: string;
+	"g-recaptcha-response"?: string;
 }): PublicLeadIngestBody {
 	const name = trim(fields.first_name);
 	const email = trim(fields.email);
@@ -385,6 +396,7 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 	const phone = trim(fields.phone);
 	const company = trim(fields.company);
 	const turnstile = trim(fields["cf-turnstile-response"]);
+	const recaptcha = trim(fields["g-recaptcha-response"]);
 
 	const meta: PublicLeadMarketingMeta = {
 		ctaSource: trim(fields.cta_source) || undefined,
@@ -420,6 +432,7 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 		source,
 		_hp: trim(fields._hp),
 		cfTurnstileResponse: turnstile || undefined,
+		recaptchaToken: recaptcha || undefined,
 	};
 }
 
@@ -446,5 +459,6 @@ export function buildPublicLeadPayloadFromFormData(
 		ga_client_id: get("ga_client_id"),
 		_hp: get("_hp"),
 		"cf-turnstile-response": get("cf-turnstile-response"),
+		"g-recaptcha-response": get("g-recaptcha-response"),
 	});
 }

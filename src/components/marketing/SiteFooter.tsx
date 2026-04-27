@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_ASSETS } from "@/design-system/brand";
+import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 
 export function SiteFooter() {
 	const year = new Date().getFullYear();
@@ -14,10 +14,10 @@ export function SiteFooter() {
 						aria-label="Designed by Anthony home"
 					>
 						<Image
-							src={BRAND_ASSETS.mark}
+							src={BRAND_MARK_IMAGE}
 							alt="Designed by Anthony Logo"
-							width={36}
-							height={27}
+							width={BRAND_MARK_IMAGE.width}
+							height={BRAND_MARK_IMAGE.height}
 							className="footer-logo"
 						/>
 					</Link>
@@ -70,12 +70,12 @@ export function SiteFooter() {
 						</li>
 						<li>
 							<a
-								href="https://www.netlify.com"
+								href="https://firebase.google.com/products/app-hosting"
 								className="footer-stack-badge"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								Netlify
+								Firebase App Hosting
 							</a>
 						</li>
 						<li>
