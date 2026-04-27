@@ -4,7 +4,7 @@
 
 ## Consolidation branch `oh-my-hopefully-complete` (2026-04-28)
 
-- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`** Turnstile wiring; dropped **`src/middleware.ts`** and the old Turnstile/Trusted-Types bootstrap from the consolidation side. **`api.js`** injection uses **`async = false`** / **`defer = false`** (explicit `ready()` path). Audit form intro now mentions **Freshworks** when CRM sync is enabled.
+- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`**; dropped **`src/middleware.ts`**. Current **`lighthouse-troubleshooting`**: Turnstile on audits is **opt-in** (`LIGHTHOUSE_STRICT_TURNSTILE`); segment no longer injects **`api.js`** by default. Audit form intro mentions **Freshworks** when CRM sync is enabled.
 
 ## PageSpeed Insights reliability (`lighthouse-troubleshooting`, 2026-04-28)
 
@@ -20,7 +20,7 @@
 ## Lighthouse premium polish (`lighthouse-troubleshooting`, 2026-04-28)
 
 - **Segment SEO:** `/lighthouse` layout exports **`viewport`** (device-width, `viewport-fit: cover`, `interactiveWidget`, `maximumScale: 5`, segment **themeColor**) + richer **`metadata`** (canonical, keywords, robots, `appleWebApp`, OG/Twitter). **`LighthouseJsonLd`**: WebApplication + WebPage + BreadcrumbList + FAQPage JSON-LD. **`/lighthouse`** added to **`sitemap.ts`** path registry; **`public/robots.txt`** disallows **`/lighthouse/report`** (print views). Print route **`layout.tsx`** sets **noindex**.
-- **Motion:** `framer-motion/client` on hero feature cards, scan progress (spring progress bar, staggered phase cards), results panels + score rings; **`LighthouseValueStrip`** three value cards with scroll-in animation. **`prefers-reduced-motion`** respected.
+- **Motion:** `framer-motion/client` on hero feature cards, scan progress (spring progress bar, staggered phase cards), results panels + score rings; **`LighthouseValueStrip`** three tap-to-flip value cards (scroll-in + flip; static layout when reduced motion). **`prefers-reduced-motion`** respected.
 - **Safe areas:** `lighthouse-globals.css` padding uses **`env(safe-area-inset-*)`** on header/main.
 - **Tech fingerprints:** `LighthouseTechFingerprints` — visually hidden `data-*` hints for Wappalyzer-class crawlers (no layout impact).
 
@@ -30,9 +30,14 @@
 - **Resend:** `src/lighthouse/lib/transactionalResend.ts` — audit receipt uses **Resend when `RESEND_API_KEY` is set** (else Gmail). Default **`RESEND_FROM_EMAIL`** fallback is **`outreach@designedbyanthony.com`** (also **`/api/lead-email`** default). **`POST /api/audit/email-summary`** emails a short summary (rate-limited).
 - **UI:** `AuditScanProgress` — step cards + progress bar + rotating facts while loading. **`AuditResults`** — PDF download (**jspdf**), print view (`/lighthouse/report/[id]/print`), **Email summary** button.
 
-## Lighthouse audit UI + Turnstile (2026-04-28)
+## Lighthouse mobile + Turnstile opt-in (2026-04-28)
 
-- **`/lighthouse`:** Wider layout (`max-w-5xl`), layered background + refined glass card, premium form fields and CTA. **`AuditForm`** uses **explicit** Turnstile: `api.js?render=explicit`, host **`#lighthouse-turnstile-host`** (no `cf-turnstile` class), `execution: "execute"` + `turnstile.ready()` + `execute()` on submit; widget host **outside** `<form>` to avoid “form not connected”. **No** `default` Trusted Types policy on this segment (conflicts with parent `trusted-types … default` + Turnstile iframe). **`Permissions-Policy`:** allow `xr-spatial-tracking=*` for challenge iframe. **`lighthouse2.md` / `.env.example`:** Turnstile **hostname allowlist** for Netlify previews.
+- **`POST /api/audit`:** Turnstile verification runs only when **`LIGHTHOUSE_STRICT_TURNSTILE=1`** (and `TURNSTILE_SECRET_KEY` is set). Default: **no** Turnstile on the audit API so `/lighthouse` avoids Cloudflare iframe + CSP issues; rate limiting still applies.
+- **`/lighthouse` UI:** Turnstile script + widget removed from the segment. **`AuditForm`** no longer sends `turnstileToken`. **`LighthouseValueStrip`:** tap-to-flip cards (keyboard-accessible); **`lighthouse-audit-shell`** responsive padding + flip CSS in `lighthouse-globals.css`.
+
+## Lighthouse audit UI + Turnstile (legacy explicit mode, 2026-04-28)
+
+- When **`LIGHTHOUSE_STRICT_TURNSTILE=1`**, restore **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** on the client and wire Turnstile again (previous pattern: explicit `api.js`, host outside `<form>`). Hostname allowlist in Cloudflare still applies for previews.
 
 ## Next.js 16 proxy + quieter build (2026-04-28)
 

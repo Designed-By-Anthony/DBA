@@ -1,6 +1,7 @@
 import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
 import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
 import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
+import { isAuditTurnstileStrict } from "@lh/lib/auditTurnstilePolicy";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
 import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
@@ -124,15 +125,28 @@ export async function POST(request: Request) {
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken : "";
 		const clientIp = getClientAddress(request);
-		const turnstile = await verifyTurnstileToken(turnstileToken, clientIp);
-		if (!turnstile.success) {
-			return NextResponse.json(
-				{
-					error:
-						"Bot verification failed. Please refresh the page and try again.",
-				},
-				{ status: 403, headers: responseHeaders },
-			);
+		const strictTurnstile = isAuditTurnstileStrict();
+		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+		if (strictTurnstile) {
+			if (!turnstileSecret) {
+				return NextResponse.json(
+					{
+						error:
+							"Audit bot protection is misconfigured (strict Turnstile without secret).",
+					},
+					{ status: 503, headers: responseHeaders },
+				);
+			}
+			const turnstile = await verifyTurnstileToken(turnstileToken, clientIp);
+			if (!turnstile.success) {
+				return NextResponse.json(
+					{
+						error:
+							"Bot verification failed. Please refresh the page and try again.",
+					},
+					{ status: 403, headers: responseHeaders },
+				);
+			}
 		}
 
 		const url = normalizeHttpUrl(body.url);

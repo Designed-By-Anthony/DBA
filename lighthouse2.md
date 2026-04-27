@@ -45,7 +45,7 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 | App | **Next.js 16** (App Router), **TypeScript** |
 | UI | Marketing design system + Lighthouse segment (`src/app/lighthouse/`, `src/lighthouse/components/`) |
 | Audit API | `src/app/api/audit/route.ts` (Node runtime) |
-| Bot protection | **Cloudflare Turnstile** |
+| Bot protection | **Rate limiting** always; **Cloudflare Turnstile** only when `LIGHTHOUSE_STRICT_TURNSTILE=1` + `TURNSTILE_SECRET_KEY` (default: `/lighthouse` runs without Turnstile) |
 | AI | **Google Gemini** (API key or Vertex) |
 | Performance data | **Google PageSpeed Insights API** |
 | Deploy | **Netlify** (see `netlify.toml` from `npm run sync:static-headers`) |
@@ -56,7 +56,7 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 
 1. **`GOOGLE_PAGESPEED_API_KEY`** — required for meaningful lab scores.
 2. **`GEMINI_API_KEY`** or Vertex env — required for AI narrative (fallback exists but is thinner).
-3. **`TURNSTILE_SECRET_KEY`** + **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** — required for public audit form.
+3. **`TURNSTILE_SECRET_KEY`** + **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** — optional unless you set **`LIGHTHOUSE_STRICT_TURNSTILE=1`** (then the audit API requires a valid token; wire the widget again on the client).
 4. **`GOOGLE_PLACES_API_KEY`** — optional; enriches local block.
 5. **`MOZ_API_CREDENTIALS`** (or token) — optional; omit if you dropped Moz subscription.
 6. **`REPORT_PUBLIC_BASE_URL`** — optional; defaults to apex site for `/report/:id` links.
@@ -68,7 +68,7 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 
 1. Open **`/lighthouse`** or **`lighthouse.designedbyanthony.com`**.
 2. Enter **URL**, **name**, **company**, **email**, **city/state**.
-3. Complete **Turnstile**, submit.
+3. Submit (no Turnstile on `/lighthouse` by default).
 4. Read scores + AI summary; share **report link** when persistence is enabled.
 
 ---
@@ -137,7 +137,7 @@ Public documentation for category leaders describes stacks roughly like this:
 
 1. **`GOOGLE_PAGESPEED_API_KEY`** — [Google Cloud Console](https://console.cloud.google.com/) → enable **PageSpeed Insights API** → create API key → restrict key to that API + your deploy hostnames if possible. Set this on Netlify with scope **Functions** (runtime) so audits can call Google. **`runPagespeed` is slow** (often 30–50s on heavy sites); the server waits up to **55s** and **retries once** on timeout or 5xx. If you still see errors, check Cloud **API quotas**, key restrictions (must allow the PageSpeed API), and that the audited URL is **publicly reachable** (no auth wall).
 2. **`GEMINI_API_KEY`** or Vertex — already used for the narrative; keep quota sane (monitor usage in Google AI Studio / Cloud).
-3. **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** + **`TURNSTILE_SECRET_KEY`** — [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/); required for `/api/audit` bot gate. In the **Cloudflare Turnstile widget** settings, add every hostname that loads the widget under **Hostnames** (e.g. `designedbyanthony.com`, `www.designedbyanthony.com`, and each **Netlify deploy-preview** subdomain such as `deploy-preview-123--your-site.netlify.app`). If a hostname is missing, the challenge iframe can return **400** and `api.js` may throw (`c.call is not a function`). For local dev, use Cloudflare’s **always-pass** test keys or add `localhost`. **`/lighthouse`** loads **`api.js?render=explicit`** (required for programmatic `turnstile.render()`), uses a **non–`cf-turnstile`** host `div`, **`execution: "execute"`** + **`turnstile.execute()`** on submit, and **`turnstile.ready()`** before render — see [explicit rendering](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#explicit-rendering). Marketing Freshworks forms keep implicit lazy-load. **Trusted Types:** do not register a `default` policy on `/lighthouse` when the parent page already sends `trusted-types … default` (e.g. enterprise Chrome) — it conflicts with Turnstile’s iframe; Tag Assistant / `goog#html` console noise is extension-side.
+3. **`LIGHTHOUSE_STRICT_TURNSTILE`** — omit or `0` for default (**no** Turnstile on `POST /api/audit`). Set to **`1`** only if you want Cloudflare verification again; then pair **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** + **`TURNSTILE_SECRET_KEY`** ([Turnstile](https://developers.cloudflare.com/turnstile/)) and re-add a client widget that posts `turnstileToken` (hostname allowlist in Cloudflare still applies to previews). Marketing Freshworks forms keep their own Turnstile lazy-load where configured.
 
 ### B. Optional but high leverage (competitor parity)
 

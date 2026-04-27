@@ -11,6 +11,47 @@
 }
 
 @layer utilities {
+	/* Tighter padding on narrow phones; outer page also uses responsive px */
+	.lighthouse-audit-shell {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	@media (max-width: 28rem) {
+		.lighthouse-audit-shell.glass-card {
+			border-radius: 1.15rem;
+		}
+	}
+
+	/* 3D flip cards (value strip) — backface hidden for clean edges */
+	.lighthouse-flip-scene {
+		perspective: 1200px;
+	}
+
+	.lighthouse-flip-inner {
+		position: relative;
+		width: 100%;
+		min-height: 11.5rem;
+		transform-style: preserve-3d;
+		transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.lighthouse-flip-inner[data-flipped="true"] {
+		transform: rotateY(180deg);
+	}
+
+	.lighthouse-flip-face {
+		position: absolute;
+		inset: 0;
+		border-radius: 1rem;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+	}
+
+	.lighthouse-flip-face--back {
+		transform: rotateY(180deg);
+	}
+
 	.glass-card {
 		background: linear-gradient(
 			165deg,

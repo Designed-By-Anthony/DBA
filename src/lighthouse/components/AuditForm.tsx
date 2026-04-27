@@ -1,9 +1,8 @@
 "use client";
 
 import type { AuditData } from "@lh/auditReport";
-import { LIGHTHOUSE_TURNSTILE_HOST_ID } from "@lh/constants";
 import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
@@ -15,22 +14,7 @@ const LOADING_MESSAGES = [
 	"Running the AI pass for your executive summary and top fixes…",
 ];
 
-type TurnstileApi = {
-	ready: (fn: () => void) => void;
-	render: (
-		container: string | HTMLElement,
-		options: Record<string, unknown>,
-	) => string;
-	reset: (widgetIdOrContainer: string | HTMLElement) => void;
-	execute: (widgetIdOrContainer: string | HTMLElement) => void;
-	remove: (widgetId: string) => void;
-};
-
-type WindowWithTurnstile = Window & {
-	turnstile?: TurnstileApi;
-};
-
-export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
+export function AuditForm() {
 	const [url, setUrl] = useState("");
 	const [email, setEmail] = useState("");
 	const [name, setName] = useState("");
@@ -46,79 +30,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 
 	const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 	const [scanPhase, setScanPhase] = useState<ScanPhase>("pagespeed");
-	const widgetIdRef = useRef<string | null>(null);
-	const pendingResolveRef = useRef<((token: string | null) => void) | null>(
-		null,
-	);
-	const siteKeyTrimmed = turnstileSiteKey?.trim() ?? "";
-	const hasTurnstile = Boolean(siteKeyTrimmed);
-
-	const mountInvisibleWidget = useCallback(() => {
-		if (!hasTurnstile) return;
-		const w = window as WindowWithTurnstile;
-		const host = document.getElementById(LIGHTHOUSE_TURNSTILE_HOST_ID);
-		if (!host || !w.turnstile || widgetIdRef.current) return;
-
-		const onSuccess = (token: string) => {
-			pendingResolveRef.current?.(token);
-			pendingResolveRef.current = null;
-		};
-		const onExpireOrError = () => {
-			pendingResolveRef.current?.(null);
-			pendingResolveRef.current = null;
-		};
-
-		const runRender = () => {
-			try {
-				const id = w.turnstile?.render(host, {
-					sitekey: siteKeyTrimmed,
-					size: "invisible",
-					theme: "dark",
-					appearance: "interaction-only",
-					/** Cloudflare: use `execution: "execute"` + `turnstile.execute(id)` on submit. */
-					execution: "execute",
-					callback: onSuccess,
-					"expired-callback": onExpireOrError,
-					"error-callback": onExpireOrError,
-					"timeout-callback": onExpireOrError,
-				});
-				if (id) widgetIdRef.current = id;
-			} catch {
-				widgetIdRef.current = null;
-			}
-		};
-
-		if (w.turnstile.ready) {
-			w.turnstile.ready(runRender);
-		} else {
-			runRender();
-		}
-	}, [hasTurnstile, siteKeyTrimmed]);
-
-	useEffect(() => {
-		if (typeof window === "undefined" || !hasTurnstile) return;
-
-		const w = window as WindowWithTurnstile;
-		const poll = window.setInterval(() => {
-			mountInvisibleWidget();
-			if (widgetIdRef.current) {
-				window.clearInterval(poll);
-			}
-		}, 150);
-
-		return () => {
-			window.clearInterval(poll);
-			const id = widgetIdRef.current;
-			if (id && w.turnstile?.remove) {
-				try {
-					w.turnstile.remove(id);
-				} catch {
-					/* ignore */
-				}
-			}
-			widgetIdRef.current = null;
-		};
-	}, [hasTurnstile, mountInvisibleWidget]);
 
 	useEffect(() => {
 		let interval: ReturnType<typeof setInterval> | undefined;
@@ -144,39 +55,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 		};
 	}, [status]);
 
-	const requestTurnstileToken = useCallback((): Promise<string | null> => {
-		if (!hasTurnstile) {
-			return Promise.resolve("");
-		}
-		return new Promise((resolve) => {
-			const w = window as WindowWithTurnstile;
-			const host = document.getElementById(LIGHTHOUSE_TURNSTILE_HOST_ID);
-			if (!host || !w.turnstile) {
-				resolve(null);
-				return;
-			}
-			mountInvisibleWidget();
-			const wid = widgetIdRef.current;
-			if (!wid) {
-				resolve(null);
-				return;
-			}
-			pendingResolveRef.current = resolve;
-			try {
-				w.turnstile.execute(wid);
-			} catch {
-				pendingResolveRef.current = null;
-				resolve(null);
-			}
-			window.setTimeout(() => {
-				if (pendingResolveRef.current === resolve) {
-					pendingResolveRef.current = null;
-					resolve(null);
-				}
-			}, 25_000);
-		});
-	}, [hasTurnstile, mountInvisibleWidget]);
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!url || status === "loading") return;
@@ -191,27 +69,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 		setErrorMsg("");
 
 		try {
-			let turnstileToken = "";
-			if (hasTurnstile) {
-				turnstileToken = (await requestTurnstileToken()) ?? "";
-				if (!turnstileToken) {
-					setErrorMsg(
-						"Security check did not complete. In Cloudflare Turnstile, add this site’s hostname (and Netlify preview hostnames) to the widget, then try again.",
-					);
-					setStatus("error");
-					const w = window as WindowWithTurnstile;
-					const wid = widgetIdRef.current;
-					if (wid && w.turnstile?.reset) {
-						try {
-							w.turnstile.reset(wid);
-						} catch {
-							/* ignore */
-						}
-					}
-					return;
-				}
-			}
-
 			const res = await fetch("/api/audit", {
 				method: "POST",
 				headers: {
@@ -223,7 +80,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 					name,
 					company,
 					location,
-					turnstileToken,
 				}),
 			});
 
@@ -255,15 +111,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 				err instanceof Error ? err.message : "Failed to fetch audit.";
 			setErrorMsg(message);
 			setStatus("error");
-			const w = window as WindowWithTurnstile;
-			const wid = widgetIdRef.current;
-			if (wid && w.turnstile?.reset) {
-				try {
-					w.turnstile.reset(wid);
-				} catch {
-					/* ignore */
-				}
-			}
 		}
 	};
 
@@ -436,16 +283,6 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 					Lighthouse Scanner v2 · Shareable report when storage is enabled.
 				</p>
 			</form>
-
-			{/* Outside <form>: avoids Turnstile iframe/hidden-input "form not connected" issues. Explicit render — no `cf-turnstile` class (Cloudflare docs). */}
-			{hasTurnstile ? (
-				<div
-					id={LIGHTHOUSE_TURNSTILE_HOST_ID}
-					className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden opacity-0"
-					data-sitekey={siteKeyTrimmed}
-					aria-hidden
-				/>
-			) : null}
 		</div>
 	);
 }
