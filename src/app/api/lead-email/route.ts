@@ -19,13 +19,14 @@
  *   - Turnstile fail: 403 `{ errors: [{ message }] }`
  *   - Resend/config fail: 502/503 `{ errors: [{ message }] }`
  */
-import {
-	parsePublicLeadIngestBody,
-	type PublicLeadIngestBody,
-} from "@/lib/lead-form-contract";
+
+import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyTurnstileToken } from "@lh/lib/turnstile";
+import {
+	type PublicLeadIngestBody,
+	parsePublicLeadIngestBody,
+} from "@/lib/lead-form-contract";
 
 const APEX_SUBDOMAIN_PATTERN =
 	/^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
@@ -42,7 +43,7 @@ function buildCorsHeaders(origin: string | null): Record<string, string> {
 	const isAllowed =
 		!!origin &&
 		(APEX_SUBDOMAIN_PATTERN.test(origin) || LOCAL_ORIGINS.has(origin));
-	const allow = isAllowed ? origin! : "https://designedbyanthony.com";
+	const allow = isAllowed && origin ? origin : "https://designedbyanthony.com";
 	return {
 		"Access-Control-Allow-Origin": allow,
 		"Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -169,8 +170,7 @@ export async function POST(request: Request) {
 				{
 					errors: [
 						{
-							message:
-								"Bot verification failed. Please refresh and try again.",
+							message: "Bot verification failed. Please refresh and try again.",
 						},
 					],
 				},
@@ -261,8 +261,5 @@ export async function POST(request: Request) {
 		);
 	}
 
-	return NextResponse.json(
-		{ ok: true },
-		{ status: 200, headers: corsHeaders },
-	);
+	return NextResponse.json({ ok: true }, { status: 200, headers: corsHeaders });
 }

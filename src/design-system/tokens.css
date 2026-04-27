@@ -31,7 +31,7 @@
 		sans-serif;
 	--font-hero: "Abril Fatface", Georgia, "Times New Roman", serif;
 	--font-report-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
-	--container-gutter: clamp(1.15rem, 2.7vw, 2rem);
+	--container-gutter: max(0.85rem, min(2rem, clamp(1.15rem, 2.7vw, 2rem)));
 	--content-max: 1160px;
 	--section-space: clamp(5.25rem, 9vw, 7.25rem);
 	--section-space-tight: clamp(3.5rem, 5.5vw, 5rem);

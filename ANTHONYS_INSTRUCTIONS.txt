@@ -5,7 +5,7 @@ Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 
 Layout
 ------
-• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `vercel.json`.
+• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `netlify.toml`.
 • Supporting folders at root (not separate deploys from this repo): `customer-site-embeds/`, `vertaflow-crm/` stubs or assets as applicable — see README.
 
 Global theme (single source of truth)
@@ -33,7 +33,7 @@ Open the folder "Designed_By_Anthony" as the workspace root.
 Vercel
 ------
 • Root Directory: repository root (`.`).
-• Install / build: `npm ci` and `npm run build` (see `vercel.json`).
+• Install / build: `npm ci` and `npm run build` (see `netlify.toml`).
 
 Cloudflare / GCP / Clerk
 ------------------------

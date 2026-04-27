@@ -81,8 +81,8 @@ export function FoundingPartnerSection() {
 					>
 						Book a 15-minute intro call
 					</a>
-					<Link href="/free-seo-audit" className="btn btn-outline">
-						Run the Free Audit
+					<Link href="/contact" className="btn btn-outline">
+						Contact us for your free audit
 					</Link>
 				</div>
 

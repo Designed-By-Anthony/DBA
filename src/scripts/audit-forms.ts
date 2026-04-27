@@ -27,12 +27,20 @@ function resolveFormEndpoint(rawEndpoint: string | null | undefined): string {
 
 	try {
 		const url = new URL(candidate, window.location.origin);
+		const isSameOriginApi =
+			url.origin === window.location.origin && url.pathname.startsWith("/api/");
+
 		if (url.hostname === LEGACY_CRM_HOST) {
 			url.hostname = CURRENT_CRM_HOST;
 			url.protocol = "https:";
 			url.port = "";
 		}
-		return url.toString();
+		const isTrustedRemote =
+			url.hostname === CURRENT_CRM_HOST && url.pathname.startsWith("/api/");
+		if (isSameOriginApi || isTrustedRemote) {
+			return url.toString();
+		}
+		return DEFAULT_FORM_ENDPOINT;
 	} catch {
 		return DEFAULT_FORM_ENDPOINT;
 	}

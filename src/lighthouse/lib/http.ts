@@ -10,6 +10,63 @@ const LOCAL_ALLOWED_ORIGINS = new Set([
 
 const localRateLimitBuckets = new Map<string, number[]>();
 
+const PRIVATE_IPV4_SEGMENTS = [
+	/^10\./,
+	/^127\./,
+	/^169\.254\./,
+	/^172\.(1[6-9]|2\d|3[0-1])\./,
+	/^192\.168\./,
+	/^0\./,
+];
+
+function isPrivateHost(hostname: string): boolean {
+	const host = hostname.toLowerCase();
+	if (
+		host === "localhost" ||
+		host === "::1" ||
+		host.endsWith(".local") ||
+		host.endsWith(".internal")
+	) {
+		return true;
+	}
+	if (PRIVATE_IPV4_SEGMENTS.some((pattern) => pattern.test(host))) {
+		return true;
+	}
+	// IPv6 unique-local/link-local ranges
+	if (
+		host.startsWith("fc") ||
+		host.startsWith("fd") ||
+		host.startsWith("fe80:")
+	) {
+		return true;
+	}
+	return false;
+}
+
+function getFetchTargetUrl(input: RequestInfo | URL): string | null {
+	if (typeof input === "string") return input;
+	if (input instanceof URL) return input.toString();
+	if (input instanceof Request) return input.url;
+	return null;
+}
+
+function assertSafeOutboundUrl(input: RequestInfo | URL): void {
+	const raw = getFetchTargetUrl(input);
+	if (!raw) {
+		throw new Error("Invalid outbound request target.");
+	}
+	const url = new URL(raw);
+	if (url.protocol !== "https:" && url.protocol !== "http:") {
+		throw new Error(`Unsupported outbound protocol: ${url.protocol}`);
+	}
+	if (
+		process.env.ALLOW_PRIVATE_EGRESS !== "true" &&
+		isPrivateHost(url.hostname)
+	) {
+		throw new Error(`Blocked private outbound target: ${url.hostname}`);
+	}
+}
+
 function normalizeOrigin(origin: string): string | null {
 	try {
 		return new URL(origin).origin;
@@ -108,6 +165,8 @@ export async function fetchWithTimeout(
 	init: RequestInit = {},
 	timeoutMs = 15_000,
 ): Promise<Response> {
+	assertSafeOutboundUrl(input);
+
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), timeoutMs);
 

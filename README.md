@@ -4,7 +4,7 @@ Single **Next.js 16** application: marketing site, APIs, and the Lighthouse audi
 
 ## Routing — `src/middleware.ts`
 
-[`src/middleware.ts`](./src/middleware.ts) runs on the Vercel deployment. It reads `Host` and handles VertaFlow redirects, `lighthouse.*` (in-app or optional `LIGHTHOUSE_UPSTREAM_URL`), and hides `/lighthouse` on the apex host.
+[`src/middleware.ts`](./src/middleware.ts) runs on the Netlify Next.js runtime. It reads `Host` and handles VertaFlow redirects, `lighthouse.*` (in-app or optional `LIGHTHOUSE_UPSTREAM_URL`), and hides `/lighthouse` on the apex host.
 
 ```
 admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*
@@ -13,7 +13,7 @@ lighthouse.designedbyanthony.com/*  →  same app by default; or $LIGHTHOUSE_UPS
 * (everything else)                 →  this Next app (fallthrough)
 ```
 
-### Optional env on the apex Vercel project
+### Optional env on the Netlify site
 
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
@@ -26,6 +26,13 @@ npm install
 npm run dev       # :3000 (builds public/scripts/site.js first)
 npm run build     # site script + sync static headers + next build
 ```
+
+Deploy on **Netlify** from the repo root via **GitLab-connected auto deploys**. `netlify.toml` is regenerated on each `npm run sync:static-headers` (runs in `prebuild`) with:
+- `command = "npm run build"`
+- `NODE_VERSION = "22"`
+- `@netlify/plugin-nextjs` runtime plugin (no static `.next` publish directory)
+
+Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 
 ## Global theme + brand
 

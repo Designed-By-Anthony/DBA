@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Belt-and-suspenders: these paths also set X-Robots-Tag: noindex, nofollow
-# via vercel.json. Explicit Disallow here avoids spending crawl budget
+# via response headers from Next.js. Explicit Disallow here avoids spending crawl budget
 # on them in the first place.
 Disallow: /report
 Disallow: /report/

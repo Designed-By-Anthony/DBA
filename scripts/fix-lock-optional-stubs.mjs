@@ -3,10 +3,11 @@
  * with version, resolved, and integrity from the registry.
  * Stub-only entries break `npm ci` on Linux (npm semver: Invalid Version: ).
  */
-import fs from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 
 const lockPath = new URL("../package-lock.json", import.meta.url);
-const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+// nosemgrep: eslint.detect-non-literal-fs-filename
+const lock = JSON.parse(await readFile(lockPath, "utf8"));
 const { packages } = lock;
 
 function getVersionForStub(stubPath) {
@@ -27,7 +28,13 @@ function getVersionForStub(stubPath) {
 }
 
 async function fetchDist(name, version) {
-	const url = `https://registry.npmjs.org/${encodeURIComponent(name)}/${version}`;
+	const url = new URL(
+		`${encodeURIComponent(name)}/${version}`,
+		"https://registry.npmjs.org/",
+	);
+	if (url.hostname !== "registry.npmjs.org") {
+		throw new Error("Unexpected registry host.");
+	}
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`${name}@${version}: HTTP ${res.status}`);
 	const j = await res.json();
@@ -61,5 +68,6 @@ for (const [p, meta] of Object.entries(packages)) {
 }
 await Promise.all(tasks);
 
-fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + "\n");
+// nosemgrep: eslint.detect-non-literal-fs-filename
+await writeFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
 console.log(`fix-lock-optional-stubs: filled ${fixed} stub entries`);

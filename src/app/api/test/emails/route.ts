@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import {
 	clearGmailTestOutbox,
 	getGmailTestOutbox,
 	isGmailTestMode,
 } from "@lh/lib/gmail";
+import { NextResponse } from "next/server";
 
 /**
  * Test-only inspector for the Lighthouse Gmail outbox.

@@ -1,6 +1,6 @@
-import { buildPublicLeadPayloadFromFormFields } from "@/lib/lead-form-contract";
-import { NextResponse } from "next/server";
 import { verifyTurnstileToken } from "@lh/lib/turnstile";
+import { NextResponse } from "next/server";
+import { buildPublicLeadPayloadFromFormFields } from "@/lib/lead-form-contract";
 
 /**
  * CORS: only the DBA family (marketing apex, admin/accounts subdomains,
@@ -24,7 +24,7 @@ function buildCorsHeaders(origin: string | null): Record<string, string> {
 	const isAllowed =
 		!!origin &&
 		(APEX_SUBDOMAIN_PATTERN.test(origin) || LOCAL_ORIGINS.has(origin));
-	const allow = isAllowed ? origin! : "https://designedbyanthony.com";
+	const allow = isAllowed && origin ? origin : "https://designedbyanthony.com";
 	return {
 		"Access-Control-Allow-Origin": allow,
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",

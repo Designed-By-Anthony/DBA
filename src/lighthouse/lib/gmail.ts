@@ -1,5 +1,5 @@
-import { google } from "googleapis";
 import { escapeHtml, normalizeEmail } from "@lh/lib/validation";
+import { google } from "googleapis";
 
 const GMAIL_SENDER = "anthony@designedbyanthony.com";
 
@@ -42,7 +42,11 @@ function getGmailStore(): GmailMailerGlobal {
 	if (!gmailG[gmailGlobalKey]) {
 		gmailG[gmailGlobalKey] = { outbox: [], counter: 0 };
 	}
-	return gmailG[gmailGlobalKey]!;
+	const store = gmailG[gmailGlobalKey];
+	if (!store) {
+		throw new Error("Failed to initialize Gmail in-memory store.");
+	}
+	return store;
 }
 
 export function getGmailTestOutbox(): GmailCapturedEmail[] {

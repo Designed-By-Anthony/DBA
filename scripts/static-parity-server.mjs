@@ -91,6 +91,7 @@ function resolveFile(pathname) {
 function pathMatchesBlock(pathname, block) {
 	if (block.regex) {
 		try {
+			// nosemgrep: eslint.detect-non-literal-regexp
 			return new RegExp(block.regex).test(pathname);
 		} catch {
 			return false;

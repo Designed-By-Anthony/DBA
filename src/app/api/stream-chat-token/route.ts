@@ -1,5 +1,5 @@
-import { StreamChat } from "stream-chat";
 import { NextResponse } from "next/server";
+import { StreamChat } from "stream-chat";
 
 const ALLOWED_ORIGINS = new Set([
 	"https://designedbyanthony.com",
@@ -52,12 +52,18 @@ export async function POST(request: Request) {
 	try {
 		body = (await request.json()) as { userId?: string; userName?: string };
 	} catch {
-		return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers });
+		return NextResponse.json(
+			{ error: "Invalid JSON" },
+			{ status: 400, headers },
+		);
 	}
 
 	const rawId = typeof body.userId === "string" ? body.userId.trim() : "";
 	if (!rawId || rawId.length > 128) {
-		return NextResponse.json({ error: "userId required" }, { status: 400, headers });
+		return NextResponse.json(
+			{ error: "userId required" },
+			{ status: 400, headers },
+		);
 	}
 
 	const safeId =

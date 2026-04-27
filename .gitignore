@@ -8,6 +8,8 @@ dist
 .turbo
 .vercel
 *.log
+playwright-report
+test-results
 # Local tooling / secrets (never commit)
 cloud-sql-proxy
 dba-website-prod-*.json

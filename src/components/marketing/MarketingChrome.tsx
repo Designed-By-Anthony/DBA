@@ -1,6 +1,3 @@
-import { BRAND_ASSETS } from "@/design-system/brand";
-import { MONTHLY_LOCAL_SEO_PRICE } from "@/lib/offers";
-import { businessProfile, GA_MEASUREMENT_ID } from "@/lib/seo";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -8,8 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { BRAND_ASSETS } from "@/design-system/brand";
+import { MONTHLY_LOCAL_SEO_PRICE } from "@/lib/offers";
+import { businessProfile, GA_MEASUREMENT_ID } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
+import { PageLifecycle } from "./PageLifecycle";
 import { SiteFooter } from "./SiteFooter";
+import { SiteQuickRailDrawer } from "./SiteQuickRailDrawer";
 import { StreamChatGate } from "./StreamChatGate";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
@@ -41,6 +43,7 @@ export function MarketingChrome({
 
 	return (
 		<>
+			<PageLifecycle />
 			<Script id="trusted-types-inline" strategy="beforeInteractive">
 				{`
 (function () {
@@ -120,8 +123,9 @@ window.__dbaRevokeAnalyticsConsent = function () {
 					>
 						<span className="site-banner-dot" aria-hidden="true" />
 						<span>
-							<strong>Launch pilot: 10 client spots</strong> — complimentary custom build +{" "}
-							{MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the program is open →
+							<strong>Launch pilot: 10 client spots</strong> — complimentary
+							custom build + {MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the
+							program is open →
 						</span>
 					</a>
 				</div>
@@ -142,7 +146,10 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							<Link href="/services">Services</Link>
 							<Link href="/portfolio">Portfolio</Link>
 							<Link href="/pricing">Pricing</Link>
+							<Link href="/service-areas">Service Areas</Link>
 							<Link href="/about">About</Link>
+							<Link href="/faq">FAQ</Link>
+							<Link href="/blog">Blog</Link>
 							<Link href="/contact" className="nav-contact-link">
 								Contact
 							</Link>
@@ -169,71 +176,72 @@ window.__dbaRevokeAnalyticsConsent = function () {
 						</button>
 					</div>
 				</header>
+			</div>
 
-				<nav className="nav-rail" aria-label="Quick actions" data-nav-rail>
-					<div className="nav-rail-inner">
-						<Link href="/free-seo-audit" className="nav-rail-link nav-rail-link--audit">
-							<span className="nav-rail-text">
-								<strong>Free site audit</strong>
-								<span className="nav-rail-sub">Performance &amp; local SEO signals</span>
-							</span>
-						</Link>
-						<Link href="/contact" className="nav-rail-link nav-rail-link--contact">
-							<span className="nav-rail-text">
-								<strong>Email the studio</strong>
-								<span className="nav-rail-sub">Human reply, usually same day</span>
-							</span>
-						</Link>
-						<a
-							href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-							className="nav-rail-link nav-rail-link--book"
-							data-calendar-link
-						>
-							<span className="nav-rail-text">
-								<strong>Book a call</strong>
-								<span className="nav-rail-sub">15 minutes · pick a time</span>
-							</span>
-						</a>
-						<a href={mailtoContactHref} className="nav-rail-link nav-rail-link--phone">
-							<span className="nav-rail-text">
-								<strong>Call now</strong>
-								<span className="nav-rail-sub">
-									{businessProfile.telephone.replace("+1-", "")}
-								</span>
-							</span>
-						</a>
+			<div
+				className="mobile-nav-overlay"
+				id="mobile-nav"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="mobile-nav-title"
+				aria-hidden="true"
+			>
+				<div
+					className="mobile-nav-backdrop"
+					data-mobile-nav-dismiss
+					aria-hidden="true"
+				/>
+				<div className="mobile-nav-scroll-wrap">
+					<div className="mobile-nav-panel">
+						<div className="mobile-nav-panel__top">
+							<h2 id="mobile-nav-title" className="sr-only">
+								Main menu
+							</h2>
+							<button
+								type="button"
+								className="mobile-nav-close"
+								data-mobile-nav-close
+								aria-label="Close navigation menu"
+							>
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<nav className="mobile-nav-links" aria-label="Mobile">
+							<Link href="/ouredge">Our Edge</Link>
+							<Link href="/services">Services</Link>
+							<Link href="/pricing">Pricing</Link>
+							<Link href="/service-areas">Service Areas</Link>
+							<Link href="/portfolio">Portfolio</Link>
+							<Link href="/about">About</Link>
+							<Link href="/faq">FAQ</Link>
+							<Link href="/blog">Blog</Link>
+							<Link href="/contact">Contact</Link>
+							<Link
+								href="/contact"
+								className="mobile-nav-cta mobile-nav-cta--secondary"
+							>
+								Contact us for your free audit
+							</Link>
+							<a
+								href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+								className="mobile-nav-cta"
+								data-calendar-link
+							>
+								Book a free call
+							</a>
+						</nav>
 					</div>
-				</nav>
+				</div>
 			</div>
 
-			<div className="mobile-nav-overlay" id="mobile-nav">
-				<nav className="mobile-nav-links" aria-label="Mobile">
-					<Link href="/ouredge">Our Edge</Link>
-					<Link href="/services">Services</Link>
-					<Link href="/pricing">Pricing</Link>
-					<Link href="/service-areas">Service Areas</Link>
-					<Link href="/portfolio">Portfolio</Link>
-					<Link href="/about">About</Link>
-					<Link href="/faq">FAQ</Link>
-					<Link href="/blog">Blog</Link>
-					<Link href="/contact">Contact</Link>
-					<Link href="/free-seo-audit" className="mobile-nav-cta mobile-nav-cta--secondary">
-						Free site audit
-					</Link>
-					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="mobile-nav-cta"
-						data-calendar-link
-					>
-						Book a free call
-					</a>
-				</nav>
+			<div className="site-body-canvas">
+				<SiteQuickRailDrawer />
+				<div className="site-main-wrap">
+					<main id="main-content">{children}</main>
+					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
+					<SiteFooter />
+				</div>
 			</div>
-
-			<main id="main-content">{children}</main>
-
-			{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
-			<SiteFooter />
 
 			<div className="reach-out-sticky" id="reachOutSticky">
 				<button
@@ -248,7 +256,12 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				</button>
 			</div>
 
-			<dialog id="reachOutModal" className="reach-out-dialog" aria-labelledby="reachOutModalTitle" aria-modal="true">
+			<dialog
+				id="reachOutModal"
+				className="reach-out-dialog"
+				aria-labelledby="reachOutModalTitle"
+				aria-modal="true"
+			>
 				<div className="reach-out-dialog-panel splash-shell splash-shell--reach-out">
 					<div className="reach-out-dialog-header">
 						<Image
@@ -271,21 +284,39 @@ window.__dbaRevokeAnalyticsConsent = function () {
 						Say hello
 					</h2>
 					<p className="reach-out-dialog-lede">
-						Pick what feels easiest — email the form, call, or grab a time on the calendar.
+						Pick what feels easiest — email the form, call, or grab a time on
+						the calendar.
 					</p>
-					<Link href="/contact" className="reach-out-dialog-primary" data-reach-out-close>
+					<Link
+						href="/contact"
+						className="reach-out-dialog-primary"
+						data-reach-out-close
+					>
 						Contact us
 					</Link>
-					<div className="reach-out-dialog-actions" role="group" aria-label="Other ways to reach us">
-						<a href={businessProfile.telephoneHref} className="reach-out-action" data-reach-out-close>
+					<section
+						className="reach-out-dialog-actions"
+						aria-label="Other ways to reach us"
+					>
+						<a
+							href={businessProfile.telephoneHref}
+							className="reach-out-action"
+							data-reach-out-close
+						>
 							<span className="reach-out-action-label">Call</span>
 							<span className="reach-out-action-detail">
 								{businessProfile.telephone.replace("+1-", "")}
 							</span>
 						</a>
-						<a href={mailtoContactHref} className="reach-out-action" data-reach-out-close>
+						<a
+							href={mailtoContactHref}
+							className="reach-out-action"
+							data-reach-out-close
+						>
 							<span className="reach-out-action-label">Email</span>
-							<span className="reach-out-action-detail">{businessProfile.email}</span>
+							<span className="reach-out-action-detail">
+								{businessProfile.email}
+							</span>
 						</a>
 						<button
 							type="button"
@@ -296,7 +327,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							<span className="reach-out-action-label">Book a call</span>
 							<span className="reach-out-action-detail">Calendly</span>
 						</button>
-					</div>
+					</section>
 				</div>
 			</dialog>
 
@@ -320,9 +351,15 @@ window.__dbaRevokeAnalyticsConsent = function () {
 					>
 						×
 					</button>
-					<div className="layout-calendly-modal__body" id="layoutCalendlyModalBody">
+					<div
+						className="layout-calendly-modal__body"
+						id="layoutCalendlyModalBody"
+					>
 						<div className="calendly-embed-loading" data-calendly-loading>
-							<div className="calendly-embed-loading__spinner" aria-hidden="true" />
+							<div
+								className="calendly-embed-loading__spinner"
+								aria-hidden="true"
+							/>
 							<p className="calendly-embed-loading__text">Loading calendar…</p>
 						</div>
 					</div>
@@ -343,15 +380,24 @@ window.__dbaRevokeAnalyticsConsent = function () {
 						Cookies and analytics
 					</p>
 					<p id="cookie-consent-desc" className="cookie-consent__text">
-						We use essential tools to keep forms secure and the site running. If you are OK with it,
-						we also load Google Analytics 4 to see how traffic moves. Read the{" "}
-						<Link href="/cookie">Cookie Policy</Link> and <Link href="/privacy">Privacy Policy</Link>.
+						We use essential tools to keep forms secure and the site running. If
+						you are OK with it, we also load Google Analytics 4 to see how
+						traffic moves. Read the <Link href="/cookie">Cookie Policy</Link>{" "}
+						and <Link href="/privacy">Privacy Policy</Link>.
 					</p>
 					<div className="cookie-consent__actions">
-						<button type="button" className="btn btn-primary btn-sm" id="cookie-consent-accept">
+						<button
+							type="button"
+							className="btn btn-primary btn-sm"
+							id="cookie-consent-accept"
+						>
 							Accept
 						</button>
-						<button type="button" className="btn btn-outline btn-sm" id="cookie-consent-reject">
+						<button
+							type="button"
+							className="btn btn-outline btn-sm"
+							id="cookie-consent-reject"
+						>
 							Decline
 						</button>
 					</div>

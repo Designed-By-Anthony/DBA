@@ -1,6 +1,7 @@
 export { initLayoutCalendlyEmbed } from "./ui/calendly";
 export { initCookieSettingsLinks } from "./ui/cookie-settings";
 export { initCursorGlow } from "./ui/cursor-glow";
+export { initExclusiveDetails } from "./ui/exclusive-details";
 export { initFaqAccordion } from "./ui/faq-accordion";
 export { initGbpRoiCalculator } from "./ui/gbp-roi-calculator";
 export { initMagneticLinks } from "./ui/magnetic-links";

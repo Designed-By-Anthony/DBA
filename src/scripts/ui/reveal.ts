@@ -2,6 +2,14 @@ const STAGGER_REVEAL_UP_MS = 58;
 const STAGGER_REVEAL_MS = 70;
 const MAX_STAGGER_INDEX = 20;
 
+/** All CSS classes that use the reveal-active animation system */
+const DIRECTIONAL_REVEAL_CLASSES = [
+	"reveal-up",
+	"reveal-left",
+	"reveal-right",
+	"reveal-scale",
+] as const;
+
 function scheduleReveal(
 	el: HTMLElement,
 	className: "reveal-active" | "active",
@@ -15,9 +23,26 @@ function scheduleReveal(
 	}, delay);
 }
 
+function isDirectionalReveal(el: Element): boolean {
+	return DIRECTIONAL_REVEAL_CLASSES.some((cls) => el.classList.contains(cls));
+}
+
+function revealElement(el: HTMLElement): void {
+	if (isDirectionalReveal(el)) {
+		el.classList.add("reveal-active");
+		return;
+	}
+
+	if (el.classList.contains("reveal")) {
+		el.classList.add("active");
+	}
+}
+
 export function initRevealAnimations(): void {
-	const revealUpElements = Array.from(
-		document.querySelectorAll<HTMLElement>(".reveal-up"),
+	const directionalElements = Array.from(
+		document.querySelectorAll<HTMLElement>(
+			DIRECTIONAL_REVEAL_CLASSES.map((c) => `.${c}`).join(","),
+		),
 	);
 	const revealElements = Array.from(
 		document.querySelectorAll<HTMLElement>(".reveal"),
@@ -26,10 +51,10 @@ export function initRevealAnimations(): void {
 		"(prefers-reduced-motion: reduce)",
 	).matches;
 
-	if (revealUpElements.length === 0 && revealElements.length === 0) return;
+	if (directionalElements.length === 0 && revealElements.length === 0) return;
 
 	if (prefersReducedMotion) {
-		for (const element of revealUpElements) {
+		for (const element of directionalElements) {
 			element.classList.add("reveal-active");
 		}
 		for (const element of revealElements) {
@@ -47,8 +72,8 @@ export function initRevealAnimations(): void {
 				const el = entry.target as HTMLElement;
 				observer.unobserve(el);
 
-				if (el.classList.contains("reveal-up")) {
-					const idx = revealUpElements.indexOf(el);
+				if (isDirectionalReveal(el)) {
+					const idx = directionalElements.indexOf(el);
 					scheduleReveal(
 						el,
 						"reveal-active",
@@ -63,13 +88,37 @@ export function initRevealAnimations(): void {
 		},
 		{
 			root: null,
-			/* Slight “early” trigger + top breathing room for hero strips */
+			/* Slight "early" trigger + top breathing room for hero strips */
 			rootMargin: "72px 0px -7% 0px",
 			threshold: 0.06,
 		},
 	);
 
-	for (const el of revealUpElements) {
+	window.setTimeout(() => {
+		for (const el of directionalElements) {
+			revealElement(el);
+		}
+		for (const el of revealElements) {
+			revealElement(el);
+		}
+	}, 1400);
+
+	/* If IO never intersects (layout quirks, embedded previews), force-visible so
+	   content is never stuck at opacity:0 under html.reveal-ready. */
+	window.setTimeout(() => {
+		for (const el of directionalElements) {
+			if (!el.classList.contains("reveal-active")) {
+				el.classList.add("reveal-active");
+			}
+		}
+		for (const el of revealElements) {
+			if (!el.classList.contains("active")) {
+				el.classList.add("active");
+			}
+		}
+	}, 3400);
+
+	for (const el of directionalElements) {
 		if (el.dataset.revealIoBound === "1") continue;
 		if (el.classList.contains("reveal-active")) continue;
 		el.dataset.revealIoBound = "1";

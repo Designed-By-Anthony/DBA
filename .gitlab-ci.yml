@@ -1,0 +1,116 @@
+stages:
+  - install
+  - test
+  - build
+  - security
+
+# ── GitLab Security Scanning templates ──
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Security/DAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+variables:
+  NODE_VERSION: "22"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  SAST_EXCLUDED_PATHS: "node_modules,.next,public/scripts,customer-site-embeds,vertaflow-crm,test-results,playwright-report,cypress/screenshots,cypress/videos"
+
+# ── Global cache: node_modules + npm cache ──
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm
+    - node_modules/
+
+# ── Install dependencies ──
+install:
+  stage: install
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+
+# ── Lint (Biome) ──
+lint:
+  stage: test
+  image: node:${NODE_VERSION}
+  needs: [install]
+  script:
+    - |
+      bash -lc '
+        set -euo pipefail
+        TARGET_REF="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+        git fetch origin "${TARGET_REF}" --depth=50
+        CHANGED_FILES=()
+        while IFS= read -r -d "" file; do
+          CHANGED_FILES+=("${file}")
+        done < <(git diff --name-only --diff-filter=ACMR -z "origin/${TARGET_REF}"...HEAD)
+        if [ "${#CHANGED_FILES[@]}" -eq 0 ]; then
+          echo "No changed files to lint."
+          exit 0
+        fi
+        FILTERED_FILES=()
+        for file in "${CHANGED_FILES[@]}"; do
+          [ -f "${file}" ] || continue
+          FILTERED_FILES+=("${file}")
+        done
+        if [ "${#FILTERED_FILES[@]}" -eq 0 ]; then
+          echo "No existing changed files to lint."
+          exit 0
+        fi
+        # Use local Biome from node_modules to avoid CLI/schema drift.
+        npx --no-install biome check "${FILTERED_FILES[@]}"
+      '
+
+# ── TypeScript type check ──
+typecheck:
+  stage: test
+  image: node:${NODE_VERSION}
+  needs: [install]
+  script:
+    - npx tsc --noEmit
+
+# ── Production build ──
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  needs: [install]
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 hour
+
+# ── Security scan tuning ──
+# Force security analyzers to run on every pipeline.
+semgrep-sast:
+  stage: security
+  rules:
+    - when: on_success
+
+secret_detection:
+  stage: security
+  rules:
+    - when: on_success
+
+gemnasium-dependency_scanning:
+  stage: security
+  rules:
+    - when: on_success
+
+# DAST requires a reachable URL.
+# Set DAST_TARGET_URL in GitLab CI/CD variables (for example your deployed preview/prod URL).
+dast:
+  stage: security
+  allow_failure: true
+  rules:
+    - if: '$DAST_TARGET_URL'
+      when: on_success
+    - when: never

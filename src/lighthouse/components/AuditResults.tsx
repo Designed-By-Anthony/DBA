@@ -1,8 +1,8 @@
-import React from "react";
 import type { IndexCheckResult } from "@lh/lib/indexCheck";
 import type { MozMetrics } from "@lh/lib/mozAnalysis";
 import type { Competitor, PlacesResult } from "@lh/lib/places";
 import type { SitewideScanResult } from "@lh/lib/sitewideScan";
+import React from "react";
 import { ScoreRing } from "./ScoreRing";
 
 export interface AuditAiInsight {
@@ -116,9 +116,9 @@ export function AuditResults({
 				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
 					<h3 className="text-xl font-display mb-4">Priority actions</h3>
 					<ol className="space-y-3 list-decimal list-inside text-[rgba(255,255,255,0.88)]">
-						{actions.map((item, i) => (
+						{actions.map((item) => (
 							<li
-								key={`${item.priority}-${i}`}
+								key={`${item.priority}-${item.action}-${item.impact}-${item.effort}`}
 								className="leading-relaxed pl-1"
 							>
 								<span className="font-medium">{item.action}</span>
@@ -233,9 +233,9 @@ export function AuditResults({
 				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
 					<h3 className="text-xl font-display mb-4">Competitive snapshot</h3>
 					<ul className="space-y-2 text-sm text-[rgba(255,255,255,0.85)]">
-						{data.competitors.slice(0, 4).map((c, i) => (
+						{data.competitors.slice(0, 4).map((c) => (
 							<li
-								key={i}
+								key={`${c.name}-${c.reviewCount}-${c.rating ?? "na"}`}
 								className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2 border-b border-white/5 pb-2 last:border-0"
 							>
 								<span className="font-medium">{c.name}</span>

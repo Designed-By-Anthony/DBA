@@ -60,13 +60,19 @@ export function FooterCta({
 									<a
 										href={secondaryHref}
 										className="btn btn-primary-book"
-										target={secondaryIsExternal && !secondaryIsCalendly ? "_blank" : undefined}
+										target={
+											secondaryIsExternal && !secondaryIsCalendly
+												? "_blank"
+												: undefined
+										}
 										rel={
 											secondaryIsExternal && !secondaryIsCalendly
 												? "noopener noreferrer"
 												: undefined
 										}
-										{...(secondaryIsCalendly ? { "data-calendar-link": true } : {})}
+										{...(secondaryIsCalendly
+											? { "data-calendar-link": true }
+											: {})}
 									>
 										{secondaryLabel}
 										{secondaryIsExternal && !secondaryIsCalendly && (

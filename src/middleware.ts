@@ -21,7 +21,10 @@ function buildUpstream(
 	return new URL(`${path}${search}`, base);
 }
 
-function redirectToVertaflow(request: NextRequest, targetHost: string): NextResponse {
+function redirectToVertaflow(
+	request: NextRequest,
+	targetHost: string,
+): NextResponse {
 	const target = request.nextUrl.clone();
 	target.hostname = targetHost;
 	target.protocol = "https:";
@@ -61,11 +64,7 @@ export function middleware(request: NextRequest) {
 	if (host === LIGHTHOUSE_HOST) {
 		const upstream = process.env.LIGHTHOUSE_UPSTREAM_URL?.trim();
 		if (upstream) {
-			const dest = buildUpstream(
-				upstream,
-				pathname,
-				request.nextUrl.search,
-			);
+			const dest = buildUpstream(upstream, pathname, request.nextUrl.search);
 			return NextResponse.rewrite(dest);
 		}
 		if (isBypassPath(pathname)) {
@@ -78,6 +77,14 @@ export function middleware(request: NextRequest) {
 
 	if (pathname === "/lighthouse" || pathname.startsWith("/lighthouse/")) {
 		return new NextResponse(null, { status: 404 });
+	}
+
+	/* `/404` cannot be a stable `(site)/[...path]` segment — Next treats `404` specially.
+	   Rewrite to a real route so the branded not-found page always renders. */
+	if (pathname === "/404" || pathname === "/404/") {
+		const url = request.nextUrl.clone();
+		url.pathname = "/page-not-found";
+		return NextResponse.rewrite(url);
 	}
 
 	return NextResponse.next();

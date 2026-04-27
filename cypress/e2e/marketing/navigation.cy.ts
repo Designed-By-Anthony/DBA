@@ -2,7 +2,7 @@ const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:4321";
 
 const CRITICAL_PAGES = [
 	"/", "/contact", "/about", "/portfolio", "/services",
-	"/faq", "/blog", "/ouredge", "/free-seo-audit", "/service-areas",
+	"/faq", "/blog", "/ouredge", "/service-areas",
 	"/services/custom-web-design", "/services/local-seo",
 	"/services/managed-hosting", "/services/website-rescue",
 	"/services/ai-automation", "/services/workspace-setup",

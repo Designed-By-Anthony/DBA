@@ -4,137 +4,28 @@ import { notFound } from "next/navigation";
 import { getArticleBlocksForSlug } from "@/data/blogArticleBlocks";
 import { blogPosts } from "@/data/blogPosts";
 import { homeFooterCta } from "@/data/home";
+import {
+	getBlogLongformSections,
+	getServiceLongformSections,
+} from "@/data/longformContent";
+import { isServiceAreaSlug } from "@/data/serviceAreaLocations";
 import { SERVICE_PAGE_EXTRA_SECTIONS } from "@/data/servicePageSections";
 import { showcaseItems } from "@/data/showcase";
-import {
-	FACEBOOK_OFFER_CALENDLY_WITH_UTM,
-	FACEBOOK_PRIVATE_OFFER_COPY,
-	PRIVATE_FACEBOOK_LABEL,
-} from "@/lib/offers";
+import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
+import { FACEBOOK_OFFER_CALENDLY_WITH_UTM } from "@/lib/offers";
 import { MARKETING_SERVICES } from "@/lib/seo";
 import { ArticleBody } from "./ArticleBody";
 import { AuditForm } from "./AuditForm";
 import { BlogArticleEnhancements } from "./BlogArticleEnhancements";
+import {
+	AboutPage,
+	FaqPage,
+	OurEdgePage,
+	PricingPage,
+	ServiceAreaLocationPage,
+	ServiceAreasPage,
+} from "./EnrichedPages";
 import { MarketingChrome } from "./MarketingChrome";
-
-const STATIC_COPY: Record<
-	string,
-	{ title: string; description: string; paragraphs: string[] }
-> = {
-	about: {
-		title: "About Designed by Anthony",
-		description:
-			"Marine Corps veteran–led Mohawk Valley web design studio for service businesses across Central New York.",
-		paragraphs: [
-			"Anthony Jones builds custom websites, local SEO programs, managed hosting, and website rescues for contractors, home-service pros, medspas, salons, and other small businesses across Utica, Rome, Syracuse, and greater CNY.",
-			"You work directly with the person writing the code — no bait-and-switch account team, no offshore ticket queue.",
-		],
-	},
-	contact: {
-		title: "Contact",
-		description: "Reach Designed by Anthony — secure form, no spam.",
-		paragraphs: [
-			"Tell us what you are trying to fix (slow site, Map Pack visibility, rescue rebuild, or net-new build). We reply within one business day with a clear next step.",
-		],
-	},
-	pricing: {
-		title: "Pricing",
-		description:
-			"Transparent ranges for Mohawk Valley and Central NY website rebuilds.",
-		paragraphs: [
-			"Most local service-business rebuilds fall in a predictable band once scope is clear. Book a short intro call for a written estimate tailored to your pages, integrations, and SEO depth.",
-		],
-	},
-	portfolio: {
-		title: "Portfolio",
-		description: "Selected builds and concept work from Designed by Anthony.",
-		paragraphs: [
-			"Below is a mix of live client work and published concept builds that show the layout, performance, and conversion patterns we ship.",
-		],
-	},
-	faq: {
-		title: "FAQ",
-		description: "Quick answers before you spend a dollar.",
-		paragraphs: [
-			"For the full FAQ list, start on the homepage — or send a note through the contact form and we will point you to the right section.",
-		],
-	},
-	ouredge: {
-		title: "Our Edge",
-		description:
-			"Why our sites feel different — performance, structure, and long-term maintainability.",
-		paragraphs: [
-			"We build lean, fast marketing sites with modern tooling so you are not fighting plugins, template drift, or mystery bloat six months after launch.",
-		],
-	},
-	"service-areas": {
-		title: "Service Areas",
-		description: "Mohawk Valley, Central NY, and select national markets.",
-		paragraphs: [
-			"Primary work is anchored in Rome, NY, with regular coverage across Utica, Syracuse, and the broader Mohawk Valley. We also support select remote clients (for example Houston and Naples) on a case-by-case basis.",
-		],
-	},
-	"free-seo-audit": {
-		title: "Free 60-Second Website Audit",
-		description:
-			"Lighthouse-style scores and a clear snapshot of where your site stands.",
-		paragraphs: [
-			"Drop your URL below. The check runs in the browser and Anthony follows up within 24 hours with the clearest next step — same workflow as the homepage audit module.",
-		],
-	},
-	privacy: {
-		title: "Privacy Policy",
-		description:
-			"How Designed by Anthony handles information submitted through this site.",
-		paragraphs: [
-			"This policy describes what we collect through contact and audit forms, how long we retain it, and how to request deletion. A full legal review copy can be expanded here; for now, treat submissions as operational email + CRM records used only to respond and deliver services.",
-		],
-	},
-	terms: {
-		title: "Terms of Service",
-		description:
-			"Terms governing use of this website and engagement with Designed by Anthony.",
-		paragraphs: [
-			"Use of this site does not create a client relationship until a written agreement is signed. Project scope, payment milestones, and deliverables are defined per engagement.",
-		],
-	},
-	cookie: {
-		title: "Cookie Policy",
-		description: "Cookies, analytics, and consent on designedbyanthony.com.",
-		paragraphs: [
-			"We use first-party and vendor cookies only where needed for security (for example Turnstile), measurement (for example GA4 after consent), and chat when enabled. Use the cookie banner to accept or reject non-essential analytics.",
-		],
-	},
-	"image-license": {
-		title: "Image License",
-		description:
-			"Attribution and licensing for imagery used on this marketing site.",
-		paragraphs: [
-			"Self-hosted marketing imagery includes Unsplash-sourced assets used under the Unsplash License unless otherwise noted. Client project screenshots are used with permission.",
-		],
-	},
-	"thank-you": {
-		title: "Thank you",
-		description: "Your submission was received.",
-		paragraphs: [
-			"Anthony reviews every inbound note personally. If you asked for an audit or a consult, you will hear back within one business day with a clear next step.",
-		],
-	},
-	"facebook-offer": {
-		title: PRIVATE_FACEBOOK_LABEL,
-		description: FACEBOOK_PRIVATE_OFFER_COPY,
-		paragraphs: [
-			"This page is for invited Facebook traffic only. If you landed here from an ad or direct message, you are in the right place — book a short strategy call using the link below and mention the private offer so we can confirm eligibility.",
-		],
-	},
-	"404": {
-		title: "Page not found",
-		description: "That URL is not on this site (or it moved).",
-		paragraphs: [
-			"Try the homepage, the services index, or contact Anthony if you followed an old bookmark.",
-		],
-	},
-};
 
 function PageHero({ title, subtitle }: { title: string; subtitle?: string }) {
 	return (
@@ -164,6 +55,7 @@ function ProseBlock({ paragraphs }: { paragraphs: string[] }) {
 }
 
 function ServicesIndex() {
+	const longform = getServiceLongformSections("Services");
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero
@@ -188,6 +80,22 @@ function ServicesIndex() {
 					</ul>
 				</div>
 			</section>
+			{longform.map((section) => (
+				<section
+					key={section.heading}
+					className="section-shell section-shell--longform"
+				>
+					<div className="section-container marketing-prose marketing-prose--longform">
+						<div className="section-divider-glow" aria-hidden="true" />
+						<h2 className="reveal-up">{section.heading}</h2>
+						{section.paragraphs.map((p) => (
+							<p key={p} className="reveal-up">
+								{p}
+							</p>
+						))}
+					</div>
+				</section>
+			))}
 		</MarketingChrome>
 	);
 }
@@ -198,6 +106,7 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 	);
 	if (!service) notFound();
 	const extra = SERVICE_PAGE_EXTRA_SECTIONS[slug];
+	const longform = getServiceLongformSections(service.name);
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero title={service.name} subtitle={service.description} />
@@ -229,6 +138,22 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					</div>
 				</section>
 			))}
+			{longform.map((section) => (
+				<section
+					key={section.heading}
+					className="section-shell section-shell--longform"
+				>
+					<div className="section-container marketing-prose marketing-prose--longform">
+						<div className="section-divider-glow" aria-hidden="true" />
+						<h2 className="reveal-up">{section.heading}</h2>
+						{section.paragraphs.map((p) => (
+							<p key={p} className="reveal-up">
+								{p}
+							</p>
+						))}
+					</div>
+				</section>
+			))}
 			<section className="section-shell section-shell--wash">
 				<div className="section-container marketing-cta-row reveal-up">
 					<Link href="/contact" className="btn btn-primary-book">
@@ -255,7 +180,7 @@ function BlogIndex() {
 			/>
 			<section className="section-shell">
 				<div className="section-container blog-index-grid">
-					{blogPosts.map((post) => (
+					{blogPosts.map((post, index) => (
 						<article
 							key={post.url}
 							className="surface-card blog-index-card reveal-up"
@@ -272,6 +197,8 @@ function BlogIndex() {
 									height={post.imageHeight}
 									className="blog-index-card__img"
 									sizes="(max-width: 900px) 100vw, 480px"
+									priority={index === 0}
+									loading={index === 0 ? "eager" : "lazy"}
 								/>
 							</Link>
 							<div className="blog-index-card__body">
@@ -304,6 +231,7 @@ function BlogPostPage({ slug }: { slug: string }) {
 	const post = blogPosts.find((p) => p.url === `/blog/${slug}`);
 	if (!post) notFound();
 	const articleBlocks = getArticleBlocksForSlug(slug);
+	const longform = getBlogLongformSections(post.title);
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<BlogArticleEnhancements />
@@ -326,6 +254,8 @@ function BlogPostPage({ slug }: { slug: string }) {
 								width={post.imageWidth}
 								height={post.imageHeight}
 								priority
+								fetchPriority="high"
+								decoding="async"
 								sizes="(max-width: 1100px) 100vw, 960px"
 							/>
 						</div>
@@ -347,6 +277,18 @@ function BlogPostPage({ slug }: { slug: string }) {
 								</p>
 							</>
 						)}
+						{longform.map((section) => (
+							<section
+								key={section.heading}
+								className="reveal-up blog-longform-section marketing-prose--longform"
+							>
+								<div className="section-divider-glow" aria-hidden="true" />
+								<h2>{section.heading}</h2>
+								{section.paragraphs.map((p) => (
+									<p key={p}>{p}</p>
+								))}
+							</section>
+						))}
 						<p className="reveal-up">
 							<Link href="/blog" className="inline-link" data-blog-back-button>
 								← Back to all posts
@@ -362,7 +304,7 @@ function BlogPostPage({ slug }: { slug: string }) {
 function PortfolioIndex() {
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero {...STATIC_COPY.portfolio} />
+			<PageHero {...staticMarketingPageCopy.portfolio} />
 			<section className="section-shell">
 				<div className="section-container featured-work-grid">
 					{showcaseItems.map((item) => {
@@ -466,11 +408,10 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 	);
 }
 
-function StaticMarketingPage({ slug }: { slug: string }) {
-	const copy = STATIC_COPY[slug];
+export function StaticMarketingPage({ slug }: { slug: string }) {
+	const copy = staticMarketingPageCopy[slug];
 	if (!copy) notFound();
 	const showContactForm = slug === "contact";
-	const showAuditForm = slug === "free-seo-audit";
 	const showFacebookCta = slug === "facebook-offer";
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
@@ -492,41 +433,33 @@ function StaticMarketingPage({ slug }: { slug: string }) {
 				</section>
 			) : null}
 			{showContactForm ? (
-				<section className="section-shell section-shell--wash">
-					<div className="section-container home-quick-lead__card surface-card reveal-up">
-						<h2 className="home-quick-lead__title">Send a message</h2>
-						<AuditForm
-							ctaSource="contact_page"
-							pageContext="contact"
-							sourcePath="/contact"
-							offerType="contact_page"
-							subjectLine="Contact form — Designed by Anthony"
-							pageTitle="Contact — Designed by Anthony"
-							successRedirect="/thank-you?offer=contact"
-							submitLabel="Send message"
-							metaMessage="Turnstile-protected. No spam."
-							websiteRequired={false}
-							issueRequired
-							issueLabel="How can we help?"
-							issuePlaceholder="Project type, timeline, and best way to reach you."
-							issueRows={5}
-							showPhoneField
-						/>
-					</div>
-				</section>
-			) : null}
-			{showAuditForm ? (
-				<section className="section-shell section-shell--wash">
-					<div className="section-container surface-card home-quick-lead__card reveal-up">
-						<AuditForm
-							ctaSource="free_audit_page"
-							pageContext="free_seo_audit"
-							sourcePath="/free-seo-audit"
-							offerType="free_website_audit"
-							pageTitle="Free Website Audit — Designed by Anthony"
-							subjectLine="Free Website Audit Request — Designed by Anthony"
-							successRedirect="/thank-you?offer=audit"
-						/>
+				<section className="section-shell section-shell--wash contact-form-section">
+					<div className="section-container">
+						<div className="contact-form-shell surface-card reveal-up">
+							<p className="contact-form-shell__eyebrow">Contact</p>
+							<h2 className="contact-form-shell__title">Send a message</h2>
+							<p className="contact-form-shell__lede">
+								Tell us what you are trying to fix — we reply within one
+								business day. Same secure path as the homepage quick form.
+							</p>
+							<AuditForm
+								ctaSource="contact_page"
+								pageContext="contact"
+								sourcePath="/contact"
+								offerType="contact_page"
+								subjectLine="Contact form — Designed by Anthony"
+								pageTitle="Contact — Designed by Anthony"
+								successRedirect="/thank-you?offer=contact"
+								submitLabel="Send message"
+								metaMessage="Turnstile-protected. No spam."
+								websiteRequired={false}
+								issueRequired
+								issueLabel="How can we help?"
+								issuePlaceholder="Project type, timeline, and best way to reach you."
+								issueRows={5}
+								showPhoneField
+							/>
+						</div>
 					</div>
 				</section>
 			) : null}
@@ -535,7 +468,7 @@ function StaticMarketingPage({ slug }: { slug: string }) {
 }
 
 function ThankYouPage() {
-	const base = STATIC_COPY["thank-you"];
+	const base = staticMarketingPageCopy["thank-you"];
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero title={base.title} subtitle={base.description} />
@@ -583,7 +516,17 @@ export function MarketingSiteRouter({ path }: { path: string[] }) {
 	if (a === "thank-you" && path.length === 1) {
 		return <ThankYouPage />;
 	}
-	if (path.length === 1 && STATIC_COPY[a]) {
+	/* Enriched pages — replaced sparse static copy with full sections */
+	if (a === "about" && path.length === 1) return <AboutPage />;
+	if (a === "pricing" && path.length === 1) return <PricingPage />;
+	if (a === "ouredge" && path.length === 1) return <OurEdgePage />;
+	if (a === "faq" && path.length === 1) return <FaqPage />;
+	if (a === "service-areas" && path.length === 1) return <ServiceAreasPage />;
+	if (a === "service-areas" && b && path.length === 2) {
+		if (!isServiceAreaSlug(b)) notFound();
+		return <ServiceAreaLocationPage slug={b} />;
+	}
+	if (path.length === 1 && staticMarketingPageCopy[a]) {
 		return <StaticMarketingPage slug={a} />;
 	}
 

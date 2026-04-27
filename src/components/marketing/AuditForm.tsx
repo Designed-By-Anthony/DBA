@@ -1,32 +1,18 @@
-import { getTurnstileSiteKey } from "@/lib/turnstile";
+"use client";
 
-const LEAD_SOURCE_LABELS: Record<string, string> = {
-	home_page_contact: "Home page contact",
-	contact_page: "Contact page",
-	facebook_growth_offer: "Facebook growth offer",
-	free_website_audit: "Free website audit",
-	general_inquiry: "Contact page",
-	quick_contact_home: "Home page contact",
-};
+import { useEffect, useId, useRef, useState } from "react";
+import { businessProfile } from "@/lib/seo";
 
-function leadSourceLabelForOfferType(ot: string): string {
-	return (
-		LEAD_SOURCE_LABELS[ot] ??
-		ot.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-	);
-}
+const FRESHWORKS_FORM_SCRIPT =
+	"https://designedbyanthony.myfreshworks.com/crm/sales/web_forms/ff38685269fceeb3790739cecf2e781d6393cac8caa7a893bb8d46c76fb8137f/form.js";
 
-const defaultFormEndpoint =
-	process.env.NEXT_PUBLIC_INGEST_URL ||
-	process.env.NEXT_PUBLIC_CRM_LEAD_URL ||
-	"/api/lead-email";
-
-const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || "";
+const SCRIPT_ATTR = "data-dba-freshworks-form";
+const LOAD_TIMEOUT_MS = 18000;
 
 export interface AuditFormProps {
-	ctaSource: string;
-	pageContext: string;
-	sourcePath: string;
+	ctaSource?: string;
+	pageContext?: string;
+	sourcePath?: string;
 	pageTitle?: string;
 	formEndpoint?: string;
 	offerType?: string;
@@ -51,188 +37,105 @@ export interface AuditFormProps {
 	issueRows?: number;
 }
 
-export function AuditForm({
-	ctaSource,
-	pageContext,
-	sourcePath,
-	pageTitle = "Designed by Anthony",
-	formEndpoint = defaultFormEndpoint,
-	offerType = "free_website_audit",
-	subjectLine = `Free Website Audit Request - ${pageTitle}`,
-	successLinkHref = "/portfolio",
-	successLinkLabel = "See Example Builds",
-	successMode = "inline",
-	successRedirect = "/thank-you?offer=audit",
-	successTag = "Audit Requested",
-	successTitle = "Audit request received",
-	successMessage =
-		"Anthony will review your submission and reach out within 24 hours with the clearest next step.",
-	successPoints = [
-		"I run the BuiltWith stack scan and Lighthouse test.",
-		"I compile the clearest issues and likely gains into one report.",
-		"You will hear from Anthony within 24 hours with a practical next step.",
-	],
-	submitLabel = "Send My Audit Request",
-	metaMessage =
-		"No spam. Just a BuiltWith scan, a Lighthouse test, and a direct follow-up within 24 hours.",
-	websiteLabel = "Website URL",
-	websitePlaceholder = "yourwebsite.com",
-	websiteRequired = true,
-	issueLabel = "What feels off right now?",
-	issuePlaceholder =
-		"Low-quality leads, not enough calls, weak local rankings, dated design, slow mobile experience...",
-	issueRequired = true,
-	showPhoneField = true,
-	issueRows = 5,
-}: AuditFormProps) {
-	const turnstileSiteKey = getTurnstileSiteKey();
-	const leadSourceLabel = leadSourceLabelForOfferType(offerType);
+export function AuditForm(_props: AuditFormProps) {
+	const statusId = useId();
+	const mountRef = useRef<HTMLDivElement>(null);
+	const [embedState, setEmbedState] = useState<"loading" | "ready" | "error">(
+		"loading",
+	);
+
+	useEffect(() => {
+		const mount = mountRef.current;
+		if (!mount) return;
+
+		const existing = document.querySelector<HTMLScriptElement>(
+			`script[${SCRIPT_ATTR}]`,
+		);
+		if (existing) {
+			existing.remove();
+		}
+
+		const script = document.createElement("script");
+		script.src = FRESHWORKS_FORM_SCRIPT;
+		script.async = true;
+		script.crossOrigin = "anonymous";
+		script.setAttribute(SCRIPT_ATTR, "1");
+
+		const onLoad = () => setEmbedState("ready");
+		const onError = () => setEmbedState("error");
+		script.addEventListener("load", onLoad);
+		script.addEventListener("error", onError);
+
+		mount.appendChild(script);
+
+		const timeout = window.setTimeout(() => {
+			setEmbedState((prev) => (prev === "loading" ? "error" : prev));
+		}, LOAD_TIMEOUT_MS);
+
+		return () => {
+			window.clearTimeout(timeout);
+			script.removeEventListener("load", onLoad);
+			script.removeEventListener("error", onError);
+			script.remove();
+		};
+	}, []);
 
 	return (
-		<form
-			className="audit-form"
-			action={formEndpoint}
-			method="POST"
-			data-audit-form
-			data-success-mode={successMode}
-			data-success-redirect={successRedirect}
-			data-tenant-id={tenantId}
-		>
-			<input type="hidden" name="_subject" value={subjectLine} />
-			<input type="hidden" name="source_page" value={sourcePath} />
-			<input type="hidden" name="page_url" value="" />
-			<input type="hidden" name="referrer_url" value="" />
-			<input type="hidden" name="page_title" value={pageTitle} />
-			<input type="hidden" name="ga_client_id" value="" />
-			<input type="hidden" name="cta_source" value={ctaSource} />
-			<input type="hidden" name="offer_type" value={offerType} />
-			<input type="hidden" name="lead_source" value={leadSourceLabel} />
-			<input type="hidden" name="page_context" value={pageContext} />
-			<input
-				type="text"
-				name="_hp"
-				autoComplete="off"
-				tabIndex={-1}
-				aria-hidden="true"
-				className="audit-form-honeypot"
-			/>
-
-			<div className="audit-form-grid" data-form-shell>
-				<div className="audit-form-field">
-					<label htmlFor={`${ctaSource}-first-name`}>First name</label>
-					<input
-						id={`${ctaSource}-first-name`}
-						name="first_name"
-						type="text"
-						autoComplete="given-name"
-						required
-					/>
-					<span className="audit-field-error" data-field-error="first_name" />
-				</div>
-
-				<div className="audit-form-field">
-					<label htmlFor={`${ctaSource}-email`}>Email</label>
-					<input
-						id={`${ctaSource}-email`}
-						name="email"
-						type="email"
-						autoComplete="email"
-						required
-					/>
-					<span className="audit-field-error" data-field-error="email" />
-				</div>
-
-				<div className="audit-form-field audit-form-field-full">
-					<label htmlFor={`${ctaSource}-website`}>
-						<span>{websiteLabel}</span>
-						{!websiteRequired && (
-							<span className="audit-label-optional">Optional</span>
-						)}
-					</label>
-					<input
-						id={`${ctaSource}-website`}
-						name="website"
-						type="text"
-						inputMode="url"
-						placeholder={websitePlaceholder}
-						autoComplete="url"
-						required={websiteRequired}
-					/>
-					<span className="audit-field-error" data-field-error="website" />
-				</div>
-
-				<div className="audit-form-field audit-form-field-full">
-					<label htmlFor={`${ctaSource}-biggest-issue`}>
-						<span>{issueLabel}</span>
-						{!issueRequired && (
-							<span className="audit-label-optional">Optional</span>
-						)}
-					</label>
-					<textarea
-						id={`${ctaSource}-biggest-issue`}
-						name="biggest_issue"
-						rows={issueRows}
-						placeholder={issuePlaceholder}
-						required={issueRequired}
-					/>
-					<span className="audit-field-error" data-field-error="biggest_issue" />
-				</div>
-
-				{showPhoneField && (
-					<div className="audit-form-field audit-form-field-full">
-						<label htmlFor={`${ctaSource}-phone`}>
-							<span>Phone</span>
-							<span className="audit-label-optional">Optional</span>
-						</label>
-						<input
-							id={`${ctaSource}-phone`}
-							name="phone"
-							type="tel"
-							autoComplete="tel"
-						/>
-						<span className="audit-field-error" data-field-error="phone" />
+		<div className="dba-embed-form">
+			<p id={statusId} className="sr-only" aria-live="polite">
+				{embedState === "loading"
+					? "Loading contact form."
+					: embedState === "ready"
+						? "Contact form loaded."
+						: "Contact form could not load in this browser."}
+			</p>
+			{embedState === "loading" ? (
+				<div className="dba-embed-form__loading" aria-hidden="true">
+					<div className="dba-embed-form__loading-dots" aria-hidden="true">
+						<span className="dba-embed-form__loading-dot" />
+						<span className="dba-embed-form__loading-dot" />
+						<span className="dba-embed-form__loading-dot" />
 					</div>
-				)}
-			</div>
-
-			<div
-				className="cf-turnstile"
-				data-sitekey={turnstileSiteKey}
-				data-theme="dark"
-				data-size="invisible"
-				data-appearance="interaction-only"
-				data-callback="__dbaAuditFormTurnstileSuccess"
-				data-error-callback="__dbaAuditFormTurnstileFailure"
-			/>
-
-			<p className="audit-form-status" data-form-error hidden />
-
-			<div className="audit-form-actions" data-form-actions>
-				<button type="submit" className="btn btn-primary audit-submit" data-form-submit>
-					{submitLabel}
-				</button>
-				<p className="audit-form-meta">{metaMessage}</p>
-				<p className="audit-form-privacy">
-					Protected by Turnstile. By submitting, you agree to the{" "}
-					<a href="/privacy">Privacy Policy</a> and <a href="/cookie">Cookie Policy</a>.
-				</p>
-			</div>
-
-			<div className="audit-success-panel" data-form-success hidden>
-				<div className="card-tag">{successTag}</div>
-				<h3>{successTitle}</h3>
-				<p>{successMessage}</p>
-				<ul className="trust-list audit-success-list">
-					{successPoints.map((item) => (
-						<li key={item}>{item}</li>
-					))}
-				</ul>
-				<div className="audit-success-actions">
-					<a href={successLinkHref} className="btn btn-outline">
-						{successLinkLabel}
-					</a>
+					<span className="dba-embed-form__loading-label">
+						Loading secure form…
+					</span>
 				</div>
-			</div>
-		</form>
+			) : null}
+			{embedState === "error" ? (
+				<div className="dba-embed-form__fallback surface-card surface-card--technical">
+					<p className="dba-embed-form__fallback-title">
+						Form did not load (network, blocker, or strict privacy mode).
+					</p>
+					<p className="dba-embed-form__fallback-copy">
+						Email us directly or book a short call — same inbox either way.
+					</p>
+					<div className="marketing-cta-row">
+						<a
+							className="btn btn-primary-audit"
+							href={`mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`}
+						>
+							Email {businessProfile.email}
+						</a>
+						<a
+							href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+							className="btn btn-secondary-proof"
+							data-calendar-link
+						>
+							Book a 15-minute intro
+						</a>
+					</div>
+				</div>
+			) : null}
+			<div
+				ref={mountRef}
+				id="freshworks-contact-form"
+				className={
+					embedState === "error"
+						? "dba-embed-form__mount"
+						: "dba-embed-form__mount dba-embed-form__mount--visible"
+				}
+				aria-busy={embedState === "loading"}
+			/>
+		</div>
 	);
 }
