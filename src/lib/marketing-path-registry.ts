@@ -26,6 +26,8 @@ export const STATIC_MARKETING_SLUGS = [
 export function getMarketingSitemapPathnames(): string[] {
 	const paths = new Set<string>(["/"]);
 
+	paths.add("/lighthouse");
+
 	paths.add("/services");
 	for (const s of MARKETING_SERVICES) {
 		paths.add(s.path);

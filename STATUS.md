@@ -6,6 +6,30 @@
 
 - **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`** Turnstile wiring; dropped **`src/middleware.ts`** and the old Turnstile/Trusted-Types bootstrap from the consolidation side. **`api.js`** injection uses **`async = false`** / **`defer = false`** (explicit `ready()` path). Audit form intro now mentions **Freshworks** when CRM sync is enabled.
 
+## PageSpeed Insights reliability (`lighthouse-troubleshooting`, 2026-04-28)
+
+- **`POST /api/audit`:** PageSpeed `runPagespeed` moved to **`fetchPageSpeedRunPagespeed()`** (`src/lighthouse/lib/pageSpeedInsights.ts`) — **55s** client timeout (was 20s), **one retry** after delay on **AbortError** or **HTTP 5xx**. User-facing errors distinguish timeout vs configuration. **`lighthouse2.md`** notes slow PSI + Netlify **Functions** scope for `GOOGLE_PAGESPEED_API_KEY`.
+
+## Lighthouse results & collateral polish (`lighthouse-troubleshooting`, 2026-04-28)
+
+- **On-screen results:** `lighthouse-globals.css` — result panels get a **sky accent top bar**, deeper glass gradient, and utility classes (`lighthouse-result-heading`, `lighthouse-result-eyebrow`, `lighthouse-score-card`, `lighthouse-metric-tile`, `lighthouse-actions-toolbar`, premium buttons). **`AuditResults`** copy hierarchy, crawl list layout, CTA block, and **`ScoreRing`** label styling aligned with marketing chrome.
+- **Print:** `@media print` rules for `.audit-print-root` — light paper-style panels, accent bar, readable type (no `!important`).
+- **PDF:** `auditReportPdf.ts` — branded header strip (slate + sky rule), soft score card, structured vitals, amber partial-report callout, light page fill.
+- **Email summary:** `auditSummaryEmail.ts` — table-based branded HTML (accent bar, score table, primary/secondary CTAs) for Resend clients.
+
+## Lighthouse premium polish (`lighthouse-troubleshooting`, 2026-04-28)
+
+- **Segment SEO:** `/lighthouse` layout exports **`viewport`** (device-width, `viewport-fit: cover`, `interactiveWidget`, `maximumScale: 5`, segment **themeColor**) + richer **`metadata`** (canonical, keywords, robots, `appleWebApp`, OG/Twitter). **`LighthouseJsonLd`**: WebApplication + WebPage + BreadcrumbList + FAQPage JSON-LD. **`/lighthouse`** added to **`sitemap.ts`** path registry; **`public/robots.txt`** disallows **`/lighthouse/report`** (print views). Print route **`layout.tsx`** sets **noindex**.
+- **Motion:** `framer-motion/client` on hero feature cards, scan progress (spring progress bar, staggered phase cards), results panels + score rings; **`LighthouseValueStrip`** three value cards with scroll-in animation. **`prefers-reduced-motion`** respected.
+- **Safe areas:** `lighthouse-globals.css` padding uses **`env(safe-area-inset-*)`** on header/main.
+- **Tech fingerprints:** `LighthouseTechFingerprints` — visually hidden `data-*` hints for Wappalyzer-class crawlers (no layout impact).
+
+## Partial audits + report UX (`lighthouse-troubleshooting`, 2026-04-28)
+
+- **Degraded PSI:** `resolvePageSpeedLighthouse()` (`src/lighthouse/lib/auditPsi.ts`) — if PageSpeed fails or returns no categories, the audit **continues** with `null` lab scores, neutral rings, and **`psiDegradedReason`** on the API payload + stored report + Convex webhook note.
+- **Resend:** `src/lighthouse/lib/transactionalResend.ts` — audit receipt uses **Resend when `RESEND_API_KEY` is set** (else Gmail). Default **`RESEND_FROM_EMAIL`** fallback is **`outreach@designedbyanthony.com`** (also **`/api/lead-email`** default). **`POST /api/audit/email-summary`** emails a short summary (rate-limited).
+- **UI:** `AuditScanProgress` — step cards + progress bar + rotating facts while loading. **`AuditResults`** — PDF download (**jspdf**), print view (`/lighthouse/report/[id]/print`), **Email summary** button.
+
 ## Lighthouse audit UI + Turnstile (2026-04-28)
 
 - **`/lighthouse`:** Wider layout (`max-w-5xl`), layered background + refined glass card, premium form fields and CTA. **`AuditForm`** uses **explicit** Turnstile: `api.js?render=explicit`, host **`#lighthouse-turnstile-host`** (no `cf-turnstile` class), `execution: "execute"` + `turnstile.ready()` + `execute()` on submit; widget host **outside** `<form>` to avoid “form not connected”. **No** `default` Trusted Types policy on this segment (conflicts with parent `trusted-types … default` + Turnstile iframe). **`Permissions-Policy`:** allow `xr-spatial-tracking=*` for challenge iframe. **`lighthouse2.md` / `.env.example`:** Turnstile **hostname allowlist** for Netlify previews.

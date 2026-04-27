@@ -139,15 +139,24 @@ export async function sendViaGmail(
 	}
 }
 
+function formatScoreCell(value: number | null): string {
+	if (value == null) {
+		return '<span style="color:#6b7280;">N/A</span>';
+	}
+	return `<strong>${value}</strong>`;
+}
+
 export function buildReceiptEmail(params: {
 	firstName: string;
 	url: string;
 	reportId: string;
 	trustScore: number;
-	performance: number;
-	accessibility: number;
-	bestPractices: number;
-	seo: number;
+	performance: number | null;
+	accessibility: number | null;
+	bestPractices: number | null;
+	seo: number | null;
+	/** Shown when lab scores were skipped (e.g. PageSpeed timeout). */
+	partialReportNote?: string | null;
 }): { subject: string; html: string } {
 	const {
 		firstName,
@@ -158,6 +167,7 @@ export function buildReceiptEmail(params: {
 		accessibility,
 		bestPractices,
 		seo,
+		partialReportNote,
 	} = params;
 	const safeFirstName = escapeHtml(firstName);
 	const safeUrl = escapeHtml(url);
@@ -174,6 +184,10 @@ export function buildReceiptEmail(params: {
 		}
 	})();
 	const subject = `Your site audit for ${displayDomain}`;
+	const safePartial =
+		partialReportNote != null && partialReportNote.length > 0
+			? escapeHtml(partialReportNote)
+			: "";
 
 	const html = `
   <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111; line-height: 1.6; font-size: 15px; max-width: 560px;">
@@ -185,9 +199,15 @@ export function buildReceiptEmail(params: {
       <a href="${reportUrl}" style="display: inline-block; background-color: #111; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px; font-weight: 600;">View your report &rarr;</a>
     </p>
 
+    ${
+			safePartial
+				? `<p style="background:#fffbeb;border:1px solid #fcd34d;padding:12px 14px;border-radius:8px;font-size:14px;color:#78350f;">${safePartial}</p>`
+				: ""
+		}
+
     <p>Your overall <strong>Local Trust Score</strong> came out to <strong>${trustScore}/100</strong>.</p>
     
-    <p>Quick technical scores: <strong>${performance}</strong> / <strong>${accessibility}</strong> / <strong>${bestPractices}</strong> / <strong>${seo}</strong> (Performance / Accessibility / Best Practices / SEO). The full breakdown, my AI's analysis of your copywriting, and a print-ready version are all at the link above.</p>
+    <p>Quick technical scores: ${formatScoreCell(performance)} / ${formatScoreCell(accessibility)} / ${formatScoreCell(bestPractices)} / ${formatScoreCell(seo)} (Performance / Accessibility / Best Practices / SEO). The full breakdown, my AI's analysis of your copywriting, and a print-ready version are all at the link above.</p>
 
     <p style="color: #6b7280; font-size: 13px;">Audit run: ${new Date().toLocaleString("en-US", { timeZone: "America/New_York", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })} ET</p>
 

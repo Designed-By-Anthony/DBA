@@ -1,5 +1,6 @@
 import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
 import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
+import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
 import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
@@ -29,6 +30,10 @@ import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
 import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
 import { createProjectSheet, pushLeadRow } from "@lh/lib/sheetsSync";
 import { type SitewideScanResult, scanSitewide } from "@lh/lib/sitewideScan";
+import {
+	isResendConfigured,
+	sendTransactionalEmail,
+} from "@lh/lib/transactionalResend";
 import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import {
 	normalizeEmail,
@@ -41,7 +46,6 @@ export const runtime = "nodejs";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;
-const PSI_TIMEOUT_MS = 20_000;
 
 /** Best-effort parse of PageSpeed Insights JSON error bodies (HTTP 4xx/5xx). */
 async function readPageSpeedErrorMessage(
@@ -147,87 +151,51 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY;
-		const strategy = "mobile";
-		let psiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES&category=SEO`;
-		if (apiKey) psiUrl += `&key=${apiKey}`;
+		const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY?.trim() || undefined;
 
-		const psiPromise = fetchWithTimeout(
-			psiUrl,
-			{
-				cache: "no-store",
-				headers: {
-					Accept: "application/json",
-				},
-			},
-			PSI_TIMEOUT_MS,
-		);
-
-		// Phase 1: Run PSI, HTML scan, Places, sitewide scan, and Moz concurrently
+		// Phase 1: HTML scan, Places, sitewide, Moz (PSI resolved separately with partial fallback)
 		const [
-			psiResponseRaw,
 			htmlResponseRaw,
 			placesResponseRaw,
 			sitewideResponseRaw,
 			mozResponseRaw,
 		] = await Promise.allSettled([
-			psiPromise,
 			scanHtml(url),
 			scanPlaces(company, location),
 			scanSitewide(url),
 			scanMoz(url),
 		]);
 
-		if (psiResponseRaw.status === "rejected") {
-			throw new Error("Google PageSpeed API failed or timed out.");
-		}
-
-		const psiResponse = psiResponseRaw.value;
-		if (!psiResponse.ok) {
-			const apiDetail = await readPageSpeedErrorMessage(psiResponse);
-			console.error(
-				"PageSpeed Insights HTTP error:",
-				psiResponse.status,
-				apiDetail || "(no body message)",
-			);
-
-			if (psiResponse.status === 429) {
+		const psiResolved = await resolvePageSpeedLighthouse(
+			url,
+			apiKey,
+			readPageSpeedErrorMessage,
+		);
+		if (!psiResolved.ok) {
+			if (psiResolved.retryAfter) {
 				return NextResponse.json(
+					{ error: psiResolved.error },
 					{
-						error:
-							"Our audit service hit the PageSpeed Insights rate limit. Please try again in a few minutes.",
-					},
-					{
-						status: 503,
+						status: psiResolved.status,
 						headers: {
 							...responseHeaders,
-							"Retry-After": "120",
+							"Retry-After": psiResolved.retryAfter,
 						},
 					},
 				);
 			}
-
-			if (psiResponse.status === 403) {
-				return NextResponse.json(
-					{
-						error:
-							"PageSpeed Insights rejected this request (API access). Please contact support if this continues.",
-					},
-					{ status: 502, headers: responseHeaders },
-				);
-			}
-
-			const hint =
-				psiResponse.status >= 500
-					? "The PageSpeed service had a temporary error. Please try again shortly."
-					: "PageSpeed Insights could not analyze this URL. Check that it is public and reachable.";
-
 			return NextResponse.json(
-				{ error: hint },
-				{
-					status: psiResponse.status === 400 ? 400 : 502,
-					headers: responseHeaders,
-				},
+				{ error: psiResolved.error },
+				{ status: psiResolved.status, headers: responseHeaders },
+			);
+		}
+
+		const { lighthouse, psiDegradedReason, usedPartialFallback } =
+			psiResolved.outcome;
+		if (usedPartialFallback) {
+			console.warn(
+				"[audit] PageSpeed partial / degraded:",
+				psiDegradedReason || "(no reason)",
 			);
 		}
 
@@ -367,69 +335,23 @@ export async function POST(request: Request) {
 			console.warn("Competitor scan failed:", compErr);
 		}
 
-		type PsiCategory = { score?: number | null };
-		type LighthousePayload = {
-			categories?: {
-				performance?: PsiCategory;
-				accessibility?: PsiCategory;
-				"best-practices"?: PsiCategory;
-				seo?: PsiCategory;
-			};
-			audits?: Record<
-				string,
-				{
-					score?: number | null;
-					scoreDisplayMode?: string;
-					title?: string;
-					id?: string;
-					displayValue?: string;
-				}
-			>;
-			finalUrl?: string;
-		};
-
-		let psiData: {
-			lighthouseResult?: LighthousePayload;
-			error?: { message?: string };
-		};
-		try {
-			psiData = await psiResponse.json();
-		} catch {
-			return NextResponse.json(
-				{ error: "Invalid response from PageSpeed Insights." },
-				{ status: 502, headers: responseHeaders },
-			);
-		}
-
-		const lighthouse = psiData.lighthouseResult;
-		if (!lighthouse?.categories) {
-			const msg = psiData.error?.message;
-			console.error(
-				"PageSpeed response missing lighthouseResult:",
-				msg || psiData,
-			);
-			return NextResponse.json(
-				{
-					error:
-						msg?.includes("Quota") || msg?.includes("quota")
-							? "PageSpeed Insights quota was exceeded. Please try again later."
-							: "PageSpeed Insights did not return audit data for this URL.",
-				},
-				{ status: 503, headers: { ...responseHeaders, "Retry-After": "120" } },
-			);
-		}
-
 		const categories = lighthouse.categories;
-		const performanceScore = Math.round(
-			(categories.performance?.score || 0) * 100,
+		if (!categories) {
+			return NextResponse.json(
+				{ error: "Audit could not load performance categories." },
+				{ status: 500, headers: responseHeaders },
+			);
+		}
+		const toPct = (s: number | null | undefined): number | null => {
+			if (s == null || Number.isNaN(s)) return null;
+			return Math.round(s * 100);
+		};
+		const performanceScore = toPct(categories.performance?.score ?? null);
+		const accessibilityScore = toPct(categories.accessibility?.score ?? null);
+		const bestPracticesScore = toPct(
+			categories["best-practices"]?.score ?? null,
 		);
-		const accessibilityScore = Math.round(
-			(categories.accessibility?.score || 0) * 100,
-		);
-		const bestPracticesScore = Math.round(
-			(categories["best-practices"]?.score || 0) * 100,
-		);
-		const seoScore = Math.round((categories.seo?.score || 0) * 100);
+		const seoScore = toPct(categories.seo?.score ?? null);
 
 		const audits = lighthouse.audits || {};
 		const fcp = audits["first-contentful-paint"]?.displayValue || "N/A";
@@ -440,12 +362,12 @@ export async function POST(request: Request) {
 		let criticalIssue = "";
 
 		const hasLowScore =
-			performanceScore < 90 ||
-			accessibilityScore < 90 ||
-			bestPracticesScore < 90 ||
-			seoScore < 90;
+			(performanceScore != null && performanceScore < 90) ||
+			(accessibilityScore != null && accessibilityScore < 90) ||
+			(bestPracticesScore != null && bestPracticesScore < 90) ||
+			(seoScore != null && seoScore < 90);
 
-		if (hasLowScore) {
+		if (hasLowScore && audits && Object.keys(audits).length > 0) {
 			for (const key in audits) {
 				const audit = audits[key];
 				if (
@@ -472,10 +394,10 @@ export async function POST(request: Request) {
 				name,
 				company,
 				url,
-				performanceScore,
-				accessibilityScore,
-				bestPracticesScore,
-				seoScore,
+				performanceScore: performanceScore ?? 0,
+				accessibilityScore: accessibilityScore ?? 0,
+				bestPracticesScore: bestPracticesScore ?? 0,
+				seoScore: seoScore ?? 0,
 				fcp,
 				lcp,
 				tbt,
@@ -549,9 +471,9 @@ export async function POST(request: Request) {
 				businessReviewCount: placesData.userRatingCount,
 			})) ??
 			buildFallbackInsight({
-				performanceScore,
-				accessibilityScore,
-				seoScore,
+				performanceScore: performanceScore ?? 0,
+				accessibilityScore: accessibilityScore ?? 0,
+				seoScore: seoScore ?? 0,
 				lcp,
 				domainAuthority: mozData.domainAuthority,
 				spamScore: mozData.spamScore,
@@ -577,9 +499,10 @@ export async function POST(request: Request) {
 			const countFactor = Math.min(placesData.userRatingCount / 50.0, 1.0);
 			mapsScore = Math.round((ratingFactor * 0.7 + countFactor * 0.3) * 100);
 		}
-		const techScore = Math.round(
-			performanceScore * 0.5 + accessibilityScore * 0.25 + seoScore * 0.25,
-		);
+		const perfN = performanceScore ?? 50;
+		const accN = accessibilityScore ?? 50;
+		const seoN = seoScore ?? 50;
+		const techScore = Math.round(perfN * 0.5 + accN * 0.25 + seoN * 0.25);
 
 		// Authority: Moz DA (+ spam penalty) or capped internal estimate for trust blend
 		let authorityScore = 50;
@@ -620,6 +543,7 @@ export async function POST(request: Request) {
 		const now = Timestamp.now();
 		const payload = {
 			createdAt: now,
+			psiDegradedReason: psiDegradedReason ?? null,
 			lead: {
 				name,
 				email,
@@ -629,10 +553,10 @@ export async function POST(request: Request) {
 			},
 			scores: {
 				trustScore,
-				performance: performanceScore,
-				accessibility: accessibilityScore,
-				bestPractices: bestPracticesScore,
-				seo: seoScore,
+				performance: performanceScore ?? null,
+				accessibility: accessibilityScore ?? null,
+				bestPractices: bestPracticesScore ?? null,
+				seo: seoScore ?? null,
 				conversion: conversionScore,
 			},
 			metrics: { fcp, lcp, tbt, cls },
@@ -744,10 +668,10 @@ export async function POST(request: Request) {
 					location,
 					url,
 					trustScore,
-					performance: performanceScore,
-					accessibility: accessibilityScore,
-					bestPractices: bestPracticesScore,
-					seo: seoScore,
+					performance: performanceScore ?? 0,
+					accessibility: accessibilityScore ?? 0,
+					bestPractices: bestPracticesScore ?? 0,
+					seo: seoScore ?? 0,
 					conversion: conversionScore,
 					rating: placesData.rating,
 					lcp,
@@ -757,7 +681,7 @@ export async function POST(request: Request) {
 			];
 
 			// Automatically trigger email receipt on completion if Gmail is setup
-			if (reportPersisted && isGmailConfigured()) {
+			if (reportPersisted && (isGmailConfigured() || isResendConfigured())) {
 				try {
 					const firstName = (name || "").split(" ")[0];
 					const { subject, html: emailHtml } = buildReceiptEmail({
@@ -769,17 +693,37 @@ export async function POST(request: Request) {
 						accessibility: accessibilityScore,
 						bestPractices: bestPracticesScore,
 						seo: seoScore,
+						partialReportNote: psiDegradedReason,
 					});
-					const sendPromise = sendViaGmail(email, subject, emailHtml)
-						.then(() => {
-							if (process.env.NODE_ENV === "development") {
-								console.info(`Email receipt dispatched for ${reportId}`);
-							}
-						})
-						.catch((err) =>
-							console.error(`Failed to dispatch email for ${reportId}:`, err),
+					if (isResendConfigured()) {
+						tasks.push(
+							sendTransactionalEmail({
+								to: email,
+								subject,
+								html: emailHtml,
+							}).catch((err) =>
+								console.error(
+									`Failed to dispatch Resend receipt for ${reportId}:`,
+									err,
+								),
+							),
 						);
-					tasks.push(sendPromise);
+					} else if (isGmailConfigured()) {
+						tasks.push(
+							sendViaGmail(email, subject, emailHtml)
+								.then(() => {
+									if (process.env.NODE_ENV === "development") {
+										console.info(`Email receipt dispatched for ${reportId}`);
+									}
+								})
+								.catch((err) =>
+									console.error(
+										`Failed to dispatch email for ${reportId}:`,
+										err,
+									),
+								),
+						);
+					}
 				} catch (emailErr) {
 					console.error(
 						"Error building receipt email in audit route:",
@@ -816,7 +760,7 @@ export async function POST(request: Request) {
 								source: "audit",
 								auditReportUrl: `${reportPublicBase}/report/${reportId}`,
 								trustScore,
-								performanceScore,
+								performanceScore: performanceScore ?? 0,
 							}),
 						},
 						10_000,
@@ -837,10 +781,10 @@ export async function POST(request: Request) {
 						reportId,
 						reportPublicUrl: `${reportPublicBase}/report/${reportId}`,
 						trustScore,
-						performanceScore,
-						accessibilityScore,
-						bestPracticesScore,
-						seoScore,
+						performanceScore: performanceScore ?? 0,
+						accessibilityScore: accessibilityScore ?? 0,
+						bestPracticesScore: bestPracticesScore ?? 0,
+						seoScore: seoScore ?? 0,
 						conversionScore,
 						userAgent: request.headers.get("user-agent") || "",
 					}).then((crmRes) => {
@@ -865,10 +809,10 @@ export async function POST(request: Request) {
 				url,
 				location,
 				trustScore,
-				performance: performanceScore,
-				accessibility: accessibilityScore,
-				bestPractices: bestPracticesScore,
-				seo: seoScore,
+				performance: performanceScore ?? 0,
+				accessibility: accessibilityScore ?? 0,
+				bestPractices: bestPracticesScore ?? 0,
+				seo: seoScore ?? 0,
 				conversion: conversionScore,
 				rating: placesData.rating,
 				reviewCount: placesData.userRatingCount,
@@ -896,10 +840,11 @@ export async function POST(request: Request) {
 						reportId,
 						reportPublicBase,
 						trustScore,
-						performanceScore,
-						seoScore,
-						accessibilityScore,
-						bestPracticesScore,
+						performanceScore: performanceScore ?? 0,
+						seoScore: seoScore ?? 0,
+						accessibilityScore: accessibilityScore ?? 0,
+						bestPracticesScore: bestPracticesScore ?? 0,
+						psiNote: psiDegradedReason,
 						failedAuditCount,
 						criticalIssue,
 						executiveSummary: aiInsightResult.executiveSummary,
@@ -922,6 +867,7 @@ export async function POST(request: Request) {
 			seo: seoScore,
 			conversion: conversionScore,
 			metrics: { fcp, lcp, tbt, cls },
+			psiDegradedReason: psiDegradedReason ?? null,
 			aiInsight: payload.aiInsight,
 			diagnostics: { failedAuditCount, criticalIssue },
 			htmlSignals: payload.htmlSignals,

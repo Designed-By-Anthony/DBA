@@ -1,6 +1,8 @@
 import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
+import { LighthouseJsonLd } from "@lh/components/LighthouseJsonLd";
+import { LighthouseTechFingerprints } from "@lh/components/LighthouseTechFingerprints";
 import { LIGHTHOUSE_TURNSTILE_HOST_ID } from "@lh/constants";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,17 +24,60 @@ const outfit = Outfit({
 	subsets: ["latin"],
 });
 
+const LIGHTHOUSE_PATH = "/lighthouse";
+const LIGHTHOUSE_URL = `${BRAND_SITE_URL}${LIGHTHOUSE_PATH}`;
+
+/** Segment overrides root viewport: safe areas + keyboard-friendly mobile forms. */
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 5,
+	viewportFit: "cover",
+	interactiveWidget: "resizes-content",
+	themeColor: [
+		{ media: "(prefers-color-scheme: dark)", color: "#060a12" },
+		{ media: "(prefers-color-scheme: light)", color: "#0f172a" },
+	],
+	colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
+	metadataBase: new URL(BRAND_SITE_URL),
 	title:
 		"Lighthouse Scanner — Free SEO & Performance Audit | Designed by Anthony",
 	description:
 		"Free website audit: PageSpeed Insights (Core Web Vitals + Lighthouse scores), on-page SEO signals, robots.txt and sitemap checks, optional local context, AI prioritized fixes. For service businesses — Built by Anthony, Central NY.",
+	keywords: [
+		"free website audit",
+		"SEO audit tool",
+		"PageSpeed Insights",
+		"Core Web Vitals",
+		"Lighthouse audit",
+		"technical SEO",
+		"local business website",
+		"Designed by Anthony",
+	],
+	alternates: {
+		canonical: LIGHTHOUSE_URL,
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+			"max-video-preview": -1,
+		},
+	},
+	category: "technology",
 	openGraph: {
 		title:
 			"Lighthouse Scanner — Free SEO & Performance Audit | Designed by Anthony",
 		description:
 			"PageSpeed lab data, technical SEO signals, crawl snapshot, and plain-English next steps. No credit card.",
-		url: `${BRAND_SITE_URL}/lighthouse`,
+		url: LIGHTHOUSE_URL,
 		siteName: BRAND_NAME,
 		images: [
 			{
@@ -54,6 +99,11 @@ export const metadata: Metadata = {
 			"PageSpeed + on-page SEO + crawl checks + AI summary. See lighthouse2.md for full feature map.",
 		images: [`${BRAND_SITE_URL}/images/og-site-premium.png`],
 	},
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "black-translucent",
+		title: "Lighthouse Scanner",
+	},
 };
 
 export default function LighthouseLayout({
@@ -64,8 +114,10 @@ export default function LighthouseLayout({
 	const hostId = LIGHTHOUSE_TURNSTILE_HOST_ID;
 	return (
 		<div
-			className={`lighthouse-segment ${inter.variable} ${outfit.variable} font-sans antialiased`}
+			className={`lighthouse-segment relative ${inter.variable} ${outfit.variable} font-sans antialiased`}
 		>
+			<LighthouseJsonLd />
+			<LighthouseTechFingerprints />
 			{/* No Trusted Types bootstrap here: parent policy `trusted-types vIaB1 default` only allows Cloudflare’s policy; registering `default` breaks Turnstile’s iframe (TrustedHTML/Script errors). Chrome extension `goog#html` warnings are from Tag Assistant, not this app. */}
 			<Script id="turnstile-lazy-lighthouse" strategy="afterInteractive">
 				{`(function () {

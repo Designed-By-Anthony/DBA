@@ -30,14 +30,243 @@
 	}
 
 	.lighthouse-result-panel {
-		border-radius: 1.1rem;
+		position: relative;
+		overflow: hidden;
+		border-radius: 1.2rem;
+		border: 1px solid rgba(96, 165, 250, 0.14);
+		background: linear-gradient(
+			165deg,
+			rgba(12, 18, 32, 0.94) 0%,
+			rgba(8, 12, 22, 0.9) 50%,
+			rgba(10, 16, 28, 0.92) 100%
+		);
+		box-shadow:
+			0 24px 56px -36px rgba(0, 0, 0, 0.55),
+			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	}
+
+	.lighthouse-result-panel::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		height: 3px;
+		background: linear-gradient(
+			90deg,
+			rgba(56, 189, 248, 0.85),
+			rgba(99, 102, 241, 0.55),
+			rgba(212, 184, 120, 0.45)
+		);
+		opacity: 0.95;
+		pointer-events: none;
+	}
+
+	.lighthouse-result-heading {
+		font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+		font-size: 1.25rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: rgba(255, 255, 255, 0.96);
+		margin-bottom: 1rem;
+	}
+
+	.lighthouse-result-eyebrow {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: rgba(125, 211, 252, 0.88);
+		margin-bottom: 0.5rem;
+	}
+
+	.lighthouse-result-body {
+		font-size: 0.9375rem;
+		line-height: 1.65;
+		color: rgba(248, 250, 252, 0.82);
+	}
+
+	.lighthouse-result-muted {
+		color: rgba(148, 163, 184, 0.92);
+	}
+
+	.lighthouse-score-card {
+		border-radius: 1rem;
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		background: linear-gradient(
 			180deg,
-			rgba(10, 14, 24, 0.92) 0%,
-			rgba(8, 12, 20, 0.88) 100%
+			rgba(8, 12, 22, 0.75) 0%,
+			rgba(6, 10, 18, 0.55) 100%
 		);
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+		padding: 1rem 0.5rem 1.25rem;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.lighthouse-metric-tile {
+		border-radius: 0.75rem;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		background: rgba(6, 10, 18, 0.45);
+		padding: 0.75rem 0.5rem;
+	}
+
+	.lighthouse-actions-toolbar {
+		border-radius: 1.15rem;
+		border: 1px solid rgba(56, 189, 248, 0.2);
+		background: linear-gradient(
+			160deg,
+			rgba(12, 20, 36, 0.85) 0%,
+			rgba(8, 14, 26, 0.75) 100%
+		);
+		padding: 1rem 1.25rem;
+		box-shadow:
+			0 20px 48px -28px rgba(0, 0, 0, 0.5),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.lighthouse-btn-primary {
+		border-radius: 0.875rem;
+		border: 1px solid rgba(56, 189, 248, 0.45);
+		background: linear-gradient(
+			165deg,
+			rgba(14, 165, 233, 0.35) 0%,
+			rgba(29, 78, 216, 0.45) 100%
+		);
+		color: rgba(255, 255, 255, 0.98);
+		font-weight: 600;
+		font-size: 0.875rem;
+		padding: 0.75rem 1.25rem;
+		box-shadow: 0 12px 32px -16px rgba(56, 189, 248, 0.45);
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.lighthouse-btn-primary:hover {
+		transform: translateY(-1px);
+		border-color: rgba(125, 211, 252, 0.55);
+		box-shadow: 0 16px 40px -14px rgba(56, 189, 248, 0.4);
+	}
+
+	.lighthouse-btn-secondary {
+		border-radius: 0.875rem;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: rgba(255, 255, 255, 0.06);
+		color: rgba(248, 250, 252, 0.92);
+		font-weight: 600;
+		font-size: 0.875rem;
+		padding: 0.75rem 1.25rem;
+		transition:
+			background 0.2s ease,
+			transform 0.2s ease;
+	}
+
+	.lighthouse-btn-secondary:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 0.1);
+		transform: translateY(-1px);
+	}
+
+	.lighthouse-btn-emerald {
+		border-radius: 0.875rem;
+		border: 1px solid rgba(52, 211, 153, 0.35);
+		background: linear-gradient(
+			165deg,
+			rgba(16, 185, 129, 0.22) 0%,
+			rgba(5, 150, 105, 0.28) 100%
+		);
+		color: rgba(236, 253, 245, 0.98);
+		font-weight: 600;
+		font-size: 0.875rem;
+		padding: 0.75rem 1.25rem;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.lighthouse-btn-emerald:hover:not(:disabled) {
+		transform: translateY(-1px);
+		border-color: rgba(110, 231, 183, 0.45);
+	}
+
+	.lighthouse-results-hero {
+		position: relative;
+		padding-bottom: 2rem;
+		margin-bottom: 2rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.lighthouse-results-hero::after {
+		content: "";
+		position: absolute;
+		left: 50%;
+		bottom: -1px;
+		transform: translateX(-50%);
+		width: min(12rem, 40%);
+		height: 2px;
+		border-radius: 999px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(56, 189, 248, 0.65),
+			rgba(212, 184, 120, 0.5),
+			transparent
+		);
+	}
+
+	.lighthouse-scan-hero {
+		border-radius: 1.25rem;
+		border: 1px solid rgba(56, 189, 248, 0.22);
+		background: linear-gradient(
+			155deg,
+			rgba(12, 20, 36, 0.96) 0%,
+			rgba(8, 14, 26, 0.9) 100%
+		);
+		box-shadow:
+			0 24px 64px -36px rgba(2, 6, 23, 0.9),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.lighthouse-phase-card {
+		backdrop-filter: blur(12px);
+	}
+}
+
+@media print {
+	.lighthouse-segment::before {
+		display: none;
+	}
+	.audit-print-root {
+		color: #0f172a;
+	}
+	.audit-print-root .lighthouse-result-panel {
+		break-inside: avoid;
+		box-shadow: none;
+		border: 1px solid #e2e8f0;
+		border-radius: 0.75rem;
+		background: linear-gradient(180deg, #fafbfc 0%, #f1f5f9 100%);
+		color: #0f172a;
+	}
+	.audit-print-root .lighthouse-result-panel::before {
+		height: 2px;
+		background: linear-gradient(90deg, #0ea5e9, #6366f1, #d4b878);
+	}
+	.audit-print-root .lighthouse-result-heading {
+		color: #0f172a;
+	}
+	.audit-print-root .lighthouse-result-eyebrow {
+		color: #0369a1;
+	}
+	.audit-print-root .lighthouse-result-body,
+	.audit-print-root .lighthouse-result-muted {
+		color: #334155;
+	}
+	.audit-print-root .lighthouse-score-card,
+	.audit-print-root .lighthouse-metric-tile {
+		border-color: #e2e8f0;
+		background: #fff;
+	}
+	.audit-print-root a {
+		color: #0369a1;
 	}
 }
 
@@ -101,4 +330,17 @@
 	display: flex;
 	flex-direction: column;
 	gap: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* Safe-area insets for notched phones (iOS / modern Android) */
+.lighthouse-segment {
+	padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
+}
+.lighthouse-header {
+	padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+	padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+}
+.lighthouse-main {
+	padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+	padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
 }

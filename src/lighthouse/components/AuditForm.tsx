@@ -1,16 +1,18 @@
 "use client";
 
+import type { AuditData } from "@lh/auditReport";
 import { LIGHTHOUSE_TURNSTILE_HOST_ID } from "@lh/constants";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { type AuditData, AuditResults } from "./AuditResults";
+import { AuditResults } from "./AuditResults";
+import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
 const LOADING_MESSAGES = [
-	"Running Google PageSpeed scan…",
-	"Analyzing Core Web Vitals…",
-	"Checking render-blocking resources…",
-	"Testing mobile accessibility…",
-	"Compiling your diagnostic…",
+	"Calling Google PageSpeed Insights for mobile lab scores…",
+	"Reading your homepage HTML for titles, headings, and schema…",
+	"Checking robots.txt, sitemap, and redirect behavior…",
+	"Pulling optional local/maps context when configured…",
+	"Running the AI pass for your executive summary and top fixes…",
 ];
 
 type TurnstileApi = {
@@ -43,6 +45,7 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 	const [reportId, setReportId] = useState<string | null>(null);
 
 	const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+	const [scanPhase, setScanPhase] = useState<ScanPhase>("pagespeed");
 	const widgetIdRef = useRef<string | null>(null);
 	const pendingResolveRef = useRef<((token: string | null) => void) | null>(
 		null,
@@ -119,13 +122,25 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 
 	useEffect(() => {
 		let interval: ReturnType<typeof setInterval> | undefined;
+		let phaseTimer: ReturnType<typeof setInterval> | undefined;
 		if (status === "loading") {
+			setScanPhase("pagespeed");
+			const start = Date.now();
 			interval = setInterval(() => {
 				setLoadingTextIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
-			}, 3500);
+			}, 3800);
+			phaseTimer = setInterval(() => {
+				const elapsed = Date.now() - start;
+				if (elapsed < 12_000) setScanPhase("pagespeed");
+				else if (elapsed < 28_000) setScanPhase("onpage");
+				else if (elapsed < 48_000) setScanPhase("crawl");
+				else if (elapsed < 72_000) setScanPhase("local");
+				else setScanPhase("ai");
+			}, 600);
 		}
 		return () => {
 			if (interval) clearInterval(interval);
+			if (phaseTimer) clearInterval(phaseTimer);
 		};
 	}, [status]);
 
@@ -216,6 +231,7 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 				error?: string;
 				results?: AuditData | null;
 				reportId?: string;
+				psiDegradedReason?: string | null;
 			} | null = null;
 			try {
 				data = await res.json();
@@ -256,6 +272,8 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 			<AuditResults
 				data={results}
 				reportId={reportId}
+				contactEmail={email}
+				contactName={name}
 				onReset={() => {
 					setStatus("idle");
 					setResults(null);
@@ -270,20 +288,14 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 
 	return (
 		<div className="relative isolate w-full">
-			{status === "loading" && (
-				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-[1.25rem] bg-[rgba(6,10,18,0.94)] p-8 text-center backdrop-blur-md">
-					<div
-						className="mb-6 h-14 w-14 animate-spin rounded-full border-2 border-sky-500/20 border-t-sky-400"
-						aria-hidden
+			{status === "loading" ? (
+				<div className="absolute inset-0 z-10 overflow-y-auto rounded-[1.25rem] bg-[rgba(6,10,18,0.97)] p-4 backdrop-blur-md md:p-6">
+					<AuditScanProgress
+						activePhase={scanPhase}
+						message={LOADING_MESSAGES[loadingTextIndex]}
 					/>
-					<p className="mb-2 font-display text-lg font-semibold tracking-tight text-white md:text-xl">
-						{LOADING_MESSAGES[loadingTextIndex]}
-					</p>
-					<p className="max-w-sm text-sm leading-relaxed text-white/55">
-						Deep scan — usually under a minute. You can leave this tab open.
-					</p>
 				</div>
-			)}
+			) : null}
 
 			<form onSubmit={handleSubmit} className="space-y-6">
 				<div className="border-b border-white/[0.08] pb-6">
