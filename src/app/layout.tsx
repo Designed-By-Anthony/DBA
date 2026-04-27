@@ -57,24 +57,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				{children}
 				<Script
 					id="crisp-widget"
-					strategy="afterInteractive"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: vendor bootstrap snippet (static)
-					dangerouslySetInnerHTML={{
-						__html: `(function () {
-  if (window.__dbaCrispLoaded) return;
-  window.__dbaCrispLoaded = true;
-  window.$crisp = window.$crisp || [];
-  window.CRISP_RUNTIME_CONFIG = Object.assign({}, window.CRISP_RUNTIME_CONFIG, {
-    locale: "en",
-  });
-  window.CRISP_WEBSITE_ID = "427bf1d5-f2a9-408b-8cc6-0efc6489c676";
-  var d = document;
-  var s = d.createElement("script");
-  s.src = "https://client.crisp.chat/l.js";
-  s.async = 1;
-  d.getElementsByTagName("head")[0].appendChild(s);
-})();`,
-					}}
+					strategy="lazyOnload"
+					src="/scripts/crisp-loader.js"
 				/>
 			</body>
 		</html>

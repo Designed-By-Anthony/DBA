@@ -6,13 +6,28 @@
 	"engines": {
 		"node": ">=22.12.0"
 	},
+	"browserslist": {
+		"production": [
+			"last 2 Chrome major versions",
+			"last 2 Firefox major versions",
+			"last 2 Edge major versions",
+			"last 2 Safari major versions",
+			"not dead",
+			"not ie <= 11",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 Chrome major version",
+			"last 1 Firefox major version",
+			"last 1 Safari major version"
+		]
+	},
 	"overrides": {
 		"yaml@<2.8.3": "^2.8.3",
 		"postcss": "^8.4.38",
-		"uuid": "^11.1.0"
+		"uuid": "^14.0.0"
 	},
 	"scripts": {
-		"generate:gbp-playbook-cover": "node build/generate-gbp-playbook-cover.mjs",
 		"generate:gbp-playbook-hero": "node build/generate-gbp-playbook-hero.mjs",
 		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
 		"sync:static-headers": "node build/sync-static-headers.mjs",

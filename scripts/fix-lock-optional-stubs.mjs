@@ -35,6 +35,7 @@ async function fetchDist(name, version) {
 	if (url.hostname !== "registry.npmjs.org") {
 		throw new Error("Unexpected registry host.");
 	}
+	// nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`${name}@${version}: HTTP ${res.status}`);
 	const j = await res.json();

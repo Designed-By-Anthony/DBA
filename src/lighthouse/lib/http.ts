@@ -171,6 +171,7 @@ export async function fetchWithTimeout(
 	const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
 	try {
+		// nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
 		return await fetch(input, {
 			...init,
 			signal: controller.signal,

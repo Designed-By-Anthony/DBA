@@ -8,19 +8,16 @@
 	"files": {
 		"ignoreUnknown": true,
 		"includes": [
-			"src/**",
-			"build/**",
-			".gitlab-ci.yml",
-			"biome.json",
-			"cypress.config.ts",
-			"next-env.d.ts",
-			"next.config.ts",
-			"playwright.config.ts",
-			"postcss.config.mjs",
-			"sentry.client.config.ts",
-			"sentry.edge.config.ts",
-			"sentry.server.config.ts",
-			"tsconfig.json"
+			"**",
+			"!**/node_modules",
+			"!**/.next",
+			"!**/dist",
+			"!**/coverage",
+			"!**/playwright-report",
+			"!**/test-results",
+			"!**/cypress/screenshots",
+			"!**/cypress/videos",
+			"!**/public/scripts"
 		]
 	},
 	"formatter": {
@@ -41,6 +38,11 @@
 	"css": {
 		"parser": {
 			"tailwindDirectives": true
+		}
+	},
+	"html": {
+		"parser": {
+			"interpolation": true
 		}
 	},
 	"assist": {

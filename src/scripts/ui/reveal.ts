@@ -63,6 +63,20 @@ export function initRevealAnimations(): void {
 		return;
 	}
 
+	const aboveFoldCutoff = window.innerHeight * 0.92;
+	for (const el of directionalElements) {
+		const rect = el.getBoundingClientRect();
+		if (rect.top <= aboveFoldCutoff) {
+			el.classList.add("reveal-active");
+		}
+	}
+	for (const el of revealElements) {
+		const rect = el.getBoundingClientRect();
+		if (rect.top <= aboveFoldCutoff) {
+			el.classList.add("active");
+		}
+	}
+
 	document.documentElement.classList.add("reveal-ready");
 
 	const observer = new IntersectionObserver(
@@ -93,15 +107,6 @@ export function initRevealAnimations(): void {
 			threshold: 0.06,
 		},
 	);
-
-	window.setTimeout(() => {
-		for (const el of directionalElements) {
-			revealElement(el);
-		}
-		for (const el of revealElements) {
-			revealElement(el);
-		}
-	}, 1400);
 
 	/* If IO never intersects (layout quirks, embedded previews), force-visible so
 	   content is never stuck at opacity:0 under html.reveal-ready. */

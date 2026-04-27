@@ -1,25 +1,43 @@
 const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:4321";
 
 const CRITICAL_PAGES = [
-	"/", "/contact", "/about", "/portfolio", "/services",
-	"/faq", "/blog", "/ouredge", "/service-areas",
-	"/services/custom-web-design", "/services/local-seo",
-	"/services/managed-hosting", "/services/website-rescue",
-	"/services/ai-automation", "/services/workspace-setup",
+	"/",
+	"/contact",
+	"/about",
+	"/portfolio",
+	"/services",
+	"/faq",
+	"/blog",
+	"/ouredge",
+	"/service-areas",
+	"/services/custom-web-design",
+	"/services/local-seo",
+	"/services/managed-hosting",
+	"/services/website-rescue",
+	"/services/ai-automation",
+	"/services/workspace-setup",
 ];
 
 const DEEP_ROUTES = [
-	"/blog/mobile-first-seo", "/portfolio/the-long-beach-handyman",
-	"/privacy", "/terms", "/cookie", "/image-license",
-	"/service-areas/utica", "/services/google-business-profile", "/thank-you",
+	"/blog/mobile-first-seo",
+	"/portfolio/the-long-beach-handyman",
+	"/privacy",
+	"/terms",
+	"/cookie",
+	"/image-license",
+	"/service-areas/utica",
+	"/services/google-business-profile",
+	"/thank-you",
 ];
 
 describe("Marketing — All Critical Pages Load (200)", () => {
 	for (const path of CRITICAL_PAGES) {
 		it(`${path} returns 200`, () => {
-			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then((res) => {
-				expect(res.status).to.eq(200);
-			});
+			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then(
+				(res) => {
+					expect(res.status).to.eq(200);
+				},
+			);
 		});
 	}
 });
@@ -27,9 +45,11 @@ describe("Marketing — All Critical Pages Load (200)", () => {
 describe("Marketing — Deep Routes (200)", () => {
 	for (const path of DEEP_ROUTES) {
 		it(`${path} returns 200`, () => {
-			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then((res) => {
-				expect(res.status).to.eq(200);
-			});
+			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then(
+				(res) => {
+					expect(res.status).to.eq(200);
+				},
+			);
 		});
 	}
 });

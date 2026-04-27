@@ -454,12 +454,32 @@ window.__dbaRevokeAnalyticsConsent = function () {
 })();`}
 			</Script>
 
-			{/* Native deferred script avoids next/script preload + unused preload warnings for ESM bundles. */}
-			<script
-				defer
-				type="module"
-				src={`/scripts/site.js?v=${siteScriptVersion}`}
-			/>
+			<Script id="site-script-lazy-loader" strategy="afterInteractive">
+				{`(function () {
+  var loaded = false;
+  function loadSiteScript() {
+    if (loaded) return;
+    loaded = true;
+    var script = document.createElement("script");
+    script.type = "module";
+    script.src = "/scripts/site.js?v=${siteScriptVersion}";
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+  var kickoff = function () {
+    loadSiteScript();
+    window.removeEventListener("pointerdown", kickoff);
+    window.removeEventListener("keydown", kickoff);
+  };
+  window.addEventListener("pointerdown", kickoff, { once: true, passive: true });
+  window.addEventListener("keydown", kickoff, { once: true });
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(loadSiteScript, { timeout: 1800 });
+  } else {
+    window.setTimeout(loadSiteScript, 1800);
+  }
+})();`}
+			</Script>
 
 			<Script id="turnstile-lazy" strategy="afterInteractive">
 				{`(function() {

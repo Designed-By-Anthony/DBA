@@ -59,6 +59,9 @@ if (document.readyState === "loading") {
 	});
 } else {
 	window.addEventListener("load", scheduleRunPageScripts, { once: true });
+	if (document.readyState === "complete") {
+		scheduleRunPageScripts();
+	}
 }
 
 window.addEventListener("dba:page-ready", scheduleRunPageScripts);
