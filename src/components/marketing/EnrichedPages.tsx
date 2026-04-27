@@ -26,7 +26,13 @@ import {
 	buildMarketingWebPageSchema,
 	buildPricingOfferCatalogSchema,
 } from "@/lib/seo";
+import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
 import { MarketingChrome } from "./MarketingChrome";
+import {
+	MotionReveal,
+	MotionStagger,
+	MotionStaggerChild,
+} from "./MotionReveal";
 
 function MarketingBreadcrumbs({ items }: { items: BreadcrumbItem[] }) {
 	if (items.length < 2) {
@@ -90,9 +96,21 @@ function MarketingPageJsonLd({
 	);
 }
 
-function PageHero({ title, subtitle }: { title: string; subtitle?: string }) {
+function PageHero({
+	title,
+	subtitle,
+	kind = "default",
+}: {
+	title: string;
+	subtitle?: string;
+	kind?: string;
+}) {
 	return (
-		<section className="section-shell section-shell--wash marketing-page-hero marketing-page-hero--editorial">
+		<section
+			className="section-shell section-shell--wash marketing-page-hero marketing-page-hero--editorial"
+			data-page-kind={kind}
+		>
+			<InnerPageMotionSystem kind={kind} />
 			<div className="marketing-hero-aurora" aria-hidden="true">
 				<span className="marketing-hero-aurora__glow marketing-hero-aurora__glow--a" />
 				<span className="marketing-hero-aurora__glow marketing-hero-aurora__glow--b" />
@@ -118,11 +136,16 @@ export function AboutPage() {
 				breadcrumbLabel={copy.title}
 			/>
 			<PageHero
+				kind="about"
 				title="About Designed by Anthony"
 				subtitle="Marine Corps veteran–led Mohawk Valley web design studio for service businesses across Central New York."
 			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					<p className="reveal-up">
 						Anthony builds custom websites, local SEO programs, managed hosting,
 						and website rescues for contractors, home-service pros, medspas,
@@ -133,16 +156,24 @@ export function AboutPage() {
 						You work directly with the person writing the code — no
 						bait-and-switch account team, no offshore ticket queue.
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
-					<div className="section-header centered">
+					<div className="section-divider-glow" aria-hidden="true" />
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
 						<p className="section-eyebrow">How we work</p>
 						<h2>Values that shape every project.</h2>
-					</div>
-					<div className="values-grid">
-						<article className="surface-card value-card reveal-left">
+					</MotionReveal>
+					<MotionStagger className="values-grid" staggerDelay={0.08}>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card value-card reveal-left"
+						>
 							<div className="value-card-icon" aria-hidden="true">
 								⚡
 							</div>
@@ -152,8 +183,11 @@ export function AboutPage() {
 								mobile-first, performance-tuned, and scored against Google's own
 								report card before launch.
 							</p>
-						</article>
-						<article className="surface-card value-card reveal-up">
+						</MotionStaggerChild>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card value-card reveal-up"
+						>
 							<div className="value-card-icon" aria-hidden="true">
 								🎯
 							</div>
@@ -163,8 +197,11 @@ export function AboutPage() {
 								accountable for the entire project. No handoff chain, no mystery
 								subcontractors.
 							</p>
-						</article>
-						<article className="surface-card value-card reveal-right">
+						</MotionStaggerChild>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card value-card reveal-right"
+						>
 							<div className="value-card-icon" aria-hidden="true">
 								🛡️
 							</div>
@@ -174,8 +211,11 @@ export function AboutPage() {
 								commitments, communication is direct, and nothing ships until it
 								meets the standard.
 							</p>
-						</article>
-						<article className="surface-card value-card reveal-up">
+						</MotionStaggerChild>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card value-card reveal-up"
+						>
 							<div className="value-card-icon" aria-hidden="true">
 								🔑
 							</div>
@@ -185,8 +225,8 @@ export function AboutPage() {
 								of it. No hostage fees, no takedowns. The monthly plan is for
 								SEO and hosting, not for keeping your site alive.
 							</p>
-						</article>
-					</div>
+						</MotionStaggerChild>
+					</MotionStagger>
 				</div>
 			</section>
 			<section className="section-shell">
@@ -212,8 +252,10 @@ export function AboutPage() {
 				</div>
 			</section>
 			<section className="section-shell section-shell--wash">
-				<div
+				<MotionReveal
 					className="section-container marketing-cta-row reveal-up"
+					y={20}
+					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
 					<a
@@ -226,7 +268,7 @@ export function AboutPage() {
 					<Link href="/contact" className="btn btn-secondary-proof">
 						Contact
 					</Link>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
@@ -247,24 +289,32 @@ export function PricingPage() {
 				{JSON.stringify(pricingCatalog)}
 			</script>
 			<PageHero
+				kind="pricing"
 				title="Pricing"
 				subtitle="Easy payments at launch, three months of hosting + SEO included, then optional Growth Plan."
 			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					<p className="reveal-up">
 						{PUBLIC_STANDARD_PAYMENT_PLAN} {PUBLIC_LAUNCH_BUNDLE_COPY} When the
 						build is done, you own the source code — no lock-in, no takedown if
 						you leave. Book a short intro call for a written estimate tailored
 						to your pages, integrations, and SEO depth.
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
 					<div className="section-divider-glow" aria-hidden="true" />
-					<div className="pricing-tiers">
-						<article className="surface-card pricing-tier reveal-left">
+					<MotionStagger className="pricing-tiers" staggerDelay={0.08}>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card pricing-tier reveal-left"
+						>
 							<p className="pricing-tier-name">Simple Site</p>
 							<p className="pricing-tier-price">
 								<span className="pricing-tier-from">from </span>
@@ -281,8 +331,11 @@ export function PricingPage() {
 								<li>Lighthouse performance tuning</li>
 								<li>Full source code handed to you at launch</li>
 							</ul>
-						</article>
-						<article className="surface-card pricing-tier pricing-tier--featured reveal-scale">
+						</MotionStaggerChild>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card pricing-tier pricing-tier--featured reveal-scale"
+						>
 							<span className="pricing-tier-badge">Most popular</span>
 							<p className="pricing-tier-name">Standard Rebuild</p>
 							<p className="pricing-tier-price pricing-tier-price--stacked">
@@ -307,8 +360,11 @@ export function PricingPage() {
 								<li>CRM integration ready</li>
 								<li>Source code is yours — no lock-in</li>
 							</ul>
-						</article>
-						<article className="surface-card pricing-tier reveal-right">
+						</MotionStaggerChild>
+						<MotionStaggerChild
+							as="article"
+							className="surface-card pricing-tier reveal-right"
+						>
 							<p className="pricing-tier-name">Enterprise</p>
 							<p className="pricing-tier-price">
 								<span className="pricing-tier-from">from </span>
@@ -325,13 +381,18 @@ export function PricingPage() {
 								<li>Advanced analytics setup</li>
 								<li>Priority support channel</li>
 							</ul>
-						</article>
-					</div>
+						</MotionStaggerChild>
+					</MotionStagger>
 				</div>
 			</section>
 			<section className="section-shell">
 				<div className="section-container">
-					<div className="section-header centered">
+					<div className="section-divider-glow" aria-hidden="true" />
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
 						<p className="section-eyebrow">Founding partner program</p>
 						<h2>Or skip the build cost entirely.</h2>
 						<p>
@@ -340,9 +401,11 @@ export function PricingPage() {
 							/mo {FOUNDING_PARTNER_SEO_LABEL} — hosting, security, and SEO
 							included.
 						</p>
-					</div>
-					<div
+					</MotionReveal>
+					<MotionReveal
 						className="marketing-cta-row reveal-up"
+						y={20}
+						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
 						<a
@@ -355,7 +418,7 @@ export function PricingPage() {
 						<Link href="/contact" className="btn btn-primary-audit">
 							Contact us for your free audit
 						</Link>
-					</div>
+					</MotionReveal>
 				</div>
 			</section>
 		</MarketingChrome>
@@ -373,30 +436,39 @@ export function OurEdgePage() {
 				breadcrumbLabel={copy.title}
 			/>
 			<PageHero
+				kind="edge"
 				title="Our Edge"
 				subtitle="Why our sites feel different — performance, structure, and long-term maintainability."
 			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					<p className="reveal-up">
 						We build lean, fast marketing sites with modern tooling so you are
 						not fighting plugins, template drift, or mystery bloat six months
 						after launch.
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
 					<div className="section-divider-glow" aria-hidden="true" />
-					<div className="section-header centered">
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
 						<h2>Template builders vs. a custom build.</h2>
 						<p>
 							The difference shows up in speed, search placement, and what
 							breaks next month.
 						</p>
-					</div>
-					<div className="comparison-grid">
-						<div className="surface-card comparison-column comparison-column--them reveal-left">
+					</MotionReveal>
+					<MotionStagger className="comparison-grid" staggerDelay={0.08}>
+						<MotionStaggerChild className="surface-card comparison-column comparison-column--them reveal-left">
 							<span className="comparison-label">Typical template site</span>
 							<ul className="comparison-list">
 								<li>Dozens of plugins to patch every week</li>
@@ -409,8 +481,8 @@ export function OurEdgePage() {
 									Agency keeps the code — site vanishes if you stop paying
 								</li>
 							</ul>
-						</div>
-						<div className="surface-card comparison-column comparison-column--us reveal-right">
+						</MotionStaggerChild>
+						<MotionStaggerChild className="surface-card comparison-column comparison-column--us reveal-right">
 							<span className="comparison-label">Designed by Anthony</span>
 							<ul className="comparison-list">
 								<li>Zero plugin dependencies</li>
@@ -421,8 +493,8 @@ export function OurEdgePage() {
 								<li>Direct line to the builder</li>
 								<li>You own the code — it never gets taken down</li>
 							</ul>
-						</div>
-					</div>
+						</MotionStaggerChild>
+					</MotionStagger>
 				</div>
 			</section>
 			<section className="section-shell">
@@ -444,8 +516,10 @@ export function OurEdgePage() {
 				</div>
 			</section>
 			<section className="section-shell section-shell--wash">
-				<div
+				<MotionReveal
 					className="section-container marketing-cta-row reveal-up"
+					y={20}
+					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
 					<Link href="/contact" className="btn btn-primary-audit">
@@ -454,7 +528,7 @@ export function OurEdgePage() {
 					<Link href="/services" className="btn btn-secondary-proof">
 						View services
 					</Link>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
@@ -476,14 +550,20 @@ export function FaqPage() {
 			/>
 			<script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
 			<PageHero
+				kind="faq"
 				title="FAQ"
 				subtitle="Quick answers before you spend a dollar."
 			/>
 			<section className="section-shell">
 				<div className="section-container">
-					<div className="home-faq-list" data-exclusive-details>
+					<MotionStagger
+						className="home-faq-list"
+						staggerDelay={0.08}
+						data-exclusive-details
+					>
 						{homeFaqEntries.map((entry) => (
-							<details
+							<MotionStaggerChild
+								as="details"
 								key={entry.question}
 								className="surface-card home-faq-item reveal-up"
 							>
@@ -494,11 +574,13 @@ export function FaqPage() {
 								<div className="home-faq-answer">
 									<p>{entry.answer}</p>
 								</div>
-							</details>
+							</MotionStaggerChild>
 						))}
-					</div>
-					<div
+					</MotionStagger>
+					<MotionReveal
 						className="marketing-cta-row reveal-up"
+						y={20}
+						duration={0.6}
 						style={{
 							justifyContent: "center",
 							marginTop: "clamp(2rem, 4vw, 3rem)",
@@ -510,7 +592,7 @@ export function FaqPage() {
 						<Link href="/contact" className="btn btn-primary-audit">
 							Contact us for your free audit
 						</Link>
-					</div>
+					</MotionReveal>
 				</div>
 			</section>
 		</MarketingChrome>
@@ -538,63 +620,72 @@ export function ServiceAreasPage() {
 			/>
 			<MarketingBreadcrumbs items={crumbs} />
 			<PageHero
+				kind="service-areas"
 				title="Service Areas"
 				subtitle="Mohawk Valley, Central NY, and select national markets."
 			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					<p className="reveal-up">
 						Primary work is anchored in Rome, NY, with regular coverage across
 						Utica, Syracuse, and the broader Mohawk Valley. We also support
 						select remote clients on a case-by-case basis.
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
-					<div className="service-area-signal-strip reveal-up">
-						<div className="surface-card service-area-signal">
+					<MotionStagger
+						className="service-area-signal-strip reveal-up"
+						staggerDelay={0.08}
+					>
+						<MotionStaggerChild className="surface-card service-area-signal">
 							<span className="service-area-signal__label">Core Markets</span>
 							<span className="service-area-signal__value">
 								{coreMarketCount}
 							</span>
-						</div>
-						<div className="surface-card service-area-signal">
+						</MotionStaggerChild>
+						<MotionStaggerChild className="surface-card service-area-signal">
 							<span className="service-area-signal__label">Remote Markets</span>
 							<span className="service-area-signal__value">
 								{remoteMarketCount}
 							</span>
-						</div>
-						<div className="surface-card service-area-signal">
+						</MotionStaggerChild>
+						<MotionStaggerChild className="surface-card service-area-signal">
 							<span className="service-area-signal__label">
 								Response Window
 							</span>
 							<span className="service-area-signal__value">1 Business Day</span>
-						</div>
-					</div>
+						</MotionStaggerChild>
+					</MotionStagger>
 				</div>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
 					<div className="section-divider-glow" aria-hidden="true" />
-					<div className="region-grid">
+					<MotionStagger className="region-grid" staggerDelay={0.08}>
 						{serviceAreaLocations.map((r) => (
-							<Link
-								key={r.slug}
-								href={`/service-areas/${r.slug}`}
-								className="surface-card region-card region-card-link reveal-up"
-							>
-								<span className={`region-card-tag region-card-tag--${r.tag}`}>
-									{r.tag === "primary" ? "Core market" : "Remote"}
-								</span>
-								<h3>{r.name}</h3>
-								<p>{r.cardTeaser}</p>
-								<span className="region-card-more">
-									Local web design guide →
-								</span>
-							</Link>
+							<MotionStaggerChild as="div" key={r.slug}>
+								<Link
+									href={`/service-areas/${r.slug}`}
+									className="surface-card region-card region-card-link reveal-up"
+								>
+									<span className={`region-card-tag region-card-tag--${r.tag}`}>
+										{r.tag === "primary" ? "Core market" : "Remote"}
+									</span>
+									<h3>{r.name}</h3>
+									<p>{r.cardTeaser}</p>
+									<span className="region-card-more">
+										Local web design guide →
+									</span>
+								</Link>
+							</MotionStaggerChild>
 						))}
-					</div>
+					</MotionStagger>
 				</div>
 			</section>
 			{longform.map((section) => (
@@ -602,7 +693,11 @@ export function ServiceAreasPage() {
 					key={section.heading}
 					className="section-shell section-shell--longform"
 				>
-					<div className="section-container marketing-prose marketing-prose--longform">
+					<MotionReveal
+						className="section-container marketing-prose marketing-prose--longform"
+						y={16}
+						duration={0.6}
+					>
 						<div className="section-divider-glow" aria-hidden="true" />
 						<h2 className="reveal-up">{section.heading}</h2>
 						{section.paragraphs.map((p) => (
@@ -610,12 +705,14 @@ export function ServiceAreasPage() {
 								{p}
 							</p>
 						))}
-					</div>
+					</MotionReveal>
 				</section>
 			))}
 			<section className="section-shell">
-				<div
+				<MotionReveal
 					className="section-container marketing-cta-row reveal-up"
+					y={20}
+					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
 					<Link href="/contact" className="btn btn-primary-book">
@@ -624,7 +721,7 @@ export function ServiceAreasPage() {
 					<Link href="/contact" className="btn btn-primary-audit">
 						Contact us for your free audit
 					</Link>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
@@ -651,28 +748,37 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 			/>
 			<MarketingBreadcrumbs items={crumbs} />
 			<PageHero
+				kind="service-areas"
 				title={`Web design & local SEO — ${loc.name}`}
 				subtitle={loc.heroSubtitle}
 			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					{loc.intro.map((p) => (
 						<p key={p} className="reveal-up">
 							{p}
 						</p>
 					))}
-				</div>
+				</MotionReveal>
 			</section>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
-					<div className="local-context-chips reveal-up">
+					<MotionReveal
+						className="local-context-chips reveal-up"
+						y={20}
+						duration={0.6}
+					>
 						<span className="local-context-chip">
 							{loc.tag === "primary" ? "Core Market" : "Remote Market"}
 						</span>
 						<span className="local-context-chip">Mobile-First Build</span>
 						<span className="local-context-chip">Local SEO Included</span>
 						<span className="local-context-chip">Manual Launch QA</span>
-					</div>
+					</MotionReveal>
 				</div>
 			</section>
 			{loc.sections.map((section) => (
@@ -680,22 +786,11 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					key={section.heading}
 					className="section-shell section-shell--wash"
 				>
-					<div className="section-container marketing-prose">
-						<h2 className="reveal-up">{section.heading}</h2>
-						{section.paragraphs.map((p) => (
-							<p key={p} className="reveal-up">
-								{p}
-							</p>
-						))}
-					</div>
-				</section>
-			))}
-			{longform.map((section) => (
-				<section
-					key={section.heading}
-					className="section-shell section-shell--longform"
-				>
-					<div className="section-container marketing-prose marketing-prose--longform">
+					<MotionReveal
+						className="section-container marketing-prose"
+						y={16}
+						duration={0.6}
+					>
 						<div className="section-divider-glow" aria-hidden="true" />
 						<h2 className="reveal-up">{section.heading}</h2>
 						{section.paragraphs.map((p) => (
@@ -703,12 +798,37 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 								{p}
 							</p>
 						))}
-					</div>
+					</MotionReveal>
+				</section>
+			))}
+			{longform.map((section) => (
+				<section
+					key={section.heading}
+					className="section-shell section-shell--longform"
+				>
+					<MotionReveal
+						className="section-container marketing-prose marketing-prose--longform"
+						y={16}
+						duration={0.6}
+					>
+						<div className="section-divider-glow" aria-hidden="true" />
+						<h2 className="reveal-up">{section.heading}</h2>
+						{section.paragraphs.map((p) => (
+							<p key={p} className="reveal-up">
+								{p}
+							</p>
+						))}
+					</MotionReveal>
 				</section>
 			))}
 			<section className="section-shell">
 				<div className="section-container">
-					<div className="section-header centered">
+					<div className="section-divider-glow" aria-hidden="true" />
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
 						<p className="section-eyebrow">More areas</p>
 						<h2>Other markets we serve</h2>
 						<p className="page-lead reveal-up">
@@ -716,28 +836,33 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 							that market — browse another city or{" "}
 							<Link href="/service-areas">return to the full list</Link>.
 						</p>
-					</div>
-					<div className="region-grid">
+					</MotionReveal>
+					<MotionStagger className="region-grid" staggerDelay={0.08}>
 						{otherAreas.map((r) => (
-							<Link
-								key={r.slug}
-								href={`/service-areas/${r.slug}`}
-								className="surface-card region-card region-card-link reveal-up"
-							>
-								<span className={`region-card-tag region-card-tag--${r.tag}`}>
-									{r.tag === "primary" ? "Core market" : "Remote"}
-								</span>
-								<h3>{r.name}</h3>
-								<p>{r.cardTeaser}</p>
-								<span className="region-card-more">Read the local guide →</span>
-							</Link>
+							<MotionStaggerChild key={r.slug}>
+								<Link
+									href={`/service-areas/${r.slug}`}
+									className="surface-card region-card region-card-link reveal-up"
+								>
+									<span className={`region-card-tag region-card-tag--${r.tag}`}>
+										{r.tag === "primary" ? "Core market" : "Remote"}
+									</span>
+									<h3>{r.name}</h3>
+									<p>{r.cardTeaser}</p>
+									<span className="region-card-more">
+										Read the local guide →
+									</span>
+								</Link>
+							</MotionStaggerChild>
 						))}
-					</div>
+					</MotionStagger>
 				</div>
 			</section>
 			<section className="section-shell section-shell--wash">
-				<div
+				<MotionReveal
 					className="section-container marketing-cta-row reveal-up"
+					y={20}
+					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
 					<Link href="/contact" className="btn btn-primary-book">
@@ -746,7 +871,7 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					<Link href="/contact" className="btn btn-primary-audit">
 						Contact us for your free audit
 					</Link>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
