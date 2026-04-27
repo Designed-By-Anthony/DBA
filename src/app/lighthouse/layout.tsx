@@ -1,4 +1,5 @@
 import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
+import { LIGHTHOUSE_TURNSTILE_HOST_ID } from "@lh/constants";
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Image from "next/image";
@@ -60,24 +61,52 @@ export default function LighthouseLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const hostId = LIGHTHOUSE_TURNSTILE_HOST_ID;
 	return (
 		<div
 			className={`lighthouse-segment ${inter.variable} ${outfit.variable} font-sans antialiased`}
 		>
-			<Script
-				id="trusted-types-bootstrap-lh"
-				src="/trusted-types-bootstrap.js"
-				strategy="beforeInteractive"
-			/>
-			<Script
-				id="cf-turnstile-api"
-				src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-				strategy="afterInteractive"
-				async
-				defer
-			/>
-			<header className="w-full border-b border-white/5 bg-[rgba(11,18,32,0.6)] backdrop-blur-md">
-				<div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
+			{/* No Trusted Types bootstrap here: parent policy `trusted-types vIaB1 default` only allows Cloudflare’s policy; registering `default` breaks Turnstile’s iframe (TrustedHTML/Script errors). Chrome extension `goog#html` warnings are from Tag Assistant, not this app. */}
+			<Script id="turnstile-lazy-lighthouse" strategy="afterInteractive">
+				{`(function () {
+  var HOST_ID = ${JSON.stringify(hostId)};
+  var TURNSTILE_TEST_SITEKEY = '1x00000000000000000000AA';
+  function applyLoopbackSiteKey() {
+    var h = location.hostname;
+    if (h !== 'localhost' && h !== '127.0.0.1') return;
+    var el = document.getElementById(HOST_ID);
+    if (el) el.setAttribute('data-sitekey', TURNSTILE_TEST_SITEKEY);
+  }
+  var loaded = false;
+  function inject() {
+    if (loaded) return;
+    var el = document.getElementById(HOST_ID);
+    if (!el || !el.getAttribute('data-sitekey')) return;
+    loaded = true;
+    if (document.getElementById('dba-turnstile-loader-lh')) return;
+    var s = document.createElement('script');
+    s.id = 'dba-turnstile-loader-lh';
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    s.async = true;
+    s.defer = true;
+    document.body.appendChild(s);
+  }
+  function onFirstIntent() {
+    applyLoopbackSiteKey();
+    inject();
+  }
+  document.addEventListener('focusin', onFirstIntent, { capture: true, once: true });
+  document.addEventListener('pointerdown', onFirstIntent, { capture: true, once: true });
+  applyLoopbackSiteKey();
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(function () { applyLoopbackSiteKey(); inject(); }, { timeout: 2500 });
+  } else {
+    window.setTimeout(function () { applyLoopbackSiteKey(); inject(); }, 2000);
+  }
+})();`}
+			</Script>
+			<header className="lighthouse-header w-full border-b border-white/[0.06] bg-[rgba(6,10,18,0.72)] backdrop-blur-xl">
+				<div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
 					<Link
 						href={BRAND_SITE_URL}
 						className="flex items-center gap-3 no-underline"
