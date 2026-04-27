@@ -16,6 +16,8 @@ const lighthouseSchema = z
 		GEMINI_API_KEY: z.string().trim().optional(),
 		GEMINI_MODEL: z.string().trim().optional(),
 		TURNSTILE_SECRET_KEY: z.string().trim().optional(),
+		/** When `1`/`true`, `/api/audit` requires Turnstile (needs secret + client token). */
+		LIGHTHOUSE_STRICT_TURNSTILE: z.string().trim().optional(),
 
 		GMAIL_SERVICE_ACCOUNT_KEY: z.string().trim().optional(),
 		SHEETS_ID: z.string().trim().optional(),

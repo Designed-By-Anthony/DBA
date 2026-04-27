@@ -31,7 +31,7 @@ Security fixes land on **`main`** and deploy through the normal Netlify pipeline
 
 ## Trust boundaries (what this app enforces)
 
-- **Turnstile** on public POST surfaces that accept browser traffic (for example `/api/contact`, `/api/audit`, `/api/lead-email`) when `TURNSTILE_SECRET_KEY` is configured server-side and the matching site key is exposed to the client.
+- **Turnstile** on public POST surfaces when `TURNSTILE_SECRET_KEY` is set and the client sends a token (for example `/api/contact`, `/api/lead-email`). **`POST /api/audit`** verifies Turnstile only when **`LIGHTHOUSE_STRICT_TURNSTILE=1`**; otherwise the audit API relies on rate limiting and validation.
 - **CORS** on `/api/contact`: responses only allow the Designed by Anthony origin family (see `src/app/api/contact/route.ts`), not arbitrary `*`.
 - **Audit abuse:** sliding-window **per-IP** limiting for `POST /api/audit` in `src/lighthouse/lib/http.ts` (`checkLocalRateLimit` — process-local; not a substitute for edge or shared-store rate limiting at scale).
 - **Secrets:** production configuration lives in Netlify environment variables. Schema and optional strictness are documented in `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, and `.env.example`.

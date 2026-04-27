@@ -17,7 +17,7 @@ accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
 | `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` | Required for `/lighthouse` audits to actually run |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Bot gate for `/api/audit`. In Cloudflare Turnstile, add **all** hostnames that load the widget (production + Netlify preview URLs) or the challenge returns **400**. |
+| `LIGHTHOUSE_STRICT_TURNSTILE` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Optional strict bot gate for **`POST /api/audit`**. Default: audits run without Turnstile (rate limit only). When strict mode is on, add all preview hostnames in Cloudflare or challenges return **400**. |
 | `AUDIT_LOGGING_WEBHOOK_URL` | Optional: after each successful **`POST /api/audit`**, POST a JSON summary to your logging endpoint (e.g. Convex `.../webhook/audit`). Unset = disabled. |
 | `FRESHWORKS_CRM_SYNC_ENABLED`, `FRESHWORKS_CRM_BASE_URL`, `FRESHWORKS_CRM_API_KEY` | Optional: log each successful `/api/audit` as a **Freshsales Lead** (see `.env.example`) |
 
