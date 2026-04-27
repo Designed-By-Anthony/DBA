@@ -3,13 +3,13 @@ import { HomePage } from "@/components/marketing/HomePage";
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { homeFaqEntries, homeFooterCta } from "@/data/home";
 import {
-	buildAgencyOsSoftwareApplicationSchema,
 	buildBaseOrganizationSchema,
 	buildBaseWebsiteSchema,
 	buildFaqPageSchema,
 	buildFounderPersonSchema,
 	buildItemListSchema,
 	buildSiteNavigationSchema,
+	buildVertaflowCrmSoftwareApplicationSchema,
 	type SchemaValue,
 } from "@/lib/seo";
 
@@ -91,7 +91,7 @@ const structuredData: SchemaValue[] = [
 	buildFounderPersonSchema(),
 	buildBaseWebsiteSchema(),
 	buildSiteNavigationSchema(),
-	buildAgencyOsSoftwareApplicationSchema(),
+	buildVertaflowCrmSoftwareApplicationSchema(),
 	homeServiceSchema,
 	homeFaqSchema,
 ];

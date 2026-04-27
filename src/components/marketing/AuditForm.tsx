@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId } from "react";
 import { businessProfile } from "@/lib/seo";
-
-const FRESHWORKS_FORM_SCRIPT =
-	"https://designedbyanthony.myfreshworks.com/crm/sales/web_forms/ff38685269fceeb3790739cecf2e781d6393cac8caa7a893bb8d46c76fb8137f/form.js";
-
-const SCRIPT_ATTR = "data-dba-freshworks-form";
-const LOAD_TIMEOUT_MS = 18000;
 
 export interface AuditFormProps {
 	ctaSource?: string;
 	pageContext?: string;
 	sourcePath?: string;
 	pageTitle?: string;
+	/** Defaults to `/api/contact` (same-origin JSON + server webhook forward). */
 	formEndpoint?: string;
 	offerType?: string;
 	subjectLine?: string;
@@ -37,98 +32,163 @@ export interface AuditFormProps {
 	issueRows?: number;
 }
 
-export function AuditForm(_props: AuditFormProps) {
-	const statusId = useId();
-	const mountRef = useRef<HTMLDivElement>(null);
-	const [embedState, setEmbedState] = useState<"loading" | "ready" | "error">(
-		"loading",
-	);
-
-	useEffect(() => {
-		const mount = mountRef.current;
-		if (!mount) return;
-
-		const existing = document.querySelector<HTMLScriptElement>(
-			`script[${SCRIPT_ATTR}]`,
-		);
-		if (existing) {
-			existing.remove();
-		}
-
-		const script = document.createElement("script");
-		script.src = FRESHWORKS_FORM_SCRIPT;
-		script.async = true;
-		script.crossOrigin = "anonymous";
-		script.setAttribute(SCRIPT_ATTR, "1");
-
-		const onLoad = () => setEmbedState("ready");
-		const onError = () => setEmbedState("error");
-		script.addEventListener("load", onLoad);
-		script.addEventListener("error", onError);
-
-		mount.appendChild(script);
-
-		const timeout = window.setTimeout(() => {
-			setEmbedState((prev) => (prev === "loading" ? "error" : prev));
-		}, LOAD_TIMEOUT_MS);
-
-		return () => {
-			window.clearTimeout(timeout);
-			script.removeEventListener("load", onLoad);
-			script.removeEventListener("error", onError);
-			script.remove();
-		};
-	}, []);
+/**
+ * Native marketing lead form — wired by `src/scripts/audit-forms.ts`
+ * (reCAPTCHA Enterprise or legacy Turnstile + JSON POST). Submits to `action`
+ * or `/api/contact`, which forwards to `LEAD_WEBHOOK_URL` on the server.
+ */
+export function AuditForm({
+	ctaSource = "marketing",
+	pageContext = "unknown",
+	offerType = "audit_request",
+	submitLabel = "Send request",
+	metaMessage = "Protected against spam.",
+	successMode = "inline",
+	successRedirect = "/thank-you?offer=audit",
+	websiteLabel = "Website URL",
+	websitePlaceholder = "https://example.com",
+	websiteRequired = true,
+	issueLabel = "What should we know?",
+	issuePlaceholder = "Goals, timeline, or anything else helpful.",
+	issueRequired = true,
+	showPhoneField = false,
+	issueRows = 4,
+	formEndpoint,
+}: AuditFormProps) {
+	const formId = useId();
+	const action = formEndpoint?.trim() || "/api/contact";
 
 	return (
-		<div className="dba-embed-form">
-			<p id={statusId} className="sr-only" aria-live="polite">
-				{embedState === "loading"
-					? "Loading contact form."
-					: embedState === "ready"
-						? "Contact form loaded."
-						: "Contact form could not load in this browser."}
-			</p>
-			{embedState === "loading" ? (
-				<div className="dba-embed-form__loading" aria-hidden="true">
-					<div className="dba-embed-form__loading-dots" aria-hidden="true">
-						<span className="dba-embed-form__loading-dot" />
-						<span className="dba-embed-form__loading-dot" />
-						<span className="dba-embed-form__loading-dot" />
-					</div>
-					<span className="dba-embed-form__loading-label">
-						Loading secure form…
-					</span>
-				</div>
-			) : null}
-			{embedState === "error" ? (
-				<div className="dba-embed-form__fallback surface-card surface-card--technical">
-					<p className="dba-embed-form__fallback-title">
-						Form did not load (network, blocker, or strict privacy mode).
-					</p>
-					<p className="dba-embed-form__fallback-copy">
-						Email us directly or book a short call — same inbox either way.
-					</p>
-					<div className="marketing-cta-row">
-						<a
-							className="btn btn-primary-audit"
-							href={`mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`}
-						>
-							Email {businessProfile.email}
-						</a>
-					</div>
-				</div>
-			) : null}
-			<div
-				ref={mountRef}
-				id="freshworks-contact-form"
-				className={
-					embedState === "error"
-						? "dba-embed-form__mount"
-						: "dba-embed-form__mount dba-embed-form__mount--visible"
-				}
-				aria-busy={embedState === "loading"}
+		<form
+			className="audit-form"
+			data-audit-form
+			action={action}
+			method="post"
+			data-success-mode={successMode}
+			data-success-redirect={successRedirect}
+			noValidate
+		>
+			<input type="hidden" name="cta_source" value={ctaSource} />
+			<input type="hidden" name="page_context" value={pageContext} />
+			<input type="hidden" name="offer_type" value={offerType} />
+			<input type="hidden" name="lead_source" value="marketing_site" />
+			<input type="hidden" name="source_page" value="" />
+			<input type="hidden" name="page_url" value="" />
+			<input type="hidden" name="referrer_url" value="" />
+			<input type="hidden" name="page_title" value="" />
+			<input type="hidden" name="ga_client_id" value="" />
+			<input
+				type="text"
+				name="_hp"
+				autoComplete="off"
+				tabIndex={-1}
+				aria-hidden="true"
+				className="audit-form-honeypot"
 			/>
-		</div>
+
+			<div data-form-shell>
+				<div className="audit-form-grid">
+					<div className="audit-form-field">
+						<label htmlFor={`${formId}-first`}>First name</label>
+						<input
+							id={`${formId}-first`}
+							name="first_name"
+							type="text"
+							autoComplete="given-name"
+							required
+						/>
+						<p
+							className="audit-form-field-hint"
+							data-field-error="first_name"
+						/>
+					</div>
+					<div className="audit-form-field">
+						<label htmlFor={`${formId}-email`}>Email</label>
+						<input
+							id={`${formId}-email`}
+							name="email"
+							type="email"
+							autoComplete="email"
+							required
+						/>
+						<p className="audit-form-field-hint" data-field-error="email" />
+					</div>
+					<div className="audit-form-field audit-form-field-full">
+						<label htmlFor={`${formId}-site`}>{websiteLabel}</label>
+						<input
+							id={`${formId}-site`}
+							name="website"
+							type="url"
+							inputMode="url"
+							placeholder={websitePlaceholder}
+							required={websiteRequired}
+						/>
+						<p className="audit-form-field-hint" data-field-error="website" />
+					</div>
+					{showPhoneField ? (
+						<div className="audit-form-field">
+							<label htmlFor={`${formId}-phone`}>Phone (optional)</label>
+							<input
+								id={`${formId}-phone`}
+								name="phone"
+								type="tel"
+								autoComplete="tel"
+							/>
+							<p className="audit-form-field-hint" data-field-error="phone" />
+						</div>
+					) : null}
+					<div className="audit-form-field audit-form-field-full">
+						<label htmlFor={`${formId}-issue`}>{issueLabel}</label>
+						<textarea
+							id={`${formId}-issue`}
+							name="biggest_issue"
+							rows={issueRows}
+							placeholder={issuePlaceholder}
+							required={issueRequired}
+						/>
+						<p
+							className="audit-form-field-hint"
+							data-field-error="biggest_issue"
+						/>
+					</div>
+				</div>
+
+				<input type="hidden" name="g-recaptcha-response" value="" />
+				{process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
+					<>
+						<div
+							className="cf-turnstile"
+							data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+							data-size="invisible"
+							data-callback="__dbaAuditFormTurnstileSuccess"
+							data-error-callback="__dbaTurnstileError"
+						/>
+						<input type="hidden" name="cf-turnstile-response" value="" />
+					</>
+				) : null}
+
+				<p className="audit-form-meta" data-form-error hidden />
+				<div className="audit-form-actions">
+					<button
+						type="submit"
+						className="btn btn-primary-audit"
+						data-form-submit
+					>
+						{submitLabel}
+					</button>
+				</div>
+				<p className="audit-form-privacy">{metaMessage}</p>
+			</div>
+
+			<div data-form-success hidden>
+				<p className="audit-form-status">Thanks — we received your message.</p>
+				<p className="audit-form-privacy">
+					Questions?{" "}
+					<a href={`mailto:${businessProfile.email}`}>
+						{businessProfile.email}
+					</a>
+				</p>
+			</div>
+		</form>
 	);
 }

@@ -6,7 +6,7 @@ import { Inter, Outfit } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import {
-	BRAND_ASSETS,
+	BRAND_MARK_IMAGE,
 	BRAND_NAME,
 	BRAND_SITE_URL,
 } from "@/design-system/brand";
@@ -123,10 +123,10 @@ export default function LighthouseLayout({
 						aria-label={`${BRAND_NAME} — home`}
 					>
 						<Image
-							src={BRAND_ASSETS.mark}
+							src={BRAND_MARK_IMAGE}
 							alt=""
-							width={36}
-							height={27}
+							width={BRAND_MARK_IMAGE.width}
+							height={BRAND_MARK_IMAGE.height}
 							className="h-7 w-auto shrink-0 object-contain"
 							priority
 						/>

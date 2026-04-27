@@ -529,7 +529,7 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 								pageTitle="Contact — Designed by Anthony"
 								successRedirect="/thank-you?offer=contact"
 								submitLabel="Send message"
-								metaMessage="Turnstile-protected. No spam."
+								metaMessage="Bot-checked. No spam."
 								websiteRequired={false}
 								issueRequired
 								issueLabel="How can we help?"

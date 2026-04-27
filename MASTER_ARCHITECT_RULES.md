@@ -5,7 +5,7 @@
 - Shared helpers belong under `src/lib/`, `src/design-system/`, or `src/lighthouse/` — not a separate workspace package.
 
 ## 2. The "Augusta" Security Protocol
-- DATABASE: Neon Postgres (`DATABASE_URL`) where CRM / Agency OS applies.
+- DATABASE: Neon Postgres (`DATABASE_URL`) where VertaFlow CRM / tenant apps apply.
 - TENANT LOCK: Every query in tenant-scoped apps must filter by tenant (`tenant_id` / `clerk_org_id`).
 - Cross-tenant data leakage is a critical failure.
 
@@ -18,7 +18,7 @@
 - CLEANUP: Delete unused legacy artifacts.
 
 ## 5. VERBATIM SYSTEM MAPPING
-- **Sales Term:** "Agency" or "Agency OS"
+- **Sales Term:** "Agency" or "VertaFlow CRM"
 - **Database Table:** `tenants`
 - **Security Key (SQL):** `tenant_id` (UUID) or `clerk_org_id` (Text)
 - **UI Logic:** Use `tenant.vertical` to drive the "Chameleon" skinning.

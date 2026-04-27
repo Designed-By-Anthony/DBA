@@ -20,3 +20,7 @@ apps/web-viewer/zapier-platform-example-app-github/
 
 # Removed app; delete locally if present (some installs had root-owned node_modules):
 apps/lighthouse/
+
+# Local Google Cloud SDK / archives (never commit)
+google-cloud-sdk/
+google-cloud-cli-darwin-arm.tar.gz

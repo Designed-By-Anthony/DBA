@@ -3,7 +3,7 @@
  * Run `npm run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
- * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.
+ * Always-on site needs: reCAPTCHA Enterprise + Turnstile (optional), Sentry, Lighthouse audit API, Convex lead webhooks.
  */
 
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
@@ -20,7 +20,7 @@ const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
-/** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
+/** GA4 + reCAPTCHA / Turnstile loaders; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC = [
 	"'self'",
 	"'unsafe-inline'",
@@ -28,6 +28,8 @@ const REPORT_ONLY_SCRIPT_SRC = [
 	"https://*.google-analytics.com",
 	"https://*.googletagmanager.com",
 	"https://www.gstatic.com",
+	"https://www.google.com/recaptcha/",
+	"https://www.gstatic.com/recaptcha/",
 	"https://challenges.cloudflare.com",
 ].join(" ");
 
@@ -43,21 +45,20 @@ const SCRIPT_SRC_ENFORCING = [
 	"https://*.google-analytics.com",
 	"https://*.googletagmanager.com",
 	"https://www.gstatic.com",
+	"https://www.google.com/recaptcha/",
+	"https://www.gstatic.com/recaptcha/",
 	"https://challenges.cloudflare.com",
 	"https://client.crisp.chat",
 	"https://settings.crisp.chat",
-	/** Freshworks CRM web forms (form embed only; chat is Crisp). */
-	"https://*.myfreshworks.com",
-	"https://*.freshworks.com",
 ].join(" ");
 
 const DIRECTIVES = {
 	"default-src": "'self'",
 	"script-src": SCRIPT_SRC_ENFORCING,
 	"style-src":
-		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
+		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://www.gstatic.com/recaptcha/ https://challenges.cloudflare.com https://client.crisp.chat",
 	"font-src":
-		"'self' data: https://fonts.gstatic.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
+		"'self' data: https://fonts.gstatic.com https://client.crisp.chat",
 	"img-src":
 		"'self' data: https: blob: https://s3.amazonaws.com https://image.crisp.chat https://client.crisp.chat https://storage.crisp.chat",
 	"connect-src": [
@@ -68,11 +69,15 @@ const DIRECTIVES = {
 		"https://*.google.com",
 		"https://designedbyanthony.com",
 		"https://www.google.com",
+		"https://www.google.com/recaptcha/",
 		"https://www.gstatic.com",
+		"https://www.gstatic.com/recaptcha/",
 		"https://*.googleapis.com",
 		LIGHTHOUSE_AUDIT_API_ORIGIN,
 		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
 		VERTAFLOW_CRM_ORIGIN,
+		/** Convex HTTP actions + webhooks (lead ingest). */
+		"https://*.convex.site",
 		"https://challenges.cloudflare.com",
 		"https://*.ingest.us.sentry.io",
 		"https://*.ingest.de.sentry.io",
@@ -80,12 +85,9 @@ const DIRECTIVES = {
 		"https://*.crisp.chat",
 		"wss://*.relay.crisp.chat",
 		"wss://*.relay.rescue.crisp.chat",
-		/** Freshworks CRM web form (no chat). */
-		"https://*.myfreshworks.com",
-		"https://*.freshworks.com",
 	].join(" "),
 	"frame-src":
-		"'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat https://*.myfreshworks.com",
+		"'self' https://www.google.com/recaptcha/ https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat",
 	"media-src": "'self'",
 	/** Crisp loads short-lived workers from *.crisp.chat (see Crisp CSP docs). */
 	"worker-src": "'self' blob: https://*.crisp.chat",
@@ -93,7 +95,7 @@ const DIRECTIVES = {
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN} https://*.myfreshworks.com`,
+	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN} https://*.convex.site`,
 	/**
 	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
 	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that

@@ -3,7 +3,6 @@ import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
 import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
 import { isAuditTurnstileStrict } from "@lh/lib/auditTurnstilePolicy";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
-import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
@@ -746,11 +745,10 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Dispatch to the central Agency OS Webhook (CRM) to capture the Lead fully natively.
-			// No-op when the webhook env vars are not configured (e.g. preview deploys or
-			// deployments without a CRM target) — do NOT fall back to a hard-coded URL.
-			const osWebhook = process.env.AGENCY_OS_WEBHOOK_URL;
-			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET;
+			// Optional: POST audit summary to your HTTP webhook (e.g. Convex → Slack).
+			// No-op when URL + secret are not configured.
+			const osWebhook = process.env.AUDIT_LEAD_WEBHOOK_URL?.trim();
+			const osSecret = process.env.AUDIT_LEAD_WEBHOOK_SECRET?.trim();
 			const reportPublicBase = (
 				process.env.REPORT_PUBLIC_BASE_URL || "https://designedbyanthony.com"
 			).replace(/\/$/, "");
@@ -779,36 +777,7 @@ export async function POST(request: Request) {
 						},
 						10_000,
 					).catch((formError) => {
-						console.error("Agency OS Webhook submission failed:", formError);
-					}),
-				);
-			}
-
-			if (process.env.FRESHWORKS_CRM_SYNC_ENABLED === "1") {
-				tasks.push(
-					createFreshworksLeadFromAudit({
-						name,
-						email,
-						company,
-						location,
-						scannedUrl: url,
-						reportId,
-						reportPublicUrl: `${reportPublicBase}/report/${reportId}`,
-						trustScore,
-						performanceScore: performanceScore ?? 0,
-						accessibilityScore: accessibilityScore ?? 0,
-						bestPracticesScore: bestPracticesScore ?? 0,
-						seoScore: seoScore ?? 0,
-						conversionScore,
-						userAgent: request.headers.get("user-agent") || "",
-					}).then((crmRes) => {
-						if (!crmRes.ok) {
-							console.error(
-								"[audit] Freshworks CRM lead sync failed:",
-								crmRes.error,
-								crmRes.status ?? "",
-							);
-						}
+						console.error("[audit] Audit lead webhook failed:", formError);
 					}),
 				);
 			}

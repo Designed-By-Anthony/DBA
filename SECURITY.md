@@ -1,6 +1,6 @@
 # Security policy
 
-This document describes the security posture of the **Designed by Anthony** site: a **single Next.js 16** application at the repository root, deployed on **Netlify** (Git → GitLab → Netlify).
+This document describes the security posture of the **Designed by Anthony** site: a **single Next.js 16** application at the repository root, deployed on **Firebase App Hosting** from **GitHub**.
 
 ## Reporting a vulnerability
 
@@ -16,7 +16,7 @@ Acknowledgement target: within 3 business days. Fix target: HIGH/CRITICAL within
 
 ## Supported versions
 
-Security fixes land on **`main`** and deploy through the normal Netlify pipeline. There is no separate long-lived release branch.
+Security fixes land on **`main`** and deploy through the normal Firebase App Hosting pipeline. There is no separate long-lived release branch.
 
 ## Scope (this repository)
 
@@ -25,16 +25,16 @@ Security fixes land on **`main`** and deploy through the normal Netlify pipeline
 | Marketing routes | Public content under `src/app/(site)/` |
 | Lighthouse segment | `src/app/lighthouse/`, `src/lighthouse/*` |
 | App Router API | `src/app/api/*` (contact, audit, lead-email, report, stream-chat-token, etc.) |
-| Request routing | `src/proxy.ts` (host-based redirects; optional `LIGHTHOUSE_UPSTREAM_URL`) |
+| Request routing | `src/proxy.ts` (host-based redirects) |
 
-**VertaFlow / Agency OS** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js proxy. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `src/`.
+**VertaFlow** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js proxy. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `src/`.
 
 ## Trust boundaries (what this app enforces)
 
 - **Turnstile** on public POST surfaces when `TURNSTILE_SECRET_KEY` is set and the client sends a token (for example `/api/contact`, `/api/lead-email`). **`POST /api/audit`** verifies Turnstile only when **`LIGHTHOUSE_STRICT_TURNSTILE=1`**; otherwise the audit API relies on rate limiting and validation.
 - **CORS** on `/api/contact`: responses only allow the Designed by Anthony origin family (see `src/app/api/contact/route.ts`), not arbitrary `*`.
 - **Audit abuse:** sliding-window **per-IP** limiting for `POST /api/audit` in `src/lighthouse/lib/http.ts` (`checkLocalRateLimit` — process-local; not a substitute for edge or shared-store rate limiting at scale).
-- **Secrets:** production configuration lives in Netlify environment variables. Schema and optional strictness are documented in `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, and `.env.example`.
+- **Secrets:** production configuration lives in Firebase App Hosting / Google Cloud env and secrets. Schema and optional strictness are documented in `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, and `.env.example`.
 
 ## Operational hygiene
 
@@ -48,7 +48,7 @@ Security fixes land on **`main`** and deploy through the normal Netlify pipeline
 |--------|----------|
 | Host-based redirects (admin / accounts / lighthouse) | `src/proxy.ts` |
 | Contact form CORS + Turnstile | `src/app/api/contact/route.ts` |
-| Audit pipeline + rate limit + optional CRM / Freshworks hooks | `src/app/api/audit/route.ts`, `src/lighthouse/lib/http.ts` |
+| Audit pipeline + rate limit + optional webhooks | `src/app/api/audit/route.ts`, `src/lighthouse/lib/http.ts` |
 | Resend lead-email bridge (Turnstile + honeypot) | `src/app/api/lead-email/route.ts` |
 | Stream Chat token issuance | `src/app/api/stream-chat-token/route.ts` |
 | CSP + security headers | `next.config.ts`, `build/csp.mjs` |

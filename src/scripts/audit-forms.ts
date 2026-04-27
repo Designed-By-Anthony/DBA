@@ -1,7 +1,7 @@
 import { buildPublicLeadPayloadFromFormData } from "@/lib/lead-form-contract";
 import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 
-/** Cloudflare Turnstile browser API (subset). */
+/** Cloudflare Turnstile browser API (subset) — legacy when Enterprise is off. */
 interface TurnstileApi {
 	reset: (container: string | HTMLElement) => void;
 	execute: (container: string | HTMLElement) => void;
@@ -9,6 +9,15 @@ interface TurnstileApi {
 }
 
 type WindowWithTurnstile = Window & { turnstile?: TurnstileApi };
+
+type GrecaptchaEnterprise = {
+	ready: (cb: () => void) => void;
+	execute: (siteKey: string, opts: { action: string }) => Promise<string>;
+};
+
+type WindowWithGrecaptcha = Window & {
+	grecaptcha?: { enterprise?: GrecaptchaEnterprise };
+};
 
 type AuditFormElement = HTMLFormElement & {
 	__dbaTurnstileResolver?: (token: string | null) => void;
@@ -18,16 +27,102 @@ function getTurnstileApi(): TurnstileApi | undefined {
 	return (window as WindowWithTurnstile).turnstile;
 }
 
+function getGrecaptchaEnterprise(): GrecaptchaEnterprise | undefined {
+	return (window as WindowWithGrecaptcha).grecaptcha?.enterprise;
+}
+
+function loadRecaptchaEnterpriseScript(siteKey: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		if (getGrecaptchaEnterprise()) {
+			resolve();
+			return;
+		}
+		const id = "dba-recaptcha-enterprise-loader";
+		const existing = document.getElementById(id);
+		if (existing) {
+			const deadline = Date.now() + 15_000;
+			const poll = () => {
+				if (getGrecaptchaEnterprise()) resolve();
+				else if (Date.now() > deadline)
+					reject(new Error("reCAPTCHA script timeout"));
+				else window.setTimeout(poll, 50);
+			};
+			poll();
+			return;
+		}
+		const script = document.createElement("script");
+		script.id = id;
+		script.src = `https://www.google.com/recaptcha/enterprise.js?render=${encodeURIComponent(siteKey)}`;
+		script.async = true;
+		script.defer = true;
+		script.onload = () => {
+			const deadline = Date.now() + 15_000;
+			const poll = () => {
+				if (getGrecaptchaEnterprise()) resolve();
+				else if (Date.now() > deadline)
+					reject(new Error("reCAPTCHA init timeout"));
+				else window.setTimeout(poll, 50);
+			};
+			poll();
+		};
+		script.onerror = () => reject(new Error("reCAPTCHA script failed to load"));
+		document.head.appendChild(script);
+	});
+}
+
+async function executeRecaptchaEnterprise(
+	siteKey: string,
+	action: string,
+): Promise<string> {
+	await loadRecaptchaEnterpriseScript(siteKey);
+	const enterprise = getGrecaptchaEnterprise();
+	if (!enterprise) {
+		throw new Error("reCAPTCHA Enterprise API unavailable");
+	}
+	return new Promise((resolve, reject) => {
+		enterprise.ready(() => {
+			void enterprise
+				.execute(siteKey, { action })
+				.then(resolve)
+				.catch(reject);
+		});
+	});
+}
+
 /**
- * Lead endpoint resolution order (Augusta Global Ingest Protocol):
- *   1. `PUBLIC_INGEST_URL` — the new versioned `POST /api/v1/ingest` route.
- *   2. `PUBLIC_CRM_LEAD_URL` — legacy browser-safe `/api/lead`; kept for
- *      backward compatibility with older deploys.
- *   3. Baked default: `https://admin.vertaflow.io/api/v1/ingest`.
+ * Lead endpoint resolution (marketing audit/contact-style forms):
+ *   1. Form `action` URL when it is a trusted target (same-origin `/api/*`,
+ *      VertaFlow `/api/*`, or Convex `*.convex.site/webhook/*`).
+ *   2. `NEXT_PUBLIC_LEAD_WEBHOOK_URL` when `action` is missing (build-time).
+ *   3. Fallback: `https://admin.vertaflow.io/api/v1/ingest`.
  */
-const DEFAULT_FORM_ENDPOINT = "https://admin.vertaflow.io/api/v1/ingest";
+const FALLBACK_FORM_ENDPOINT = "https://admin.vertaflow.io/api/v1/ingest";
+
+function readDefaultLeadEndpoint(): string {
+	/** `site.js` is esbuild-bundled; read URL from `<html data-lead-webhook>` (set in `layout.tsx`). */
+	if (typeof document !== "undefined") {
+		const fromDom =
+			document.documentElement?.dataset?.leadWebhook?.trim() ?? "";
+		if (fromDom) return fromDom;
+	}
+	const fromEnv =
+		typeof process !== "undefined" &&
+		typeof process.env?.NEXT_PUBLIC_LEAD_WEBHOOK_URL === "string"
+			? process.env.NEXT_PUBLIC_LEAD_WEBHOOK_URL.trim()
+			: "";
+	return fromEnv || FALLBACK_FORM_ENDPOINT;
+}
+
 const LEGACY_CRM_HOST = "admin.designedbyanthony.com";
 const CURRENT_CRM_HOST = "admin.vertaflow.io";
+
+function isTrustedConvexWebhook(url: URL): boolean {
+	return (
+		url.protocol === "https:" &&
+		url.hostname.endsWith(".convex.site") &&
+		url.pathname.startsWith("/webhook/")
+	);
+}
 
 export interface AuditFormError {
 	field?: string;
@@ -40,7 +135,8 @@ export interface AuditFormResponse {
 }
 
 function resolveFormEndpoint(rawEndpoint: string | null | undefined): string {
-	const candidate = rawEndpoint?.trim() || DEFAULT_FORM_ENDPOINT;
+	const defaultEndpoint = readDefaultLeadEndpoint();
+	const candidate = rawEndpoint?.trim() || defaultEndpoint;
 
 	try {
 		const url = new URL(candidate, window.location.origin);
@@ -54,12 +150,12 @@ function resolveFormEndpoint(rawEndpoint: string | null | undefined): string {
 		}
 		const isTrustedRemote =
 			url.hostname === CURRENT_CRM_HOST && url.pathname.startsWith("/api/");
-		if (isSameOriginApi || isTrustedRemote) {
+		if (isSameOriginApi || isTrustedRemote || isTrustedConvexWebhook(url)) {
 			return url.toString();
 		}
-		return DEFAULT_FORM_ENDPOINT;
+		return defaultEndpoint;
 	} catch {
-		return DEFAULT_FORM_ENDPOINT;
+		return defaultEndpoint;
 	}
 }
 
@@ -111,12 +207,15 @@ export function resetAuditFormState(
 
 	void syncGaClientId(form);
 
-	// Reset the Turnstile widget so it's ready for re-submission
 	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
 	const turnstile = getTurnstileApi();
 	if (turnstileEl && turnstile) {
 		turnstile.reset(turnstileEl);
 	}
+	const recaptchaInput = form.querySelector<HTMLInputElement>(
+		'input[name="g-recaptcha-response"]',
+	);
+	if (recaptchaInput) recaptchaInput.value = "";
 }
 
 function clearAuditFormErrors(form: HTMLFormElement): void {
@@ -285,7 +384,7 @@ function handleAuditSuccess(form: HTMLFormElement): void {
 			cta_source: ctaSource,
 			source_page: window.location.pathname,
 			offer_type: offerType,
-			form_endpoint: form.getAttribute("action") || DEFAULT_FORM_ENDPOINT,
+			form_endpoint: form.getAttribute("action") || readDefaultLeadEndpoint(),
 		});
 	}
 
@@ -361,9 +460,14 @@ export function initFacebookOfferTracking(): void {
 	}
 }
 
+type CaptchaPayload =
+	| { type: "none" }
+	| { type: "turnstile"; token: string }
+	| { type: "recaptcha"; token: string };
+
 async function finalizeAuditFormSubmission(
 	form: HTMLFormElement,
-	turnstileToken: string,
+	captcha: CaptchaPayload,
 ): Promise<void> {
 	const submitButton =
 		form.querySelector<HTMLButtonElement>("[data-form-submit]");
@@ -379,14 +483,31 @@ async function finalizeAuditFormSubmission(
 	const turnstileInput = form.querySelector<HTMLInputElement>(
 		'input[name="cf-turnstile-response"]',
 	);
-	if (turnstileInput) turnstileInput.value = turnstileToken;
+	const recaptchaInput = form.querySelector<HTMLInputElement>(
+		'input[name="g-recaptcha-response"]',
+	);
+
+	if (captcha.type === "recaptcha") {
+		if (recaptchaInput) recaptchaInput.value = captcha.token;
+		if (turnstileInput) turnstileInput.value = "";
+	} else if (captcha.type === "turnstile") {
+		if (turnstileInput) turnstileInput.value = captcha.token;
+		if (recaptchaInput) recaptchaInput.value = "";
+	} else {
+		if (turnstileInput) turnstileInput.value = "";
+		if (recaptchaInput) recaptchaInput.value = "";
+	}
 
 	const formData = new FormData(form);
 	formData.set("source_page", window.location.pathname);
 	formData.set("page_url", window.location.href);
 	formData.set("referrer_url", document.referrer || "direct");
 	formData.set("page_title", document.title);
-	formData.set("cf-turnstile-response", turnstileToken);
+	if (captcha.type === "recaptcha") {
+		formData.set("g-recaptcha-response", captcha.token);
+	} else if (captcha.type === "turnstile") {
+		formData.set("cf-turnstile-response", captcha.token);
+	}
 
 	const payload = buildPublicLeadPayloadFromFormData(formData);
 
@@ -451,20 +572,20 @@ async function finalizeAuditFormSubmission(
 		);
 		restoreAuditSubmitButton(submitButton, defaultLabel);
 	} finally {
-		const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-		const turnstile = getTurnstileApi();
-		if (turnstileEl && turnstile) {
-			turnstile.reset(turnstileEl);
+		if (captcha.type === "turnstile") {
+			const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
+			const turnstile = getTurnstileApi();
+			if (turnstileEl && turnstile) {
+				turnstile.reset(turnstileEl);
+			}
 		}
 	}
 }
 
 /**
- * Invisible Turnstile does not render a widget or auto-solve — you must
- * call `turnstile.execute()` in response to a user action and then
- * submit once the `callback` fires with a token. This function wires
- * the current submit intent to a per-form resolver that completes when
- * the Cloudflare callback lands.
+ * reCAPTCHA Enterprise (preferred): `grecaptcha.enterprise.execute` on submit.
+ * Legacy: invisible Turnstile when `.cf-turnstile` is present. Otherwise submits
+ * without a captcha token (server allows when bot keys are unset).
  */
 async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	const submitButton =
@@ -480,54 +601,74 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	clearAuditFormErrors(form);
 	await syncGaClientId(form);
 
-	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-	const tsAny = getTurnstileApi();
-
-	if (!turnstileEl || !tsAny) {
-		showAuditFormError(
-			form,
-			"Security check could not load. Please refresh the page and try again.",
-		);
-		restoreAuditSubmitButton(submitButton, defaultLabel);
+	const siteKey = document.documentElement
+		.getAttribute("data-recaptcha-site-key")
+		?.trim();
+	if (siteKey) {
+		const action =
+			document.documentElement
+				.getAttribute("data-recaptcha-action")
+				?.trim() || "contact_submit";
+		try {
+			const token = await executeRecaptchaEnterprise(siteKey, action);
+			await finalizeAuditFormSubmission(form, { type: "recaptcha", token });
+		} catch {
+			showAuditFormError(
+				form,
+				"Security check could not complete. Please refresh the page and try again.",
+			);
+			restoreAuditSubmitButton(submitButton, defaultLabel);
+		}
 		return;
 	}
 
-	const auditForm = form as AuditFormElement;
+	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
+	const tsAny = getTurnstileApi();
 
-	await new Promise<void>((resolve) => {
-		auditForm.__dbaTurnstileResolver = (token: string | null) => {
-			auditForm.__dbaTurnstileResolver = undefined;
-			if (!token) {
+	if (turnstileEl && tsAny) {
+		const auditForm = form as AuditFormElement;
+
+		await new Promise<void>((resolve) => {
+			auditForm.__dbaTurnstileResolver = (token: string | null) => {
+				auditForm.__dbaTurnstileResolver = undefined;
+				if (!token) {
+					showAuditFormError(
+						form,
+						"Security check failed. Please refresh the page and try again.",
+					);
+					restoreAuditSubmitButton(submitButton, defaultLabel);
+					try {
+						tsAny.reset(turnstileEl);
+					} catch {
+						/* ignore */
+					}
+					resolve();
+					return;
+				}
+
+				finalizeAuditFormSubmission(form, {
+					type: "turnstile",
+					token,
+				}).finally(resolve);
+			};
+
+			try {
+				tsAny.reset(turnstileEl);
+				tsAny.execute(turnstileEl);
+			} catch {
+				auditForm.__dbaTurnstileResolver = undefined;
 				showAuditFormError(
 					form,
-					"Security check failed. Please refresh the page and try again.",
+					"Security check could not start. Please refresh the page and try again.",
 				);
 				restoreAuditSubmitButton(submitButton, defaultLabel);
-				try {
-					tsAny.reset(turnstileEl);
-				} catch {
-					/* ignore */
-				}
 				resolve();
-				return;
 			}
+		});
+		return;
+	}
 
-			finalizeAuditFormSubmission(form, token).finally(resolve);
-		};
-
-		try {
-			tsAny.reset(turnstileEl);
-			tsAny.execute(turnstileEl);
-		} catch {
-			auditForm.__dbaTurnstileResolver = undefined;
-			showAuditFormError(
-				form,
-				"Security check could not start. Please refresh the page and try again.",
-			);
-			restoreAuditSubmitButton(submitButton, defaultLabel);
-			resolve();
-		}
-	});
+	await finalizeAuditFormSubmission(form, { type: "none" });
 }
 
 type AuditFormWindow = Window & {

@@ -13,9 +13,12 @@ describe("Marketing — Contact Form", () => {
 		cy.get('textarea[name="biggest_issue"]').should("be.visible");
 	});
 
-	it("invisible Turnstile widget is attached", () => {
-		cy.get(".cf-turnstile").should("have.attr", "data-size", "invisible");
-		cy.get(".cf-turnstile").should("have.length", 1);
+	it("bot token field is present (reCAPTCHA hidden or legacy Turnstile)", () => {
+		cy.get("[data-audit-form]").within(() => {
+			cy.get(
+				'input[name="g-recaptcha-response"], .cf-turnstile[data-size="invisible"]',
+			).should("exist");
+		});
 	});
 
 	it("submit button is present and enabled", () => {

@@ -25,6 +25,7 @@ if (dsn) {
 			"ResizeObserver loop limit exceeded",
 			"ResizeObserver loop completed with undelivered notifications",
 			/challenges\.cloudflare\.com/i,
+			/www\.google\.com\/recaptcha/i,
 			/^Script error\.?$/,
 			/** Turnstile 110200 = hostname not in site key allowlist (common on localhost). */
 			/110200/,

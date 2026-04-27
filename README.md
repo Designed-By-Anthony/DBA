@@ -4,7 +4,7 @@ Single **Next.js 16** application: marketing site, APIs, and the Lighthouse audi
 
 ## Routing — `src/proxy.ts`
 
-[`src/proxy.ts`](./src/proxy.ts) runs on the Netlify Next.js runtime (Next.js 16 **proxy** convention). It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
+[`src/proxy.ts`](./src/proxy.ts) runs on the Next.js 16 **proxy** convention. It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
 
 ```
 admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*
@@ -12,25 +12,15 @@ accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
 * (everything else, including /lighthouse) → this Next app (fallthrough)
 ```
 
-### Optional env on the Netlify site
+### Optional env (Firebase App Hosting / local)
 
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
 | `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` | Required for `/lighthouse` audits to actually run |
 | `LIGHTHOUSE_STRICT_TURNSTILE` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Optional strict bot gate for **`POST /api/audit`**. Default: audits run without Turnstile (rate limit only). When strict mode is on, add all preview hostnames in Cloudflare or challenges return **400**. |
 | `AUDIT_LOGGING_WEBHOOK_URL` | Optional: after each successful **`POST /api/audit`**, POST a JSON summary to your logging endpoint (e.g. Convex `.../webhook/audit`). Unset = disabled. |
-| `FRESHWORKS_CRM_SYNC_ENABLED`, `FRESHWORKS_CRM_BASE_URL`, `FRESHWORKS_CRM_API_KEY` | Optional: log each successful `/api/audit` as a **Freshsales Lead** (see `.env.example`) |
-
-## GitLab CLI (`glab`)
-
-Optional tool for **merge requests**, pipelines, and API tasks from the terminal. Not required to build the site.
-
-```bash
-bash scripts/install-glab.sh   # Linux amd64 → /usr/local/bin/glab (needs sudo)
-glab auth login                 # then: glab mr list, glab mr create, etc.
-```
-
-See **`AGENTS.md`** (GitLab CLI section) for token env vars and agent/CI notes.
+| `LEAD_WEBHOOK_URL` | Required for **`POST /api/contact`** to forward marketing leads (e.g. Convex → Slack). See `.env.example`. |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` + `RECAPTCHA_ENTERPRISE_API_KEY` + `GOOGLE_CLOUD_PROJECT` (or `RECAPTCHA_GOOGLE_CLOUD_PROJECT`) | Optional **reCAPTCHA Enterprise** for marketing forms (`CreateAssessment`); see `.env.example`. |
 
 ## Lighthouse Scanner (`/lighthouse`)
 
@@ -44,10 +34,7 @@ npm run dev       # :3000 (builds public/scripts/site.js first)
 npm run build     # site script + sync static headers + next build
 ```
 
-Deploy on **Netlify** from the repo root via **GitLab-connected auto deploys**. `netlify.toml` is regenerated on each `npm run sync:static-headers` (runs in `prebuild`) with:
-- `command = "npm run build"`
-- `NODE_VERSION = "22"`
-- `@netlify/plugin-nextjs` runtime plugin (no static `.next` publish directory)
+Deploy from the repo root on **Firebase App Hosting** with the **GitHub** repo linked in Firebase console. `npm run sync:static-headers` (runs in `prebuild`) still regenerates `netlify.toml` + `static-headers.json` from `build/csp.mjs` for CSP alignment.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 

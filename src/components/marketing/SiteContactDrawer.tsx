@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BRAND_ASSETS } from "@/design-system/brand";
+import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
 const STORAGE_KEY = "dba_contact_drawer_open";
@@ -131,10 +131,10 @@ export function SiteContactDrawer() {
 			>
 				<div className="site-quick-rail__head">
 					<Image
-						src={BRAND_ASSETS.mark}
+						src={BRAND_MARK_IMAGE}
 						alt=""
-						width={28}
-						height={21}
+						width={BRAND_MARK_IMAGE.width}
+						height={BRAND_MARK_IMAGE.height}
 						className="site-quick-rail__mark"
 						aria-hidden
 					/>
