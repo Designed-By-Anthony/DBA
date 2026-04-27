@@ -2,6 +2,10 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Consolidation branch `oh-my-hopefully-complete` (2026-04-28)
+
+- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`** Turnstile wiring; dropped **`src/middleware.ts`** and the old Turnstile/Trusted-Types bootstrap from the consolidation side. **`api.js`** injection uses **`async = false`** / **`defer = false`** (explicit `ready()` path). Audit form intro now mentions **Freshworks** when CRM sync is enabled.
+
 ## Lighthouse audit UI + Turnstile (2026-04-28)
 
 - **`/lighthouse`:** Wider layout (`max-w-5xl`), layered background + refined glass card, premium form fields and CTA. **`AuditForm`** uses **explicit** Turnstile: `api.js?render=explicit`, host **`#lighthouse-turnstile-host`** (no `cf-turnstile` class), `execution: "execute"` + `turnstile.ready()` + `execute()` on submit; widget host **outside** `<form>` to avoid “form not connected”. **No** `default` Trusted Types policy on this segment (conflicts with parent `trusted-types … default` + Turnstile iframe). **`Permissions-Policy`:** allow `xr-spatial-tracking=*` for challenge iframe. **`lighthouse2.md` / `.env.example`:** Turnstile **hostname allowlist** for Netlify previews.

@@ -87,8 +87,8 @@ export default function LighthouseLayout({
     var s = document.createElement('script');
     s.id = 'dba-turnstile-loader-lh';
     s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-    s.async = true;
-    s.defer = true;
+    s.async = false;
+    s.defer = false;
     document.body.appendChild(s);
   }
   function onFirstIntent() {
