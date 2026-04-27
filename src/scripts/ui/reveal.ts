@@ -27,17 +27,6 @@ function isDirectionalReveal(el: Element): boolean {
 	return DIRECTIONAL_REVEAL_CLASSES.some((cls) => el.classList.contains(cls));
 }
 
-function revealElement(el: HTMLElement): void {
-	if (isDirectionalReveal(el)) {
-		el.classList.add("reveal-active");
-		return;
-	}
-
-	if (el.classList.contains("reveal")) {
-		el.classList.add("active");
-	}
-}
-
 export function initRevealAnimations(): void {
 	const directionalElements = Array.from(
 		document.querySelectorAll<HTMLElement>(

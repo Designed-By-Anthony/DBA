@@ -1,5 +1,5 @@
-import Script from "next/script";
 import "@/design-system/dba-global.css";
+import { CrispBootstrap } from "@/components/CrispBootstrap";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
@@ -55,11 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 		<html lang="en" prefix="og: https://ogp.me/ns#">
 			<body>
 				{children}
-				<Script
-					id="crisp-widget"
-					strategy="lazyOnload"
-					src="/scripts/crisp-loader.js"
-				/>
+				<CrispBootstrap />
 			</body>
 		</html>
 	);

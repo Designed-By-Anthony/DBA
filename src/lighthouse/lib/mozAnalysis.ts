@@ -11,6 +11,10 @@ export interface MozMetrics {
 	externalBacklinks: number | null;
 	pagesCrawled: number | null;
 	lastCrawled: string | null;
+	/** `moz` when from Moz API; `internal` when from first-party heuristic */
+	dataSource?: "moz" | "internal";
+	/** Short disclaimer for UI when not Moz */
+	authorityLabel?: string;
 }
 
 const DEFAULT_MOZ: MozMetrics = {
@@ -56,7 +60,7 @@ export async function scanMoz(url: string): Promise<MozMetrics> {
 		})();
 
 		if (decoded.includes(":")) {
-			headers["Authorization"] = `Basic ${credentials}`;
+			headers.Authorization = `Basic ${credentials}`;
 		} else {
 			headers["x-moz-token"] = credentials;
 		}
@@ -101,6 +105,7 @@ export async function scanMoz(url: string): Promise<MozMetrics> {
 			externalBacklinks: result.external_pages_to_root_domain ?? null,
 			pagesCrawled: result.pages_crawled_from_root_domain ?? null,
 			lastCrawled: result.last_crawled ?? null,
+			dataSource: "moz",
 		};
 	} catch (err) {
 		console.warn("Moz scan failed:", err instanceof Error ? err.message : err);

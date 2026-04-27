@@ -2,15 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BRAND_ASSETS } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
-const STORAGE_KEY = "dba_quick_rail_open";
+const STORAGE_KEY = "dba_contact_drawer_open";
+const LEGACY_STORAGE_KEY = "dba_quick_rail_open";
 
 function readStoredOpen(): boolean {
 	try {
-		return window.localStorage.getItem(STORAGE_KEY) === "1";
+		const v = window.localStorage.getItem(STORAGE_KEY);
+		if (v === "1" || v === "0") return v === "1";
+		const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+		if (legacy === "1") {
+			window.localStorage.setItem(STORAGE_KEY, "1");
+			return true;
+		}
+		return false;
 	} catch {
 		return false;
 	}
@@ -26,11 +34,15 @@ function writeStoredOpen(open: boolean): void {
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
+const BODY_LOCK_CLASS = "site-contact-drawer-open";
+
 /**
- * Desktop quick actions: slides in from the left; tab on the edge toggles open/closed.
+ * Contact drawer: desktop slides in from the left (transform-origin 0% 100%);
+ * narrow viewports use a bottom sheet. High-contrast panel; CSS transitions only.
  */
-export function SiteQuickRailDrawer() {
-	const panelId = useId();
+export function SiteContactDrawer() {
+	const panelId = "site-contact-drawer-panel";
+	const tabRef = useRef<HTMLButtonElement>(null);
 	const [open, setOpen] = useState(false);
 	const [hydrated, setHydrated] = useState(false);
 
@@ -38,6 +50,38 @@ export function SiteQuickRailDrawer() {
 		setOpen(readStoredOpen());
 		setHydrated(true);
 	}, []);
+
+	useEffect(() => {
+		if (!open || typeof document === "undefined") return;
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				e.preventDefault();
+				setOpen(false);
+				writeStoredOpen(false);
+				tabRef.current?.focus();
+			}
+		};
+		document.addEventListener("keydown", onKeyDown);
+		return () => document.removeEventListener("keydown", onKeyDown);
+	}, [open]);
+
+	useEffect(() => {
+		if (typeof document === "undefined" || !hydrated) return;
+		const mq = window.matchMedia("(max-width: 1199px)");
+		const sync = () => {
+			if (mq.matches && open) {
+				document.body.classList.add(BODY_LOCK_CLASS);
+			} else {
+				document.body.classList.remove(BODY_LOCK_CLASS);
+			}
+		};
+		sync();
+		mq.addEventListener("change", sync);
+		return () => {
+			mq.removeEventListener("change", sync);
+			document.body.classList.remove(BODY_LOCK_CLASS);
+		};
+	}, [open, hydrated]);
 
 	const toggle = useCallback(() => {
 		setOpen((prev) => {
@@ -50,6 +94,7 @@ export function SiteQuickRailDrawer() {
 	const close = useCallback(() => {
 		setOpen(false);
 		writeStoredOpen(false);
+		tabRef.current?.focus();
 	}, []);
 
 	return (
@@ -57,6 +102,15 @@ export function SiteQuickRailDrawer() {
 			className={`site-quick-rail-host${open ? " site-quick-rail-host--open" : ""}${hydrated ? " site-quick-rail-host--hydrated" : ""}`}
 		>
 			<button
+				type="button"
+				className="site-quick-rail-backdrop"
+				aria-label="Close contact drawer"
+				tabIndex={-1}
+				aria-hidden={!open}
+				onClick={close}
+			/>
+			<button
+				ref={tabRef}
 				type="button"
 				className="site-quick-rail-tab"
 				aria-expanded={open}
@@ -66,12 +120,12 @@ export function SiteQuickRailDrawer() {
 				<span className="site-quick-rail-tab__chevron" aria-hidden="true">
 					{open ? "⟨" : "⟩"}
 				</span>
-				<span className="site-quick-rail-tab__label">Quick</span>
+				<span className="site-quick-rail-tab__label">Contact</span>
 			</button>
 			<aside
 				id={panelId}
 				className="site-quick-rail site-quick-rail--drawer"
-				aria-label="Quick actions"
+				aria-label="Contact options"
 				aria-hidden={!open}
 				data-nav-rail
 			>
@@ -88,20 +142,23 @@ export function SiteQuickRailDrawer() {
 						type="button"
 						className="site-quick-rail__close"
 						onClick={close}
-						aria-label="Close quick actions"
+						aria-label="Close contact drawer"
 					>
 						×
 					</button>
 				</div>
 				<div className="site-quick-rail__inner">
+					<p className="site-quick-rail__lead">
+						Pick whichever channel is easiest:
+					</p>
 					<Link
-						href="/contact"
+						href="/lighthouse"
 						className="nav-rail-link nav-rail-link--audit"
 						onClick={close}
 					>
 						<span className="nav-rail-text">
-							<strong>Request site audit</strong>
-							<span className="nav-rail-sub">Manual performance review</span>
+							<strong>Audit my site</strong>
+							<span className="nav-rail-sub">Free SEO + performance scan</span>
 						</span>
 					</Link>
 					<Link
@@ -110,25 +167,24 @@ export function SiteQuickRailDrawer() {
 						onClick={close}
 					>
 						<span className="nav-rail-text">
-							<strong>Email the studio</strong>
+							<strong>Open contact form</strong>
 							<span className="nav-rail-sub">
 								Human reply, usually same day
 							</span>
 						</span>
 					</Link>
 					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="nav-rail-link nav-rail-link--book"
-						data-calendar-link
+						href={mailtoContactHref}
+						className="nav-rail-link nav-rail-link--phone"
 						onClick={close}
 					>
 						<span className="nav-rail-text">
-							<strong>Book a call</strong>
-							<span className="nav-rail-sub">15 minutes · pick a time</span>
+							<strong>Email directly</strong>
+							<span className="nav-rail-sub">{businessProfile.email}</span>
 						</span>
 					</a>
 					<a
-						href={mailtoContactHref}
+						href={businessProfile.telephoneHref}
 						className="nav-rail-link nav-rail-link--phone"
 						onClick={close}
 					>

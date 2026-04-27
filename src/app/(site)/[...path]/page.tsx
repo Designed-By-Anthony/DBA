@@ -8,6 +8,7 @@ import { blogPosts } from "@/data/blogPosts";
 import { getAllServiceAreaSlugs } from "@/data/serviceAreaLocations";
 import { showcaseItems } from "@/data/showcase";
 import { resolveMarketingMetadata } from "@/lib/marketing-metadata";
+import { STATIC_MARKETING_SLUGS } from "@/lib/marketing-path-registry";
 import { MARKETING_SERVICES } from "@/lib/seo";
 
 type PageProps = {
@@ -43,21 +44,7 @@ export async function generateStaticParams(): Promise<{ path: string[] }[]> {
 		}
 	}
 
-	const staticSlugs = [
-		"about",
-		"contact",
-		"pricing",
-		"faq",
-		"ouredge",
-		"service-areas",
-		"privacy",
-		"terms",
-		"cookie",
-		"image-license",
-		"thank-you",
-		"facebook-offer",
-	];
-	for (const slug of staticSlugs) {
+	for (const slug of STATIC_MARKETING_SLUGS) {
 		paths.push({ path: [slug] });
 	}
 

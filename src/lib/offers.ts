@@ -92,7 +92,3 @@ export const FACEBOOK_PRIVATE_OFFER_COPY = `${PRIVATE_FACEBOOK_LABEL}. Invite-on
  * Facebook Ads destination URL (paste in Ads Manager; not used by app code):
  * https://designedbyanthony.com/facebook-offer?utm_source=facebook&utm_medium=paid_social&utm_campaign=founding_partner_facebook&utm_content=private_offer
  */
-
-/** Calendly with matching UTMs for strategy calls from this landing page. */
-export const FACEBOOK_OFFER_CALENDLY_WITH_UTM =
-	"https://calendly.com/anthony-designedbyanthony/web-design-consult?utm_source=facebook&utm_medium=paid_social&utm_campaign=founding_partner_facebook&utm_content=strategy_call";

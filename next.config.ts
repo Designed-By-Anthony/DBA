@@ -9,6 +9,17 @@ validateLighthouseEnv();
 const nextConfig: NextConfig = {
 	trailingSlash: false,
 	reactStrictMode: true,
+	experimental: {
+		/** Tree-shake `framer-motion` re-exports so only used motion primitives ship. */
+		optimizePackageImports: ["framer-motion"],
+	},
+	compiler: {
+		/** Drop stray `console.log` / `console.info` / `console.debug` in production client+server bundles. */
+		removeConsole:
+			process.env.NODE_ENV === "production"
+				? { exclude: ["error", "warn"] }
+				: false,
+	},
 	async redirects() {
 		return [
 			{

@@ -6,12 +6,11 @@ import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { BRAND_ASSETS } from "@/design-system/brand";
-import { MONTHLY_LOCAL_SEO_PRICE } from "@/lib/offers";
 import { businessProfile, GA_MEASUREMENT_ID } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
+import { SiteContactDrawer } from "./SiteContactDrawer";
 import { SiteFooter } from "./SiteFooter";
-import { SiteQuickRailDrawer } from "./SiteQuickRailDrawer";
 import { StreamChatGate } from "./StreamChatGate";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
@@ -116,18 +115,13 @@ window.__dbaRevokeAnalyticsConsent = function () {
 			<div id="reading-progress-bar" aria-hidden="true" />
 			<div className="site-chrome-sticky">
 				<div className="site-banner">
-					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="site-banner-link"
-						data-calendar-link
-					>
+					<Link href="/lighthouse" className="site-banner-link">
 						<span className="site-banner-dot" aria-hidden="true" />
 						<span>
-							<strong>Launch pilot: 10 client spots</strong> — complimentary
-							custom build + {MONTHLY_LOCAL_SEO_PRICE}/mo growth plan while the
-							program is open →
+							<strong>Launch pilot · 10 founding spots</strong> — start with a
+							free SEO + performance audit →
 						</span>
-					</a>
+					</Link>
 				</div>
 				<header className="header">
 					<div className="header-container">
@@ -153,14 +147,13 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							<Link href="/contact" className="nav-contact-link">
 								Contact
 							</Link>
-							<a
-								href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+							<Link
+								href="/lighthouse"
 								className="btn btn-primary btn-sm nav-book-btn"
-								id="nav-book-call-btn"
-								data-calendar-link
+								id="nav-audit-btn"
 							>
-								Book a Free Call
-							</a>
+								Audit My Site
+							</Link>
 						</nav>
 						<button
 							className="hamburger"
@@ -220,22 +213,18 @@ window.__dbaRevokeAnalyticsConsent = function () {
 								href="/contact"
 								className="mobile-nav-cta mobile-nav-cta--secondary"
 							>
-								Contact us for your free audit
+								Contact us
 							</Link>
-							<a
-								href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-								className="mobile-nav-cta"
-								data-calendar-link
-							>
-								Book a free call
-							</a>
+							<Link href="/lighthouse" className="mobile-nav-cta">
+								Audit My Site
+							</Link>
 						</nav>
 					</div>
 				</div>
 			</div>
 
 			<div className="site-body-canvas">
-				<SiteQuickRailDrawer />
+				<SiteContactDrawer />
 				<div className="site-main-wrap">
 					<main id="main-content">{children}</main>
 					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
@@ -284,15 +273,14 @@ window.__dbaRevokeAnalyticsConsent = function () {
 						Say hello
 					</h2>
 					<p className="reach-out-dialog-lede">
-						Pick what feels easiest — email the form, call, or grab a time on
-						the calendar.
+						Start with a free site audit — or just call / email.
 					</p>
 					<Link
-						href="/contact"
+						href="/lighthouse"
 						className="reach-out-dialog-primary"
 						data-reach-out-close
 					>
-						Contact us
+						Audit My Site
 					</Link>
 					<section
 						className="reach-out-dialog-actions"
@@ -318,53 +306,17 @@ window.__dbaRevokeAnalyticsConsent = function () {
 								{businessProfile.email}
 							</span>
 						</a>
-						<button
-							type="button"
-							className="reach-out-action reach-out-action--calendly"
-							id="reachOutCalendlyBtn"
-							aria-label="Book a call — opens calendar in this window"
+						<Link
+							href="/contact"
+							className="reach-out-action"
+							data-reach-out-close
 						>
-							<span className="reach-out-action-label">Book a call</span>
-							<span className="reach-out-action-detail">Calendly</span>
-						</button>
+							<span className="reach-out-action-label">Contact</span>
+							<span className="reach-out-action-detail">Form / message</span>
+						</Link>
 					</section>
 				</div>
 			</dialog>
-
-			<div
-				className="layout-calendly-modal"
-				id="layoutCalendlyModal"
-				hidden
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="layoutCalendlyModalTitle"
-			>
-				<div className="layout-calendly-modal__content splash-shell splash-shell--calendly">
-					<h2 id="layoutCalendlyModalTitle" className="sr-only">
-						Schedule a web design consultation
-					</h2>
-					<button
-						type="button"
-						className="layout-calendly-modal__close splash-close"
-						id="layoutCalendlyCloseBtn"
-						aria-label="Close calendar"
-					>
-						×
-					</button>
-					<div
-						className="layout-calendly-modal__body"
-						id="layoutCalendlyModalBody"
-					>
-						<div className="calendly-embed-loading" data-calendly-loading>
-							<div
-								className="calendly-embed-loading__spinner"
-								aria-hidden="true"
-							/>
-							<p className="calendly-embed-loading__text">Loading calendar…</p>
-						</div>
-					</div>
-				</div>
-			</div>
 
 			<div
 				id="cookie-consent-root"

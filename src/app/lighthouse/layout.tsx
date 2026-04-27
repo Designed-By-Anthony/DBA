@@ -22,14 +22,16 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-	title: "Website Audit & Performance Tool | Designed by Anthony",
+	title:
+		"Lighthouse Scanner — Free SEO & Performance Audit | Designed by Anthony",
 	description:
-		"Get a free Google Lighthouse report to see what's holding your site back. We audit speed, accessibility, and SEO.",
+		"Free website audit: PageSpeed Insights (Core Web Vitals + Lighthouse scores), on-page SEO signals, robots.txt and sitemap checks, optional local context, AI prioritized fixes. For service businesses — Built by Anthony, Central NY.",
 	openGraph: {
-		title: "Website Audit & Performance Tool | Designed by Anthony",
+		title:
+			"Lighthouse Scanner — Free SEO & Performance Audit | Designed by Anthony",
 		description:
-			"Free Lighthouse audit — performance, accessibility, best practices, and SEO scores in under 60 seconds.",
-		url: "https://lighthouse.designedbyanthony.com",
+			"PageSpeed lab data, technical SEO signals, crawl snapshot, and plain-English next steps. No credit card.",
+		url: `${BRAND_SITE_URL}/lighthouse`,
 		siteName: BRAND_NAME,
 		images: [
 			{
@@ -45,9 +47,10 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Website Audit & Performance Tool | Designed by Anthony",
+		title:
+			"Lighthouse Scanner — Free SEO & Performance Audit | Designed by Anthony",
 		description:
-			"Free Lighthouse audit — performance, accessibility, best practices, and SEO scores in under 60 seconds.",
+			"PageSpeed + on-page SEO + crawl checks + AI summary. See lighthouse2.md for full feature map.",
 		images: [`${BRAND_SITE_URL}/images/og-site-premium.png`],
 	},
 };
@@ -65,6 +68,13 @@ export default function LighthouseLayout({
 				id="trusted-types-bootstrap-lh"
 				src="/trusted-types-bootstrap.js"
 				strategy="beforeInteractive"
+			/>
+			<Script
+				id="cf-turnstile-api"
+				src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+				strategy="afterInteractive"
+				async
+				defer
 			/>
 			<header className="w-full border-b border-white/5 bg-[rgba(11,18,32,0.6)] backdrop-blur-md">
 				<div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">

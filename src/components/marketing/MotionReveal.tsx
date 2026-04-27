@@ -1,6 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+import {
+	article as MotionArticle,
+	details as MotionDetails,
+	div as MotionDiv,
+	li as MotionLi,
+	ul as MotionUl,
+} from "framer-motion/client";
 import type { CSSProperties, ReactNode } from "react";
 
 interface MotionRevealProps {
@@ -33,7 +40,7 @@ export function MotionReveal({
 	}
 
 	return (
-		<motion.div
+		<MotionDiv
 			className={className}
 			style={style}
 			initial={{ opacity: 0, y }}
@@ -46,7 +53,7 @@ export function MotionReveal({
 			}}
 		>
 			{children}
-		</motion.div>
+		</MotionDiv>
 	);
 }
 
@@ -95,7 +102,7 @@ export function MotionStagger({
 
 	if (as === "ul") {
 		return (
-			<motion.ul
+			<MotionUl
 				className={className}
 				style={style}
 				data-exclusive-details={exclusiveDetails}
@@ -109,12 +116,12 @@ export function MotionStagger({
 				}}
 			>
 				{children}
-			</motion.ul>
+			</MotionUl>
 		);
 	}
 
 	return (
-		<motion.div
+		<MotionDiv
 			className={className}
 			style={style}
 			data-exclusive-details={exclusiveDetails}
@@ -128,7 +135,7 @@ export function MotionStagger({
 			}}
 		>
 			{children}
-		</motion.div>
+		</MotionDiv>
 	);
 }
 
@@ -187,28 +194,28 @@ export function MotionStaggerChild({
 
 	if (as === "li") {
 		return (
-			<motion.li className={className} style={style} variants={variants}>
+			<MotionLi className={className} style={style} variants={variants}>
 				{children}
-			</motion.li>
+			</MotionLi>
 		);
 	}
 	if (as === "article") {
 		return (
-			<motion.article className={className} style={style} variants={variants}>
+			<MotionArticle className={className} style={style} variants={variants}>
 				{children}
-			</motion.article>
+			</MotionArticle>
 		);
 	}
 	if (as === "details") {
 		return (
-			<motion.details className={className} style={style} variants={variants}>
+			<MotionDetails className={className} style={style} variants={variants}>
 				{children}
-			</motion.details>
+			</MotionDetails>
 		);
 	}
 	return (
-		<motion.div className={className} style={style} variants={variants}>
+		<MotionDiv className={className} style={style} variants={variants}>
 			{children}
-		</motion.div>
+		</MotionDiv>
 	);
 }

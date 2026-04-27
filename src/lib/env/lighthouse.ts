@@ -29,7 +29,16 @@ const lighthouseSchema = z
 
 		AGENCY_OS_WEBHOOK_URL: optionalUrl,
 		AGENCY_OS_WEBHOOK_SECRET: z.string().trim().optional(),
+		/** POST JSON audit summary after success (e.g. Convex logging pipeline). */
+		AUDIT_LOGGING_WEBHOOK_URL: optionalUrl,
 		REPORT_PUBLIC_BASE_URL: optionalUrl,
+
+		/** When `1`, POST successful audit leads to Freshsales (`FRESHWORKS_CRM_*`). */
+		FRESHWORKS_CRM_SYNC_ENABLED: z.string().trim().optional(),
+		FRESHWORKS_CRM_BASE_URL: optionalUrl,
+		FRESHWORKS_CRM_API_KEY: z.string().trim().optional(),
+		FRESHWORKS_CRM_AUTH_MODE: z.enum(["token", "bearer"]).optional(),
+		FRESHWORKS_CRM_CUSTOM_FIELD_KEYS: z.string().trim().optional(),
 
 		/**
 		 * Interim lead-email bridge (`/api/lead-email`). Active until the

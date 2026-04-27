@@ -14,11 +14,9 @@ const LIGHTHOUSE_AUDIT_API_ORIGIN =
 const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
 
 /**
- * Lighthouse subdomain on Vercel — hosts the audit UI, the `/api/contact`
- * legacy lead endpoint, and the interim `/api/lead-email` bridge that ships
- * marketing lead submissions to Anthony's inbox until the VertaFlow CRM
- * tenant is provisioned. Required in `connect-src` + `form-action` because
- * the browser posts cross-origin from `designedbyanthony.com` to this host.
+ * Legacy Lighthouse subdomain origin — kept in CSP so any historical inbound
+ * links continue to resolve via redirect; the audit now lives on the apex at
+ * `/lighthouse`. Safe to drop once analytics confirms zero traffic.
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
@@ -48,8 +46,7 @@ const SCRIPT_SRC_ENFORCING = [
 	"https://challenges.cloudflare.com",
 	"https://client.crisp.chat",
 	"https://settings.crisp.chat",
-	/** Freshworks Chat + CRM web forms */
-	"https://fw-cdn.com",
+	/** Freshworks CRM web forms (form embed only; chat is Crisp). */
 	"https://*.myfreshworks.com",
 	"https://*.freshworks.com",
 ].join(" ");
@@ -60,7 +57,7 @@ const DIRECTIVES = {
 	"style-src":
 		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
 	"font-src":
-		"'self' data: https://fonts.gstatic.com https://client.crisp.chat",
+		"'self' data: https://fonts.gstatic.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
 	"img-src":
 		"'self' data: https: blob: https://s3.amazonaws.com https://image.crisp.chat https://client.crisp.chat https://storage.crisp.chat",
 	"connect-src": [
@@ -79,19 +76,13 @@ const DIRECTIVES = {
 		"https://challenges.cloudflare.com",
 		"https://*.ingest.us.sentry.io",
 		"https://*.ingest.de.sentry.io",
-		/** GetStream Chat (REST + WebSocket) — marketing live chat widget */
-		"https://chat.stream-io-api.com",
-		"https://*.stream-io-api.com",
-		"wss://chat.stream-io-api.com",
-		"wss://*.stream-io-api.com",
 		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
 		"https://*.crisp.chat",
 		"wss://*.relay.crisp.chat",
 		"wss://*.relay.rescue.crisp.chat",
-		/** Freshworks CRM + Chat */
+		/** Freshworks CRM web form (no chat). */
 		"https://*.myfreshworks.com",
 		"https://*.freshworks.com",
-		"https://fw-cdn.com",
 	].join(" "),
 	"frame-src":
 		"'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat https://*.myfreshworks.com",

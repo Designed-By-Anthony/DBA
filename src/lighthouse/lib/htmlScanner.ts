@@ -284,7 +284,7 @@ export async function scanHtml(
 		$("h1, h2, h3, h4, h5, h6").each((_: unknown, el: unknown) => {
 			const tag = ($(el as never).prop("tagName") || "").toLowerCase();
 			const level = parseInt(tag.replace("h", ""), 10);
-			if (!isNaN(level)) headingLevels.push(level);
+			if (!Number.isNaN(level)) headingLevels.push(level);
 		});
 		if (headingLevels.length > 0) {
 			result.headingHierarchyValid = headingLevels[0] === 1;

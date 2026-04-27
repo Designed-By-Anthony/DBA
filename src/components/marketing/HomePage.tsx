@@ -94,21 +94,20 @@ export function HomePage() {
 							single-service sites from {STANDARD_WEBSITE_STARTING_PRICE}.
 						</p>
 						<div className="hero-actions">
-							<a
-								href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+							<Link
+								href="/lighthouse"
 								className="btn btn-primary-book hero-cta-glow"
-								id="hero-founder-btn"
-								data-calendar-link
+								id="hero-audit-btn"
 							>
 								<span className="hero-cta-glow-halo" aria-hidden="true" />
-								Book a 15-minute intro call
-							</a>
+								Audit My Site
+							</Link>
 							<Link
 								href="/contact"
 								className="btn btn-primary-audit"
-								id="hero-run-audit-btn"
+								id="hero-contact-btn"
 							>
-								Contact us for your free audit
+								Contact us
 							</Link>
 						</div>
 						<div className="hero-trust-strip">
@@ -229,13 +228,9 @@ export function HomePage() {
 							<Link href="/contact" className="btn btn-primary-book">
 								Open contact form
 							</Link>
-							<a
-								href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-								className="btn btn-secondary-proof"
-								data-calendar-link
-							>
-								Or book a 15-minute call
-							</a>
+							<Link href="/lighthouse" className="btn btn-secondary-proof">
+								Or run a free site audit
+							</Link>
 						</div>
 					</div>
 				</div>

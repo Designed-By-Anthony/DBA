@@ -5,7 +5,7 @@ import {
 	readStoredConsent,
 	writeConsent,
 } from "@lh/lib/cookieConsent";
-import React, { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 const PRIVACY_URL = "https://designedbyanthony.com/privacy";
 

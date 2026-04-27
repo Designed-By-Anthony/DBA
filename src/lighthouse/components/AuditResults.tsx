@@ -2,7 +2,6 @@ import type { IndexCheckResult } from "@lh/lib/indexCheck";
 import type { MozMetrics } from "@lh/lib/mozAnalysis";
 import type { Competitor, PlacesResult } from "@lh/lib/places";
 import type { SitewideScanResult } from "@lh/lib/sitewideScan";
-import React from "react";
 import { ScoreRing } from "./ScoreRing";
 
 export interface AuditAiInsight {
@@ -156,18 +155,36 @@ export function AuditResults({
 
 			{moz?.found ? (
 				<div className="bg-[#0d1117] rounded-xl p-6 mb-8 border border-white/10">
-					<h3 className="text-xl font-display mb-4">
+					<h3 className="text-xl font-display mb-1">
 						Authority &amp; backlinks
 					</h3>
+					{moz.dataSource === "internal" ? (
+						<p className="mb-4 text-xs leading-relaxed text-amber-200/85">
+							{moz.authorityLabel ??
+								"On-page estimate from your homepage crawl — not Moz Domain Authority or Ahrefs DR. Use for direction only."}
+						</p>
+					) : (
+						<p className="mb-4 text-xs text-slate-500">
+							Moz Link Explorer metrics for this domain.
+						</p>
+					)}
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
 						<div>
-							<p className="text-slate-400 mb-1">Domain authority</p>
+							<p className="text-slate-400 mb-1">
+								{moz.dataSource === "internal"
+									? "Authority estimate"
+									: "Domain authority"}
+							</p>
 							<p className="font-medium text-lg">
 								{moz.domainAuthority ?? "—"}
 							</p>
 						</div>
 						<div>
-							<p className="text-slate-400 mb-1">Page authority</p>
+							<p className="text-slate-400 mb-1">
+								{moz.dataSource === "internal"
+									? "Page estimate"
+									: "Page authority"}
+							</p>
 							<p className="font-medium text-lg">{moz.pageAuthority ?? "—"}</p>
 						</div>
 						<div>
@@ -277,7 +294,26 @@ export function AuditResults({
 				</div>
 			</div>
 
-			<div className="flex justify-center mt-10">
+			<div className="bg-gradient-to-br from-emerald-500/15 to-cyan-500/10 rounded-xl p-6 mt-10 mb-6 border border-emerald-400/30">
+				<h3 className="text-xl font-display mb-2">
+					Want help fixing the highest-impact items?
+				</h3>
+				<p className="text-slate-300 mb-4">
+					Book a 15-minute call with Anthony — we'll walk through your report
+					together, prioritize what matters for revenue, and outline the fastest
+					path to results.
+				</p>
+				<a
+					href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+					target="_blank"
+					rel="noopener"
+					className="inline-block px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold rounded-full transition-all"
+				>
+					Book a 15-minute call →
+				</a>
+			</div>
+
+			<div className="flex justify-center mt-6">
 				<button
 					type="button"
 					onClick={onReset}

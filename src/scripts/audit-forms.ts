@@ -1,6 +1,23 @@
 import { buildPublicLeadPayloadFromFormData } from "@/lib/lead-form-contract";
 import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 
+/** Cloudflare Turnstile browser API (subset). */
+interface TurnstileApi {
+	reset: (container: string | HTMLElement) => void;
+	execute: (container: string | HTMLElement) => void;
+	remove?: (widgetId: string) => void;
+}
+
+type WindowWithTurnstile = Window & { turnstile?: TurnstileApi };
+
+type AuditFormElement = HTMLFormElement & {
+	__dbaTurnstileResolver?: (token: string | null) => void;
+};
+
+function getTurnstileApi(): TurnstileApi | undefined {
+	return (window as WindowWithTurnstile).turnstile;
+}
+
 /**
  * Lead endpoint resolution order (Augusta Global Ingest Protocol):
  *   1. `PUBLIC_INGEST_URL` — the new versioned `POST /api/v1/ingest` route.
@@ -96,8 +113,9 @@ export function resetAuditFormState(
 
 	// Reset the Turnstile widget so it's ready for re-submission
 	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-	if (turnstileEl && typeof (window as any).turnstile !== "undefined") {
-		(window as any).turnstile.reset(turnstileEl);
+	const turnstile = getTurnstileApi();
+	if (turnstileEl && turnstile) {
+		turnstile.reset(turnstileEl);
 	}
 }
 
@@ -434,8 +452,9 @@ async function finalizeAuditFormSubmission(
 		restoreAuditSubmitButton(submitButton, defaultLabel);
 	} finally {
 		const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-		if (turnstileEl && typeof (window as any).turnstile !== "undefined") {
-			(window as any).turnstile.reset(turnstileEl);
+		const turnstile = getTurnstileApi();
+		if (turnstileEl && turnstile) {
+			turnstile.reset(turnstileEl);
 		}
 	}
 }
@@ -462,14 +481,9 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	await syncGaClientId(form);
 
 	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-	const tsAny = (window as any).turnstile as
-		| {
-				execute: (el: HTMLElement) => void;
-				reset: (el: HTMLElement) => void;
-		  }
-		| undefined;
+	const tsAny = getTurnstileApi();
 
-	if (!turnstileEl || !tsAny || typeof tsAny.execute !== "function") {
+	if (!turnstileEl || !tsAny) {
 		showAuditFormError(
 			form,
 			"Security check could not load. Please refresh the page and try again.",
@@ -478,9 +492,11 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 		return;
 	}
 
+	const auditForm = form as AuditFormElement;
+
 	await new Promise<void>((resolve) => {
-		(form as any).__dbaTurnstileResolver = (token: string | null) => {
-			(form as any).__dbaTurnstileResolver = undefined;
+		auditForm.__dbaTurnstileResolver = (token: string | null) => {
+			auditForm.__dbaTurnstileResolver = undefined;
 			if (!token) {
 				showAuditFormError(
 					form,
@@ -503,7 +519,7 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 			tsAny.reset(turnstileEl);
 			tsAny.execute(turnstileEl);
 		} catch {
-			(form as any).__dbaTurnstileResolver = undefined;
+			auditForm.__dbaTurnstileResolver = undefined;
 			showAuditFormError(
 				form,
 				"Security check could not start. Please refresh the page and try again.",
@@ -526,8 +542,8 @@ function installAuditFormTurnstileCallbacks(): void {
 	w.__dbaAuditFormTurnstileSuccess = (token: string) => {
 		document
 			.querySelectorAll<HTMLFormElement>("[data-audit-form]")
-			.forEach((form) => {
-				const resolver = (form as any).__dbaTurnstileResolver;
+			.forEach((f) => {
+				const resolver = (f as AuditFormElement).__dbaTurnstileResolver;
 				if (typeof resolver === "function") resolver(token);
 			});
 	};
@@ -535,8 +551,8 @@ function installAuditFormTurnstileCallbacks(): void {
 	w.__dbaAuditFormTurnstileFailure = () => {
 		document
 			.querySelectorAll<HTMLFormElement>("[data-audit-form]")
-			.forEach((form) => {
-				const resolver = (form as any).__dbaTurnstileResolver;
+			.forEach((f) => {
+				const resolver = (f as AuditFormElement).__dbaTurnstileResolver;
 				if (typeof resolver === "function") resolver(null);
 			});
 	};

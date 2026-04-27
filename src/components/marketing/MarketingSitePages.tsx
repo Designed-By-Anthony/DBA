@@ -12,7 +12,6 @@ import { isServiceAreaSlug } from "@/data/serviceAreaLocations";
 import { SERVICE_PAGE_EXTRA_SECTIONS } from "@/data/servicePageSections";
 import { showcaseItems } from "@/data/showcase";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
-import { FACEBOOK_OFFER_CALENDLY_WITH_UTM } from "@/lib/offers";
 import { MARKETING_SERVICES } from "@/lib/seo";
 import { ArticleBody } from "./ArticleBody";
 import { AuditForm } from "./AuditForm";
@@ -204,15 +203,12 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					y={20}
 					duration={0.6}
 				>
-					<Link href="/contact" className="btn btn-primary-book">
-						Contact
+					<Link href="/lighthouse" className="btn btn-primary-book">
+						Audit My Site
 					</Link>
-					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="btn btn-secondary-proof"
-					>
-						Book a 15-minute call
-					</a>
+					<Link href="/contact" className="btn btn-secondary-proof">
+						Contact us
+					</Link>
 				</MotionReveal>
 			</section>
 		</MarketingChrome>
@@ -505,12 +501,9 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 						y={20}
 						duration={0.6}
 					>
-						<a
-							className="btn btn-primary-book"
-							href={FACEBOOK_OFFER_CALENDLY_WITH_UTM}
-						>
-							Book a strategy call (Facebook offer)
-						</a>
+						<Link href="/lighthouse" className="btn btn-primary-book">
+							Audit My Site
+						</Link>
 						<Link href="/contact" className="btn btn-secondary-proof">
 							Contact instead
 						</Link>

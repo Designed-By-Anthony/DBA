@@ -4,9 +4,9 @@ import { z } from "zod";
 /**
  * Shared helpers for the "Zod" environment guard.
  *
- * Every app in the monorepo runs its env through `validateEnv` at import
- * time so the build fails fast if a subdomain is missing a required key
- * (e.g. web-viewer without `CLERK_SECRET_KEY`). This prevents the
+ * Next.js runs env through `validateEnv` at import time so the build fails
+ * fast when a required key is missing for the surface being validated.
+ * This prevents the
  * "White Screen of Death" — code that compiles on Vercel but crashes on
  * first request because `process.env.X` is undefined.
  *

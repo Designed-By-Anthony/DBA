@@ -83,7 +83,7 @@ export function AuditForm() {
 
 		return () => {
 			window.clearInterval(interval);
-			if (widgetId && anyWindow.turnstile && anyWindow.turnstile.remove) {
+			if (widgetId && anyWindow.turnstile?.remove) {
 				anyWindow.turnstile.remove(widgetId);
 			}
 			anyWindow.__lighthouseTurnstileOnSuccess = undefined;
@@ -183,24 +183,33 @@ export function AuditForm() {
 	}
 
 	return (
-		<div className="w-full relative">
+		<div className="relative w-full">
 			{status === "loading" && (
-				<div className="absolute inset-0 bg-[rgba(11,18,32,0.97)] backdrop-blur-md z-10 flex flex-col items-center justify-center p-8 text-center rounded-2xl">
-					<div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin-slow mb-6 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-					<p className="text-xl font-display font-medium text-glow mb-3 transition-opacity duration-500">
+				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-[rgba(11,18,32,0.97)] p-8 text-center backdrop-blur-md">
+					<div className="mb-6 h-16 w-16 animate-spin-slow rounded-full border-4 border-primary/20 border-t-primary shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+					<p className="mb-3 font-display text-xl font-medium text-glow transition-opacity duration-500">
 						{LOADING_MESSAGES[loadingTextIndex]}
 					</p>
 					<p className="text-sm text-[rgba(255,255,255,0.62)]">
-						This deep scan can take up to a minute. Hold tight.
+						Deep scan — usually under a minute. You can leave this tab open.
 					</p>
 				</div>
 			)}
 
 			<form onSubmit={handleSubmit} className="space-y-5">
+				<div className="border-b border-white/10 pb-5">
+					<h2 className="font-display text-lg font-semibold tracking-tight text-white">
+						Run your free audit
+					</h2>
+					<p className="mt-1.5 text-sm leading-relaxed text-white/60">
+						We use your details to deliver the report and (when enabled) create
+						a lead in Freshworks so nothing falls through the cracks.
+					</p>
+				</div>
 				<div>
 					<label
 						htmlFor="url"
-						className="block text-sm font-semibold text-label mb-1.5 tracking-wide"
+						className="mb-1.5 block text-sm font-semibold tracking-wide text-label"
 					>
 						Website URL
 					</label>
@@ -309,17 +318,14 @@ export function AuditForm() {
 					type="submit"
 					disabled={status === "loading"}
 					aria-disabled={status === "loading"}
-					className="w-full text-white font-bold text-lg rounded-xl px-4 py-4 mt-4 transition-all transform hover:-translate-y-0.5 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
-					style={{
-						background:
-							"linear-gradient(135deg, rgba(96, 165, 250, 0.34), rgba(37, 99, 235, 1))",
-						border: "1px solid rgba(96, 165, 250, 0.55)",
-						boxShadow:
-							"0 22px 40px -22px rgba(37, 99, 235, 1), inset 0 1px 0 rgba(255, 255, 255, 0.22)",
-					}}
+					className="mt-4 w-full cursor-pointer rounded-xl border border-sky-400/55 bg-gradient-to-br from-sky-400/35 to-blue-600 px-4 py-4 text-lg font-bold text-white shadow-[0_22px_40px_-22px_rgba(37,99,235,1)] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
 				>
-					Run Free Audit
+					Run free audit
 				</button>
+				<p className="text-center text-[11px] leading-relaxed text-white/40">
+					Lighthouse Scanner v2 · Results include a shareable report link when
+					storage is available.
+				</p>
 			</form>
 		</div>
 	);

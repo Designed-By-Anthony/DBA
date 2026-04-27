@@ -55,6 +55,42 @@ export function SiteFooter() {
 					</div>
 				</div>
 
+				<div className="footer-tech-badges">
+					<p className="footer-tech-badges__label">Built with</p>
+					<ul className="footer-tech-badges__list">
+						<li>
+							<a
+								href="https://nextjs.org"
+								className="footer-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Next.js
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://www.netlify.com"
+								className="footer-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Netlify
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://tailwindcss.com"
+								className="footer-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Tailwind CSS
+							</a>
+						</li>
+					</ul>
+				</div>
+
 				<div className="footer-bottom">
 					<p>© {year} Designed by Anthony</p>
 					<span className="footer-sep">·</span>

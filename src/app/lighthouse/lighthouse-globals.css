@@ -41,5 +41,6 @@
 
 .lighthouse-segment {
 	min-height: 100dvh;
+	width: 100%;
 	color: var(--color-foreground);
 }
