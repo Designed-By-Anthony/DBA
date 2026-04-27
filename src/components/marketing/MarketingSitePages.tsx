@@ -25,11 +25,29 @@ import {
 	ServiceAreaLocationPage,
 	ServiceAreasPage,
 } from "./EnrichedPages";
+import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
 import { MarketingChrome } from "./MarketingChrome";
+import {
+	MotionReveal,
+	MotionStagger,
+	MotionStaggerChild,
+} from "./MotionReveal";
 
-function PageHero({ title, subtitle }: { title: string; subtitle?: string }) {
+function PageHero({
+	title,
+	subtitle,
+	kind = "default",
+}: {
+	title: string;
+	subtitle?: string;
+	kind?: string;
+}) {
 	return (
-		<section className="section-shell section-shell--wash marketing-page-hero">
+		<section
+			className="section-shell section-shell--wash marketing-page-hero"
+			data-page-kind={kind}
+		>
+			<InnerPageMotionSystem kind={kind} />
 			<div className="section-container">
 				<div className="section-header">
 					<h1 className="page-title reveal-up">{title}</h1>
@@ -43,13 +61,17 @@ function PageHero({ title, subtitle }: { title: string; subtitle?: string }) {
 function ProseBlock({ paragraphs }: { paragraphs: string[] }) {
 	return (
 		<section className="section-shell">
-			<div className="section-container marketing-prose">
+			<MotionReveal
+				className="section-container marketing-prose"
+				y={16}
+				duration={0.6}
+			>
 				{paragraphs.map((p) => (
 					<p key={p} className="reveal-up">
 						{p}
 					</p>
 				))}
-			</div>
+			</MotionReveal>
 		</section>
 	);
 }
@@ -59,14 +81,19 @@ function ServicesIndex() {
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero
+				kind="services"
 				title="Services"
 				subtitle="Custom sites, local SEO, hosting, rescues, GBP programs, workspace setup, and AI-assisted lead capture."
 			/>
 			<section className="section-shell section-shell--wash">
 				<div className="section-container">
-					<ul className="marketing-link-grid">
+					<MotionStagger
+						as="ul"
+						className="marketing-link-grid"
+						staggerDelay={0.08}
+					>
 						{MARKETING_SERVICES.map((s) => (
-							<li key={s.path} className="reveal-up">
+							<MotionStaggerChild as="li" key={s.path} className="reveal-up">
 								<Link
 									href={s.path}
 									className="surface-card marketing-service-card"
@@ -75,9 +102,9 @@ function ServicesIndex() {
 									<p>{s.description}</p>
 									<span className="inline-link">Read more →</span>
 								</Link>
-							</li>
+							</MotionStaggerChild>
 						))}
-					</ul>
+					</MotionStagger>
 				</div>
 			</section>
 			{longform.map((section) => (
@@ -85,7 +112,11 @@ function ServicesIndex() {
 					key={section.heading}
 					className="section-shell section-shell--longform"
 				>
-					<div className="section-container marketing-prose marketing-prose--longform">
+					<MotionReveal
+						className="section-container marketing-prose marketing-prose--longform"
+						y={16}
+						duration={0.6}
+					>
 						<div className="section-divider-glow" aria-hidden="true" />
 						<h2 className="reveal-up">{section.heading}</h2>
 						{section.paragraphs.map((p) => (
@@ -93,7 +124,7 @@ function ServicesIndex() {
 								{p}
 							</p>
 						))}
-					</div>
+					</MotionReveal>
 				</section>
 			))}
 		</MarketingChrome>
@@ -109,7 +140,11 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 	const longform = getServiceLongformSections(service.name);
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero title={service.name} subtitle={service.description} />
+			<PageHero
+				kind="services"
+				title={service.name}
+				subtitle={service.description}
+			/>
 			<ProseBlock
 				paragraphs={[
 					`${service.name} is part of the core offer stack for Mohawk Valley and Central NY service businesses. If this matches what you need, book a short intro call or send a note — we will confirm scope, timeline, and pricing in writing before any work starts.`,
@@ -121,7 +156,12 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					key={section.heading}
 					className="section-shell section-shell--wash"
 				>
-					<div className="section-container marketing-prose">
+					<MotionReveal
+						className="section-container marketing-prose"
+						y={16}
+						duration={0.6}
+					>
+						<div className="section-divider-glow" aria-hidden="true" />
 						<h2 className="reveal-up">{section.heading}</h2>
 						{section.paragraphs.map((p) => (
 							<p key={p} className="reveal-up">
@@ -135,7 +175,7 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 								))}
 							</ul>
 						) : null}
-					</div>
+					</MotionReveal>
 				</section>
 			))}
 			{longform.map((section) => (
@@ -143,7 +183,11 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					key={section.heading}
 					className="section-shell section-shell--longform"
 				>
-					<div className="section-container marketing-prose marketing-prose--longform">
+					<MotionReveal
+						className="section-container marketing-prose marketing-prose--longform"
+						y={16}
+						duration={0.6}
+					>
 						<div className="section-divider-glow" aria-hidden="true" />
 						<h2 className="reveal-up">{section.heading}</h2>
 						{section.paragraphs.map((p) => (
@@ -151,11 +195,15 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 								{p}
 							</p>
 						))}
-					</div>
+					</MotionReveal>
 				</section>
 			))}
 			<section className="section-shell section-shell--wash">
-				<div className="section-container marketing-cta-row reveal-up">
+				<MotionReveal
+					className="section-container marketing-cta-row reveal-up"
+					y={20}
+					duration={0.6}
+				>
 					<Link href="/contact" className="btn btn-primary-book">
 						Contact
 					</Link>
@@ -165,7 +213,7 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					>
 						Book a 15-minute call
 					</a>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
@@ -175,13 +223,18 @@ function BlogIndex() {
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero
+				kind="blog"
 				title="Blog"
 				subtitle="Local SEO, performance, and how we build marketing sites."
 			/>
 			<section className="section-shell">
-				<div className="section-container blog-index-grid">
+				<MotionStagger
+					className="section-container blog-index-grid"
+					staggerDelay={0.08}
+				>
 					{blogPosts.map((post, index) => (
-						<article
+						<MotionStaggerChild
+							as="article"
 							key={post.url}
 							className="surface-card blog-index-card reveal-up"
 						>
@@ -219,9 +272,9 @@ function BlogIndex() {
 									Read article →
 								</Link>
 							</div>
-						</article>
+						</MotionStaggerChild>
 					))}
-				</div>
+				</MotionStagger>
 			</section>
 		</MarketingChrome>
 	);
@@ -236,7 +289,11 @@ function BlogPostPage({ slug }: { slug: string }) {
 		<MarketingChrome footerCta={homeFooterCta}>
 			<BlogArticleEnhancements />
 			<article className="blog-article-root">
-				<section className="section-shell section-shell--wash">
+				<section
+					className="section-shell section-shell--wash marketing-page-hero"
+					data-page-kind="blog"
+				>
+					<InnerPageMotionSystem kind="blog" />
 					<div className="section-container blog-article-hero">
 						<p className="blog-index-meta reveal-up">
 							{post.displayDate} · {post.readTime}
@@ -278,16 +335,18 @@ function BlogPostPage({ slug }: { slug: string }) {
 							</>
 						)}
 						{longform.map((section) => (
-							<section
+							<MotionReveal
 								key={section.heading}
 								className="reveal-up blog-longform-section marketing-prose--longform"
+								y={16}
+								duration={0.6}
 							>
 								<div className="section-divider-glow" aria-hidden="true" />
 								<h2>{section.heading}</h2>
 								{section.paragraphs.map((p) => (
 									<p key={p}>{p}</p>
 								))}
-							</section>
+							</MotionReveal>
 						))}
 						<p className="reveal-up">
 							<Link href="/blog" className="inline-link" data-blog-back-button>
@@ -304,16 +363,20 @@ function BlogPostPage({ slug }: { slug: string }) {
 function PortfolioIndex() {
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero {...staticMarketingPageCopy.portfolio} />
+			<PageHero kind="portfolio" {...staticMarketingPageCopy.portfolio} />
 			<section className="section-shell">
-				<div className="section-container featured-work-grid">
+				<MotionStagger
+					className="section-container featured-work-grid"
+					staggerDelay={0.08}
+				>
 					{showcaseItems.map((item) => {
 						const href = item.caseStudySlug
 							? `/portfolio/${item.caseStudySlug}`
 							: (item.href ?? "#");
 						const isExternal = !item.caseStudySlug;
 						return (
-							<article
+							<MotionStaggerChild
+								as="article"
 								key={item.name}
 								className="surface-card featured-work-card reveal-up"
 							>
@@ -347,10 +410,10 @@ function PortfolioIndex() {
 										{item.caseStudySlug ? "View case study" : "Open example"}
 									</a>
 								</div>
-							</article>
+							</MotionStaggerChild>
 						);
 					})}
-				</div>
+				</MotionStagger>
 			</section>
 		</MarketingChrome>
 	);
@@ -361,9 +424,17 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 	if (!item) notFound();
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero title={item.name} subtitle={item.description} />
+			<PageHero
+				kind="portfolio"
+				title={item.name}
+				subtitle={item.description}
+			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose reveal-up">
+				<MotionReveal
+					className="section-container marketing-prose reveal-up"
+					y={16}
+					duration={0.6}
+				>
 					<div className="blog-article-cover">
 						<Image
 							src={item.displayImage ?? item.image}
@@ -402,7 +473,7 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 							← Back to portfolio
 						</Link>
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);
@@ -415,11 +486,15 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 	const showFacebookCta = slug === "facebook-offer";
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero title={copy.title} subtitle={copy.description} />
+			<PageHero kind={slug} title={copy.title} subtitle={copy.description} />
 			<ProseBlock paragraphs={copy.paragraphs} />
 			{showFacebookCta ? (
 				<section className="section-shell section-shell--wash">
-					<div className="section-container marketing-cta-row reveal-up">
+					<MotionReveal
+						className="section-container marketing-cta-row reveal-up"
+						y={20}
+						duration={0.6}
+					>
 						<a
 							className="btn btn-primary-book"
 							href={FACEBOOK_OFFER_CALENDLY_WITH_UTM}
@@ -429,7 +504,7 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 						<Link href="/contact" className="btn btn-secondary-proof">
 							Contact instead
 						</Link>
-					</div>
+					</MotionReveal>
 				</section>
 			) : null}
 			{showContactForm ? (
@@ -471,9 +546,17 @@ function ThankYouPage() {
 	const base = staticMarketingPageCopy["thank-you"];
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
-			<PageHero title={base.title} subtitle={base.description} />
+			<PageHero
+				kind="thank-you"
+				title={base.title}
+				subtitle={base.description}
+			/>
 			<section className="section-shell">
-				<div className="section-container marketing-prose">
+				<MotionReveal
+					className="section-container marketing-prose"
+					y={16}
+					duration={0.6}
+				>
 					{base.paragraphs.map((p) => (
 						<p key={p} className="reveal-up">
 							{p}
@@ -484,7 +567,7 @@ function ThankYouPage() {
 							Back to home
 						</Link>
 					</p>
-				</div>
+				</MotionReveal>
 			</section>
 		</MarketingChrome>
 	);

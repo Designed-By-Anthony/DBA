@@ -791,3 +791,20 @@ Coverage: `apps/web-viewer/tests/lead-spam-guard.spec.ts` (pure-logic tests for 
 - Validation:
   - `npm run build` passes.
   - `npm install` reports 0 vulnerabilities.
+
+## 2026-04-27 Inner Page Animation Upgrade
+
+- Completed the Framer Motion layer for inner marketing pages: prose containers, CTA rows, service grids, blog index cards, portfolio cards, pricing tiers, FAQ items, comparison panels, values, and service-area cards now reveal/stagger with reduced-motion fallbacks.
+- Promoted blog article heroes into the inner-page hero atmosphere scope and preserved clean prose reading flow.
+- Added semantic-safe motion wrapper support for lists, articles, and details; reduced-motion paths render plain elements.
+- Elevated the visual system with GSAP ScrollTrigger on inner pages:
+  - Added branded blueprint hero linework and page-specific hero motifs for services, pricing, FAQ, service areas, portfolio, and blog.
+  - Added ScrollTrigger-driven section progress rails, media parallax variables, and pricing tier signal bars.
+  - Added inner-page card glare sweeps, stronger FAQ open states, portfolio/blog image lift, and CTA press polish.
+- Validation:
+  - `npm ci` passes after adding `gsap`.
+  - `npm run build` passes.
+  - Changed files pass targeted `npx biome check`.
+  - HTML smoke checked `/services`, `/pricing`, `/faq`, `/service-areas`, `/blog`, and `/portfolio` on localhost for hero/motion markup.
+  - Brand assets verified: `/brand/logo.png` and `/brand/mark.webp` return 200 on localhost.
+  - Playwright browser session was blocked by an existing locked MCP Chrome profile; production build and localhost HTML/asset checks passed.

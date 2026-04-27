@@ -660,10 +660,11 @@ main {
 	border: 1px solid var(--border-soft);
 	border-radius: var(--radius-card-lg);
 	box-shadow: var(--shadow-card);
+	perspective: 800px;
 	transition:
-		transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-		box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-		border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+		transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+		box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+		border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 	position: relative;
 	overflow: hidden;
 }
@@ -726,9 +727,17 @@ main {
 }
 
 .surface-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 28px 68px -36px rgba(2, 6, 23, 0.92);
-	border-color: rgba(255, 252, 245, 0.1);
+	transform: translateY(-4px) rotateX(1.5deg) rotateY(-1.5deg);
+	box-shadow:
+		0 32px 64px -32px rgba(2, 6, 23, 0.8),
+		0 0 0 1px rgba(96, 165, 250, 0.12);
+	border-color: rgba(96, 165, 250, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+	.surface-card:hover {
+		transform: none;
+	}
 }
 
 .feature-grid {
@@ -896,6 +905,21 @@ button:hover .card-tag {
 	border-color: rgba(125, 211, 252, 0.72);
 }
 
+@media (hover: hover) and (pointer: fine) and (
+		prefers-reduced-motion: no-preference
+	) {
+	.btn-primary-book:hover,
+	.btn-primary-audit:hover {
+		transform: translateY(-2px) scale(1.012);
+	}
+
+	.btn-primary-book:active,
+	.btn-primary-audit:active {
+		transform: translateY(0) scale(0.965);
+		transition-duration: 0.12s;
+	}
+}
+
 .btn-secondary-proof {
 	background: rgba(8, 15, 28, 0.78);
 	color: var(--text-white);
@@ -909,6 +933,34 @@ button:hover .card-tag {
 	background:
 		linear-gradient(135deg, rgba(201, 168, 108, 0.16), rgba(91, 156, 248, 0.2)),
 		rgba(9, 15, 28, 0.74);
+}
+
+/* ── CTA glow pulse ── */
+@keyframes btn-glow-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.65),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+	50% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.88),
+			0 0 32px 6px rgba(201, 168, 108, 0.22),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+}
+
+.btn-primary-book,
+.btn-primary-audit {
+	animation: btn-glow-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.btn-primary-book,
+	.btn-primary-audit {
+		animation: none;
+	}
 }
 
 .btn-outline {

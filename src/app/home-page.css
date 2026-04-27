@@ -280,6 +280,12 @@
 	overflow: visible;
 }
 
+/* Suppress global btn-glow-pulse on hero CTA — halo system handles it */
+.hero-cta-glow.btn-primary-book,
+.hero-cta-glow .btn-primary-book {
+	animation: none;
+}
+
 .hero-cta-glow-halo {
 	position: absolute;
 	inset: -4px;
