@@ -1,3 +1,9 @@
+/**
+ * Optional cover presentation for very dark artwork on the dark site shell.
+ * Replace with a brighter asset when ready — then remove `liftOnDark`.
+ */
+export type BlogCoverPresentation = "liftOnDark";
+
 export interface BlogPostMeta {
 	title: string;
 	excerpt: string;
@@ -5,6 +11,8 @@ export interface BlogPostMeta {
 	imageAlt: string;
 	imageWidth: number;
 	imageHeight: number;
+	/** When set, index + article apply contrast framing so the cover reads on dark backgrounds. */
+	coverPresentation?: BlogCoverPresentation;
 	publishedTime: string;
 	displayDate: string;
 	readTime: string;
@@ -17,11 +25,12 @@ export const blogPosts: BlogPostMeta[] = [
 			"Google Business Profile: The 2026 Playbook for CNY Service Businesses",
 		excerpt:
 			"GBP changed fast — AI calling, freshness pressure, visual ranking, and Ask Maps. Here is a Central New York field guide for plumbers, HVAC, and home-service crews who live in the Map Pack.",
-		image: "/images/gbp_2026_cny_playbook_hero.png",
+		image: "/images/gbp_2026_cny_playbook_cover.png",
 		imageAlt:
-			"Infographic: Google Business Profile 2026 playbook for Central New York service businesses — four panels for AI calling, freshness pressure and recent posts, visual ranking good vs bad photos, and Ask Maps conversational search around a Syracuse-area map and service-area highlight.",
-		imageWidth: 1920,
-		imageHeight: 960,
+			"Abstract dark map grid with brass and blue location pins and signal rings — custom artwork for Google Business Profile 2026 Central New York guide",
+		imageWidth: 1024,
+		imageHeight: 1024,
+		coverPresentation: "liftOnDark",
 		publishedTime: "2026-04-25T09:00:00-04:00",
 		displayDate: "April 25, 2026",
 		readTime: "16 min read",

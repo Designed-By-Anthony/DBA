@@ -15,7 +15,7 @@
 - Verified with `npm run build` from the repo root plus targeted checks against `http://localhost:3000`, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
 - **Pricing + schema polish:** Offer-catalog JSON-LD for standard rebuilds references `STANDARD_WEBSITE_INSTALLMENT_EACH` and `PUBLIC_LAUNCH_BUNDLE_MONTHS` so it stays aligned with `offers.ts`. Homepage metadata, hero variants, process strip, and pitch strip use the same "contact us for your free audit" CTA language. FAQPage JSON-LD has a stable `@id`; homepage JSON-LD script keys derive from `@id` / type instead of array indexes (Biome-clean).
 - **Service area landing pages:** `src/data/serviceAreaLocations.ts` drives `/service-areas/[slug]` (Rome, Utica, New Hartford, Clinton, Syracuse, Watertown, Naples, Houston) with long-form copy, breadcrumbs, WebPage + BreadcrumbList JSON-LD (`buildMarketingWebPageSchema`), clickable cards on `/service-areas`, `generateStaticParams` + meta descriptions in `[...path]/page.tsx`, and Playwright route coverage via `getAllServiceAreaSlugs()` in `marketing-routes.ts`.
-- **GBP 2026 blog hero:** Post cover uses `public/images/gbp_2026_cny_playbook_hero.png` (1920×960) plus infographic-style alt text. Regenerate placeholder with `npm run generate:gbp-playbook-hero`, or replace that file with the final exported artwork (keep the same path).
+- **GBP 2026 blog cover:** Post uses `public/images/gbp_2026_cny_playbook_cover.png` (1024×1024) with `coverPresentation: "liftOnDark"` so the dark map artwork reads on the marketing shell (see `.blog-cover--lift-on-dark` in `marketing-site-pages.css`).
 - **Marketing SEO completeness:** `resolveMarketingMetadata()` in `src/lib/marketing-metadata.ts` supplies per-route `description`, `alternates.canonical`, Open Graph (and Twitter where useful), plus `noindex` for thank-you / Facebook offer. `MarketingJsonLd` + `EnrichedPages` emit WebPage + BreadcrumbList, ItemList (services, blog index), Service (service detail), BlogPosting (posts), FAQPage + OfferCatalog on `/faq` and `/pricing` respectively, without duplicate graphs on enriched routes.
 - **Viewport + responsive polish:** Root `export const viewport` (device-width, initial scale 1, `viewport-fit: cover`, theme-color) so phones get a proper meta viewport. `html { overflow-x: clip }`, section containers `max-width: 100%`, pilot banner link wraps on small screens, marketing CTA rows stack full-width under 520px, blog index lazy-loads images after the first card, article hero uses `fetchPriority="high"` + `decoding="async"`. Crisp chat loads `lazyOnload` to reduce main-thread contention (Lighthouse-friendly).
 - **Premium inner-page polish:** `@font-face` for Fraunces Variable (woff2); `PageHero` uses `marketing-page-hero--editorial` — centered editorial headline (gradient text), softer aurora, scoped `::after` vignette. Pilot banner + left quick rail restyled (glass, brass accent, narrower rail) for a quieter chrome vs. content hierarchy.
@@ -791,6 +791,19 @@ Coverage: `apps/web-viewer/tests/lead-spam-guard.spec.ts` (pure-logic tests for 
 - Validation:
   - `npm run build` passes.
   - `npm install` reports 0 vulnerabilities.
+
+## 2026-04-27 GitLab Branch Cleanup (MR Triage Follow-through)
+
+- Removed stale recovery and local MR helper branches after validating `!136` was legacy Astro-path work not applicable to current Next.js root app:
+  - Remote deleted: `origin/cursor/recovered-mr-136`
+  - Local deleted: `cursor/recovered-mr-136`, `mr-118`, `mr-135`, `mr-136`
+- Pruned and normalized branch view.
+- Remaining remote branches:
+  - `origin/main`
+  - `origin/fix/csp-remove-trusted-types-enforcement`
+  - `origin/cursor/marketing-consolidated-4941`
+  - `origin/cursor/marketing-form-and-pages-a03d`
+  - `origin/cursor/marketing-services-configuration-a55c`
 
 ## 2026-04-27 Inner Page Animation Upgrade
 
