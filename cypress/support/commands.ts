@@ -99,9 +99,7 @@ declare global {
 			/** Assert the page does NOT show "Application Error" */
 			assertNoAppError(): Chainable<void>;
 			/** Intercept /api/portal/data with mock portal data */
-			mockPortalData(
-				overrides?: Record<string, unknown>,
-			): Chainable<void>;
+			mockPortalData(overrides?: Record<string, unknown>): Chainable<void>;
 			/** Intercept /api/portal/tickets with mock ticket data */
 			mockTickets(): Chainable<void>;
 		}

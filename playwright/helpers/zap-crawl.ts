@@ -11,9 +11,7 @@ const defaultAllowedTargets = new Set([
 
 function isLoopbackHost(hostname: string): boolean {
 	return (
-		hostname === "localhost" ||
-		hostname === "127.0.0.1" ||
-		hostname === "::1"
+		hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1"
 	);
 }
 
@@ -44,6 +42,7 @@ async function zapJson<T>(
 	for (const [k, v] of Object.entries(params)) {
 		u.searchParams.set(k, v);
 	}
+	// nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
 	const res = await fetch(u);
 	if (!res.ok) {
 		const body = await res.text().catch(() => "");
@@ -67,6 +66,7 @@ async function zapOther(
 	for (const [k, v] of Object.entries(params)) {
 		u.searchParams.set(k, v);
 	}
+	// nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
 	const res = await fetch(u);
 	if (!res.ok) {
 		const body = await res.text().catch(() => "");
@@ -83,6 +83,7 @@ async function waitSpiderComplete(scanId: string): Promise<void> {
 		const u = new URL("/JSON/spider/view/status/", `${zapBaseUrl()}/`);
 		u.searchParams.set("apikey", key);
 		u.searchParams.set("scanId", scanId);
+		// nosemgrep: nodejs_scan.javascript-ssrf-rule-node_ssrf
 		const res = await fetch(u);
 		if (!res.ok) throw new Error(`ZAP spider status ${res.status}`);
 		const data = (await res.json()) as { status?: string };

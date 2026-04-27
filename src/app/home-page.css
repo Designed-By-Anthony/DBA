@@ -990,31 +990,35 @@
 	from {
 		opacity: 0;
 		transform: translateY(18px);
-		filter: blur(6px);
 	}
 	to {
 		opacity: 1;
 		transform: translateY(0);
-		filter: blur(0);
 	}
 }
 
 /* ── 2. Gradient text shimmer on H1 ── */
 .page-hero--home h1 {
-	background: linear-gradient(
-		90deg,
-		var(--text-cream) 0%,
-		var(--text-cream) 40%,
-		rgba(201, 168, 108, 0.95) 50%,
-		var(--text-cream) 60%,
-		var(--text-cream) 100%
-	);
-	background-size: 200% 100%;
-	-webkit-background-clip: text;
-	background-clip: text;
-	-webkit-text-fill-color: transparent;
-	animation: hero-h1-shimmer 6s ease-in-out infinite;
-	animation-delay: 1.2s;
+	color: var(--text-cream);
+}
+
+@media (min-width: 901px) {
+	.page-hero--home h1 {
+		background: linear-gradient(
+			90deg,
+			var(--text-cream) 0%,
+			var(--text-cream) 40%,
+			rgba(201, 168, 108, 0.95) 50%,
+			var(--text-cream) 60%,
+			var(--text-cream) 100%
+		);
+		background-size: 200% 100%;
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: hero-h1-shimmer 6s ease-in-out infinite;
+		animation-delay: 1.2s;
+	}
 }
 
 @keyframes hero-h1-shimmer {

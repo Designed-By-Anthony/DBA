@@ -29,7 +29,9 @@ describe("Marketing — Contact Page Calendly", () => {
 		cy.get("#calendlyOpenBtn").click();
 		cy.get("#calendlyModal").should("be.visible");
 		cy.get("#calendlyModalBody iframe").should("be.visible");
-		cy.get("#calendlyModalBody iframe").should("have.attr", "src").and("match", /calendly\.com/);
+		cy.get("#calendlyModalBody iframe")
+			.should("have.attr", "src")
+			.and("match", /calendly\.com/);
 	});
 });
 
@@ -43,9 +45,13 @@ describe("Marketing — FAQ Accordion", () => {
 				cy.wait(400);
 			}
 		});
-		cy.get("#faq-accordion .faq-trigger").first().should("have.attr", "aria-expanded", "false");
+		cy.get("#faq-accordion .faq-trigger")
+			.first()
+			.should("have.attr", "aria-expanded", "false");
 		cy.get("#faq-accordion .faq-trigger").first().click();
-		cy.get("#faq-accordion .faq-trigger").first().should("have.attr", "aria-expanded", "true");
+		cy.get("#faq-accordion .faq-trigger")
+			.first()
+			.should("have.attr", "aria-expanded", "true");
 		cy.get("#faq-accordion .faq-panel.is-open").first().should("be.visible");
 	});
 });

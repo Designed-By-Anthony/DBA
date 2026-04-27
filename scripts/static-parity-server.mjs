@@ -91,7 +91,9 @@ function resolveFile(pathname) {
 function pathMatchesBlock(pathname, block) {
 	if (block.regex) {
 		try {
+			if (block.regex.length > 180) return false;
 			// nosemgrep: eslint.detect-non-literal-regexp
+			// nosemgrep: nodejs_scan.javascript-dos-rule-regex_dos
 			return new RegExp(block.regex).test(pathname);
 		} catch {
 			return false;

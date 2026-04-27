@@ -18,10 +18,11 @@ test.describe("OWASP ZAP crawl harness", () => {
 
 	test.afterAll(async () => {
 		if (process.env.PLAYWRIGHT_ZAP !== "1") return;
+		const testPort = process.env.PLAYWRIGHT_TEST_PORT ?? "3001";
 		const base =
 			process.env.PLAYWRIGHT_TEST_BASE_URL ??
 			process.env.BASE_URL ??
-			"http://127.0.0.1:3000";
+			`http://127.0.0.1:${testPort}`;
 		const seed = base.replace(/\/$/, "");
 		await runZapSpiderAndReport(`${seed}/`);
 	});

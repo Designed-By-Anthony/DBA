@@ -321,6 +321,10 @@ export function isServiceAreaSlug(slug: string): boolean {
 }
 
 /** URL segment → display label for breadcrumbs (e.g. `rome-ny` → `Rome, NY`). */
-export const serviceAreaSlugLabels: Record<string, string> = Object.fromEntries(
-	serviceAreaLocations.map((l) => [l.slug, l.name] as const),
-);
+export const serviceAreaSlugLabels: Record<string, string> = (() => {
+	const labels: Record<string, string> = {};
+	for (const location of serviceAreaLocations) {
+		labels[location.slug] = location.name;
+	}
+	return labels;
+})();

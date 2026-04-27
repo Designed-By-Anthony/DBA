@@ -80,17 +80,11 @@ function MarketingPageJsonLd({
 
 	return (
 		<>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD from schema builders
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(webPage) }}
-			/>
+			<script type="application/ld+json">{JSON.stringify(webPage)}</script>
 			{breadcrumbJson ? (
-				<script
-					type="application/ld+json"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD from schema builders
-					dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
-				/>
+				<script type="application/ld+json">
+					{JSON.stringify(breadcrumbJson)}
+				</script>
 			) : null}
 		</>
 	);
@@ -249,11 +243,9 @@ export function PricingPage() {
 				description={copy.description}
 				breadcrumbLabel={copy.title}
 			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD from schema builders
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingCatalog) }}
-			/>
+			<script type="application/ld+json">
+				{JSON.stringify(pricingCatalog)}
+			</script>
 			<PageHero
 				title="Pricing"
 				subtitle="Easy payments at launch, three months of hosting + SEO included, then optional Growth Plan."
@@ -482,11 +474,7 @@ export function FaqPage() {
 				description={copy.description}
 				breadcrumbLabel={copy.title}
 			/>
-			<script
-				type="application/ld+json"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD from schema builders
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-			/>
+			<script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
 			<PageHero
 				title="FAQ"
 				subtitle="Quick answers before you spend a dollar."

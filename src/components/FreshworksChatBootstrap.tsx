@@ -4,19 +4,39 @@ import { useLayoutEffect } from "react";
 
 const SCRIPT_ID = "freshworks-fw-cdn-web-chat";
 const STORAGE_KEY = "dba_fc_external_id";
+let anonymousIdCounter = 0;
+
+function createEntropyId(prefix: string): string {
+	try {
+		const cryptoRef =
+			typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+		if (cryptoRef?.randomUUID) {
+			return `${prefix}_${cryptoRef.randomUUID()}`;
+		}
+		if (cryptoRef?.getRandomValues) {
+			const bytes = new Uint8Array(8);
+			cryptoRef.getRandomValues(bytes);
+			const token = Array.from(bytes, (b) =>
+				b.toString(16).padStart(2, "0"),
+			).join("");
+			return `${prefix}_${token}`;
+		}
+	} catch {
+		// Ignore and use deterministic fallback below.
+	}
+	anonymousIdCounter += 1;
+	return `${prefix}_${Date.now().toString(36)}_${anonymousIdCounter.toString(36)}`;
+}
 
 function getOrCreateAnonymousExternalId(): string {
 	try {
 		const existing = window.localStorage.getItem(STORAGE_KEY);
 		if (existing) return existing;
-		const id =
-			typeof crypto !== "undefined" && "randomUUID" in crypto
-				? `anon_${crypto.randomUUID()}`
-				: `anon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 12)}`;
+		const id = createEntropyId("anon");
 		window.localStorage.setItem(STORAGE_KEY, id);
 		return id;
 	} catch {
-		return `anon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 12)}`;
+		return createEntropyId("anon");
 	}
 }
 

@@ -111,7 +111,7 @@ export function HomePage() {
 								Contact us for your free audit
 							</Link>
 						</div>
-						<div className="hero-trust-strip reveal-up">
+						<div className="hero-trust-strip">
 							<div className="hero-trust-badge">
 								<span>Free · Manual Audit</span>
 							</div>

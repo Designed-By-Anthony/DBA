@@ -48,7 +48,9 @@ describe("Marketing — Mobile UX", () => {
 		cy.get("#reachOutModal").should("be.visible");
 		cy.get('#reachOutModal a[href="/contact"]').should("be.visible");
 		cy.get('#reachOutModal a[href="tel:+13159225592"]').should("be.visible");
-		cy.get('#reachOutModal a[href*="mailto:anthony@designedbyanthony.com"]').should("be.visible");
+		cy.get(
+			'#reachOutModal a[href*="mailto:anthony@designedbyanthony.com"]',
+		).should("be.visible");
 		cy.get("#reachOutCalendlyBtn").should("be.visible");
 	});
 

@@ -19,19 +19,30 @@ interface Orb {
 const ORB_COUNT = 5;
 const MOUSE_INFLUENCE = 0.08;
 
+function secureRandomUnit(): number {
+	const cryptoRef =
+		typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+	if (cryptoRef?.getRandomValues) {
+		const bytes = new Uint32Array(1);
+		cryptoRef.getRandomValues(bytes);
+		return bytes[0] / 4294967296;
+	}
+	return 0.5;
+}
+
 function createOrbs(w: number, h: number): Orb[] {
 	return Array.from({ length: ORB_COUNT }, (_, i) => ({
-		x: Math.random() * w,
-		y: Math.random() * h,
-		vx: (Math.random() - 0.5) * 0.3,
-		vy: (Math.random() - 0.5) * 0.3,
-		radius: Math.min(w, h) * (0.18 + Math.random() * 0.22),
+		x: secureRandomUnit() * w,
+		y: secureRandomUnit() * h,
+		vx: (secureRandomUnit() - 0.5) * 0.3,
+		vy: (secureRandomUnit() - 0.5) * 0.3,
+		radius: Math.min(w, h) * (0.18 + secureRandomUnit() * 0.22),
 		hue: 215 + i * 12,
-		saturation: 65 + Math.random() * 20,
-		lightness: 45 + Math.random() * 15,
-		alpha: 0.06 + Math.random() * 0.04,
-		phase: Math.random() * Math.PI * 2,
-		speed: 0.0004 + Math.random() * 0.0003,
+		saturation: 65 + secureRandomUnit() * 20,
+		lightness: 45 + secureRandomUnit() * 15,
+		alpha: 0.06 + secureRandomUnit() * 0.04,
+		phase: secureRandomUnit() * Math.PI * 2,
+		speed: 0.0004 + secureRandomUnit() * 0.0003,
 	}));
 }
 

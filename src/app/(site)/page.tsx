@@ -114,13 +114,9 @@ export default function Home() {
 	return (
 		<>
 			{structuredData.map((entry) => (
-				<script
-					key={jsonLdScriptKey(entry)}
-					type="application/ld+json"
-					// Trusted JSON-LD from schema builders (not user HTML).
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD serialization
-					dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
-				/>
+				<script key={jsonLdScriptKey(entry)} type="application/ld+json">
+					{JSON.stringify(entry)}
+				</script>
 			))}
 			<MarketingChrome footerCta={homeFooterCta}>
 				<HomePage />

@@ -8,7 +8,10 @@ describe("Marketing — SEO Meta", () => {
 
 	it("homepage has structured data", () => {
 		cy.visit(`${MARKETING}/`);
-		cy.get('script[type="application/ld+json"]').should("have.length.greaterThan", 0);
+		cy.get('script[type="application/ld+json"]').should(
+			"have.length.greaterThan",
+			0,
+		);
 	});
 });
 
@@ -25,9 +28,11 @@ describe("Marketing — Service Pages", () => {
 
 	for (const path of servicePages) {
 		it(`${path} loads without error`, () => {
-			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then((res) => {
-				expect(res.status).to.eq(200);
-			});
+			cy.request({ url: `${MARKETING}${path}`, failOnStatusCode: false }).then(
+				(res) => {
+					expect(res.status).to.eq(200);
+				},
+			);
 		});
 	}
 
