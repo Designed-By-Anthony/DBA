@@ -129,6 +129,8 @@ export async function generateAiInsight(params: {
 	spamScore?: number | null;
 	linkingRootDomains?: number | null;
 	externalBacklinks?: number | null;
+	/** `moz` = Moz API; `internal` = first-party estimate from HTML — never call it Moz DA */
+	authorityDataSource?: "moz" | "internal";
 	// Index coverage
 	estimatedIndexedPages?: number | null;
 	// Competitor + reputation
@@ -154,11 +156,11 @@ You now have access to comprehensive SEO data including:
 - Technical audit: Core Web Vitals, crawlability (robots.txt, sitemap.xml, redirect chains), mobile-readiness
 - On-page SEO: Full heading hierarchy (H1-H6), meta tags with character counts, canonical tags, Open Graph, internal/external link ratios
 - Content signals: Word count, copy analysis, keyword alignment
-- Off-page/authority: Domain Authority (Moz), spam score, linking root domains, total backlinks
+- Off-page/authority: When Moz API data is present, use Domain Authority, spam score, linking root domains, and backlinks. When only an internal estimate is present (not Moz), call it an "on-page authority estimate" derived from link counts and trust signals — never label it Moz DA or third-party authority.
 - Index coverage: Estimated indexed pages from Google
 - Local presence: Google Business Profile rating, review count, competitor benchmarks
 
-Use ALL available data to produce the most insightful analysis possible. When backlink or DA data is available, weave it into the narrative — it's rare for free audits to include this. When crawlability issues are found (missing sitemap, blocked robots.txt, redirect chains), flag them as technical priorities.
+Use ALL available data to produce the most insightful analysis possible. When Moz backlink data is available, weave it into the narrative. When only the internal estimate is available, explain that it is a bounded heuristic from the homepage crawl, not a Moz or Ahrefs authority score. When crawlability issues are found (missing sitemap, blocked robots.txt, redirect chains), flag them as technical priorities.
 
 You must return valid JSON matching this exact schema:
 {
@@ -175,9 +177,9 @@ You must return valid JSON matching this exact schema:
 }
 
 Rules for each field:
-- executiveSummary: Reference specific numbers. Mention DA, backlinks, indexation, and competitors when data is available. Written like a letter to the business owner. Weave technical findings (crawlability, redirect chains, sitemap) into actionable context.
+- executiveSummary: Reference specific numbers. Mention authority only with the correct label (Moz vs internal estimate). Mention indexation and competitors when data is available. Written like a letter to the business owner. Weave technical findings (crawlability, redirect chains, sitemap) into actionable context.
 - conversionScore: 0-100. Based on CTA presence, phone link, forms, schema, copy quality, word count.
-- strengths: Exactly 3 items. Be specific (e.g. "Domain Authority of 28 with 45 linking domains" or "Fast 1.0s First Contentful Paint").
+- strengths: Exactly 3 items. Be specific (e.g. Moz DA when present, or "Strong external reference footprint from homepage scan" when using internal estimate, or "Fast 1.0s First Contentful Paint").
 - weaknesses: Exactly 3 items. Be specific and actionable. Include technical/crawlability issues when found.
 - prioritizedActions: 3-5 items. Each must be a concrete task the owner can hand to a developer or do themselves. Impact and effort must be "high", "medium", or "low". Include crawlability, backlink, and on-page fixes.
 - copywritingAnalysis: Analyze their actual homepage text. Do they have a clear headline? A clear offer? Does the copy speak to a pain point? Is there a clear next step?`;
@@ -196,7 +198,13 @@ Rules for each field:
 
 	const backlinkBlock =
 		params.domainAuthority != null
-			? `\nBacklink & Authority Profile (Moz):
+			? params.authorityDataSource === "internal"
+				? `\nAuthority (internal estimate from homepage HTML — not Moz DA):
+- Estimated authority score: ${params.domainAuthority}/100 (bounded heuristic)
+- External links counted on page: ${params.externalBacklinks ?? "N/A"}
+- Derived linking-root hint: ${params.linkingRootDomains ?? "N/A"}
+- Do not compare this number to Moz or Ahrefs Domain Rating.`
+				: `\nBacklink & Authority Profile (Moz):
 - Domain Authority: ${params.domainAuthority}/100
 - Spam Score: ${params.spamScore ?? "N/A"}/100 ${params.spamScore != null && params.spamScore > 30 ? "⚠ HIGH — toxic links likely" : ""}
 - Linking Root Domains: ${params.linkingRootDomains ?? "N/A"}

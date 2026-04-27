@@ -258,13 +258,9 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="btn btn-primary-book"
-						data-calendar-link
-					>
-						Book a 15-minute call
-					</a>
+					<Link href="/lighthouse" className="btn btn-primary-book">
+						Audit My Site
+					</Link>
 					<Link href="/contact" className="btn btn-secondary-proof">
 						Contact
 					</Link>
@@ -408,15 +404,11 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<a
-							href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-							className="btn btn-primary-book"
-							data-calendar-link
-						>
-							Book a call to confirm fit
-						</a>
+						<Link href="/lighthouse" className="btn btn-primary-book">
+							Audit My Site
+						</Link>
 						<Link href="/contact" className="btn btn-primary-audit">
-							Contact us for your free audit
+							Contact us
 						</Link>
 					</MotionReveal>
 				</div>

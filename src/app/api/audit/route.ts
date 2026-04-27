@@ -1,4 +1,7 @@
 import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
+import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
+import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
+import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
@@ -336,13 +339,19 @@ export async function POST(request: Request) {
 			pagesCrawled: null,
 			lastCrawled: null,
 		};
-		const mozData: MozMetrics =
+		const mozFromApi: MozMetrics =
 			mozResponseRaw.status === "fulfilled" ? mozResponseRaw.value : defaultMoz;
+		const mozData: MozMetrics =
+			mozFromApi.found && mozFromApi.dataSource === "moz"
+				? mozFromApi
+				: buildInternalAuthorityMetrics(url, htmlData);
 
-		// Derive index coverage from sitemap + Moz data (no external API call needed)
+		// Index estimate: sitemap + Moz pages-crawled only when Moz API returned data
 		const indexData: IndexCheckResult = estimateIndexCoverage(
 			sitewideData.sitemap,
-			mozData,
+			mozFromApi.dataSource === "moz" && mozFromApi.found
+				? mozFromApi
+				: defaultMoz,
 		);
 
 		// Phase 2: Run competitor scan (needs primaryType from Places result)
@@ -531,6 +540,7 @@ export async function POST(request: Request) {
 				spamScore: mozData.spamScore,
 				linkingRootDomains: mozData.linkingRootDomains,
 				externalBacklinks: mozData.externalBacklinks,
+				authorityDataSource: mozData.dataSource,
 				// Index coverage
 				estimatedIndexedPages: indexData.estimatedIndexedPages,
 				// Competitor + reputation data
@@ -571,10 +581,13 @@ export async function POST(request: Request) {
 			performanceScore * 0.5 + accessibilityScore * 0.25 + seoScore * 0.25,
 		);
 
-		// Authority score: DA normalized, penalized by spam score
+		// Authority: Moz DA (+ spam penalty) or capped internal estimate for trust blend
 		let authorityScore = 50;
 		if (mozData.found && mozData.domainAuthority != null) {
 			authorityScore = mozData.domainAuthority;
+			if (mozData.dataSource === "internal") {
+				authorityScore = Math.round(authorityScore * 0.72);
+			}
 			if (mozData.spamScore != null && mozData.spamScore > 30) {
 				const spamPenalty = Math.min((mozData.spamScore - 30) * 0.7, 40);
 				authorityScore = Math.max(0, authorityScore - spamPenalty);
@@ -813,6 +826,35 @@ export async function POST(request: Request) {
 				);
 			}
 
+			if (process.env.FRESHWORKS_CRM_SYNC_ENABLED === "1") {
+				tasks.push(
+					createFreshworksLeadFromAudit({
+						name,
+						email,
+						company,
+						location,
+						scannedUrl: url,
+						reportId,
+						reportPublicUrl: `${reportPublicBase}/report/${reportId}`,
+						trustScore,
+						performanceScore,
+						accessibilityScore,
+						bestPracticesScore,
+						seoScore,
+						conversionScore,
+						userAgent: request.headers.get("user-agent") || "",
+					}).then((crmRes) => {
+						if (!crmRes.ok) {
+							console.error(
+								"[audit] Freshworks CRM lead sync failed:",
+								crmRes.error,
+								crmRes.status ?? "",
+							);
+						}
+					}),
+				);
+			}
+
 			// Create project-level Google Sheet for this lead
 			await createProjectSheet({
 				projectCode: reportId,
@@ -845,7 +887,28 @@ export async function POST(request: Request) {
 				return null;
 			});
 
-			// Send internal lead alert to Anthony relies purely on AgencyOS CRM Pipeline mapping now. (Removed email duplication).
+			if (process.env.AUDIT_LOGGING_WEBHOOK_URL?.trim()) {
+				tasks.push(
+					fireAuditLoggingWebhook({
+						company,
+						url,
+						email,
+						reportId,
+						reportPublicBase,
+						trustScore,
+						performanceScore,
+						seoScore,
+						accessibilityScore,
+						bestPracticesScore,
+						failedAuditCount,
+						criticalIssue,
+						executiveSummary: aiInsightResult.executiveSummary,
+						weaknesses: aiInsightResult.weaknesses,
+						prioritizedActions: aiInsightResult.prioritizedActions,
+						copywritingAnalysis: aiInsightResult.copywritingAnalysis,
+					}),
+				);
+			}
 
 			await Promise.allSettled(tasks);
 		});

@@ -116,13 +116,6 @@ export function AuditForm(_props: AuditFormProps) {
 						>
 							Email {businessProfile.email}
 						</a>
-						<a
-							href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-							className="btn btn-secondary-proof"
-							data-calendar-link
-						>
-							Book a 15-minute intro
-						</a>
 					</div>
 				</div>
 			) : null}

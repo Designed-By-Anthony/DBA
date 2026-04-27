@@ -4,20 +4,36 @@ Single **Next.js 16** application: marketing site, APIs, and the Lighthouse audi
 
 ## Routing — `src/middleware.ts`
 
-[`src/middleware.ts`](./src/middleware.ts) runs on the Netlify Next.js runtime. It reads `Host` and handles VertaFlow redirects, `lighthouse.*` (in-app or optional `LIGHTHOUSE_UPSTREAM_URL`), and hides `/lighthouse` on the apex host.
+[`src/middleware.ts`](./src/middleware.ts) runs on the Netlify Next.js runtime. It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
 
 ```
 admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*
 accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
-lighthouse.designedbyanthony.com/*  →  same app by default; or $LIGHTHOUSE_UPSTREAM_URL/* if set
-* (everything else)                 →  this Next app (fallthrough)
+* (everything else, including /lighthouse) → this Next app (fallthrough)
 ```
 
 ### Optional env on the Netlify site
 
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
-| `LIGHTHOUSE_UPSTREAM_URL` | Only if `lighthouse.*` should hit a **different** deploy |
+| `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` | Required for `/lighthouse` audits to actually run |
+| `AUDIT_LOGGING_WEBHOOK_URL` | Optional: after each successful **`POST /api/audit`**, POST a JSON summary to your logging endpoint (e.g. Convex `.../webhook/audit`). Unset = disabled. |
+| `FRESHWORKS_CRM_SYNC_ENABLED`, `FRESHWORKS_CRM_BASE_URL`, `FRESHWORKS_CRM_API_KEY` | Optional: log each successful `/api/audit` as a **Freshsales Lead** (see `.env.example`) |
+
+## GitLab CLI (`glab`)
+
+Optional tool for **merge requests**, pipelines, and API tasks from the terminal. Not required to build the site.
+
+```bash
+bash scripts/install-glab.sh   # Linux amd64 → /usr/local/bin/glab (needs sudo)
+glab auth login                 # then: glab mr list, glab mr create, etc.
+```
+
+See **`AGENTS.md`** (GitLab CLI section) for token env vars and agent/CI notes.
+
+## Lighthouse Scanner (`/lighthouse`)
+
+Free **technical + performance audit** (PageSpeed Insights, on-page HTML signals, crawlability, optional Places/Moz, AI summary). Product copy, feature table, env checklist, and paste-ready hero text live in **[`lighthouse2.md`](./lighthouse2.md)** at the repo root — structured like common SEO audit READMEs (feature blocks + stack + usage) so marketing and OG metadata stay aligned.
 
 ## Build
 

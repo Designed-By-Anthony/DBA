@@ -17,7 +17,9 @@
 			"!**/test-results",
 			"!**/cypress/screenshots",
 			"!**/cypress/videos",
-			"!**/public/scripts"
+			"!**/public/scripts",
+			"!static-headers.json",
+			"!netlify.toml"
 		]
 	},
 	"formatter": {
@@ -56,6 +58,29 @@
 	"overrides": [
 		{
 			"includes": ["src/styles/freshworks-chat-widget.css"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noImportantStyles": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/styles/theme.css", "src/styles/layout-shell.css"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noImportantStyles": "off"
+					},
+					"style": {
+						"noDescendingSpecificity": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["emails/**/*.html"],
 			"linter": {
 				"rules": {
 					"complexity": {

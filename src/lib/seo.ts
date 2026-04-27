@@ -766,8 +766,7 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 
 export function buildBaseWebsiteSchema(): SchemaValue {
 	const contactUrl = toAbsoluteUrl("/contact");
-	const calendlyBook =
-		"https://calendly.com/anthony-designedbyanthony/web-design-consult";
+	const auditUrl = toAbsoluteUrl("/lighthouse");
 
 	return {
 		"@context": "https://schema.org",
@@ -800,10 +799,10 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 			},
 			{
 				"@type": "ViewAction",
-				name: "Book a free web design consultation",
+				name: "Run a free site audit",
 				target: {
 					"@type": "EntryPoint",
-					urlTemplate: calendlyBook,
+					urlTemplate: auditUrl,
 				},
 			},
 		],

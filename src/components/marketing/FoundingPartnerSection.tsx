@@ -74,15 +74,11 @@ export function FoundingPartnerSection() {
 				</div>
 
 				<div className="founding-partner-actions reveal-up">
-					<a
-						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-						className="btn btn-primary"
-						data-calendar-link
-					>
-						Book a 15-minute intro call
-					</a>
+					<Link href="/lighthouse" className="btn btn-primary">
+						Audit My Site
+					</Link>
 					<Link href="/contact" className="btn btn-outline">
-						Contact us for your free audit
+						Contact us
 					</Link>
 				</div>
 

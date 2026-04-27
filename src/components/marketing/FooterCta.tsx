@@ -50,38 +50,36 @@ export function FooterCta({
 								{primaryLabel}
 							</a>
 						)}
-						{secondaryHref && secondaryLabel && (
-							<>
-								{secondaryHref.startsWith("/") ? (
-									<Link href={secondaryHref} className="btn btn-primary-book">
-										{secondaryLabel}
-									</Link>
-								) : (
-									<a
-										href={secondaryHref}
-										className="btn btn-primary-book"
-										target={
-											secondaryIsExternal && !secondaryIsCalendly
-												? "_blank"
-												: undefined
-										}
-										rel={
-											secondaryIsExternal && !secondaryIsCalendly
-												? "noopener noreferrer"
-												: undefined
-										}
-										{...(secondaryIsCalendly
-											? { "data-calendar-link": true }
-											: {})}
-									>
-										{secondaryLabel}
-										{secondaryIsExternal && !secondaryIsCalendly && (
-											<span className="sr-only"> (opens in new window)</span>
-										)}
-									</a>
-								)}
-							</>
-						)}
+						{secondaryHref &&
+							secondaryLabel &&
+							(secondaryHref.startsWith("/") ? (
+								<Link href={secondaryHref} className="btn btn-primary-book">
+									{secondaryLabel}
+								</Link>
+							) : (
+								<a
+									href={secondaryHref}
+									className="btn btn-primary-book"
+									target={
+										secondaryIsExternal && !secondaryIsCalendly
+											? "_blank"
+											: undefined
+									}
+									rel={
+										secondaryIsExternal && !secondaryIsCalendly
+											? "noopener noreferrer"
+											: undefined
+									}
+									{...(secondaryIsCalendly
+										? { "data-calendar-link": true }
+										: {})}
+								>
+									{secondaryLabel}
+									{secondaryIsExternal && !secondaryIsCalendly && (
+										<span className="sr-only"> (opens in new window)</span>
+									)}
+								</a>
+							))}
 					</div>
 				</div>
 			</div>

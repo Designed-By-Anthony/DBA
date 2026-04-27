@@ -39,8 +39,7 @@ async function fetchDist(name, version) {
 	const res = await fetch(url);
 	if (!res.ok) throw new Error(`${name}@${version}: HTTP ${res.status}`);
 	const j = await res.json();
-	const dist =
-		j.dist || (j.versions && j.versions[version] && j.versions[version].dist);
+	const dist = j.dist || j.versions?.[version]?.dist;
 	if (!dist?.integrity || !dist?.tarball) {
 		throw new Error(`${name}@${version}: missing dist in registry response`);
 	}

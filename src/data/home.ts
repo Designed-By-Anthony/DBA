@@ -80,14 +80,13 @@ export const processSteps = [
 ];
 
 export const homeFooterCta = {
-	eyebrow: "Free audit (by request)",
+	eyebrow: "Free site audit",
 	title: "Curious how your site is really doing?",
 	description:
-		"Send us your URL and you will get a straight report — speed, accessibility, best practices, and SEO. No signup, no pitch deck. Anthony provides a human read on what it means.",
-	primaryHref: "/contact",
-	primaryLabel: "Contact us for your free audit",
-	secondaryHref:
-		"https://calendly.com/anthony-designedbyanthony/web-design-consult",
-	secondaryLabel: "Book a 15-minute intro call",
+		"Drop your URL and you'll get a straight report — Core Web Vitals, on-page SEO, crawl checks, and an AI-prioritized fix list. No signup, no pitch deck.",
+	primaryHref: "/lighthouse",
+	primaryLabel: "Audit My Site",
+	secondaryHref: "/contact",
+	secondaryLabel: "Or open the contact form",
 	note: "A reply from Anthony usually comes within one business day.",
 };

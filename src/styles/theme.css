@@ -1688,21 +1688,70 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	user-select: none;
 }
 
-.footer-bottom .footer-stack-badge {
+.footer-tech-badges {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem 0.65rem;
+	padding-top: 0.35rem;
+	margin-top: 0.25rem;
+}
+
+@media (min-width: 768px) {
+	.footer-tech-badges {
+		justify-content: flex-start;
+	}
+}
+
+.footer-tech-badges__label {
+	margin: 0;
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: rgba(247, 244, 238, 0.38);
+	white-space: nowrap;
+}
+
+.footer-tech-badges__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 0.5rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.footer-tech-badges__list li {
+	margin: 0;
+	padding: 0;
+}
+
+.footer-stack-badge {
+	display: inline-flex;
+	align-items: center;
 	font-weight: 600;
+	font-size: 0.78rem;
 	text-decoration: none;
-	padding: 0.2rem 0.45rem;
-	margin-left: 0.15rem;
+	padding: 0.2rem 0.5rem;
 	border-radius: 0.4rem;
 	border: 1px solid rgba(147, 197, 253, 0.15);
 	background: rgba(255, 252, 245, 0.04);
+	color: rgba(247, 244, 238, 0.72);
 	transition:
 		border-color var(--motion-duration) var(--ease-out),
 		background var(--motion-duration) var(--ease-out),
-		transform var(--motion-duration) var(--ease-out);
+		transform var(--motion-duration) var(--ease-out),
+		color var(--motion-duration) var(--ease-out);
 }
 
-.footer-bottom .footer-stack-badge:hover {
+.footer-bottom .footer-stack-badge {
+	margin-left: 0.15rem;
+}
+
+.footer-stack-badge:hover {
 	color: var(--text-cream);
 	border-color: rgba(147, 197, 253, 0.35);
 	background: rgba(91, 156, 248, 0.1);
@@ -1797,7 +1846,7 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	.footer-link-list a:hover,
 	.footer-social-links a:hover,
 	.footer-badge-link:hover,
-	.footer-bottom .footer-stack-badge:hover {
+	.footer-stack-badge:hover {
 		transform: none;
 	}
 }
@@ -1948,9 +1997,9 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	*,
 	*::before,
 	*::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
 	}
 
 	.section-divider-glow {

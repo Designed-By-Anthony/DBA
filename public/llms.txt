@@ -12,7 +12,7 @@ Canonical business information:
 - Email: anthony@designedbyanthony.com
 - Phone: +1-315-922-5592
 - Contact page: https://designedbyanthony.com/contact
-- Sitemap: https://designedbyanthony.com/sitemap-index.xml
+- Sitemap: https://designedbyanthony.com/sitemap.xml
 - Robots: https://designedbyanthony.com/robots.txt
 
 Primary offers:

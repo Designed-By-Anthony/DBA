@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 // Unambiguous alphabet — no 0/O, no 1/I/l — so report IDs are phone-friendly.
 const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -21,13 +21,13 @@ function sanitize(input: string): string {
 export function buildPrefix(company: string, url: string): string {
 	const fromCompany = sanitize(company || "").slice(0, 4);
 	if (fromCompany.length === 4) return fromCompany;
-	if (fromCompany.length > 0) return (fromCompany + "XXXX").slice(0, 4);
+	if (fromCompany.length > 0) return `${fromCompany}XXXX`.slice(0, 4);
 
 	try {
 		const host = new URL(url).hostname.replace(/^www\./, "");
 		const fromHost = sanitize(host).slice(0, 4);
 		if (fromHost.length === 4) return fromHost;
-		if (fromHost.length > 0) return (fromHost + "XXXX").slice(0, 4);
+		if (fromHost.length > 0) return `${fromHost}XXXX`.slice(0, 4);
 	} catch {
 		// URL was malformed; fall through to ANON
 	}

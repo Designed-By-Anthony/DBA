@@ -171,7 +171,7 @@ async function scanSitemap(
 
 			const childFetches = childUrls.slice(0, 10).map(async (childUrl) => {
 				const childText = await fetchSitemapText(childUrl);
-				if (!childText || !childText.includes("<urlset")) return [];
+				if (!childText?.includes("<urlset")) return [];
 				return extractLocs(childText);
 			});
 

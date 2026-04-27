@@ -163,8 +163,13 @@ export async function createProjectSheet(
 			},
 		});
 
-		const spreadsheetId = createRes.data.spreadsheetId!;
-		const spreadsheetUrl = createRes.data.spreadsheetUrl!;
+		const spreadsheetId = createRes.data.spreadsheetId;
+		const spreadsheetUrl = createRes.data.spreadsheetUrl;
+		if (!spreadsheetId || !spreadsheetUrl) {
+			throw new Error(
+				"Google Sheets API returned a spreadsheet without id or url",
+			);
+		}
 
 		// ── Build the Project Profile rows ──
 		const profileRows: string[][] = [
