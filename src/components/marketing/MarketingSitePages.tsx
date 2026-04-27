@@ -240,7 +240,11 @@ function BlogIndex() {
 						>
 							<Link
 								href={post.url}
-								className="blog-index-card__media"
+								className={
+									post.coverPresentation === "liftOnDark"
+										? "blog-index-card__media blog-cover--lift-on-dark"
+										: "blog-index-card__media"
+								}
 								data-blog-post-link
 							>
 								<Image
@@ -304,7 +308,13 @@ function BlogPostPage({ slug }: { slug: string }) {
 				</section>
 				<section className="section-shell">
 					<div className="section-container marketing-prose blog-article-main">
-						<div className="blog-article-cover reveal-up">
+						<div
+							className={
+								post.coverPresentation === "liftOnDark"
+									? "blog-article-cover blog-cover--lift-on-dark reveal-up"
+									: "blog-article-cover reveal-up"
+							}
+						>
 							<Image
 								src={post.image}
 								alt={post.imageAlt}

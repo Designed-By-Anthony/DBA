@@ -368,7 +368,7 @@
 		display: block;
 		visibility: hidden;
 		position: fixed;
-		left: 0.35rem;
+		left: 0;
 		top: 11rem;
 		z-index: 88;
 		transform: translateX(calc(-100% + 1.7rem));
