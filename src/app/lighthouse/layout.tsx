@@ -1,10 +1,14 @@
-import { BRAND_ASSETS, BRAND_NAME, BRAND_SITE_URL } from "@/design-system/brand";
 import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
+import {
+	BRAND_ASSETS,
+	BRAND_NAME,
+	BRAND_SITE_URL,
+} from "@/design-system/brand";
 import "./lighthouse-globals.css";
 
 const inter = Inter({

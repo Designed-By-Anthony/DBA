@@ -118,7 +118,7 @@ Upgrade path if abuse emerges: swap the in-memory counter in `src/lib/rate-limit
 | Portal session hash | `apps/web-viewer/src/lib/portal-auth.ts` |
 | Apex-operator allowlist | `apps/web-viewer/src/lib/admin-allowlist.ts` |
 | Postgres row-level security policies | `packages/database/sql/enable_rls.sql` |
-| Security response headers | `next.config.ts`, `vercel.json` / `static-headers.json` (CSP synced from `build/csp.mjs` via `npm run sync:static-headers`) |
+| Security response headers | `next.config.ts` (CSP + baseline headers), `static-headers.json` (Playwright parity; CSP synced from `build/csp.mjs` via `npm run sync:static-headers`) |
 
 ## Audit log for this document
 

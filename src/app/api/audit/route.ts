@@ -1,4 +1,3 @@
-import { after, NextResponse } from "next/server";
 import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
 import {
 	buildReceiptEmail,
@@ -12,7 +11,10 @@ import {
 	fetchWithTimeout,
 	getClientAddress,
 } from "@lh/lib/http";
-import { estimateIndexCoverage, type IndexCheckResult } from "@lh/lib/indexCheck";
+import {
+	estimateIndexCoverage,
+	type IndexCheckResult,
+} from "@lh/lib/indexCheck";
 import { type MozMetrics, scanMoz } from "@lh/lib/mozAnalysis";
 import {
 	type Competitor,
@@ -30,6 +32,7 @@ import {
 	normalizeHttpUrl,
 	normalizeText,
 } from "@lh/lib/validation";
+import { after, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 

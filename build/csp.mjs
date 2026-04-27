@@ -1,5 +1,5 @@
 /**
- * Single source of truth for marketing CSP-related headers (synced into static-headers.json).
+ * Single source of truth for marketing CSP (used by `next.config.ts` and synced into `static-headers.json`).
  * Run `npm run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
@@ -22,12 +22,6 @@ const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
-/** Vercel Toolbar / Live feedback / Speed Insights (preview + production). */
-const VERCEL_PLATFORM_SCRIPT_ORIGINS = [
-	"https://vercel.live",
-	"https://va.vercel-scripts.com",
-];
-
 /** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC = [
 	"'self'",
@@ -37,7 +31,6 @@ const REPORT_ONLY_SCRIPT_SRC = [
 	"https://*.googletagmanager.com",
 	"https://www.gstatic.com",
 	"https://challenges.cloudflare.com",
-	...VERCEL_PLATFORM_SCRIPT_ORIGINS,
 ].join(" ");
 
 /**
@@ -53,16 +46,23 @@ const SCRIPT_SRC_ENFORCING = [
 	"https://*.googletagmanager.com",
 	"https://www.gstatic.com",
 	"https://challenges.cloudflare.com",
-	...VERCEL_PLATFORM_SCRIPT_ORIGINS,
+	"https://client.crisp.chat",
+	"https://settings.crisp.chat",
+	/** Freshworks Chat + CRM web forms */
+	"https://fw-cdn.com",
+	"https://*.myfreshworks.com",
+	"https://*.freshworks.com",
 ].join(" ");
 
 const DIRECTIVES = {
 	"default-src": "'self'",
 	"script-src": SCRIPT_SRC_ENFORCING,
 	"style-src":
-		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com",
-	"font-src": "'self' data: https://fonts.gstatic.com",
-	"img-src": "'self' data: https: blob: https://s3.amazonaws.com",
+		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com https://challenges.cloudflare.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
+	"font-src":
+		"'self' data: https://fonts.gstatic.com https://client.crisp.chat",
+	"img-src":
+		"'self' data: https: blob: https://s3.amazonaws.com https://image.crisp.chat https://client.crisp.chat https://storage.crisp.chat",
 	"connect-src": [
 		"'self'",
 		"https://*.google-analytics.com",
@@ -84,20 +84,25 @@ const DIRECTIVES = {
 		"https://*.stream-io-api.com",
 		"wss://chat.stream-io-api.com",
 		"wss://*.stream-io-api.com",
-		/** @vercel/analytics, @vercel/speed-insights, Vercel Live / preview toolbar */
-		"https://vercel.live",
-		"https://va.vercel-scripts.com",
-		"https://vitals.vercel-insights.com",
+		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
+		"https://*.crisp.chat",
+		"wss://*.relay.crisp.chat",
+		"wss://*.relay.rescue.crisp.chat",
+		/** Freshworks CRM + Chat */
+		"https://*.myfreshworks.com",
+		"https://*.freshworks.com",
+		"https://fw-cdn.com",
 	].join(" "),
 	"frame-src":
-		"'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com",
+		"'self' https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat https://*.myfreshworks.com",
 	"media-src": "'self'",
-	"worker-src": "'self' blob:",
+	/** Crisp loads short-lived workers from *.crisp.chat (see Crisp CSP docs). */
+	"worker-src": "'self' blob: https://*.crisp.chat",
 	"object-src": "'none'",
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
+	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN} https://*.myfreshworks.com`,
 	/**
 	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
 	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that

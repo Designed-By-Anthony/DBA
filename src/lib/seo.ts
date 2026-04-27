@@ -57,6 +57,7 @@ interface ItemListSchemaInput {
 	}>;
 }
 
+import { serviceAreaSlugLabels } from "@/data/serviceAreaLocations";
 import { BRAND_ASSETS } from "@/design-system/brand";
 import {
 	AGENCY_OS_APP_URL,
@@ -66,6 +67,8 @@ import {
 	AGENCY_OS_SUITE_MONTHLY,
 	FOUNDING_PARTNER_SEO_MONTHLY,
 	GBP_FULL_PROGRAM_MONTHLY_PRICE,
+	PUBLIC_LAUNCH_BUNDLE_MONTHS,
+	STANDARD_WEBSITE_INSTALLMENT_EACH,
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "./offers";
@@ -333,6 +336,7 @@ const breadcrumbLabelMap: Record<string, string> = {
 	"thank-you": "Thank You",
 	"404": "404",
 	"google-business-profile": "Google Business Profile",
+	...serviceAreaSlugLabels,
 };
 
 export function normalizePath(path: string): string {
@@ -478,6 +482,31 @@ export function buildBreadcrumbSchema(
 	};
 }
 
+/** WebPage JSON-LD for marketing landing pages (paired with breadcrumb list). */
+export function buildMarketingWebPageSchema(input: {
+	pathname: string;
+	name: string;
+	description: string;
+}): SchemaValue {
+	const url = toAbsoluteUrl(input.pathname);
+
+	return {
+		"@context": "https://schema.org",
+		"@type": "WebPage",
+		"@id": `${url}#webpage`,
+		url,
+		name: input.name,
+		description: input.description,
+		isPartOf: {
+			"@id": WEBSITE_ID,
+		},
+		inLanguage: "en-US",
+		publisher: {
+			"@id": ORGANIZATION_ID,
+		},
+	};
+}
+
 export function buildServiceSchema(input: ServiceSchemaInput): SchemaValue {
 	const url = toAbsoluteUrl(input.path);
 
@@ -612,10 +641,17 @@ export function buildBlogPostingSchema(
 	};
 }
 
-export function buildFaqPageSchema(entries: FaqEntry[]): SchemaValue {
+export function buildFaqPageSchema(
+	entries: FaqEntry[],
+	options?: { path?: string },
+): SchemaValue {
+	const path = options?.path ?? "/";
+	const faqId = `${toAbsoluteUrl(path)}#faqpage`;
+
 	return {
 		"@context": "https://schema.org",
 		"@type": "FAQPage",
+		"@id": faqId,
 		mainEntity: entries.map((entry) => ({
 			"@type": "Question",
 			name: entry.question,
@@ -730,7 +766,6 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 
 export function buildBaseWebsiteSchema(): SchemaValue {
 	const contactUrl = toAbsoluteUrl("/contact");
-	const auditUrl = toAbsoluteUrl("/free-seo-audit");
 	const calendlyBook =
 		"https://calendly.com/anthony-designedbyanthony/web-design-consult";
 
@@ -755,14 +790,6 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 		inLanguage: "en-US",
 		/** Machine-readable primary actions — aligns with Google rich result / entity understanding. */
 		potentialAction: [
-			{
-				"@type": "ViewAction",
-				name: "Run free Lighthouse-style website audit",
-				target: {
-					"@type": "EntryPoint",
-					urlTemplate: auditUrl,
-				},
-			},
 			{
 				"@type": "ContactAction",
 				name: "Contact Designed by Anthony",
@@ -854,7 +881,7 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 			{
 				"@type": "Offer",
 				name: `Custom website (typical range)`,
-				description: `Most service-business rebuilds land in the ${STANDARD_WEBSITE_TYPICAL_RANGE} range; simple sites from ${STANDARD_WEBSITE_STARTING_PRICE}.`,
+				description: `Standard rebuilds: three equal payments of ${STANDARD_WEBSITE_INSTALLMENT_EACH} at launch (typical total ${STANDARD_WEBSITE_TYPICAL_RANGE}) with ${PUBLIC_LAUNCH_BUNDLE_MONTHS} months of hosting and core local SEO included, then optional ${FOUNDING_PARTNER_SEO_MONTHLY}/mo Growth Plan; simple sites from ${STANDARD_WEBSITE_STARTING_PRICE}.`,
 				url: pricingUrl,
 			},
 			{
@@ -900,53 +927,6 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 	};
 }
 
-/**
- * SoftwareApplication schema for the Lighthouse audit tool.
- * Emit on `/free-seo-audit` and the homepage so Google/Bing understand
- * the free tool as a distinct product entity offered by the organization.
- */
-export function buildLighthouseSoftwareApplicationSchema(): SchemaValue {
-	const url = toAbsoluteUrl("/free-seo-audit");
-
-	return {
-		"@context": "https://schema.org",
-		"@type": "SoftwareApplication",
-		"@id": `${url}#software`,
-		name: "Designed by Anthony — Free Lighthouse Audit",
-		description:
-			"Free in-house Lighthouse audit tool for service-business websites. Returns Google Core Web Vitals, accessibility, best-practices, and SEO scores in under 60 seconds with a written breakdown of practical fixes.",
-		applicationCategory: "BusinessApplication",
-		applicationSubCategory: "WebPerformance",
-		operatingSystem: "Web",
-		url,
-		image: buildOwnedImageObject(DEFAULT_SOCIAL_IMAGE),
-		offers: {
-			"@type": "Offer",
-			price: "0",
-			priceCurrency: "USD",
-			availability: "https://schema.org/InStock",
-			url,
-		},
-		featureList: [
-			"Google Lighthouse performance score",
-			"Accessibility score",
-			"Best-practices score",
-			"SEO score",
-			"Core Web Vitals (LCP / CLS / TBT) metrics",
-			"Mobile-first audit",
-			"Plain-language writeup of issues",
-		],
-		creator: {
-			"@id": ORGANIZATION_ID,
-		},
-		publisher: {
-			"@id": ORGANIZATION_ID,
-		},
-		inLanguage: "en-US",
-		isAccessibleForFree: true,
-	};
-}
-
 export function buildFounderPersonSchema(): SchemaValue {
 	return {
 		"@context": "https://schema.org",
@@ -962,5 +942,36 @@ export function buildFounderPersonSchema(): SchemaValue {
 		},
 		homeLocation: toPlace(businessProfile.homeBase),
 		knowsAbout: businessProfile.knowsAbout,
+	};
+}
+
+/**
+ * SiteNavigationElement — signals to Google which pages are primary nav targets.
+ * This is the strongest structured-data hint for earning sitelinks in SERPs.
+ * Order matters: list pages in the priority you'd want them shown.
+ */
+export function buildSiteNavigationSchema(): SchemaValue {
+	const navItems = [
+		{ name: "Services", path: "/services" },
+
+		{ name: "Pricing", path: "/pricing" },
+		{ name: "Portfolio", path: "/portfolio" },
+		{ name: "Blog", path: "/blog" },
+		{ name: "About", path: "/about" },
+		{ name: "Our Edge", path: "/ouredge" },
+		{ name: "Contact", path: "/contact" },
+	];
+
+	return {
+		"@context": "https://schema.org",
+		"@type": "ItemList",
+		"@id": `${SITE_URL}#site-navigation`,
+		name: "Main Navigation",
+		itemListElement: navItems.map((item, index) => ({
+			"@type": "SiteNavigationElement",
+			position: index + 1,
+			name: item.name,
+			url: toAbsoluteUrl(item.path),
+		})),
 	};
 }

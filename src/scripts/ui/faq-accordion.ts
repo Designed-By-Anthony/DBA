@@ -1,4 +1,27 @@
+function initExclusiveDetails(): void {
+	const containers = document.querySelectorAll<HTMLElement>(".home-faq-list");
+	containers.forEach((container) => {
+		if (container.dataset.exclusiveBound === "true") return;
+		container.dataset.exclusiveBound = "true";
+		container.addEventListener(
+			"toggle",
+			(e) => {
+				const target = e.target;
+				if (!(target instanceof HTMLDetailsElement) || !target.open) return;
+				const siblings =
+					container.querySelectorAll<HTMLDetailsElement>("details");
+				siblings.forEach((d) => {
+					if (d !== target) d.open = false;
+				});
+			},
+			true,
+		);
+	});
+}
+
 export function initFaqAccordion(): void {
+	initExclusiveDetails();
+
 	const accordions = Array.from(
 		document.querySelectorAll<HTMLElement>("[data-faq-accordion]"),
 	);

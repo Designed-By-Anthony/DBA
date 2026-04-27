@@ -2,6 +2,27 @@
 
 > **Note:** Entries below are historical (monorepo, pnpm, Astro paths). The current app is a **single root Next.js** project using **npm** and `package-lock.json` — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Site shell + content audit (2026-04-25)
+
+- **Layout repair:** Removed root `freshworks-widget` script (floating embed was painting above the header). Homepage no longer embeds the Freshworks form inline — CTA card links to `/contact`. Marketing chrome uses a **left sticky quick-action rail** (desktop) + main column; desktop nav adds FAQ, Blog, Service Areas. Contact page uses a styled `contact-form-shell`; Freshworks embed only loads on pages that render `AuditForm`.
+- Added CSS-only aurora layers on the homepage hero and inner marketing heroes (`hero-drift`, `marketing-hero-aurora`) for a richer look without extra JS; motion respects `prefers-reduced-motion`.
+- Added Playwright (`@playwright/test`) with `playwright/security-crawl.spec.ts` to walk high-signal GET routes. When `PLAYWRIGHT_ZAP=1`, Chromium uses the ZAP proxy and `afterAll` triggers a ZAP spider plus HTML/JSON reports under `test-results/zap/` (requires ZAP listening with `ZAP_API_KEY`). Scripts: `npm run test:playwright`, `npm run test:playwright:zap`.
+- **Blank-page hardening:** Reveal animations now force `.reveal-active` after 3.4s if IntersectionObserver never fires. `/404` → middleware rewrite to `/page-not-found` for the branded not-found page. Legacy `/free-seo-audit` **308 → `/contact`** via `next.config.ts` redirects while on-site audit tooling is paused. `playwright/pages-render.spec.ts` asserts every marketing URL has visible `#main-content` text (`npm run test:playwright:render`). Playwright starts `next start` on **port 3001** by default (`PLAYWRIGHT_TEST_PORT`) so it does not collide with a dev server on :3000; set `PLAYWRIGHT_REUSE_SERVER=1` only when you intentionally reuse an already-running server.
+- Fixed the client-side page lifecycle so shared marketing behaviors re-initialize after Next.js route changes instead of only on the first load. That removes the DOM-mutation timing issue that was throwing hydration mismatches and leaving shell interactions unreliable across internal navigation.
+- Hardened the reveal animation system with a timed fallback so below-the-fold sections and footer content no longer stay visually blank when the intersection observer is late or skipped.
+- Removed Astro-era naming and copy from the live Next.js app surface: homepage section classes, footer badge styling, blog metadata, image asset names, env comments, and related source comments now reflect the current stack.
+- Updated the blog index/article metadata so the former Astro-focused posts now ship as Next.js content with matching slugs and assets.
+- Verified with `npm run build` from the repo root plus targeted checks against `http://localhost:3000`, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
+- **Pricing + schema polish:** Offer-catalog JSON-LD for standard rebuilds references `STANDARD_WEBSITE_INSTALLMENT_EACH` and `PUBLIC_LAUNCH_BUNDLE_MONTHS` so it stays aligned with `offers.ts`. Homepage metadata, hero variants, process strip, and pitch strip use the same "contact us for your free audit" CTA language. FAQPage JSON-LD has a stable `@id`; homepage JSON-LD script keys derive from `@id` / type instead of array indexes (Biome-clean).
+- **Service area landing pages:** `src/data/serviceAreaLocations.ts` drives `/service-areas/[slug]` (Rome, Utica, New Hartford, Clinton, Syracuse, Watertown, Naples, Houston) with long-form copy, breadcrumbs, WebPage + BreadcrumbList JSON-LD (`buildMarketingWebPageSchema`), clickable cards on `/service-areas`, `generateStaticParams` + meta descriptions in `[...path]/page.tsx`, and Playwright route coverage via `getAllServiceAreaSlugs()` in `marketing-routes.ts`.
+- **GBP 2026 blog hero:** Post cover uses `public/images/gbp_2026_cny_playbook_hero.png` (1920×960) plus infographic-style alt text. Regenerate placeholder with `npm run generate:gbp-playbook-hero`, or replace that file with the final exported artwork (keep the same path).
+- **Marketing SEO completeness:** `resolveMarketingMetadata()` in `src/lib/marketing-metadata.ts` supplies per-route `description`, `alternates.canonical`, Open Graph (and Twitter where useful), plus `noindex` for thank-you / Facebook offer. `MarketingJsonLd` + `EnrichedPages` emit WebPage + BreadcrumbList, ItemList (services, blog index), Service (service detail), BlogPosting (posts), FAQPage + OfferCatalog on `/faq` and `/pricing` respectively, without duplicate graphs on enriched routes.
+- **Viewport + responsive polish:** Root `export const viewport` (device-width, initial scale 1, `viewport-fit: cover`, theme-color) so phones get a proper meta viewport. `html { overflow-x: clip }`, section containers `max-width: 100%`, pilot banner link wraps on small screens, marketing CTA rows stack full-width under 520px, blog index lazy-loads images after the first card, article hero uses `fetchPriority="high"` + `decoding="async"`. Crisp chat loads `lazyOnload` to reduce main-thread contention (Lighthouse-friendly).
+- **Premium inner-page polish:** `@font-face` for Fraunces Variable (woff2); `PageHero` uses `marketing-page-hero--editorial` — centered editorial headline (gradient text), softer aurora, scoped `::after` vignette. Pilot banner + left quick rail restyled (glass, brass accent, narrower rail) for a quieter chrome vs. content hierarchy.
+- **Mobile-first overflow pass:** `--container-gutter` floors at `0.85rem` (synced in `tokens.css`); home `.hero-grid` no longer uses a fixed `minmax(320px, …)` track that forced horizontal scroll on ~320px phones; marketing/home grids use `minmax(min(100%, …), 1fr)`; `#main-content` + responsive media max-width; footer stacks to two columns by 1024px; reach-out dialog actions single-column under 420px; `.feature-grid` single column under 560px.
+- **Crisp + CSP:** `connect-src` now matches Crisp’s published hosts (`https://*.crisp.chat`, `wss://*.relay.crisp.chat`, `wss://*.relay.rescue.crisp.chat`); `worker-src` adds `https://*.crisp.chat` for verification workers; Crisp bootstrap uses `afterInteractive` instead of `lazyOnload` so the realtime socket initializes reliably after deploy.
+- **Mobile nav:** Full-screen menu gets a visible close control, tap-outside on the dimmed backdrop, iOS-friendly scroll lock (`position: fixed` + restore scroll), inner scroll with `overscroll-behavior: contain` / `100dvh`, and closes on `dba:page-ready` so SPA navigations do not leave the sheet stuck open.
+
 ## Marketing lead-email bridge — interim Resend handler until VertaFlow CRM tenant is live (2026-04-22)
 
 - Added `apps/lighthouse/src/app/api/lead-email/route.ts` — a new POST handler that accepts the existing `AuditForm` `FormData` contract (no marketing markup changes), honors the same Turnstile verification + honeypot that `/api/contact` uses, composes a plain-text + HTML lead summary, and ships it to `LEAD_EMAIL_TO` (default `anthony@designedbyanthony.com`) via the Resend REST API. Same CORS allowlist as `/api/contact` (apex + `*.designedbyanthony.com` + local dev).
@@ -620,3 +641,95 @@ Coverage: `apps/web-viewer/tests/lead-spam-guard.spec.ts` (pure-logic tests for 
   - `admin.*` / `app.*` style hostnames -> internal `/admin` routes
   - `portal.*` hostnames -> internal `/portal` routes
   - preview hostnames -> internal `/preview/[customer]` routes
+
+## 2026-04-26 GitLab + Netlify Platform Alignment
+
+- Updated platform instructions to GitLab-first deploy flow (`Git -> GitLab -> Netlify`) in `AGENTS.md`.
+- Updated `README.md` deploy section to reflect Netlify Next runtime (`@netlify/plugin-nextjs`) and removed outdated static `.next` publish guidance.
+- Disabled Vercel-only Sentry monitor automation in `next.config.ts` (`automaticVercelMonitors: false`) to match Netlify production.
+- Removed root `vercel.json` from the repo to prevent cross-platform config drift.
+- Validation: `npm run build` passes from repo root after these changes.
+
+## 2026-04-26 Pre-Launch UX + Content Hardening (MR #134)
+
+- Replaced always-open quick rail with `SiteQuickRailDrawer` and added missing drawer/tab CSS so rail stays tucked and slides in intentionally.
+- Restored robust contact embed flow in `AuditForm` (mount-targeted script injection + fallback states) to prevent footer/header placement drift.
+- Removed footer `id="contact"` collision risk that could hijack anchor/form targeting.
+- Hardened Crisp bootstrap in `src/app/layout.tsx` with duplicate-load guard (`window.__dbaCrispLoaded`) and safe `$crisp` initialization.
+- Expanded long-form content system for `services`, `service-areas`, and `blog` pages via `src/data/longformContent.ts`, including a universal depth addendum to ensure dense, conversion-oriented page depth.
+- Validation: `npm run build` passes from repo root after these changes. Biome check on touched files reports no errors (warnings only for existing global `!important` rules in shared CSS).
+
+## 2026-04-26 Footer UX Polish (MR #134 follow-up)
+
+- Fixed broken slim-footer layout where nav links collapsed together due missing class definitions.
+- Added mobile-first styles for `footer--slim`, `footer-container--slim`, `footer-row`, and `footer-nav` with proper wrapping, spacing, and responsive behavior.
+- Improved desktop alignment (logo / nav / socials) and tighter small-screen stacking for cleaner rendering.
+- Removed duplicate `min-height` declaration in `src/styles/theme.css` flagged by Biome as an error.
+- Validation: `npm run build` passes after footer updates.
+
+## 2026-04-26 UX Polish Pass (Home / Services / Service Areas / About)
+
+- Removed portfolio concept entries for **Serenity Medspa** and **Empire Home Services** from `src/data/showcase.ts`.
+- Fixed home featured tile misalignment by removing stagger offset on the second featured-work card.
+- Equalized service tiles on `/services` by making card containers flex-based with consistent minimum height and bottom-anchored CTA text.
+- Added visual flair to service-area pages:
+  - New service-area signal strip (core markets, remote markets, response window)
+  - New local context chips on location pages
+  - Richer region-card backgrounds and hover treatment
+- Added longform readability/interest treatment across long sections:
+  - Dedicated longform section wrapper styles
+  - Divider glow, editorial card surface, accent rails for paragraphs
+- Tightened tucked quick-actions rail (closed state shows less tab width).
+- Removed last name from About copy (now “Anthony” instead of “Anthony Jones”) in both About page content and static marketing copy.
+- Validation: `npm run build` passes.
+
+## 2026-04-26 GitLab CI Security Scan Wiring (DAST + SAST)
+
+- Updated `.gitlab-ci.yml` includes to use official GitLab templates for security scanning:
+  - `Jobs/SAST.gitlab-ci.yml`
+  - `Security/DAST.gitlab-ci.yml`
+  - `Jobs/Secret-Detection.gitlab-ci.yml`
+  - `Jobs/Dependency-Scanning.gitlab-ci.yml`
+- Hardened DAST job rules so it runs for MRs/default branch only when `DAST_TARGET_URL` is defined (prevents silent misfire and noisy failures).
+- Set DAST to `allow_failure: true` so scan results still surface without blocking delivery while tuning target/auth setup.
+- Validation: `npm run build` passes from repo root after CI updates.
+
+## 2026-04-26 Full-Repo Biome Lint Stabilization
+
+- Ran a full-project Biome pass (`biome check .`) and applied automated fixes repo-wide where safe.
+- Enabled Tailwind directive parsing in Biome (`css.parser.tailwindDirectives = true`) so `@theme` blocks in design-system/lighthouse CSS lint correctly.
+- Fixed blocking lint errors:
+  - Removed focusable `aria-hidden` usage in hero canvas.
+  - Added SVG `<title>` accessibility text for score ring.
+  - Replaced array-index keys in lighthouse result lists with stable content-based keys.
+  - Fixed `forEach` callback returns in sheets sync logic.
+  - Removed duplicate `min-height` declaration in lighthouse global CSS.
+  - Formatted `src/design-system/tailwind-v4-bridge.css` to satisfy Biome formatter checks.
+- Validation: `npm run lint` now exits successfully for the full repo (warnings remain for style-hardening follow-up).
+
+## 2026-04-26 GitLab Security Jobs Forced Per Pipeline
+
+- Updated `.gitlab-ci.yml` to force security jobs to run on every pipeline:
+  - `semgrep-sast`
+  - `secret_detection`
+  - `gemnasium-dependency_scanning`
+- Kept `dast` enabled whenever `DAST_TARGET_URL` is present, regardless of pipeline source.
+- Result: security stage now executes consistently for push, MR, and default-branch pipelines when target URL is configured.
+
+## 2026-04-26 Security Report Remediation Pass (DAST/SAST/Dependency)
+
+- Applied SSRF hardening:
+  - Added outbound URL safety checks in `src/lighthouse/lib/http.ts` (protocol + private-host blocking, with `ALLOW_PRIVATE_EGRESS=true` escape hatch for trusted internal workflows).
+  - Restricted browser-side lead endpoint resolution in `src/scripts/audit-forms.ts` to trusted `/api/` targets (same-origin or `admin.vertaflow.io`), with safe fallback.
+  - Added ZAP helper safeguards in `playwright/helpers/zap-crawl.ts` to block untrusted proxy hosts and unapproved spider targets by default.
+- Reduced SAST null-assertion findings by removing unsafe non-null assertions in report/contact/email/index utility paths.
+- Added explicit semgrep suppressions for known-safe dynamic file path/regex usage in local maintenance scripts:
+  - `scripts/fix-lock-optional-stubs.mjs`
+  - `scripts/static-parity-server.mjs`
+- Dependency remediation:
+  - Added root overrides for `postcss` and `uuid` in `package.json`.
+  - Ran `npm install` and updated `package-lock.json`.
+  - Verified resolved versions in tree: `postcss@8.5.12`, `uuid@11.1.0`.
+- Validation:
+  - `npm run lint` passes (warnings only).
+  - `npm run build` passes from repo root.

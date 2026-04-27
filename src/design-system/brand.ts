@@ -3,8 +3,8 @@
  *
  * Single source of truth for logo paths served by each app.
  *
- * Each app ships a mirrored copy of the canonical files under
- * `public/brand/...` so Next.js (and Astro’s public/) can serve them
+ * The app ships a mirrored copy of the canonical files under
+ * `public/brand/...` so Next.js can serve them
  * from `/brand/logo.png`, `/brand/mark.webp`, and `/brand/logo-full.png`.
  * Source files also live under `src/design-system/`; `public/brand/` mirrors
  * them for static serving.

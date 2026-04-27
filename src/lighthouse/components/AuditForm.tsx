@@ -12,7 +12,6 @@ const LOADING_MESSAGES = [
 	"Compiling Final Diagnostic...",
 ];
 
-
 export function AuditForm() {
 	const [url, setUrl] = useState("");
 	const [email, setEmail] = useState("");
@@ -63,7 +62,7 @@ export function AuditForm() {
 		const mount = () => {
 			const host = document.getElementById("lighthouse-turnstile");
 			if (!host || !anyWindow.turnstile || widgetId) return;
-			
+
 			widgetId = anyWindow.turnstile.render(host, {
 				sitekey: siteKey,
 				theme: "dark",

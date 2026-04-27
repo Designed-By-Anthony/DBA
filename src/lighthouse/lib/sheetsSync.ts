@@ -245,17 +245,17 @@ export async function createProjectSheet(
 			if (data.strengths && data.strengths.length > 0) {
 				profileRows.push(["", "", "", ""]);
 				profileRows.push(["STRENGTHS", "", "", ""]);
-				data.strengths.forEach((s, i) =>
-					profileRows.push([`${i + 1}`, s, "Strengths", ""]),
-				);
+				data.strengths.forEach((s, i) => {
+					profileRows.push([`${i + 1}`, s, "Strengths", ""]);
+				});
 			}
 
 			if (data.weaknesses && data.weaknesses.length > 0) {
 				profileRows.push(["", "", "", ""]);
 				profileRows.push(["WEAKNESSES", "", "", ""]);
-				data.weaknesses.forEach((w, i) =>
-					profileRows.push([`${i + 1}`, w, "Weaknesses", ""]),
-				);
+				data.weaknesses.forEach((w, i) => {
+					profileRows.push([`${i + 1}`, w, "Weaknesses", ""]);
+				});
 			}
 
 			if (data.prioritizedActions && data.prioritizedActions.length > 0) {

@@ -1,12 +1,13 @@
 export const STANDARD_WEBSITE_STARTING_PRICE = "$999";
 /**
- * Typical project range for a standard custom build (5–10 pages, custom design,
- * technical SEO). Benchmarked April 2026 against local Mohawk Valley / Syracuse
- * agencies ($2,000–$2,499 premium tiers) and the national boutique-agency /
- * small-business custom range ($2,000–$6,000). Competitive with the top of the
- * local pack while clearly positioned above template / DIY work.
+ * Typical total project band for a standard custom rebuild (5–10 pages, custom
+ * design, technical + local SEO setup). Dialed for CNY / Mohawk Valley buying
+ * expectations while staying above template work — pair with the public
+ * installment headline instead of leading with a single large sticker number.
  */
-export const STANDARD_WEBSITE_TYPICAL_RANGE = "$2,400–$4,800";
+export const STANDARD_WEBSITE_TYPICAL_RANGE = "$1,900–$3,000";
+/** One-third of a ~$2,499 typical anchor — shown as “3 easy payments” at launch. */
+export const STANDARD_WEBSITE_INSTALLMENT_EACH = "$833";
 /**
  * Starting price for enterprise / multi-location / integration-heavy scope.
  * Benchmarked against the national growing-business / enterprise bracket
@@ -22,8 +23,8 @@ export const FACEBOOK_OFFER_SOCIAL_IMAGE =
 
 export const PRIVATE_FACEBOOK_LABEL = "Private Facebook Offer";
 
-export const PUBLIC_PAYMENT_STRUCTURE_COPY =
-	"50% down to start, 50% at launch.";
+/** Months of included hosting + SEO care bundled with a standard rebuild before the monthly retainer. */
+export const PUBLIC_LAUNCH_BUNDLE_MONTHS = 3;
 
 /** Launch program: first N local partners — complimentary build with Growth Plan enrollment. */
 export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
@@ -35,6 +36,14 @@ export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
 export const FOUNDING_PARTNER_SEO_MONTHLY = "$149";
 /** Public name for the founding-partner monthly stack (hosting, security, SEO). */
 export const FOUNDING_PARTNER_SEO_LABEL = "Growth Plan";
+
+/** Shown on pricing, hero, and FAQs — installment frame + what happens after month three. */
+export const PUBLIC_STANDARD_PAYMENT_PLAN = `3 easy payments of ${STANDARD_WEBSITE_INSTALLMENT_EACH} at launch for most standard rebuilds (typical all-in scope lands in the ${STANDARD_WEBSITE_TYPICAL_RANGE} band).`;
+
+export const PUBLIC_LAUNCH_BUNDLE_COPY = `For the first ${PUBLIC_LAUNCH_BUNDLE_MONTHS} months we host, secure, and actively tune the site with core local SEO — then, if you want to keep momentum, you roll into the ${FOUNDING_PARTNER_SEO_MONTHLY}/mo ${FOUNDING_PARTNER_SEO_LABEL}.`;
+
+/** Legacy single-line copy for anywhere that still expects one sentence (FAQ, process). */
+export const PUBLIC_PAYMENT_STRUCTURE_COPY = `${PUBLIC_STANDARD_PAYMENT_PLAN} ${PUBLIC_LAUNCH_BUNDLE_COPY}`;
 
 /** Public CRM / admin app URL (Clerk sign-in). Used in schema and positioning copy—not a crawl-first landing page. */
 export const AGENCY_OS_APP_URL = "https://admin.vertaflow.io";

@@ -4,6 +4,7 @@ import { initBlogScrollState, initReadingProgress } from "./reading-progress";
 import {
 	initCookieSettingsLinks,
 	initCursorGlow,
+	initExclusiveDetails,
 	initFaqAccordion,
 	initGbpRoiCalculator,
 	initLayoutCalendlyEmbed,
@@ -14,8 +15,9 @@ import {
 	initTabbedProof,
 } from "./ui";
 
-/** Abort previous window-level listeners when re-running after Astro view transitions. */
+/** Abort previous window-level listeners when re-running after page transitions. */
 let pageLifecycleAbort: AbortController | undefined;
+let pageScriptsScheduled = false;
 
 function runPageScripts(): void {
 	pageLifecycleAbort?.abort();
@@ -28,6 +30,7 @@ function runPageScripts(): void {
 	initReachOutModal();
 	initLayoutCalendlyEmbed();
 	initFaqAccordion();
+	initExclusiveDetails();
 	initBlogScrollState(signal);
 	initReadingProgress(signal);
 	initAuditForms();
@@ -39,5 +42,23 @@ function runPageScripts(): void {
 	initMagneticLinks();
 }
 
-document.addEventListener("DOMContentLoaded", runPageScripts);
-runPageScripts();
+function scheduleRunPageScripts(): void {
+	if (pageScriptsScheduled) return;
+	pageScriptsScheduled = true;
+	window.requestAnimationFrame(() => {
+		window.setTimeout(() => {
+			pageScriptsScheduled = false;
+			runPageScripts();
+		}, 0);
+	});
+}
+
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", scheduleRunPageScripts, {
+		once: true,
+	});
+} else {
+	window.addEventListener("load", scheduleRunPageScripts, { once: true });
+}
+
+window.addEventListener("dba:page-ready", scheduleRunPageScripts);

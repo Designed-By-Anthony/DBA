@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ScoreRingProps {
 	score: number;
 	label: string;
@@ -19,6 +17,7 @@ export function ScoreRing({ score, label }: ScoreRingProps) {
 			<div className="relative w-24 h-24 flex items-center justify-center">
 				{/* Background Ring */}
 				<svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
+					<title>{`${label} score: ${score}`}</title>
 					<circle
 						cx="40"
 						cy="40"

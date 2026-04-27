@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
@@ -13,6 +12,7 @@ import {
 } from "@lh/lib/report-store";
 import { isValidReportId } from "@lh/lib/reportId";
 import { normalizeEmail } from "@lh/lib/validation";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
@@ -46,7 +46,10 @@ async function reserveEmailSend(ref: DocRef) {
 			throw new ApiError(404, "Report not found");
 		}
 
-		const data = snap.data()!;
+		const data = snap.data();
+		if (!data) {
+			throw new ApiError(500, "Report data unavailable");
+		}
 		const sentCount = Number(data.emailSentCount ?? 0);
 		if (sentCount >= MAX_SENDS_PER_REPORT) {
 			throw new ApiError(
@@ -115,7 +118,7 @@ async function reserveEmailSend(ref: DocRef) {
  * POST /api/report/[id]/email
  *
  * Sends the short transactional receipt email to the address stored on the
- * report's lead record. Triggered by the "Email me a copy" button on the Astro
+ * report's lead record. Triggered by the "Email me a copy" button on the
  * report page.
  *
  * Rate-limited: max 3 sends per report, min 60s between sends.

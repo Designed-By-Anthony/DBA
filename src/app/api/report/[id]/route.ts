@@ -1,4 +1,3 @@
-import { after, NextResponse } from "next/server";
 import { buildCorsHeaders } from "@lh/lib/http";
 import {
 	db,
@@ -7,6 +6,7 @@ import {
 	Timestamp,
 } from "@lh/lib/report-store";
 import { isValidReportId } from "@lh/lib/reportId";
+import { after, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
@@ -14,7 +14,7 @@ export const runtime = "nodejs";
  * GET /api/report/[id]
  *
  * Fetches a stored report by ID. Intended to be called server-side by the
- * Astro `/report/[id]` page during SSR.
+ * `/report/[id]` page during SSR.
  *
  * - Validates the ID format (DBA-XXXXYYYY)
  * - 404 if not found
@@ -47,7 +47,13 @@ export async function GET(
 			);
 		}
 
-		const data = snap.data()!;
+		const data = snap.data();
+		if (!data) {
+			return NextResponse.json(
+				{ error: "Report data unavailable" },
+				{ status: 500, headers: responseHeaders },
+			);
+		}
 		const publicLead = {
 			name: data.lead?.name || "",
 			company: data.lead?.company || "",

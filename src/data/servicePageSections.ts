@@ -6,7 +6,10 @@ export type ServiceExtraSection = {
 	bullets?: string[];
 };
 
-export const SERVICE_PAGE_EXTRA_SECTIONS: Record<string, ServiceExtraSection[]> = {
+export const SERVICE_PAGE_EXTRA_SECTIONS: Record<
+	string,
+	ServiceExtraSection[]
+> = {
 	"custom-web-design": [
 		{
 			heading: "What you get",

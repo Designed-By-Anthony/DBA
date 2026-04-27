@@ -46,7 +46,7 @@ export function estimateIndexCoverage(
 		estimate = sitemapCount;
 		source = "sitemap";
 	} else {
-		estimate = mozCount!;
+		estimate = mozCount ?? 0;
 		source = "moz";
 	}
 

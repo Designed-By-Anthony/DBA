@@ -16,7 +16,7 @@ Canonical business information:
 - Robots: https://designedbyanthony.com/robots.txt
 
 Primary offers:
-- Free instant website audit for performance, accessibility, best practices, and SEO
+- Free website audit by request (contact the studio — on-site automated audit tooling is paused pending redeployment)
 - Limited founding partner program: 10 complimentary custom website builds for qualified businesses that enroll in the $149/month Growth Plan (hosting, security, local SEO, and Agency OS CRM access)
 - Standard custom website builds starting at $999
 
@@ -44,7 +44,6 @@ Primary active markets:
 
 Preferred entry points:
 - https://designedbyanthony.com
-- https://designedbyanthony.com/free-seo-audit
 - https://designedbyanthony.com/pricing
 - https://designedbyanthony.com/services
 - https://designedbyanthony.com/services/custom-web-design

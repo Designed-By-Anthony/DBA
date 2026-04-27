@@ -1,7 +1,9 @@
 import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_MONTHLY,
+	STANDARD_WEBSITE_INSTALLMENT_EACH,
 	STANDARD_WEBSITE_STARTING_PRICE,
+	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
 
 export function PremiumPitchStrip({
@@ -15,7 +17,7 @@ export function PremiumPitchStrip({
 					{
 						label: "Fast",
 						title: "Built to load on a phone",
-						body: "Lean builds that open quickly on a phone, a free audit you can run yourself, and timelines measured in weeks — not quarters lost to meetings.",
+						body: "Lean builds that open quickly on a phone, contact us for your free audit, and timelines measured in weeks — not quarters lost to meetings.",
 					},
 					{
 						label: "Stylish",
@@ -30,7 +32,12 @@ export function PremiumPitchStrip({
 					{
 						label: "Fair price",
 						title: "Numbers before the invoice",
-						body: `Founding spots (${FOUNDING_PARTNER_BUILD_SLOTS} total) pair a complimentary build with ${FOUNDING_PARTNER_SEO_MONTHLY}/mo growth while the launch program is open. After that, projects start at ${STANDARD_WEBSITE_STARTING_PRICE}, scoped to what the audit shows.`,
+						body: `Most standard scopes: three payments of ${STANDARD_WEBSITE_INSTALLMENT_EACH} at launch (typical total ${STANDARD_WEBSITE_TYPICAL_RANGE}) with three months of hosting + core SEO bundled. Founding spots (${FOUNDING_PARTNER_BUILD_SLOTS} total) still pair a complimentary build with ${FOUNDING_PARTNER_SEO_MONTHLY}/mo growth. Simple sites from ${STANDARD_WEBSITE_STARTING_PRICE}.`,
+					},
+					{
+						label: "Yours to keep",
+						title: "You pay, you own the code",
+						body: "When the build is done, the source code is yours. No hostage fees, no takedowns if you leave. The monthly retainer covers SEO and hosting — not permission to keep your own site running.",
 					},
 				]
 			: [
@@ -54,24 +61,38 @@ export function PremiumPitchStrip({
 						title: "No mystery bundles",
 						body: `Scope tied to what you need: audit-first recommendations, clear phases, and founder-friendly entry when spots remain (${FOUNDING_PARTNER_BUILD_SLOTS} launch builds + ${FOUNDING_PARTNER_SEO_MONTHLY}/mo SEO tier).`,
 					},
+					{
+						label: "Yours to keep",
+						title: "You own every line of code",
+						body: "The finished site belongs to you — source code, assets, and all. No lock-in, no takedown threats. Our monthly plan is for growth, not for keeping the lights on.",
+					},
 				];
 
 	return (
-		<section className="premium-pitch" aria-labelledby={`premium-pitch-heading-${variant}`}>
+		<section
+			className="premium-pitch"
+			aria-labelledby={`premium-pitch-heading-${variant}`}
+		>
 			<div className="section-container">
 				<div className="premium-pitch__header">
 					<p className="page-eyebrow" id={`premium-pitch-heading-${variant}`}>
 						What you get here
 					</p>
-					<h2 className="premium-pitch__title">Fast, considered, and honest about price.</h2>
+					<h2 className="premium-pitch__title">
+						Fast, considered, and honest about price.
+					</h2>
 					<p className="premium-pitch__lede">
-						Boutique delivery for Upstate NY service businesses: one senior builder, modern
-						performance habits, and quotes tied to what we actually find in your audit.
+						Boutique delivery for Upstate NY service businesses: one senior
+						builder, modern performance habits, and quotes tied to what we
+						actually find in your audit.
 					</p>
 				</div>
 				<ul className="premium-pitch__grid">
 					{items.map((item) => (
-						<li key={item.label} className="surface-card premium-pitch__card reveal-up">
+						<li
+							key={item.label}
+							className="surface-card premium-pitch__card reveal-up"
+						>
 							<span className="premium-pitch__label">{item.label}</span>
 							<h3 className="premium-pitch__card-title">{item.title}</h3>
 							<p className="premium-pitch__card-body">{item.body}</p>

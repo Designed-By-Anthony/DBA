@@ -13,6 +13,21 @@ export interface BlogPostMeta {
 
 export const blogPosts: BlogPostMeta[] = [
 	{
+		title:
+			"Google Business Profile: The 2026 Playbook for CNY Service Businesses",
+		excerpt:
+			"GBP changed fast — AI calling, freshness pressure, visual ranking, and Ask Maps. Here is a Central New York field guide for plumbers, HVAC, and home-service crews who live in the Map Pack.",
+		image: "/images/gbp_2026_cny_playbook_hero.png",
+		imageAlt:
+			"Infographic: Google Business Profile 2026 playbook for Central New York service businesses — four panels for AI calling, freshness pressure and recent posts, visual ranking good vs bad photos, and Ask Maps conversational search around a Syracuse-area map and service-area highlight.",
+		imageWidth: 1920,
+		imageHeight: 960,
+		publishedTime: "2026-04-25T09:00:00-04:00",
+		displayDate: "April 25, 2026",
+		readTime: "16 min read",
+		url: "/blog/google-business-profile-2026-cny-playbook",
+	},
+	{
 		title: "Upstate NY Local SEO 2026",
 		excerpt:
 			"How plumbers, HVAC, landscapers, and contractors across Albany, Syracuse, Rochester, Buffalo, and the Capital Region can win Google Maps and local search without NYC-sized budgets.",
@@ -55,9 +70,9 @@ export const blogPosts: BlogPostMeta[] = [
 		url: "/blog/fix-thin-content",
 	},
 	{
-		title: "Free Website Audit — Utica & CNY",
+		title: "Website audits — Utica & CNY",
 		excerpt:
-			"Free Lighthouse audit for Utica, Rome, Syracuse, and CNY service businesses—performance, accessibility, and SEO scores in about a minute.",
+			"What a Lighthouse-style audit measures for Utica, Rome, Syracuse, and CNY service businesses — and how to get a human read on your results through our contact page.",
 		image: "/images/lighthouse_audit_cover.png",
 		imageAlt:
 			"Lighthouse beam scanning a cityscape revealing website performance metrics for Central New York service businesses",
@@ -69,18 +84,18 @@ export const blogPosts: BlogPostMeta[] = [
 		url: "/blog/free-lighthouse-audit-utica-ny",
 	},
 	{
-		title: "Astro vs Wix for Local Service Sites",
+		title: "Next.js vs Wix for Local Service Sites",
 		excerpt:
-			"A practical comparison of Astro and Wix for SEO, page speed, and long-term flexibility — with examples from Naples, Houston, and Central NY.",
-		image: "/images/astro_vs_wix_cover.png",
+			"A practical comparison of Next.js and Wix for SEO, page speed, and long-term flexibility — with examples from Naples, Houston, and Central NY.",
+		image: "/images/nextjs_vs_wix_cover.png",
 		imageAlt:
-			"Side-by-side comparison of Astro framework code architecture and Wix website builder interface highlighting performance and SEO differences",
+			"Side-by-side comparison of Next.js code architecture and Wix website builder interface highlighting performance and SEO differences",
 		imageWidth: 1024,
 		imageHeight: 1024,
 		publishedTime: "2026-04-05T09:00:00-05:00",
 		displayDate: "April 5, 2026",
 		readTime: "7 min read",
-		url: "/blog/astro-vs-wix",
+		url: "/blog/nextjs-vs-wix",
 	},
 	{
 		title: "How Much Does a Website Cost in 2026?",
@@ -181,17 +196,17 @@ export const blogPosts: BlogPostMeta[] = [
 		url: "/blog/local-seo-death",
 	},
 	{
-		title: "Marketing Sites Built with Astro",
+		title: "Marketing Sites Built with Next.js",
 		excerpt:
-			"A source-backed look at why we choose Astro over builders for local-business marketing websites — from Manhattan to the Mohawk Valley.",
-		image: "/images/astro_rocket_cover.png",
+			"A source-backed look at why we choose Next.js over builders for local-business marketing websites — from Manhattan to the Mohawk Valley.",
+		image: "/images/nextjs_stack_cover.png",
 		imageAlt:
-			"Minimalist rocket ship made of code lines launching upward with blue exhaust trails representing Astro framework speed",
+			"Minimalist rocket ship made of code lines launching upward with blue exhaust trails representing a high-performance Next.js stack",
 		imageWidth: 1024,
 		imageHeight: 1024,
 		publishedTime: "2026-02-10T09:00:00-05:00",
 		displayDate: "February 10, 2026",
 		readTime: "12 min read",
-		url: "/blog/astro-tech-stack",
+		url: "/blog/nextjs-marketing-stack",
 	},
 ];

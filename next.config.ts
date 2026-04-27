@@ -1,7 +1,7 @@
-import { validateLighthouseEnv } from "@/lib/env/lighthouse";
-import { validateMarketingEnv } from "@/lib/env/marketing";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+import { validateLighthouseEnv } from "@/lib/env/lighthouse";
+import { validateMarketingEnv } from "@/lib/env/marketing";
 
 validateMarketingEnv();
 validateLighthouseEnv();
@@ -9,6 +9,15 @@ validateLighthouseEnv();
 const nextConfig: NextConfig = {
 	trailingSlash: false,
 	reactStrictMode: true,
+	async redirects() {
+		return [
+			{
+				source: "/free-seo-audit",
+				destination: "/contact",
+				permanent: true,
+			},
+		];
+	},
 	async headers() {
 		return [
 			{
@@ -56,7 +65,7 @@ export default withSentryConfig(nextConfig, {
 		console.warn("[Sentry build plugin]", err.message);
 	},
 	webpack: {
-		automaticVercelMonitors: true,
+		automaticVercelMonitors: false,
 		treeshake: {
 			removeDebugLogging: true,
 		},
