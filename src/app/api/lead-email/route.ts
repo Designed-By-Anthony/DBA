@@ -181,7 +181,7 @@ export async function POST(request: Request) {
 
 	const resendApiKey = process.env.RESEND_API_KEY;
 	const fromEmail =
-		process.env.RESEND_FROM_EMAIL || "anthony@designedbyanthony.com";
+		process.env.RESEND_FROM_EMAIL?.trim() || "outreach@designedbyanthony.com";
 	const toEmail = process.env.LEAD_EMAIL_TO || "anthony@designedbyanthony.com";
 
 	if (!resendApiKey) {

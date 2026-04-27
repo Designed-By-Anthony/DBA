@@ -20,6 +20,8 @@ export type AuditLoggingWebhookInput = {
 	seoScore: number;
 	accessibilityScore: number;
 	bestPracticesScore: number;
+	/** When lab scores were omitted or estimated (e.g. PageSpeed timeout). */
+	psiNote?: string | null;
 	failedAuditCount: number;
 	criticalIssue: string;
 	executiveSummary: string;
@@ -38,6 +40,9 @@ function buildBody(input: AuditLoggingWebhookInput): Record<string, unknown> {
 	const auditedAt = new Date().toISOString().slice(0, 10);
 
 	const issueNotes: string[] = [];
+	if (input.psiNote) {
+		issueNotes.push(input.psiNote);
+	}
 	if (input.criticalIssue) {
 		issueNotes.push(`Critical: ${input.criticalIssue}`);
 	}

@@ -19,6 +19,7 @@ function toTimestamp(value: Date | string | number): TimestampLike {
 type StoredReport = Record<string, unknown> & {
 	id?: string;
 	createdAt?: TimestampLike | null;
+	psiDegradedReason?: string | null;
 	lead?: {
 		name?: string;
 		email?: string;

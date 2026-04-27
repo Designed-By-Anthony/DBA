@@ -78,6 +78,10 @@ export async function GET(
 			{
 				id: data.id,
 				createdAt: data.createdAt?.toDate?.().toISOString() || null,
+				psiDegradedReason:
+					typeof data.psiDegradedReason === "string"
+						? data.psiDegradedReason
+						: null,
 				lead: publicLead,
 				scores: data.scores,
 				metrics: data.metrics,

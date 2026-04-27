@@ -9,5 +9,6 @@ Disallow: /report/
 Disallow: /thank-you
 Disallow: /facebook-offer
 Disallow: /404
+Disallow: /lighthouse/report
 
 Sitemap: https://designedbyanthony.com/sitemap.xml

@@ -1,5 +1,6 @@
 import { AuditForm } from "@lh/components/AuditForm";
 import { LighthouseHero } from "@lh/components/LighthouseHero";
+import { LighthouseValueStrip } from "@lh/components/LighthouseValueStrip";
 import { getTurnstileSiteKey } from "@/lib/turnstile";
 
 export default function LighthouseHome() {
@@ -12,6 +13,7 @@ export default function LighthouseHome() {
 		>
 			<div className="lighthouse-main-inner mx-auto w-full max-w-5xl">
 				<LighthouseHero />
+				<LighthouseValueStrip />
 				<div className="lighthouse-audit-shell glass-card px-6 py-8 md:px-10 md:py-10">
 					<AuditForm turnstileSiteKey={turnstileSiteKey} />
 				</div>
