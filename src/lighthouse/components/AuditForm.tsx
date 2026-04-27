@@ -295,7 +295,9 @@ export function AuditForm({ turnstileSiteKey }: { turnstileSiteKey: string }) {
 					</h2>
 					<p className="mt-2 max-w-xl text-sm leading-relaxed text-white/58">
 						PageSpeed lab data, technical SEO signals, and a plain-English
-						summary. We use your email only to deliver the report link.
+						summary. We use your email to deliver the report link; when CRM sync
+						is enabled, we also log a Freshworks lead so nothing falls through
+						the cracks.
 					</p>
 				</div>
 
