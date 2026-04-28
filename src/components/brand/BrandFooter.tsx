@@ -90,7 +90,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					))}
 				</div>
 
-				{poweredBy && poweredBy.length > 0 ? (
+				{poweredBy?.length ? (
 					<div className="dba-footer-stack">
 						<span className="dba-footer-stack-label">Powered by</span>
 						{poweredBy.map(({ label, href }) => (

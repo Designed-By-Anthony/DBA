@@ -132,7 +132,7 @@ function DiagnosticPreview({ animate }: { animate: boolean }) {
 							aria-hidden
 						/>
 						<span className="min-w-0">
-							<span className="block font-report text-[13.5px] font-semibold leading-tight text-white/92">
+							<span className="block font-report text-[14px] font-semibold leading-tight text-white/92">
 								{row.label}
 							</span>
 							<span className="mt-0.5 block text-[11.5px] leading-[1.5] text-white/48">

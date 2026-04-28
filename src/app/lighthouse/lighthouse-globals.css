@@ -1196,7 +1196,9 @@
  * ────────────────────────────────────────────────── */
 
 /* Editorial display headline — Fraunces with optical-size axis.
-   Premium weight and spacing for studio feel */
+   Premium weight and spacing for studio feel.
+   160deg angle + bronze tint on the tail gives depth against the dark bg
+   without looking off-brand — cream top bleeds into the accent at bottom-right. */
 .lh-editorial-h1 {
 	font-family: var(--font-report, var(--font-display));
 	font-size: clamp(2.55rem, 5.5vw, 4.85rem);
