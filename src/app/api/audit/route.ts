@@ -3,7 +3,6 @@ import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
 import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
 import { isAuditTurnstileStrict } from "@lh/lib/auditTurnstilePolicy";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
-import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
@@ -27,6 +26,10 @@ import {
 	scanCompetitors,
 	scanPlaces,
 } from "@lh/lib/places";
+import {
+	getRecaptchaEnterpriseConfigStatus,
+	verifyRecaptchaEnterpriseToken,
+} from "@lh/lib/recaptchaEnterprise";
 import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
 import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
 import { createProjectSheet, pushLeadRow } from "@lh/lib/sheetsSync";
@@ -41,8 +44,8 @@ import {
 	normalizeHttpUrl,
 	normalizeText,
 } from "@lh/lib/validation";
-import { postLeadIngest } from "@/lib/leadWebhook";
 import { after, NextResponse } from "next/server";
+import { postLeadIngest } from "@/lib/leadWebhook";
 
 export const runtime = "nodejs";
 
@@ -125,7 +128,32 @@ export async function POST(request: Request) {
 
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+		const recaptchaToken =
+			typeof body.recaptchaToken === "string" ? body.recaptchaToken : "";
 		const clientIp = getClientAddress(request);
+		const recaptchaStatus = getRecaptchaEnterpriseConfigStatus();
+		if (recaptchaStatus === "incomplete") {
+			return NextResponse.json(
+				{ error: "Audit bot protection is misconfigured." },
+				{ status: 503, headers: responseHeaders },
+			);
+		}
+		if (recaptchaStatus === "ready") {
+			const recaptcha = await verifyRecaptchaEnterpriseToken(
+				recaptchaToken,
+				clientIp,
+			);
+			if (!recaptcha.success) {
+				return NextResponse.json(
+					{
+						error:
+							"Bot verification failed. Please refresh the page and try again.",
+					},
+					{ status: 403, headers: responseHeaders },
+				);
+			}
+		}
+
 		const strictTurnstile = isAuditTurnstileStrict();
 		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
 		if (strictTurnstile) {
@@ -807,35 +835,6 @@ export async function POST(request: Request) {
 						10_000,
 					).catch((formError) => {
 						console.error("Agency OS Webhook submission failed:", formError);
-					}),
-				);
-			}
-
-			if (process.env.FRESHWORKS_CRM_SYNC_ENABLED === "1") {
-				tasks.push(
-					createFreshworksLeadFromAudit({
-						name,
-						email,
-						company,
-						location,
-						scannedUrl: url,
-						reportId,
-						reportPublicUrl: `${reportPublicBase}/report/${reportId}`,
-						trustScore,
-						performanceScore: performanceScore ?? 0,
-						accessibilityScore: accessibilityScore ?? 0,
-						bestPracticesScore: bestPracticesScore ?? 0,
-						seoScore: seoScore ?? 0,
-						conversionScore,
-						userAgent: request.headers.get("user-agent") || "",
-					}).then((crmRes) => {
-						if (!crmRes.ok) {
-							console.error(
-								"[audit] Freshworks CRM lead sync failed:",
-								crmRes.error,
-								crmRes.status ?? "",
-							);
-						}
 					}),
 				);
 			}

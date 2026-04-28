@@ -109,19 +109,18 @@
 	position: sticky;
 	top: 0;
 	z-index: 100;
-	box-shadow: 0 8px 28px rgba(3, 7, 18, 0.35);
+	box-shadow: 0 12px 32px rgba(3, 7, 18, 0.34);
 }
 
 /* ── Announcement Banner ── */
 .site-banner {
 	background: linear-gradient(
-		180deg,
-		rgba(10, 14, 22, 0.72) 0%,
-		rgba(8, 11, 18, 0.88) 100%
+		90deg,
+		rgba(8, 12, 22, 0.94) 0%,
+		rgba(11, 17, 30, 0.94) 50%,
+		rgba(8, 12, 22, 0.94) 100%
 	);
-	backdrop-filter: blur(14px);
-	-webkit-backdrop-filter: blur(14px);
-	border-bottom: 1px solid rgba(255, 252, 245, 0.06);
+	border-bottom: 1px solid rgb(var(--accent-bronze-rgb) / 0.14);
 	text-align: center;
 	position: relative;
 	z-index: 101;
@@ -135,12 +134,12 @@
 	max-width: 100%;
 	box-sizing: border-box;
 	text-align: left;
-	hyphens: auto;
-	overflow-wrap: anywhere;
+	hyphens: none;
+	overflow-wrap: normal;
 	font-size: 0.78rem;
 	font-weight: 500;
 	letter-spacing: 0.02em;
-	color: rgba(247, 244, 238, 0.76);
+	color: color-mix(in srgb, var(--accent-bronze-muted) 86%, transparent);
 	transition: color 0.25s ease;
 }
 
@@ -149,20 +148,18 @@
 }
 
 .site-banner-link strong {
-	color: rgba(201, 168, 108, 0.95);
+	color: var(--accent-bronze-light);
 	font-weight: 650;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
 	font-size: 0.62rem;
 	font-family: var(--font-display, system-ui, sans-serif);
 }
 
 .site-banner-dot {
-	width: 5px;
-	height: 5px;
+	width: 0.4rem;
+	height: 0.4rem;
 	border-radius: 50%;
-	background: rgba(201, 168, 108, 0.85);
-	box-shadow: 0 0 10px rgba(201, 168, 108, 0.35);
+	background: var(--accent-bronze);
+	box-shadow: 0 0 8px 1px var(--accent-bronze-glow);
 	animation: banner-pulse 2s ease-in-out infinite;
 	flex-shrink: 0;
 }
@@ -209,11 +206,12 @@
 	position: relative;
 	background: linear-gradient(
 		180deg,
-		rgba(7, 13, 24, 0.94) 0%,
-		rgba(10, 18, 32, 0.88) 100%
+		rgba(6, 10, 18, 0.9) 0%,
+		rgba(6, 10, 18, 0.76) 100%
 	);
-	backdrop-filter: blur(18px);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-bottom: 1px solid rgb(var(--accent-bronze-rgb) / 0.26);
 }
 
 /* ── Body canvas: main column + tucked quick rail drawer (desktop) ── */
@@ -317,7 +315,7 @@
 }
 
 .nav-rail-link:hover {
-	border-color: rgba(201, 168, 108, 0.22);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.22);
 	background: rgba(255, 252, 245, 0.05);
 	color: var(--text-cream);
 	transform: translateY(-1px);
@@ -366,7 +364,7 @@
 }
 
 .nav-rail-link--book .nav-rail-text strong {
-	color: rgba(201, 168, 108, 0.95);
+	color: rgb(var(--accent-bronze-rgb) / 0.95);
 }
 
 .site-quick-rail__lead {
@@ -607,7 +605,7 @@ body.site-contact-drawer-open {
 .header-container {
 	max-width: var(--content-max);
 	margin: 0 auto;
-	padding: 0.5rem var(--container-gutter);
+	padding: 0.82rem var(--container-gutter);
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -615,10 +613,13 @@ body.site-contact-drawer-open {
 }
 
 .brand-lockup {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
+	gap: 0.72rem;
 	transition: opacity 0.25s ease;
 	flex-shrink: 0;
+	min-width: 0;
+	text-decoration: none;
 }
 
 .brand-lockup:hover {
@@ -631,20 +632,51 @@ body.site-contact-drawer-open {
 	max-height: none;
 	object-fit: contain;
 	display: block;
+	flex-shrink: 0;
+	transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand-lockup:hover .nav-icon {
+	transform: rotate(-3deg);
+}
+
+.brand-lockup-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.brand-lockup-name {
+	color: rgba(247, 244, 238, 0.95);
+	font-family: var(--font-display, system-ui, sans-serif);
+	font-size: 0.98rem;
+	font-weight: 650;
+	line-height: 1.1;
+	white-space: nowrap;
+}
+
+.brand-lockup-sub {
+	margin-top: 0.18rem;
+	color: color-mix(in srgb, var(--accent-bronze) 68%, transparent);
+	font-size: 0.62rem;
+	font-weight: 600;
+	letter-spacing: 0.16em;
+	line-height: 1.1;
+	text-transform: uppercase;
+	white-space: nowrap;
 }
 
 .nav {
 	display: flex;
-	gap: 1.35rem;
+	gap: 1.15rem;
 	align-items: center;
 }
 
 .nav a {
-	font-size: 0.77rem;
+	font-size: 0.78rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.11em;
-	color: rgba(255, 255, 255, 0.54);
+	letter-spacing: 0;
+	color: rgba(247, 244, 238, 0.66);
 	transition: color 0.35s ease;
 	position: relative;
 }
@@ -656,7 +688,7 @@ body.site-contact-drawer-open {
 	left: 0;
 	width: 0;
 	height: 1px;
-	background-color: var(--accent-blue);
+	background-color: color-mix(in srgb, var(--accent-bronze) 72%, transparent);
 	transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -673,15 +705,11 @@ body.site-contact-drawer-open {
 }
 
 .nav-contact-link {
-	padding: 0.75rem 1rem;
+	padding: 0.68rem 0.92rem;
 	border-radius: 999px;
-	border: 1px solid rgba(96, 165, 250, 0.22);
-	color: rgba(255, 255, 255, 0.92);
-	background: linear-gradient(
-		135deg,
-		rgba(26, 70, 154, 0.3) 0%,
-		rgba(17, 29, 53, 0.84) 100%
-	);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.26);
+	color: color-mix(in srgb, var(--accent-bronze-light) 92%, transparent);
+	background: rgb(var(--accent-bronze-rgb) / 0.08);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
@@ -691,7 +719,7 @@ body.site-contact-drawer-open {
 
 .nav-contact-link:hover {
 	color: var(--text-white);
-	border-color: rgba(147, 197, 253, 0.4);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.44);
 	transform: translateY(-1px);
 }
 
@@ -701,6 +729,13 @@ body.site-contact-drawer-open {
 	letter-spacing: 0;
 	white-space: nowrap;
 	flex-shrink: 0;
+	border-color: rgb(var(--accent-bronze-rgb) / 0.38);
+	background: linear-gradient(
+		135deg,
+		rgb(var(--accent-bronze-rgb) / 0.18),
+		rgba(91, 156, 248, 0.28)
+	);
+	color: var(--accent-bronze-light);
 }
 
 .nav-book-btn::after {
@@ -951,13 +986,17 @@ body.site-contact-drawer-open {
 	}
 
 	.header-container {
-		padding: 0.5rem var(--container-gutter);
+		padding: 0.72rem var(--container-gutter);
 	}
 
 	.nav-icon {
 		width: 32px;
 		height: auto;
 		object-fit: contain;
+	}
+
+	.brand-lockup-sub {
+		display: none;
 	}
 
 	.nav-desktop {

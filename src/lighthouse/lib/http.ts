@@ -106,7 +106,10 @@ function isAllowedOrigin(origin: string): boolean {
 		return true;
 	}
 
-	if (url.protocol === "https:" && isTrustedHostedPreviewHostname(url.hostname)) {
+	if (
+		url.protocol === "https:" &&
+		isTrustedHostedPreviewHostname(url.hostname)
+	) {
 		return true;
 	}
 

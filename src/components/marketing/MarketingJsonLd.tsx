@@ -15,7 +15,13 @@ import {
 } from "@/lib/seo";
 
 function JsonLd({ data }: { data: unknown }) {
-	return <script type="application/ld+json">{JSON.stringify(data)}</script>;
+	return (
+		<script
+			type="application/ld+json"
+			// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+			dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+		/>
+	);
 }
 
 /** JSON-LD emitted inside enriched page components — skip duplicate graphs here. */

@@ -29,7 +29,9 @@ export function isTrustedHostedPreviewHostname(hostname: string): boolean {
 	return TRUSTED_HOST_SUFFIXES.some((suffix) => h.endsWith(suffix));
 }
 
-export function isTrustedMarketingBrowserOrigin(origin: string | null): boolean {
+export function isTrustedMarketingBrowserOrigin(
+	origin: string | null,
+): boolean {
 	if (!origin) return false;
 	if (APEX_SUBDOMAIN_PATTERN.test(origin)) return true;
 	if (LOCAL_ORIGINS.has(origin)) return true;
@@ -46,8 +48,7 @@ export function buildMarketingLeadApiCorsHeaders(
 	origin: string | null,
 ): Record<string, string> {
 	const allowed = isTrustedMarketingBrowserOrigin(origin);
-	const allow =
-		allowed && origin ? origin : "https://designedbyanthony.com";
+	const allow = allowed && origin ? origin : "https://designedbyanthony.com";
 	return {
 		"Access-Control-Allow-Origin": allow,
 		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",

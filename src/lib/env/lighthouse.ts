@@ -15,6 +15,13 @@ const lighthouseSchema = z
 		GOOGLE_PAGESPEED_API_KEY: z.string().trim().optional(),
 		GEMINI_API_KEY: z.string().trim().optional(),
 		GEMINI_MODEL: z.string().trim().optional(),
+		NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY: z.string().trim().optional(),
+		NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_ACTION: z.string().trim().optional(),
+		RECAPTCHA_ENTERPRISE_API_KEY: z.string().trim().optional(),
+		RECAPTCHA_ENTERPRISE_PROJECT_ID: z.string().trim().optional(),
+		RECAPTCHA_ENTERPRISE_SITE_KEY: z.string().trim().optional(),
+		RECAPTCHA_ENTERPRISE_EXPECTED_ACTION: z.string().trim().optional(),
+		RECAPTCHA_ENTERPRISE_MIN_SCORE: z.string().trim().optional(),
 		TURNSTILE_SECRET_KEY: z.string().trim().optional(),
 		/** When `1`/`true`, `/api/audit` requires Turnstile (needs secret + client token). */
 		LIGHTHOUSE_STRICT_TURNSTILE: z.string().trim().optional(),

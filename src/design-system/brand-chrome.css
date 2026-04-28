@@ -1,0 +1,476 @@
+/**
+ * Designed by Anthony — shared brand chrome.
+ * Header (banner + nav) and footer used across the entire site,
+ * including the lighthouse audit segment.
+ *
+ * Imported by `dba-global.css` (loaded by the root layout) so these
+ * styles are available everywhere.
+ *
+ * Class prefix: `.dba-*`
+ */
+
+@keyframes dba-pulse-dot {
+	0%,
+	100% {
+		opacity: 1;
+		box-shadow: 0 0 8px 2px rgba(52, 211, 153, 0.55);
+	}
+	50% {
+		opacity: 0.6;
+		box-shadow: 0 0 4px 1px rgba(52, 211, 153, 0.28);
+	}
+}
+
+/* ──────────────────────────────────────────────────
+ * Top launch banner
+ * ────────────────────────────────────────────────── */
+
+.dba-banner {
+	position: relative;
+	z-index: 4;
+	background: linear-gradient(
+		90deg,
+		rgba(8, 12, 22, 0.96) 0%,
+		rgba(11, 17, 30, 0.96) 50%,
+		rgba(8, 12, 22, 0.96) 100%
+	);
+	border-bottom: 1px solid rgba(201, 168, 108, 0.14);
+}
+
+.dba-banner-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+	padding: 0.55rem 1rem;
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(232, 213, 168, 0.92);
+	text-decoration: none;
+	transition: color 180ms ease;
+}
+
+.dba-banner-link:hover {
+	color: rgba(252, 240, 210, 1);
+}
+
+.dba-banner-link strong {
+	font-family: var(--font-fraunces, "Fraunces Variable", Georgia, serif);
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	color: rgba(252, 240, 210, 0.96);
+}
+
+.dba-banner-dot {
+	display: inline-block;
+	width: 0.4rem;
+	height: 0.4rem;
+	border-radius: 50%;
+	background: rgba(201, 168, 108, 0.95);
+	box-shadow: 0 0 8px 1px rgba(201, 168, 108, 0.4);
+	flex-shrink: 0;
+}
+
+.dba-banner-sep {
+	color: rgba(232, 213, 168, 0.4);
+	margin: 0 0.05em;
+}
+
+.dba-banner-cta {
+	font-style: italic;
+	color: rgba(232, 213, 168, 0.7);
+}
+
+@media (max-width: 36rem) {
+	.dba-banner-link {
+		font-size: 0.65rem;
+		padding: 0.5rem 0.75rem;
+	}
+	.dba-banner-cta {
+		display: none;
+	}
+}
+
+/* ──────────────────────────────────────────────────
+ * Header
+ * ────────────────────────────────────────────────── */
+
+.dba-header {
+	position: relative;
+	z-index: 3;
+	background: linear-gradient(
+		180deg,
+		rgba(6, 10, 18, 0.9) 0%,
+		rgba(6, 10, 18, 0.78) 100%
+	);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+	padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+}
+
+.dba-header-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+	max-width: 80rem;
+	margin: 0 auto;
+	padding: 0.95rem 0;
+}
+
+@media (min-width: 768px) {
+	.dba-header-inner {
+		padding: 1.1rem 0;
+	}
+}
+
+/* Brand lockup */
+.dba-brand-lockup {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.75rem;
+	text-decoration: none;
+	min-width: 0;
+}
+
+.dba-brand-mark {
+	height: 1.85rem;
+	width: auto;
+	flex-shrink: 0;
+	transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 768px) {
+	.dba-brand-mark {
+		height: 2rem;
+	}
+}
+
+.dba-brand-lockup:hover .dba-brand-mark {
+	transform: rotate(-3deg);
+}
+
+.dba-brand-wordmark {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.dba-brand-wordmark-display {
+	font-family: var(--font-fraunces, "Fraunces Variable", Georgia, serif);
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: rgba(247, 244, 238, 0.95);
+	line-height: 1.1;
+	font-variation-settings: "opsz" 40;
+}
+
+@media (min-width: 768px) {
+	.dba-brand-wordmark-display {
+		font-size: 1.05rem;
+	}
+}
+
+.dba-brand-wordmark-sub {
+	margin-top: 0.18rem;
+	font-size: 0.62rem;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(201, 168, 108, 0.68);
+}
+
+@media (max-width: 28rem) {
+	.dba-brand-wordmark-sub {
+		display: none;
+	}
+}
+
+/* Desktop nav */
+.dba-nav--desktop {
+	display: none;
+	align-items: center;
+	gap: 1.25rem;
+}
+
+@media (min-width: 960px) {
+	.dba-nav--desktop {
+		display: flex;
+	}
+}
+
+.dba-nav-link {
+	font-size: 0.82rem;
+	font-weight: 500;
+	color: rgba(247, 244, 238, 0.7);
+	text-decoration: none;
+	transition: color 180ms ease;
+	letter-spacing: -0.005em;
+	white-space: nowrap;
+}
+
+.dba-nav-link:hover {
+	color: rgba(247, 244, 238, 0.98);
+}
+
+/* Current-page chip (lighthouse audit) */
+.dba-nav-current {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.75rem;
+	border-radius: 999px;
+	border: 1px solid rgba(56, 189, 248, 0.32);
+	background: rgba(56, 189, 248, 0.08);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: rgba(186, 230, 253, 0.95);
+	white-space: nowrap;
+}
+
+.dba-nav-current-dot {
+	display: inline-block;
+	width: 0.35rem;
+	height: 0.35rem;
+	border-radius: 50%;
+	background: rgb(74, 222, 128);
+	box-shadow: 0 0 6px 1px rgba(74, 222, 128, 0.55);
+	animation: dba-pulse-dot 2s ease-in-out infinite;
+}
+
+/* Audit CTA button (marketing pages) */
+.dba-nav-cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.55rem 1.1rem;
+	border-radius: 0.6rem;
+	border: 1px solid rgba(96, 165, 250, 0.38);
+	background: linear-gradient(
+		170deg,
+		rgba(56, 189, 248, 0.22) 0%,
+		rgba(37, 99, 235, 0.32) 100%
+	);
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	color: rgba(247, 250, 255, 0.96);
+	text-decoration: none;
+	box-shadow:
+		0 8px 22px -10px rgba(56, 189, 248, 0.4),
+		inset 0 1px 0 rgba(255, 255, 255, 0.08);
+	transition:
+		transform 180ms ease,
+		box-shadow 220ms ease,
+		border-color 220ms ease;
+	white-space: nowrap;
+}
+
+.dba-nav-cta:hover {
+	transform: translateY(-1px);
+	border-color: rgba(125, 211, 252, 0.55);
+	box-shadow:
+		0 12px 28px -10px rgba(56, 189, 248, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.dba-nav-cta--compact {
+	padding: 0.4rem 0.85rem;
+	font-size: 0.72rem;
+	letter-spacing: 0.04em;
+}
+
+/* Mobile nav slot */
+.dba-nav--mobile {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+@media (min-width: 960px) {
+	.dba-nav--mobile {
+		display: none;
+	}
+}
+
+.dba-hamburger {
+	display: inline-flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.28rem;
+	width: 2.4rem;
+	height: 2.4rem;
+	padding: 0 0.55rem;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 0.5rem;
+	cursor: pointer;
+	transition:
+		background 180ms ease,
+		border-color 180ms ease;
+}
+
+.dba-hamburger:hover,
+.dba-hamburger[aria-expanded="true"] {
+	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.dba-hamburger .hamburger-line {
+	display: block;
+	height: 1.5px;
+	width: 100%;
+	background: rgba(247, 244, 238, 0.78);
+	border-radius: 1px;
+	transition: transform 200ms ease;
+}
+
+/* Brass accent rule under header */
+.dba-header-rule {
+	position: relative;
+	height: 1px;
+	background: linear-gradient(
+		90deg,
+		rgba(201, 168, 108, 0) 0%,
+		rgba(201, 168, 108, 0.25) 25%,
+		rgba(201, 168, 108, 0.55) 50%,
+		rgba(201, 168, 108, 0.25) 75%,
+		rgba(201, 168, 108, 0) 100%
+	);
+}
+
+/* ──────────────────────────────────────────────────
+ * Footer — compact single row
+ * ────────────────────────────────────────────────── */
+
+.dba-footer {
+	position: relative;
+	z-index: 1;
+	margin-top: clamp(2.5rem, 5vw, 4rem);
+	padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+	padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+	background: linear-gradient(
+		180deg,
+		transparent 0%,
+		rgba(6, 8, 14, 0.65) 40%,
+		rgba(6, 8, 14, 0.92) 100%
+	);
+}
+
+.dba-footer-rule {
+	height: 1px;
+	background: linear-gradient(
+		90deg,
+		rgba(201, 168, 108, 0) 0%,
+		rgba(201, 168, 108, 0.4) 50%,
+		rgba(201, 168, 108, 0) 100%
+	);
+}
+
+.dba-footer-inner {
+	max-width: 80rem;
+	margin: 0 auto;
+	padding: 1.25rem 0 1.1rem;
+}
+
+/* Single compact row: brand · nav links · legal */
+.dba-footer-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem 1.5rem;
+}
+
+.dba-footer-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	text-decoration: none;
+	flex-shrink: 0;
+}
+
+.dba-footer-mark {
+	flex-shrink: 0;
+}
+
+.dba-footer-brand-name {
+	font-family: var(--font-fraunces, "Fraunces Variable", Georgia, serif);
+	font-size: 0.88rem;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	color: rgba(247, 244, 238, 0.88);
+	line-height: 1;
+}
+
+.dba-footer-nav {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 0.25rem 1rem;
+}
+
+.dba-footer-nav a {
+	font-size: 0.78rem;
+	color: rgba(247, 244, 238, 0.55);
+	text-decoration: none;
+	transition: color 180ms ease;
+	white-space: nowrap;
+}
+
+.dba-footer-nav a:hover {
+	color: rgba(247, 244, 238, 0.92);
+}
+
+/* Legal + copyright pushed to the right on wide screens */
+.dba-footer-legal {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.55rem;
+	margin-left: auto;
+	font-size: 0.7rem;
+	color: rgba(247, 244, 238, 0.38);
+}
+
+.dba-footer-legal a {
+	color: rgba(247, 244, 238, 0.48);
+	text-decoration: none;
+	transition: color 180ms ease;
+}
+
+.dba-footer-legal a:hover {
+	color: rgba(247, 244, 238, 0.82);
+}
+
+.dba-footer-legal-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+}
+
+.dba-footer-sep {
+	color: rgba(247, 244, 238, 0.22);
+}
+
+.dba-footer-copy {
+	margin: 0;
+	white-space: nowrap;
+}
+
+.dba-footer-meta {
+	color: rgba(201, 168, 108, 0.55);
+	font-size: 0.66rem;
+	letter-spacing: 0.06em;
+}
+
+/* Stack gracefully on narrow screens */
+@media (max-width: 640px) {
+	.dba-footer-legal {
+		margin-left: 0;
+	}
+}

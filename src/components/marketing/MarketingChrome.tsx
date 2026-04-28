@@ -5,12 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
-import { BRAND_MARK_IMAGE } from "@/design-system/brand";
-import { businessProfile, GA_MEASUREMENT_ID } from "@/lib/seo";
+import { BrandFooter } from "@/components/brand/BrandFooter";
+import { BrandHeader } from "@/components/brand/BrandHeader";
+import {
+	SITE_AUDIT_CTA,
+	SITE_BRAND,
+	SITE_CONTACT_LINK,
+	SITE_HEADER_NAV_LINKS,
+} from "@/design-system/site-config";
+import { businessProfile } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
 import { SiteContactDrawer } from "./SiteContactDrawer";
-import { SiteFooter } from "./SiteFooter";
 import { StreamChatGate } from "./StreamChatGate";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
@@ -67,39 +73,33 @@ window.gtag('consent', 'default', {
   ad_user_data: 'denied',
   ad_personalization: 'denied',
 });
-var analyticsLoaded = false;
-var analyticsConfigured = false;
+var gtmLoaded = false;
+var gtmConfigured = false;
 window.__dbaCookieConsentKey = 'dba_cookie_consent';
-function configureAnalytics() {
-  if (analyticsConfigured) return;
-  analyticsConfigured = true;
-  window.gtag('js', new Date());
-  window.gtag('config', '${GA_MEASUREMENT_ID}', {
-    anonymize_ip: true,
-    allow_google_signals: false,
-    allow_ad_personalization_signals: false,
-    send_page_view: true,
-  });
+function configureGtm() {
+  if (gtmConfigured) return;
+  gtmConfigured = true;
+  // GTM already handles its own initialization once the script is loaded
 }
 window.__dbaLoadAnalytics = function () {
-  if (analyticsLoaded) { configureAnalytics(); return; }
-  analyticsLoaded = true;
-  if (document.getElementById('dba-ga4-loader')) { configureAnalytics(); return; }
-  var script = document.createElement('script');
-  script.id = 'dba-ga4-loader';
-  script.async = true;
-  script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent('${GA_MEASUREMENT_ID}');
-  script.onload = configureAnalytics;
-  document.head.appendChild(script);
+  if (gtmLoaded) return;
+  gtmLoaded = true;
+  if (document.getElementById('dba-gtm-loader')) return;
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.id='dba-gtm-loader';j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-W2JBTH5L');
 };
 window.__dbaGrantAnalyticsConsent = function () {
   window.__dbaAnalyticsEnabled = true;
   window.gtag('consent', 'update', {
     analytics_storage: 'granted',
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
+    ad_storage: 'granted',
+    ad_user_data: 'granted',
+    ad_personalization: 'granted',
   });
+  window.dataLayer.push({ event: 'consent_granted' });
 };
 window.__dbaRevokeAnalyticsConsent = function () {
   window.__dbaAnalyticsEnabled = false;
@@ -114,61 +114,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 
 			<div id="reading-progress-bar" aria-hidden="true" />
 			<div className="site-chrome-sticky">
-				<div className="site-banner">
-					<Link href="/lighthouse" className="site-banner-link">
-						<span className="site-banner-dot" aria-hidden="true" />
-						<span>
-							<strong>Launch pilot · 10 founding spots</strong> — start with a
-							free SEO + performance audit →
-						</span>
-					</Link>
-				</div>
-				<header className="header">
-					<div className="header-container">
-						<Link href="/" className="brand-lockup">
-							<Image
-								src={BRAND_MARK_IMAGE}
-								alt="Designed by Anthony"
-								width={BRAND_MARK_IMAGE.width}
-								height={BRAND_MARK_IMAGE.height}
-								className="nav-icon"
-								priority
-							/>
-						</Link>
-						<nav className="nav nav-desktop" aria-label="Primary">
-							<Link href="/ouredge">Our Edge</Link>
-							<Link href="/services">Services</Link>
-							<Link href="/portfolio">Portfolio</Link>
-							<Link href="/pricing">Pricing</Link>
-							<Link href="/service-areas">Service Areas</Link>
-							<Link href="/about">About</Link>
-							<Link href="/faq">FAQ</Link>
-							<Link href="/blog">Blog</Link>
-							<Link href="/contact" className="nav-contact-link">
-								Contact
-							</Link>
-							<Link
-								href="/lighthouse"
-								className="btn btn-primary btn-sm nav-book-btn"
-								id="nav-audit-btn"
-							>
-								Audit My Site
-							</Link>
-						</nav>
-						<button
-							className="hamburger"
-							id="hamburger-btn"
-							type="button"
-							aria-label="Open navigation menu"
-							aria-controls="mobile-nav"
-							aria-expanded="false"
-						>
-							<span className="hamburger-line" />
-							<span className="hamburger-line" />
-							<span className="hamburger-line" />
-						</button>
-					</div>
-				</header>
+				<BrandHeader />
 			</div>
 
 			<div
@@ -200,23 +146,22 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							</button>
 						</div>
 						<nav className="mobile-nav-links" aria-label="Mobile">
-							<Link href="/ouredge">Our Edge</Link>
-							<Link href="/services">Services</Link>
-							<Link href="/pricing">Pricing</Link>
-							<Link href="/service-areas">Service Areas</Link>
-							<Link href="/portfolio">Portfolio</Link>
-							<Link href="/about">About</Link>
-							<Link href="/faq">FAQ</Link>
-							<Link href="/blog">Blog</Link>
-							<Link href="/contact">Contact</Link>
+							{SITE_HEADER_NAV_LINKS.map((link) => (
+								<Link key={link.href} href={link.href}>
+									{link.label}
+								</Link>
+							))}
+							<Link href={SITE_CONTACT_LINK.href}>
+								{SITE_CONTACT_LINK.label}
+							</Link>
 							<Link
-								href="/contact"
+								href={SITE_CONTACT_LINK.href}
 								className="mobile-nav-cta mobile-nav-cta--secondary"
 							>
 								Contact us
 							</Link>
-							<Link href="/lighthouse" className="mobile-nav-cta">
-								Audit My Site
+							<Link href={SITE_AUDIT_CTA.href} className="mobile-nav-cta">
+								{SITE_AUDIT_CTA.label}
 							</Link>
 						</nav>
 					</div>
@@ -228,7 +173,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				<div className="site-main-wrap">
 					<main id="main-content">{children}</main>
 					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
-					<SiteFooter />
+					<BrandFooter />
 				</div>
 			</div>
 
@@ -254,10 +199,10 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				<div className="reach-out-dialog-panel splash-shell splash-shell--reach-out">
 					<div className="reach-out-dialog-header">
 						<Image
-							src={BRAND_MARK_IMAGE}
-							alt="Designed by Anthony"
-							width={BRAND_MARK_IMAGE.width}
-							height={BRAND_MARK_IMAGE.height}
+							src={SITE_BRAND.assets.mark}
+							alt={SITE_BRAND.name}
+							width={40}
+							height={30}
 							className="reach-out-dialog-logo"
 						/>
 						<button
@@ -433,44 +378,15 @@ window.__dbaRevokeAnalyticsConsent = function () {
 })();`}
 			</Script>
 
-			<Script id="recaptcha-enterprise-lazy" strategy="afterInteractive">
-				{`(function() {
-  function siteKey() {
-    return document.documentElement.getAttribute('data-recaptcha-site-key') || '';
-  }
-  var loaded = false;
-  function injectRecaptcha() {
-    var k = siteKey();
-    if (!k || loaded) return;
-    loaded = true;
-    if (document.getElementById('dba-recaptcha-enterprise-loader')) return;
-    var script = document.createElement('script');
-    script.id = 'dba-recaptcha-enterprise-loader';
-    script.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(k);
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  }
-  function maybeLoad(target) {
-    if (!siteKey()) return;
-    if (!target || !(target instanceof Element)) return;
-    if (!target.closest('[data-audit-form]')) return;
-    injectRecaptcha();
-  }
-  function bind() {
-    if (!siteKey()) return;
-    document.addEventListener('focusin', function (e) { maybeLoad(e.target); }, { passive: true });
-    document.addEventListener('pointerdown', function (e) { maybeLoad(e.target); }, { passive: true });
-  }
-  document.addEventListener('DOMContentLoaded', bind, { once: true });
-  if (document.readyState !== 'loading') bind();
-})();`}
-			</Script>
-
 			<Script id="turnstile-lazy" strategy="afterInteractive">
 				{`(function() {
-  if (document.documentElement.getAttribute('data-recaptcha-site-key')) return;
+  var TURNSTILE_TEST_SITEKEY = '1x00000000000000000000AA';
   window.__dbaTurnstileError = function () { document.querySelectorAll('.cf-turnstile').forEach(function (w) { var form = w.closest('[data-audit-form]'); if (form) { var box = form.querySelector('[data-form-error]'); if (box) { box.textContent = 'Security check could not load. Refresh the page.'; box.removeAttribute('hidden'); } } }); };
+  function applyLoopbackTurnstileSiteKey() {
+    var h = location.hostname;
+    if (h !== 'localhost' && h !== '127.0.0.1') return;
+    document.querySelectorAll('.cf-turnstile').forEach(function (el) { el.setAttribute('data-sitekey', TURNSTILE_TEST_SITEKEY); });
+  }
   var turnstileLoaded = false;
   function injectTurnstileScript() {
     if (turnstileLoaded) return;
@@ -484,6 +400,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
     document.body.appendChild(script);
   }
   function maybeLoadTurnstile(target) {
+    applyLoopbackTurnstileSiteKey();
     if (!document.querySelector('.cf-turnstile')) return;
     if (!target) return;
     var host = target instanceof Element ? target.closest('[data-audit-form]') : null;
@@ -492,6 +409,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
   }
   var bound = false;
   function bind() {
+    applyLoopbackTurnstileSiteKey();
     if (bound) return;
     if (!document.querySelector('.cf-turnstile')) return;
     bound = true;

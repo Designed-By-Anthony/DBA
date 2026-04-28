@@ -1,10 +1,7 @@
 import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import { NextResponse } from "next/server";
 import { buildPublicLeadPayloadFromFormFields } from "@/lib/lead-form-contract";
-import {
-	postLeadIngest,
-	resolveContactLeadIngestUrl,
-} from "@/lib/leadWebhook";
+import { postLeadIngest, resolveContactLeadIngestUrl } from "@/lib/leadWebhook";
 import { buildMarketingLeadApiCorsHeaders } from "@/lib/marketingBrowserOrigins";
 
 /**

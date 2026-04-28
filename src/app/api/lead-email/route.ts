@@ -202,8 +202,7 @@ export async function POST(request: Request) {
 					{
 						errors: [
 							{
-								message:
-									"Could not save your request. Please try again later.",
+								message: "Could not save your request. Please try again later.",
 							},
 						],
 					},
@@ -219,8 +218,7 @@ export async function POST(request: Request) {
 				{
 					errors: [
 						{
-							message:
-								"Could not save your request. Please try again later.",
+							message: "Could not save your request. Please try again later.",
 						},
 					],
 				},
@@ -230,7 +228,10 @@ export async function POST(request: Request) {
 	}
 
 	if (!resendApiKey) {
-		return NextResponse.json({ ok: true }, { status: 200, headers: corsHeaders });
+		return NextResponse.json(
+			{ ok: true },
+			{ status: 200, headers: corsHeaders },
+		);
 	}
 
 	const fromEmail =

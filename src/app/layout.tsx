@@ -65,6 +65,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			data-recaptcha-action={recaptchaSiteKey ? recaptchaAction : undefined}
 		>
 			<body>
+				{/* Google Tag Manager (noscript) */}
+				<noscript>
+					<iframe
+						src="https://www.googletagmanager.com/ns.html?id=GTM-W2JBTH5L"
+						height="0"
+						width="0"
+						style={{ display: "none", visibility: "hidden" }}
+						title="GTM-NoScript"
+					/>
+				</noscript>
 				{children}
 				<CrispBootstrap />
 			</body>

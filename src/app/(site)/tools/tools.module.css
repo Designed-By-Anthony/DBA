@@ -1,0 +1,207 @@
+/* /tools — Micro SaaS Store  |  CSS Modules pattern */
+
+.page {
+	min-height: 80vh;
+	padding: clamp(4rem, 8vw, 7rem) 1.25rem clamp(4rem, 8vw, 6rem);
+}
+
+/* ─── Hero ─── */
+.hero {
+	max-width: 52rem;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.85rem;
+	border-radius: 999px;
+	border: 1px solid rgba(201, 168, 108, 0.28);
+	background: rgba(201, 168, 108, 0.07);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(232, 213, 168, 0.82);
+	margin-bottom: 1.5rem;
+}
+
+.badgeDot {
+	display: inline-block;
+	width: 0.35rem;
+	height: 0.35rem;
+	border-radius: 50%;
+	background: rgba(201, 168, 108, 0.9);
+	box-shadow: 0 0 6px 1px rgba(201, 168, 108, 0.45);
+	flex-shrink: 0;
+}
+
+.heading {
+	font-size: clamp(2rem, 5vw, 3.25rem);
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1.12;
+	color: rgba(247, 244, 238, 0.97);
+	margin: 0 0 1.25rem;
+}
+
+.subheading {
+	font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+	color: rgba(247, 244, 238, 0.6);
+	line-height: 1.65;
+	max-width: 38rem;
+	margin: 0 auto 2.5rem;
+}
+
+/* ─── Waitlist form ─── */
+.form {
+	display: flex;
+	gap: 0.6rem;
+	max-width: 26rem;
+	margin: 0 auto 1rem;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.input {
+	flex: 1 1 14rem;
+	min-width: 0;
+	padding: 0.7rem 1rem;
+	border-radius: 0.55rem;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(255, 255, 255, 0.04);
+	color: rgba(247, 244, 238, 0.95);
+	font-size: 0.9rem;
+	outline: none;
+	transition: border-color 180ms ease;
+}
+
+.input::placeholder {
+	color: rgba(247, 244, 238, 0.3);
+}
+
+.input:focus {
+	border-color: rgba(96, 165, 250, 0.45);
+}
+
+.submitBtn {
+	padding: 0.7rem 1.4rem;
+	border-radius: 0.55rem;
+	border: 1px solid rgba(96, 165, 250, 0.38);
+	background: linear-gradient(170deg, rgba(56, 189, 248, 0.22) 0%, rgba(37, 99, 235, 0.32) 100%);
+	color: rgba(247, 250, 255, 0.96);
+	font-size: 0.88rem;
+	font-weight: 700;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: transform 180ms ease, box-shadow 220ms ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 24px -8px rgba(56, 189, 248, 0.42);
+}
+
+.submitBtn:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.formNote {
+	font-size: 0.72rem;
+	color: rgba(247, 244, 238, 0.35);
+	text-align: center;
+}
+
+.successMsg {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	font-size: 0.9rem;
+	color: rgba(74, 222, 128, 0.9);
+	margin-bottom: 0.75rem;
+}
+
+.errorMsg {
+	font-size: 0.82rem;
+	color: rgba(248, 113, 113, 0.85);
+	text-align: center;
+	margin-bottom: 0.5rem;
+}
+
+/* ─── Preview grid ─── */
+.previewSection {
+	max-width: 68rem;
+	margin: 5rem auto 0;
+}
+
+.previewHeading {
+	text-align: center;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(201, 168, 108, 0.6);
+	margin-bottom: 2rem;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+	gap: 1.25rem;
+}
+
+.card {
+	padding: 1.5rem;
+	border-radius: 0.875rem;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: rgba(255, 255, 255, 0.025);
+	backdrop-filter: blur(8px);
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+	transition: border-color 220ms ease, transform 220ms ease;
+}
+
+.card:hover {
+	border-color: rgba(255, 255, 255, 0.11);
+	transform: translateY(-2px);
+}
+
+.cardIcon {
+	font-size: 1.4rem;
+	line-height: 1;
+}
+
+.cardTag {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.6rem;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.04);
+	font-size: 0.64rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: rgba(247, 244, 238, 0.45);
+	width: fit-content;
+}
+
+.cardTitle {
+	font-size: 0.96rem;
+	font-weight: 600;
+	color: rgba(247, 244, 238, 0.9);
+	line-height: 1.3;
+	margin: 0;
+}
+
+.cardDesc {
+	font-size: 0.82rem;
+	color: rgba(247, 244, 238, 0.5);
+	line-height: 1.55;
+	margin: 0;
+}

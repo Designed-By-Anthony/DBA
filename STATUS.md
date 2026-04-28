@@ -2,15 +2,47 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
-## GitHub + Firebase / lead pipeline scrub (2026-04-27)
+## Site-wide brand + stack unification (2026-04-28)
 
-- **Source of truth:** GitHub; **`.gitlab-ci.yml` removed**. Docs (`AGENTS.md`, `README.md`, `SECURITY.md`, `lighthouse2.md`, `.env.example`) now describe **Firebase App Hosting** + Convex webhooks instead of GitLab/Netlify-first, Freshworks, or legacy Agency OS ingest env names.
-- **Leads:** `POST /api/contact` uses **`LEAD_WEBHOOK_URL` only**. Audit optional forwarder uses **`AUDIT_LEAD_WEBHOOK_URL`** + **`AUDIT_LEAD_WEBHOOK_SECRET`**; Freshworks CRM module deleted.
-- **Copy / schema:** Public “Agency OS” strings moved to **VertaFlow** (`offers.ts`, `seo.ts`, `llms.txt`, cold email HTML). CSP dropped Freshworks domains.
+- **Tech stack accuracy:** Updated footer badges (`SiteFooter.tsx`) → Next.js, Firebase Hosting, Cloudflare, reCAPTCHA Enterprise.
+- **Tech fingerprints (`LighthouseTechFingerprints.tsx`):** Corrected `data-builtwith-tech-stack` to reflect production stack (Firebase Hosting, Cloudflare, reCAPTCHA Enterprise).
+- **Color palette unification:** Enhanced `theme.css` body atmospheric gradients to match Lighthouse premium depth — sky blue primary glow (0.12 opacity), bronze warm accent (0.06), tertiary blue depth layer, unified ink base gradient.
+- **Brand consistency:** Entire site now shares the same bronze/sky color language as the Lighthouse audit page.
+- Validation: `npm run build` and `npm run lint` pass from repo root.
+
+## Lighthouse final premium brand polish (2026-04-28)
+
+- **Visual depth:** Enhanced atmospheric gradients with multi-layer radial glow (sky blue + bronze), premium grain texture overlay for studio-paper feel, and refined shadow depth on all surfaces.
+- **Tactile interactions:** Added cursor-glow tracking to glass cards (`cursorGlow.ts`), premium shimmer sweep on submit button with animated glow pulse, hover lift transforms on score cards with enhanced ring glow.
+- **Editorial typography:** H1 gradient text treatment matching marketing heroes, refined Fraunces optical sizing, tighter letter-spacing and line-height for premium hierarchy.
+- **Component refinements:** Refined glass card border/gradient finishes, enhanced score ring spring animations with hover state, instrument-panel feel for scan progress with spring physics, premium phase cards with smoother transitions.
+- **Files:** `lighthouse-globals.css`, `ScoreRing.tsx`, `AuditForm.tsx`, `AuditScanProgress.tsx`, new `cursorGlow.ts`.
+- Validation: `npm run build` and `npm run lint` pass from repo root.
+
+## Lighthouse premium scanner + reCAPTCHA Enterprise (2026-04-28)
+
+- Reworked `/lighthouse` into a single premium audit workstation: editorial scanner hero, bronze diagnostic preview, sticky audit panel, tighter process coverage strip, and quieter form copy/states.
+- Extended the premium system into the generated report surfaces: on-screen results now open with an executive report cover, print/save route uses warm paper + bronze report styling, and the downloadable PDF matches the same brand palette.
+- Added Google reCAPTCHA Enterprise frontend execution with the DBA public site key and server assessment verification for `POST /api/audit` when `RECAPTCHA_ENTERPRISE_API_KEY` is configured.
+- Updated CSP source of truth for the Google reCAPTCHA loader/frames plus `.env.example` and README env notes. Private Google API keys stay server-only.
+
+## Premium chrome + Lighthouse landing polish (2026-04-28)
+
+- Migrated the main marketing chrome toward the newer Lighthouse header treatment: branded mark + wordmark lockup, brass banner/header rule, quieter nav typography, and aligned mobile brand behavior.
+- Tightened `/lighthouse`: removed the headline overlap badge/glow clutter, reduced vertical void space, contained the report preview, compacted the process strip/form, and softened the audit form copy toward a more premium service tone.
+- Verified with `npm run build`, `npm run lint` (2 sanitized HTML warnings only), Playwright desktop/mobile checks for `/` and `/lighthouse`, and brand asset presence checks for `/brand/logo.png` + `/brand/mark.webp`.
+- Added `src/design-system/site-config.ts` as the shared brand/nav/banner/footer/social source of truth for marketing + Lighthouse chrome.
+- Promoted bronze to canonical design tokens (`--accent-bronze*`) with legacy brass aliases, then swept authored CSS to consume the tokenized bronze RGB instead of hand-coded bronze values.
+
+## Convex lead webhook + Firebase docs (2026-04-28)
+
+- **`LEAD_WEBHOOK_URL`** / optional **`LEAD_WEBHOOK_SECRET`**: server-side POST for **`POST /api/audit`** (`after()`), **`POST /api/lead-email`**, and **`/api/contact`** (`src/lib/leadWebhook.ts`). Legacy **`AGENCY_OS_WEBHOOK_*`** audit path runs only when `LEAD_WEBHOOK_URL` is unset.
+- **CORS:** `*.hosted.app`, `*.web.app`, `*.firebaseapp.com`, `*.netlify.app` allowed for marketing lead APIs + Lighthouse `POST /api/audit` origins (`src/lib/marketingBrowserOrigins.ts`, `src/lighthouse/lib/http.ts`).
+- **Docs:** `AGENTS.md`, `README.md`, `SECURITY.md`, `.env.example` — production path **GitHub → Firebase App Hosting**.
 
 ## Consolidation branch `oh-my-hopefully-complete` (2026-04-28)
 
-- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`**; dropped **`src/middleware.ts`**. Current **`lighthouse-troubleshooting`**: Turnstile on audits is **opt-in** (`LIGHTHOUSE_STRICT_TURNSTILE`); segment no longer injects **`api.js`** by default.
+- **`main` + `origin/consolidation/all-mrs`:** One merge from the open MR !153 trunk. Kept **Next.js 16 `src/proxy.ts`**, Convex **`AUDIT_LOGGING_WEBHOOK_URL`**, and premium **`/lighthouse`**; dropped **`src/middleware.ts`**. Current **`lighthouse-troubleshooting`**: Turnstile on audits is **opt-in** (`LIGHTHOUSE_STRICT_TURNSTILE`); segment no longer injects **`api.js`** by default. Audit form intro mentions **Freshworks** when CRM sync is enabled.
 
 ## PageSpeed Insights reliability (`lighthouse-troubleshooting`, 2026-04-28)
 
