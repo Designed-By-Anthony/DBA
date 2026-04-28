@@ -9,8 +9,6 @@ import { optionalUrl, validateEnv } from "./shared";
 const lighthouseSchema = z
 	.object({
 		NODE_ENV: z.enum(["development", "test", "production"]).optional(),
-		VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
-		VERCEL: z.string().optional(),
 
 		GOOGLE_PAGESPEED_API_KEY: z.string().trim().optional(),
 		GEMINI_API_KEY: z.string().trim().optional(),
@@ -69,43 +67,7 @@ const lighthouseSchema = z
 		SENTRY_ORG: z.string().trim().optional(),
 		SENTRY_PROJECT: z.string().trim().optional(),
 	})
-	.passthrough()
-	.superRefine((env, ctx) => {
-		// Only enforce on Vercel (`VERCEL=1`). Skip local/CI.
-		//
-		// This repo ships one Next.js app (marketing + `/lighthouse`). That deploy
-		// often shares Vercel env with Agency OS secrets — same as
-		// `validateMarketingEnv` unified mode. Do **not** hard-fail here by default.
-		//
-		// Legacy: a **dedicated** Lighthouse-only Vercel project should set
-		// `LIGHTHOUSE_ISOLATED_PROJECT=1` so CRM secrets are rejected (env-bleed).
-		if (env.VERCEL !== "1" && process.env.VERCEL !== "1") return;
-
-		const isolated =
-			env.LIGHTHOUSE_ISOLATED_PROJECT === "1" ||
-			env.LIGHTHOUSE_ISOLATED_PROJECT === "true" ||
-			process.env.LIGHTHOUSE_ISOLATED_PROJECT === "1" ||
-			process.env.LIGHTHOUSE_ISOLATED_PROJECT === "true";
-		if (!isolated) return;
-
-		const forbidden = [
-			"CLERK_SECRET_KEY",
-			"DATABASE_URL",
-			"STRIPE_SECRET_KEY",
-			"STRIPE_WEBHOOK_SECRET",
-		] as const;
-		const source = env as unknown as Record<string, string | undefined>;
-		for (const key of forbidden) {
-			const value = source[key] ?? process.env[key];
-			if (value && value.length > 0) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: [key],
-					message: `${key} must not be set on an isolated lighthouse project — it belongs to Agency OS (env-bleed detected).`,
-				});
-			}
-		}
-	});
+	.passthrough();
 
 export type LighthouseEnv = z.infer<typeof lighthouseSchema>;
 

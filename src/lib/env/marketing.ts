@@ -13,8 +13,6 @@ import { optionalUrl, validateEnv } from "./shared";
 const marketingSchema = z
 	.object({
 		NODE_ENV: z.enum(["development", "test", "production"]).optional(),
-		VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
-		VERCEL: z.string().optional(),
 
 		PUBLIC_CRM_LEAD_URL: optionalUrl,
 		PUBLIC_API_URL: optionalUrl,

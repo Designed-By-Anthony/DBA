@@ -127,7 +127,7 @@ Public documentation for category leaders describes stacks roughly like this:
 - **Moz optional:** If the Moz API does not return real data, the audit uses **`buildInternalAuthorityMetrics()`** (`src/lighthouse/lib/authorityEstimate.ts`) so scores and UI still populate. Labels say **internal estimate**, not Moz DA.
 - **Index estimate:** Uses **sitemap + Moz pages-crawled only when Moz actually returned**; otherwise sitemap-only (avoids inflating index with fake `pagesCrawled`).
 - **AI prompts** updated to treat internal authority differently from Moz (`authorityDataSource` in `generateAiInsight`).
-- **`biome.json`** restored with ignores/overrides so `npm run lint` stays usable (includes ignoring generated `static-headers.json` / `netlify.toml` formatting noise).
+- **`biome.json`** restored with ignores/overrides so `npm run lint` stays usable (includes ignoring generated `static-headers.json` formatting noise).
 
 ---
 
