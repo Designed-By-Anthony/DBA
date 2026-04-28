@@ -116,7 +116,14 @@ export default function LighthouseLayout({
 
 			{children}
 
-			<BrandFooter buildTag="Lighthouse Scanner v2" />
+			<BrandFooter
+				buildTag="Lighthouse Scanner v2"
+				poweredBy={[
+					{ label: "Gemini 2.0", href: "https://deepmind.google/technologies/gemini/" },
+					{ label: "Firebase", href: "https://firebase.google.com" },
+					{ label: "Next.js", href: "https://nextjs.org" },
+				]}
+			/>
 
 			<CookieConsentBanner />
 		</div>

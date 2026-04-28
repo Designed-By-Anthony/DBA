@@ -516,6 +516,90 @@ export function OurEdgePage() {
 				</div>
 			</section>
 			<section className="section-shell section-shell--wash">
+				<div className="section-container">
+					<div className="section-divider-glow" aria-hidden="true" />
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
+						<h2>The stack.</h2>
+						<p>
+							Modern tooling chosen for speed, stability, and longevity — not
+							defaults inherited from a template.
+						</p>
+					</MotionReveal>
+					<MotionStagger className="stack-grid" staggerDelay={0.08}>
+						<MotionStaggerChild className="surface-card stack-col reveal-up">
+							<span className="stack-col-label">Rendering</span>
+							<div className="stack-chips">
+								{[
+									{ label: "Next.js 16", href: "https://nextjs.org" },
+									{ label: "React 19", href: "https://react.dev" },
+									{ label: "TypeScript", href: "https://www.typescriptlang.org" },
+									{ label: "esbuild", href: "https://esbuild.github.io" },
+								].map(({ label, href }) => (
+									<a
+										key={label}
+										href={href}
+										className="dba-stack-badge"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{label}
+									</a>
+								))}
+							</div>
+						</MotionStaggerChild>
+						<MotionStaggerChild className="surface-card stack-col reveal-up">
+							<span className="stack-col-label">Styling &amp; Motion</span>
+							<div className="stack-chips">
+								{[
+									{ label: "Tailwind v4", href: "https://tailwindcss.com" },
+									{ label: "Framer Motion", href: "https://www.framer.com/motion/" },
+									{ label: "GSAP", href: "https://gsap.com" },
+									{ label: "Variable Fonts", href: "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_fonts/Variable_fonts_guide" },
+								].map(({ label, href }) => (
+									<a
+										key={label}
+										href={href}
+										className="dba-stack-badge"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{label}
+									</a>
+								))}
+							</div>
+						</MotionStaggerChild>
+						<MotionStaggerChild className="surface-card stack-col reveal-up">
+							<span className="stack-col-label">Infrastructure &amp; AI</span>
+							<div className="stack-chips">
+								{[
+									{ label: "Firebase App Hosting", href: "https://firebase.google.com/docs/app-hosting" },
+									{ label: "Cloud Run", href: "https://cloud.google.com/run" },
+									{ label: "Cloudflare", href: "https://cloudflare.com" },
+									{ label: "Gemini 2.0", href: "https://deepmind.google/technologies/gemini/" },
+									{ label: "reCAPTCHA Enterprise", href: "https://cloud.google.com/recaptcha" },
+									{ label: "Zod", href: "https://zod.dev" },
+									{ label: "Zustand", href: "https://zustand.docs.pmnd.rs" },
+								].map(({ label, href }) => (
+									<a
+										key={label}
+										href={href}
+										className="dba-stack-badge"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{label}
+									</a>
+								))}
+							</div>
+						</MotionStaggerChild>
+					</MotionStagger>
+				</div>
+			</section>
+			<section className="section-shell section-shell--wash">
 				<MotionReveal
 					className="section-container marketing-cta-row reveal-up"
 					y={20}

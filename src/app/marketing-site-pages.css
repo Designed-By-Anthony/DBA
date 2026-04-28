@@ -1832,3 +1832,46 @@ a.marketing-service-card:hover {
 		padding-left: 0;
 	}
 }
+
+/* ──────────────────────────────────────────────────
+ * Stack grid — OurEdge "The stack" section
+ * ────────────────────────────────────────────────── */
+
+.stack-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: clamp(1rem, 2.2vw, 1.35rem);
+	margin-top: clamp(1.5rem, 3vw, 2.1rem);
+}
+
+.stack-col {
+	padding: clamp(1.2rem, 2.4vw, 1.6rem);
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
+}
+
+.stack-col-label {
+	display: inline-block;
+	font-size: 0.68rem;
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	padding: 0.3rem 0.6rem;
+	border-radius: 999px;
+	color: rgba(186, 230, 253, 0.9);
+	background: rgba(56, 189, 248, 0.08);
+	border: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.stack-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+@media (max-width: 768px) {
+	.stack-grid {
+		grid-template-columns: 1fr;
+	}
+}

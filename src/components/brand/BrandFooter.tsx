@@ -6,12 +6,22 @@ import {
 	SITE_LEGAL_LINKS,
 } from "@/design-system/site-config";
 
+const BUILT_WITH = [
+	{ label: "Next.js", href: "https://nextjs.org" },
+	{ label: "React 19", href: "https://react.dev" },
+	{ label: "Tailwind v4", href: "https://tailwindcss.com" },
+	{ label: "Firebase", href: "https://firebase.google.com" },
+	{ label: "Cloudflare", href: "https://cloudflare.com" },
+] as const;
+
 export type BrandFooterProps = {
 	/** Optional small mono build tag (e.g. "Lighthouse Scanner v2") shown next to legal links. */
 	buildTag?: string;
+	/** Optional contextual "Powered by" chips shown below the standard Built-with row. */
+	poweredBy?: ReadonlyArray<{ label: string; href: string }>;
 };
 
-export function BrandFooter({ buildTag }: BrandFooterProps) {
+export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 	const year = new Date().getFullYear();
 
 	return (
@@ -64,6 +74,38 @@ export function BrandFooter({ buildTag }: BrandFooterProps) {
 						) : null}
 					</div>
 				</div>
+
+				<div className="dba-footer-stack">
+					<span className="dba-footer-stack-label">Built with</span>
+					{BUILT_WITH.map(({ label, href }) => (
+						<a
+							key={label}
+							href={href}
+							className="dba-stack-badge"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{label}
+						</a>
+					))}
+				</div>
+
+				{poweredBy?.length ? (
+					<div className="dba-footer-stack">
+						<span className="dba-footer-stack-label">Powered by</span>
+						{poweredBy.map(({ label, href }) => (
+							<a
+								key={label}
+								href={href}
+								className="dba-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{label}
+							</a>
+						))}
+					</div>
+				) : null}
 			</div>
 		</footer>
 	);

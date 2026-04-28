@@ -1196,7 +1196,9 @@
  * ────────────────────────────────────────────────── */
 
 /* Editorial display headline — Fraunces with optical-size axis.
-   Premium weight and spacing for studio feel */
+   Premium weight and spacing for studio feel.
+   160deg angle + bronze tint on the tail gives depth against the dark bg
+   without looking off-brand — cream top bleeds into the accent at bottom-right. */
 .lh-editorial-h1 {
 	font-family: var(--font-report, var(--font-display));
 	font-size: clamp(2.55rem, 5.5vw, 4.85rem);
@@ -1210,9 +1212,10 @@
 		"WONK" 0;
 	text-wrap: balance;
 	background: linear-gradient(
-		180deg,
+		160deg,
 		rgba(247, 244, 238, 1) 0%,
-		rgba(247, 244, 238, 0.92) 100%
+		rgba(247, 244, 238, 0.92) 55%,
+		rgb(var(--accent-bronze-rgb) / 0.78) 100%
 	);
 	-webkit-background-clip: text;
 	background-clip: text;
@@ -1486,13 +1489,32 @@
 
 .lighthouse-segment {
 	background:
-		linear-gradient(
-			180deg,
-			rgba(6, 10, 18, 0.98) 0%,
-			rgba(8, 10, 14, 1) 48%,
-			rgba(6, 8, 12, 1) 100%
-		),
-		var(--bg-deeper, #060a12);
+		/* Primary atmospheric glow - sky blue, stronger */
+			radial-gradient(
+				ellipse 140% 60% at 50% -10%,
+				rgba(91, 156, 248, 0.17),
+				transparent 55%
+			),
+			/* Bronze warm counter-glow */
+			radial-gradient(
+				ellipse 80% 40% at 85% 30%,
+				rgb(var(--accent-bronze-rgb) / 0.09),
+				transparent 50%
+			),
+			/* Subtle blue depth layer */
+			radial-gradient(
+				ellipse 60% 30% at 15% 70%,
+				rgba(59, 130, 246, 0.05),
+				transparent 45%
+			),
+			/* Base gradient */
+			linear-gradient(
+				180deg,
+				rgba(6, 10, 18, 0.98) 0%,
+				rgba(8, 10, 14, 1) 48%,
+				rgba(6, 8, 12, 1) 100%
+			),
+			var(--bg-deeper, #060a12);
 }
 
 .lighthouse-segment::before {
@@ -1548,7 +1570,7 @@
 	position: relative;
 	overflow: hidden;
 	border-radius: 1rem;
-	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.18);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.22);
 	background:
 		linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 8rem),
 		linear-gradient(
@@ -1559,7 +1581,8 @@
 		);
 	box-shadow:
 		0 34px 90px -54px rgba(0, 0, 0, 0.95),
-		0 0 0 1px rgba(255, 255, 255, 0.035) inset;
+		0 0 0 1px rgba(255, 255, 255, 0.035) inset,
+		0 0 70px -30px rgb(var(--accent-bronze-rgb) / 0.1);
 	padding: clamp(1.15rem, 2.8vw, 1.85rem);
 }
 
@@ -1636,24 +1659,30 @@
 	max-width: 42rem;
 	overflow: hidden;
 	border-radius: 1rem;
-	border: 1px solid rgba(255, 255, 255, 0.09);
+	border: 1px solid rgba(255, 255, 255, 0.11);
 	background: /* Bronze accent wash */
 			radial-gradient(
 				ellipse 70% 60% at 80% 20%,
-				rgb(var(--accent-bronze-rgb) / 0.04),
+				rgb(var(--accent-bronze-rgb) / 0.06),
+				transparent 60%
+			),
+			/* Sky accent wash */
+			radial-gradient(
+				ellipse 50% 40% at 10% 80%,
+				rgba(91, 156, 248, 0.04),
 				transparent 60%
 			),
 			/* Base gradient */
 			linear-gradient(
 				180deg,
-				rgba(255, 255, 255, 0.045),
+				rgba(255, 255, 255, 0.05),
 				rgba(255, 255, 255, 0)
 			),
-			linear-gradient(145deg, rgba(16, 18, 24, 0.88), rgba(8, 10, 16, 0.94));
+			linear-gradient(145deg, rgba(16, 18, 24, 0.92), rgba(8, 10, 16, 0.96));
 	box-shadow:
 		0 32px 80px -48px rgba(0, 0, 0, 0.92),
-		0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-		0 0 60px -30px rgb(var(--accent-bronze-rgb) / 0.06);
+		0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+		0 0 60px -20px rgb(var(--accent-bronze-rgb) / 0.1);
 	padding: clamp(1.2rem, 2.4vw, 1.55rem);
 }
 
@@ -1762,6 +1791,11 @@
 
 .lh-row-status--green {
 	background: #4fc58f;
+}
+
+.lh-row-status--red {
+	background: #f87171;
+	box-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
 }
 
 .lh-diagnostic-pill {

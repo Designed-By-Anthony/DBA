@@ -202,13 +202,13 @@ export function AuditForm() {
 
 			<form onSubmit={handleSubmit} className="lh-form-grid">
 				<div className="lh-form-header">
-					<p className="lighthouse-result-eyebrow">Private diagnostic</p>
+					<p className="lighthouse-result-eyebrow">Free · Private · No Account Needed</p>
 					<h2 className="font-report text-[1.6rem] font-semibold tracking-tight text-white/98 sm:text-[1.85rem]">
-						Start the scan
+						Get Your Free Report
 					</h2>
 					<p className="mt-3 max-w-xl text-[14px] leading-[1.7] text-white/58">
-						Drop in the site, confirm where the report should go, and the
-						scanner builds a decision-ready readout for Anthony to review.
+						Enter your site below. We score it on speed, SEO, and trust signals
+						in about 60 seconds and send a private report link to your email.
 					</p>
 				</div>
 

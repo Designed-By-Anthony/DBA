@@ -7,18 +7,11 @@ import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
 const STORAGE_KEY = "dba_contact_drawer_open";
-const LEGACY_STORAGE_KEY = "dba_quick_rail_open";
 
 function readStoredOpen(): boolean {
 	try {
 		const v = window.localStorage.getItem(STORAGE_KEY);
-		if (v === "1" || v === "0") return v === "1";
-		const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
-		if (legacy === "1") {
-			window.localStorage.setItem(STORAGE_KEY, "1");
-			return true;
-		}
-		return false;
+		return v === "1";
 	} catch {
 		return false;
 	}
