@@ -1,258 +1,474 @@
 import type { AuditData } from "@lh/auditReport";
 import { jsPDF } from "jspdf";
 
-const MARGIN = 18;
-const LINE = 6.5;
+const MARGIN = 16;
 const PAGE_W = 210;
 const PAGE_H = 297;
 const MAX_W = PAGE_W - MARGIN * 2;
+const BODY_LINE = 6;
+const COL2 = MARGIN + MAX_W / 2 + 4;
 
-/** Brand-aligned PDF: deep slate + sky accent (reads well on screen & print). */
-const C_BG = [248, 250, 252] as const;
-const C_SLATE = [15, 23, 42] as const;
-const C_MUTED = [71, 85, 105] as const;
-const C_SKY = [14, 165, 233] as const;
-const C_SKY_SOFT = [224, 242, 254] as const;
-const C_AMBER = [180, 83, 9] as const;
-const C_AMBER_BG = [255, 251, 235] as const;
+/* ── Palette ── */
+const C_BG = [247, 243, 234] as const;
+const C_PANEL = [255, 253, 248] as const;
+const C_SLATE_900 = [23, 16, 8] as const;
+const C_SLATE_700 = [61, 54, 45] as const;
+const C_SLATE_500 = [111, 102, 88] as const;
+const C_SLATE_200 = [232, 220, 198] as const;
+const C_BRONZE = [201, 168, 108] as const;
+const C_BRONZE_DARK = [139, 106, 56] as const;
+const C_BRONZE_LIGHT = [252, 240, 210] as const;
+const C_AMBER_700 = [180, 83, 9] as const;
+const C_AMBER_50 = [255, 251, 235] as const;
+const C_GREEN_700 = [21, 128, 61] as const;
+const C_GREEN_100 = [220, 252, 231] as const;
+const C_RED_700 = [185, 28, 28] as const;
+const C_RED_100 = [254, 226, 226] as const;
 
-function addWrapped(
+/* ── Utilities ── */
+function addPage(doc: jsPDF): number {
+	doc.addPage();
+	doc.setFillColor(...C_BG);
+	doc.rect(0, 0, PAGE_W, PAGE_H, "F");
+	return MARGIN;
+}
+
+function ensureSpace(doc: jsPDF, y: number, need: number): number {
+	if (y + need > PAGE_H - MARGIN - 10) return addPage(doc);
+	return y;
+}
+
+function wrapped(
 	doc: jsPDF,
 	text: string,
 	x: number,
 	y: number,
-	maxWidth: number,
-	lineHeight: number,
+	maxW: number,
+	lineH: number,
 ): number {
-	const lines = doc.splitTextToSize(text, maxWidth);
+	const lines = doc.splitTextToSize(text, maxW);
 	doc.text(lines, x, y);
-	return y + lines.length * lineHeight;
+	return y + lines.length * lineH;
 }
 
-function ensureSpace(doc: jsPDF, y: number, needMm: number): number {
-	if (y + needMm > PAGE_H - MARGIN - 12) {
-		doc.addPage();
-		doc.setFillColor(...C_BG);
-		doc.rect(0, 0, PAGE_W, PAGE_H, "F");
-		return MARGIN;
-	}
-	return y;
+function sectionHeader(
+	doc: jsPDF,
+	y: number,
+	eyebrow: string,
+	title: string,
+	accentRgb: readonly [number, number, number] = C_BRONZE,
+): number {
+	y = ensureSpace(doc, y, 20);
+
+	// Accent bar
+	doc.setFillColor(...accentRgb);
+	doc.rect(MARGIN, y, 3, 16, "F");
+
+	// Eyebrow
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(7);
+	doc.setTextColor(...accentRgb);
+	doc.text(eyebrow.toUpperCase(), MARGIN + 7, y + 5);
+
+	// Title
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(12.5);
+	doc.setTextColor(...C_SLATE_900);
+	doc.text(title, MARGIN + 7, y + 12.5);
+
+	return y + 20;
 }
 
+function divider(doc: jsPDF, y: number): number {
+	doc.setDrawColor(...C_SLATE_200);
+	doc.setLineWidth(0.25);
+	doc.line(MARGIN, y, MARGIN + MAX_W, y);
+	return y + 4;
+}
+
+/* ── Score cell ── */
+function scoreColor(score: number | null): {
+	bg: readonly [number, number, number];
+	fg: readonly [number, number, number];
+	ring: readonly [number, number, number];
+} {
+	if (score == null) return { bg: C_BG, fg: C_SLATE_500, ring: C_SLATE_200 };
+	if (score >= 90)
+		return { bg: C_GREEN_100, fg: C_GREEN_700, ring: [134, 239, 172] };
+	if (score >= 50)
+		return { bg: C_AMBER_50, fg: C_AMBER_700, ring: [252, 211, 77] };
+	return { bg: C_RED_100, fg: C_RED_700, ring: [252, 165, 165] };
+}
+
+function scoreBox(
+	doc: jsPDF,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	score: number | null,
+	label: string,
+) {
+	const { bg, fg, ring } = scoreColor(score);
+	doc.setFillColor(...bg);
+	doc.setDrawColor(...ring);
+	doc.setLineWidth(0.5);
+	doc.roundedRect(x, y, w, h, 2, 2, "FD");
+
+	doc.setFont("helvetica", "bold");
+	doc.setFontSize(16);
+	doc.setTextColor(...fg);
+	const scoreStr = score == null ? "—" : String(score);
+	const sw = doc.getTextWidth(scoreStr);
+	doc.text(scoreStr, x + w / 2 - sw / 2, y + h / 2 + 1);
+
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(6.5);
+	doc.setTextColor(...fg);
+	const lw = doc.getTextWidth(label.toUpperCase());
+	doc.text(label.toUpperCase(), x + w / 2 - lw / 2, y + h - 3.5);
+}
+
+/* ── Main export ── */
 export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 	const doc = new jsPDF({ unit: "mm", format: "a4" });
 	doc.setProperties({
-		title: `Website audit — ${data.url}`,
+		title: `Executive audit report — ${data.url}`,
 		subject: "Designed by Anthony — Lighthouse Scanner",
 		author: "Designed by Anthony",
 		keywords: "SEO audit, PageSpeed, Core Web Vitals, Designed by Anthony",
 	});
 
+	// Background
 	doc.setFillColor(...C_BG);
 	doc.rect(0, 0, PAGE_W, PAGE_H, "F");
 
 	let y = MARGIN;
 
-	/* Header band */
-	doc.setFillColor(...C_SLATE);
-	doc.roundedRect(MARGIN, y, MAX_W, 28, 2, 2, "F");
-	doc.setDrawColor(...C_SKY);
-	doc.setLineWidth(0.6);
-	doc.line(MARGIN, y + 28, MARGIN + MAX_W, y + 28);
+	/* ── Cover header ── */
+	doc.setFillColor(...C_SLATE_900);
+	doc.roundedRect(MARGIN, y, MAX_W, 32, 2.5, 2.5, "F");
 
-	doc.setTextColor(255, 255, 255);
-	doc.setFontSize(9);
-	doc.setFont("helvetica", "normal");
-	doc.text("LIGHTHOUSE SCANNER · DESIGNED BY ANTHONY", MARGIN + 4, y + 7);
+	// Accent strip
+	doc.setFillColor(...C_BRONZE);
+	doc.rect(MARGIN, y + 30, MAX_W, 2, "F");
 
-	doc.setFontSize(16);
+	// Brand
+	doc.setTextColor(...C_BRONZE_LIGHT);
+	doc.setFontSize(7.5);
 	doc.setFont("helvetica", "bold");
-	doc.text("Website audit report", MARGIN + 4, y + 17);
+	doc.text("DESIGNED BY ANTHONY  ·  EXECUTIVE AUDIT REPORT", MARGIN + 5, y + 7);
 
-	doc.setFontSize(8);
-	doc.setFont("helvetica", "normal");
-	doc.setTextColor(200, 210, 225);
+	// Report title
+	doc.setTextColor(255, 255, 255);
+	doc.setFontSize(17);
+	doc.setFont("helvetica", "bold");
+	doc.text("Website Audit Report", MARGIN + 5, y + 18);
+
+	// Date (right-aligned)
 	const dateStr = new Date().toLocaleDateString("en-US", {
 		month: "short",
 		day: "numeric",
 		year: "numeric",
 	});
-	doc.text(dateStr, MARGIN + MAX_W - 4 - doc.getTextWidth(dateStr), y + 7);
-
-	y += 34;
-
-	doc.setTextColor(...C_SLATE);
-	doc.setFontSize(10);
+	doc.setFontSize(8);
 	doc.setFont("helvetica", "normal");
-	y = addWrapped(doc, `Scanned URL`, MARGIN, y, MAX_W, LINE) - LINE + 2;
+	doc.setTextColor(...C_BRONZE_LIGHT);
+	const dw = doc.getTextWidth(dateStr);
+	doc.text(dateStr, MARGIN + MAX_W - dw - 5, y + 7);
+
+	y += 36;
+
+	/* URL & Report ID */
+	doc.setFontSize(9);
+	doc.setFont("helvetica", "normal");
+	doc.setTextColor(...C_SLATE_500);
+	doc.text("Scanned URL", MARGIN, y + 4);
 	doc.setFont("helvetica", "bold");
-	y = addWrapped(doc, data.url, MARGIN, y, MAX_W, LINE + 1) + 3;
-	doc.setFont("helvetica", "normal");
+	doc.setFontSize(10);
+	doc.setTextColor(...C_SLATE_900);
+	y = wrapped(doc, data.url, MARGIN, y + 10, MAX_W, BODY_LINE);
 
 	if (reportId) {
-		doc.setTextColor(...C_MUTED);
-		doc.setFontSize(9);
-		y = addWrapped(doc, `Report ID · ${reportId}`, MARGIN, y, MAX_W, LINE) + 4;
-		doc.setFontSize(10);
-		doc.setTextColor(...C_SLATE);
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(8);
+		doc.setTextColor(...C_SLATE_500);
+		doc.text(`Report ID: ${reportId}`, MARGIN, y + 4);
+		y += 8;
 	}
 
+	y += 4;
+	y = divider(doc, y);
+
+	/* ── Degraded note ── */
 	if (data.psiDegradedReason) {
-		y = ensureSpace(doc, y, 24);
-		doc.setFillColor(...C_AMBER_BG);
-		doc.roundedRect(MARGIN, y, MAX_W, 18, 1.5, 1.5, "F");
-		doc.setDrawColor(253, 230, 138);
-		doc.roundedRect(MARGIN, y, MAX_W, 18, 1.5, 1.5, "S");
-		doc.setTextColor(...C_AMBER);
+		y = ensureSpace(doc, y, 22);
+		doc.setFillColor(...C_AMBER_50);
+		doc.setDrawColor(252, 211, 77);
+		doc.roundedRect(MARGIN, y, MAX_W, 18, 2, 2, "FD");
 		doc.setFont("helvetica", "bold");
-		doc.text("Partial report", MARGIN + 3, y + 6);
-		doc.setFont("helvetica", "normal");
 		doc.setFontSize(8.5);
-		const noteY = addWrapped(
+		doc.setTextColor(...C_AMBER_700);
+		doc.text("Partial report.", MARGIN + 3.5, y + 6.5);
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(8);
+		y = wrapped(
 			doc,
 			data.psiDegradedReason,
-			MARGIN + 3,
-			y + 10,
-			MAX_W - 6,
-			5.5,
+			MARGIN + 3.5,
+			y + 12,
+			MAX_W - 7,
+			5,
 		);
-		y = noteY + 6;
-		doc.setFontSize(10);
-		doc.setTextColor(...C_SLATE);
+		y += 6;
 	}
 
-	y += 6;
-	y = ensureSpace(doc, y, 40);
+	/* ── Score grid (3×2) ── */
+	y = ensureSpace(doc, y, 42);
+	const boxW = (MAX_W - 10) / 3;
+	const boxH = 18;
+	const boxGap = 5;
 
-	/* Scores section */
-	doc.setFillColor(...C_SKY_SOFT);
-	doc.roundedRect(MARGIN, y, MAX_W, 52, 2, 2, "F");
-	doc.setDrawColor(186, 230, 253);
-	doc.roundedRect(MARGIN, y, MAX_W, 52, 2, 2, "S");
+	const scores: [number | null, string][] = [
+		[data.trustScore, "Trust score"],
+		[data.conversion, "Conversion"],
+		[data.performance, "Performance"],
+		[data.accessibility, "Accessibility"],
+		[data.bestPractices, "Best practices"],
+		[data.seo, "SEO"],
+	];
 
-	doc.setTextColor(...C_SLATE);
-	doc.setFont("helvetica", "bold");
-	doc.setFontSize(11);
-	doc.text("Scores at a glance", MARGIN + 4, y + 8);
+	for (let row = 0; row < 2; row++) {
+		for (let col = 0; col < 3; col++) {
+			const idx = row * 3 + col;
+			const bx = MARGIN + col * (boxW + boxGap);
+			scoreBox(
+				doc,
+				bx,
+				y + row * (boxH + boxGap),
+				boxW,
+				boxH,
+				scores[idx][0],
+				scores[idx][1],
+			);
+		}
+	}
+	y += 2 * boxH + boxGap + 8;
 
-	const scoreLine = (label: string, v: number | null) =>
-		`${label}: ${v == null ? "—" : `${v}/100`}`;
-
-	doc.setFont("helvetica", "normal");
-	doc.setFontSize(9.5);
-	const leftX = MARGIN + 4;
-	const rightX = MARGIN + 4 + MAX_W / 2 - 4;
-	const row1 = y + 14;
-	doc.text(scoreLine("Trust score", data.trustScore), leftX, row1);
-	doc.text(scoreLine("Conversion", data.conversion), rightX, row1);
-	const row2 = row1 + LINE + 2;
-	doc.text(scoreLine("Performance", data.performance), leftX, row2);
-	doc.text(scoreLine("Accessibility", data.accessibility), rightX, row2);
-	const row3 = row2 + LINE + 2;
-	doc.text(scoreLine("Best practices", data.bestPractices), leftX, row3);
-	doc.text(scoreLine("SEO", data.seo), rightX, row3);
-	y += 56;
-
+	/* ── Core Web Vitals ── */
 	if (data.metrics) {
-		y = ensureSpace(doc, y, 36);
-		doc.setTextColor(...C_SLATE);
-		doc.setFont("helvetica", "bold");
-		doc.setFontSize(11);
-		y = addWrapped(doc, "Core Web Vitals (lab)", MARGIN, y, MAX_W, LINE) + 3;
-		doc.setFont("helvetica", "normal");
-		doc.setFontSize(9.5);
-		doc.setTextColor(...C_MUTED);
-		const m = [
-			["First Contentful Paint", data.metrics.fcp],
-			["Largest Contentful Paint", data.metrics.lcp],
-			["Total Blocking Time", data.metrics.tbt],
-			["Cumulative Layout Shift", data.metrics.cls],
+		y = sectionHeader(doc, y, "Lab vitals", "Core Web Vitals", C_BRONZE);
+		const vw = (MAX_W - 6) / 4;
+		const vitals = [
+			["FCP", data.metrics.fcp],
+			["LCP", data.metrics.lcp],
+			["TBT", data.metrics.tbt],
+			["CLS", data.metrics.cls],
 		] as const;
-		for (const [k, v] of m) {
-			y = ensureSpace(doc, y, LINE + 2);
-			doc.text(`${k}: `, MARGIN, y);
-			const w = doc.getTextWidth(`${k}: `);
+		y = ensureSpace(doc, y, 16);
+		for (let i = 0; i < vitals.length; i++) {
+			const [abbr, val] = vitals[i];
+			const bx = MARGIN + i * (vw + 2);
+			doc.setFillColor(...C_PANEL);
+			doc.setDrawColor(...C_SLATE_200);
+			doc.roundedRect(bx, y, vw, 14, 1.5, 1.5, "FD");
 			doc.setFont("helvetica", "bold");
-			doc.setTextColor(...C_SLATE);
-			doc.text(String(v || "—"), MARGIN + w, y);
+			doc.setFontSize(9.5);
+			doc.setTextColor(...C_SLATE_900);
+			const vw2 = doc.getTextWidth(String(val || "—"));
+			doc.text(String(val || "—"), bx + vw / 2 - vw2 / 2, y + 7.5);
 			doc.setFont("helvetica", "normal");
-			doc.setTextColor(...C_MUTED);
-			y += LINE + 1;
+			doc.setFontSize(6.5);
+			doc.setTextColor(...C_SLATE_500);
+			const aw = doc.getTextWidth(abbr);
+			doc.text(abbr, bx + vw / 2 - aw / 2, y + 12.5);
 		}
-		y += 4;
-		doc.setTextColor(...C_SLATE);
+		y += 18;
+		y = divider(doc, y);
 	}
 
+	/* ── Executive summary ── */
 	if (data.aiInsight?.executiveSummary) {
-		y = ensureSpace(doc, y, 30);
-		doc.setDrawColor(...C_SKY);
-		doc.setLineWidth(0.35);
-		doc.line(MARGIN, y, MARGIN + 24, y);
-		doc.setFont("helvetica", "bold");
-		doc.setFontSize(11);
-		y =
-			addWrapped(
-				doc,
-				"Executive summary",
-				MARGIN + 28,
-				y - 1,
-				MAX_W - 28,
-				LINE,
-			) + 6;
-		doc.setFont("helvetica", "normal");
-		doc.setFontSize(10);
-		doc.setTextColor(...C_MUTED);
-		y =
-			addWrapped(
-				doc,
-				data.aiInsight.executiveSummary,
-				MARGIN,
-				y,
-				MAX_W,
-				LINE + 0.5,
-			) + 8;
-		doc.setTextColor(...C_SLATE);
-	}
+		const plain = data.aiInsight.executiveSummary
+			.replace(/<p>/gi, "")
+			.replace(/<\/p>/gi, "\n")
+			.replace(/<br\s*\/?>/gi, "\n")
+			.replace(/<[^>]+>/g, "")
+			.replace(/&amp;/gi, "&")
+			.replace(/&lt;/gi, "<")
+			.replace(/&gt;/gi, ">")
+			.replace(/&nbsp;/gi, " ")
+			.trim();
 
-	const actions = (data.aiInsight?.prioritizedActions ?? []).slice(0, 8);
-	if (actions.length > 0) {
-		y = ensureSpace(doc, y, 28);
-		doc.setDrawColor(...C_SKY);
-		doc.line(MARGIN, y, MARGIN + 24, y);
-		doc.setFont("helvetica", "bold");
-		doc.setFontSize(11);
-		y =
-			addWrapped(
-				doc,
-				"Prioritized actions",
-				MARGIN + 28,
-				y - 1,
-				MAX_W - 28,
-				LINE,
-			) + 5;
+		y = sectionHeader(doc, y, "Executive readout", "Summary", C_BRONZE);
 		doc.setFont("helvetica", "normal");
 		doc.setFontSize(9.5);
-		doc.setTextColor(...C_MUTED);
-		for (const a of actions) {
-			const block = `${a.priority}. ${a.action}  (${a.impact} impact · ${a.effort} effort)`;
-			y = ensureSpace(doc, y, LINE + 2);
-			y = addWrapped(doc, block, MARGIN, y, MAX_W, LINE) + 2;
-		}
-		y += 4;
-		doc.setTextColor(...C_SLATE);
+		doc.setTextColor(...C_SLATE_700);
+		y = wrapped(doc, plain, MARGIN + 7, y, MAX_W - 7, BODY_LINE + 0.5);
+		y += 6;
 	}
 
-	doc.setFontSize(8);
-	doc.setTextColor(148, 163, 184);
-	y = ensureSpace(doc, y, 12);
-	addWrapped(
-		doc,
-		"Designed by Anthony · designedbyanthony.com · Lighthouse Scanner v2",
-		MARGIN,
-		PAGE_H - MARGIN - 2,
-		MAX_W,
-		LINE,
-	);
+	/* ── Priority actions ── */
+	const actions = (data.aiInsight?.prioritizedActions ?? [])
+		.slice()
+		.sort((a, b) => a.priority - b.priority)
+		.slice(0, 8);
+
+	if (actions.length > 0) {
+		y = sectionHeader(
+			doc,
+			y,
+			"What to fix first",
+			"Priority actions",
+			C_BRONZE_DARK,
+		);
+		doc.setFontSize(9.5);
+		for (const a of actions) {
+			y = ensureSpace(doc, y, BODY_LINE + 3);
+			doc.setFont("helvetica", "bold");
+			doc.setTextColor(...C_SLATE_900);
+			doc.text(`${a.priority}.`, MARGIN + 7, y);
+			doc.setFont("helvetica", "normal");
+			doc.setTextColor(...C_SLATE_700);
+			y = wrapped(doc, a.action, MARGIN + 14, y, MAX_W - 21, BODY_LINE);
+			doc.setFontSize(8);
+			doc.setTextColor(...C_SLATE_500);
+			doc.text(`${a.impact} impact  ·  ${a.effort} effort`, MARGIN + 14, y);
+			doc.setFontSize(9.5);
+			y += BODY_LINE + 1;
+		}
+		y += 4;
+	}
+
+	/* ── Authority & backlinks ── */
+	if (data.backlinks?.found) {
+		const moz = data.backlinks;
+		y = sectionHeader(
+			doc,
+			y,
+			"Link profile",
+			"Authority & backlinks",
+			C_BRONZE,
+		);
+
+		if (moz.dataSource === "internal") {
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(8);
+			doc.setTextColor(...C_AMBER_700);
+			y = wrapped(
+				doc,
+				moz.authorityLabel ??
+					"On-page estimate — not Moz DA. Use for direction only.",
+				MARGIN + 7,
+				y,
+				MAX_W - 7,
+				5,
+			);
+			y += 3;
+		}
+
+		const metrics: [string, number | string | undefined][] = [
+			[
+				moz.dataSource === "internal" ? "Authority est." : "Domain authority",
+				moz.domainAuthority ?? undefined,
+			],
+			[
+				moz.dataSource === "internal" ? "Page est." : "Page authority",
+				moz.pageAuthority ?? undefined,
+			],
+			["Linking domains", moz.linkingRootDomains ?? undefined],
+			["Spam score", moz.spamScore ?? undefined],
+		];
+
+		y = ensureSpace(doc, y, 16);
+		const mw = (MAX_W - 6) / 4;
+		for (let i = 0; i < metrics.length; i++) {
+			const [ml, mv] = metrics[i];
+			const bx = MARGIN + i * (mw + 2);
+			doc.setFillColor(...C_BG);
+			doc.setDrawColor(...C_SLATE_200);
+			doc.roundedRect(bx, y, mw, 14, 1.5, 1.5, "FD");
+			doc.setFont("helvetica", "bold");
+			doc.setFontSize(10);
+			doc.setTextColor(...C_SLATE_900);
+			const vs = String(mv ?? "—");
+			const vw3 = doc.getTextWidth(vs);
+			doc.text(vs, bx + mw / 2 - vw3 / 2, y + 7.5);
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(6);
+			doc.setTextColor(...C_SLATE_500);
+			const lw2 = doc.getTextWidth(ml.toUpperCase());
+			doc.text(ml.toUpperCase(), bx + mw / 2 - lw2 / 2, y + 12.5);
+		}
+		y += 18;
+		y = divider(doc, y);
+	}
+
+	/* ── Site crawl ── */
+	if (data.sitewide) {
+		const sw = data.sitewide;
+		y = sectionHeader(
+			doc,
+			y,
+			"Technical crawl",
+			"Site crawl signals",
+			C_BRONZE,
+		);
+		const crawlRows: [string, string][] = [
+			[
+				"robots.txt",
+				sw.robotsTxt.exists
+					? sw.robotsTxt.allowsCrawlers
+						? "Found — allows crawlers"
+						: "Found — may restrict crawlers"
+					: "Not found",
+			],
+			[
+				"XML sitemap",
+				sw.sitemap.exists
+					? `${sw.sitemap.urlCount.toLocaleString()} URLs`
+					: "Not found",
+			],
+			[
+				"HTTPS / redirects",
+				`${sw.redirectChain.httpToHttps ? "HTTP→HTTPS present" : "Check mixed content"}${sw.redirectChain.chainLength > 1 ? ` · ${sw.redirectChain.chainLength} hops` : ""}`,
+			],
+		];
+		doc.setFontSize(9.5);
+		for (const [k, v] of crawlRows) {
+			y = ensureSpace(doc, y, BODY_LINE + 2);
+			doc.setFont("helvetica", "bold");
+			doc.setTextColor(...C_BRONZE_DARK);
+			doc.text(k, MARGIN + 7, y);
+			doc.setFont("helvetica", "normal");
+			doc.setTextColor(...C_SLATE_700);
+			doc.text(v, COL2, y);
+			y += BODY_LINE + 1;
+		}
+		y += 4;
+	}
+
+	/* ── Footer (every page) ── */
+	const totalPages = (
+		doc.internal as unknown as { getNumberOfPages: () => number }
+	).getNumberOfPages();
+	for (let pg = 1; pg <= totalPages; pg++) {
+		doc.setPage(pg);
+		doc.setFontSize(7.5);
+		doc.setTextColor(...C_SLATE_500);
+		doc.setFont("helvetica", "normal");
+		doc.text(
+			"Designed by Anthony · designedbyanthony.com · Lighthouse Scanner v2",
+			MARGIN,
+			PAGE_H - 7,
+		);
+		doc.text(`Page ${pg} of ${totalPages}`, MARGIN + MAX_W, PAGE_H - 7, {
+			align: "right",
+		});
+		doc.setDrawColor(...C_SLATE_200);
+		doc.setLineWidth(0.25);
+		doc.line(MARGIN, PAGE_H - 10, MARGIN + MAX_W, PAGE_H - 10);
+	}
 
 	return doc.output("blob");
 }

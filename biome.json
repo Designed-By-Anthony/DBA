@@ -18,6 +18,8 @@
 			"!**/cypress/screenshots",
 			"!**/cypress/videos",
 			"!**/public/scripts",
+			"!google-cloud-sdk",
+			"!google-cloud-cli-darwin-arm.tar.gz",
 			"!static-headers.json",
 			"!netlify.toml"
 		]
@@ -29,7 +31,10 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"security": {
+				"noDangerouslySetInnerHtml": "warn"
+			}
 		}
 	},
 	"javascript": {
@@ -85,6 +90,19 @@
 				"rules": {
 					"complexity": {
 						"noImportantStyles": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/app/lighthouse/lighthouse-globals.css"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noImportantStyles": "off"
+					},
+					"style": {
+						"noDescendingSpecificity": "off"
 					}
 				}
 			}

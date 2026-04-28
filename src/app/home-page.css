@@ -35,7 +35,7 @@
 	font-weight: 500;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: rgba(201, 168, 108, 0.92);
+	color: rgb(var(--accent-bronze-rgb) / 0.92);
 }
 
 .hero-place-marker__rule {
@@ -45,8 +45,8 @@
 	background: linear-gradient(
 		90deg,
 		transparent,
-		rgba(201, 168, 108, 0.85) 60%,
-		rgba(201, 168, 108, 0.15)
+		rgb(var(--accent-bronze-rgb) / 0.85) 60%,
+		rgb(var(--accent-bronze-rgb) / 0.15)
 	);
 }
 
@@ -69,7 +69,7 @@
 		),
 		radial-gradient(
 			circle at 82% 12%,
-			rgba(201, 168, 108, 0.06),
+			rgb(var(--accent-bronze-rgb) / 0.06),
 			transparent 28%
 		),
 		linear-gradient(
@@ -227,7 +227,7 @@
 	background: linear-gradient(
 		135deg,
 		rgba(91, 156, 248, 0.14),
-		rgba(201, 168, 108, 0.1)
+		rgb(var(--accent-bronze-rgb) / 0.1)
 	);
 	border: 1px solid rgba(255, 252, 245, 0.1);
 	box-shadow: 0 12px 40px -28px rgba(91, 156, 248, 0.5);
@@ -534,7 +534,7 @@
 	background: linear-gradient(
 		90deg,
 		transparent,
-		rgba(201, 168, 108, 0.8),
+		rgb(var(--accent-bronze-rgb) / 0.8),
 		rgba(91, 156, 248, 0.8),
 		transparent
 	);
@@ -564,11 +564,11 @@
 }
 
 .command-strip__item--brand {
-	border-color: rgba(201, 168, 108, 0.32);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.32);
 	background:
 		radial-gradient(
 			circle at top right,
-			rgba(201, 168, 108, 0.1),
+			rgb(var(--accent-bronze-rgb) / 0.1),
 			transparent 55%
 		),
 		rgba(15, 23, 42, 0.55);
@@ -862,7 +862,7 @@
 	height: min(68vw, 480px);
 	background: radial-gradient(
 		circle at 50% 45%,
-		rgba(201, 168, 108, 0.28) 0%,
+		rgb(var(--accent-bronze-rgb) / 0.28) 0%,
 		rgba(91, 156, 248, 0.1) 50%,
 		transparent 70%
 	);
@@ -1014,7 +1014,7 @@
 			90deg,
 			var(--text-cream) 0%,
 			var(--text-cream) 40%,
-			rgba(201, 168, 108, 0.95) 50%,
+			rgb(var(--accent-bronze-rgb) / 0.95) 50%,
 			var(--text-cream) 60%,
 			var(--text-cream) 100%
 		);
@@ -1073,7 +1073,7 @@
 		90deg,
 		transparent,
 		rgba(91, 156, 248, 0.25) 15%,
-		rgba(201, 168, 108, 0.35) 50%,
+		rgb(var(--accent-bronze-rgb) / 0.35) 50%,
 		rgba(91, 156, 248, 0.25) 85%,
 		transparent
 	);
@@ -1101,7 +1101,7 @@
 	background: linear-gradient(
 		135deg,
 		rgba(91, 156, 248, 0.3),
-		rgba(201, 168, 108, 0.3)
+		rgb(var(--accent-bronze-rgb) / 0.3)
 	);
 	-webkit-background-clip: text;
 	background-clip: text;
@@ -1146,7 +1146,7 @@
 	border-radius: 50%;
 	background: radial-gradient(
 		circle,
-		rgba(201, 168, 108, 0.05),
+		rgb(var(--accent-bronze-rgb) / 0.05),
 		transparent 70%
 	);
 	bottom: -80px;

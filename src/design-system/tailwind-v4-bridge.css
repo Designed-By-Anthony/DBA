@@ -11,6 +11,8 @@
 	--color-text-muted: var(--text-muted);
 	--color-accent-blue: var(--accent-blue);
 	--color-accent-blue-hover: var(--accent-blue-hover);
+	--color-accent-bronze: var(--accent-bronze);
+	--color-accent-bronze-light: var(--accent-bronze-light);
 	--color-accent-brass: var(--accent-brass);
 	--font-main: var(--font-main);
 	--font-display: var(--font-display);

@@ -6,15 +6,23 @@ export default function LighthouseHome() {
 	return (
 		<main
 			id="main-content"
-			className="lighthouse-main w-full px-5 pb-20 pt-10 md:px-8 md:pb-24 md:pt-14"
+			className="lighthouse-main w-full px-5 pb-16 pt-6 md:px-8 md:pb-20 lg:pt-10"
 		>
-			<div className="lighthouse-main-inner mx-auto w-full max-w-5xl">
-				<LighthouseHero />
-				<LighthouseValueStrip />
-				<div className="lighthouse-audit-shell glass-card px-5 py-7 sm:px-6 sm:py-8 md:px-10 md:py-10">
-					<AuditForm />
+			<section className="lh-audit-stage mx-auto w-full max-w-7xl">
+				<div className="lh-stage-grid">
+					<LighthouseHero />
+					<aside
+						className="lighthouse-audit-shell lh-audit-panel"
+						aria-label="Run your website audit"
+					>
+						<AuditForm />
+					</aside>
 				</div>
-			</div>
+
+				<div className="lh-stage-lower">
+					<LighthouseValueStrip />
+				</div>
+			</section>
 		</main>
 	);
 }

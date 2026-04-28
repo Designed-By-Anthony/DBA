@@ -1,6 +1,11 @@
 "use client";
 
 import type { AuditData } from "@lh/auditReport";
+import { initCursorGlow } from "@lh/lib/cursorGlow";
+import {
+	RECAPTCHA_ENTERPRISE_ACTION,
+	RECAPTCHA_ENTERPRISE_SITE_KEY,
+} from "@lh/lib/recaptchaEnterpriseConfig";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { AuditResults } from "./AuditResults";
@@ -13,6 +18,37 @@ const LOADING_MESSAGES = [
 	"Pulling optional local/maps context when configured…",
 	"Running the AI pass for your executive summary and top fixes…",
 ];
+
+type RecaptchaEnterpriseApi = {
+	ready(callback: () => void): void;
+	execute(siteKey: string, options: { action: string }): Promise<string>;
+};
+
+declare global {
+	interface Window {
+		grecaptcha?: {
+			enterprise?: RecaptchaEnterpriseApi;
+		};
+	}
+}
+
+async function getRecaptchaEnterpriseToken(): Promise<string> {
+	if (typeof window === "undefined") return "";
+
+	const enterprise = window.grecaptcha?.enterprise;
+	if (!enterprise) return "";
+
+	return new Promise((resolve, reject) => {
+		enterprise.ready(() => {
+			enterprise
+				.execute(RECAPTCHA_ENTERPRISE_SITE_KEY, {
+					action: RECAPTCHA_ENTERPRISE_ACTION,
+				})
+				.then(resolve)
+				.catch(reject);
+		});
+	});
+}
 
 export function AuditForm() {
 	const [url, setUrl] = useState("");
@@ -30,6 +66,14 @@ export function AuditForm() {
 
 	const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 	const [scanPhase, setScanPhase] = useState<ScanPhase>("pagespeed");
+
+	// Initialize cursor glow effect for glass cards
+	useEffect(() => {
+		if (status !== "loading") {
+			const cleanup = initCursorGlow(".glass-card");
+			return cleanup;
+		}
+	}, [status]);
 
 	useEffect(() => {
 		let interval: ReturnType<typeof setInterval> | undefined;
@@ -69,6 +113,14 @@ export function AuditForm() {
 		setErrorMsg("");
 
 		try {
+			let recaptchaToken = "";
+			try {
+				recaptchaToken = await getRecaptchaEnterpriseToken();
+			} catch {
+				throw new Error(
+					"Security check could not finish. Please refresh and try again.",
+				);
+			}
 			const res = await fetch("/api/audit", {
 				method: "POST",
 				headers: {
@@ -80,6 +132,7 @@ export function AuditForm() {
 					name,
 					company,
 					location,
+					recaptchaToken,
 				}),
 			});
 
@@ -131,10 +184,13 @@ export function AuditForm() {
 	}
 
 	const inputClass =
-		"lighthouse-field w-full rounded-xl border border-white/[0.1] bg-[rgba(6,10,18,0.55)] px-4 py-3.5 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] placeholder:text-white/35 transition-[border-color,box-shadow] focus:border-sky-400/45 focus:outline-none focus:ring-2 focus:ring-sky-500/25";
+		"lh-field w-full rounded-lg border border-white/[0.09] bg-[rgba(7,10,17,0.74)] px-4 py-3 text-[14.5px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] placeholder:text-white/28 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.58)] focus:bg-[rgba(10,13,21,0.88)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.14)]";
+
+	const labelClass =
+		"mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent-bronze-muted)]";
 
 	return (
-		<div className="relative isolate w-full">
+		<div className="relative isolate w-full" id="run-audit">
 			{status === "loading" ? (
 				<div className="absolute inset-0 z-10 overflow-y-auto rounded-[1.25rem] bg-[rgba(6,10,18,0.97)] p-4 backdrop-blur-md md:p-6">
 					<AuditScanProgress
@@ -144,121 +200,112 @@ export function AuditForm() {
 				</div>
 			) : null}
 
-			<form onSubmit={handleSubmit} className="space-y-6">
-				<div className="border-b border-white/[0.08] pb-6">
-					<p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-300/80">
-						Free scan
-					</p>
-					<h2 className="font-display text-xl font-bold tracking-tight text-white md:text-2xl">
-						Run your audit
+			<form onSubmit={handleSubmit} className="lh-form-grid">
+				<div className="lh-form-header">
+					<p className="lighthouse-result-eyebrow">Private diagnostic</p>
+					<h2 className="font-report text-[1.6rem] font-semibold tracking-tight text-white/98 sm:text-[1.85rem]">
+						Start the scan
 					</h2>
-					<p className="mt-2 max-w-xl text-sm leading-relaxed text-white/58">
-						PageSpeed lab data, technical SEO signals, and a plain-English
-						summary. We use your email to deliver the report link only — no
-						third-party CRM embeds on this form.
+					<p className="mt-3 max-w-xl text-[14px] leading-[1.7] text-white/58">
+						Drop in the site, confirm where the report should go, and the
+						scanner builds a decision-ready readout for Anthony to review.
 					</p>
 				</div>
 
-				<div>
-					<label
-						htmlFor="url"
-						className="mb-2 block text-xs font-semibold uppercase tracking-wider text-sky-200/75"
-					>
-						Website URL
+				<div className="lh-url-block">
+					<label htmlFor="url" className={labelClass}>
+						Website to scan
 					</label>
-					<input
-						id="url"
-						name="url"
-						type="text"
-						required
-						value={url}
-						onChange={(e) => setUrl(e.target.value)}
-						placeholder="yoursite.com"
-						autoComplete="url"
-						className={inputClass}
-					/>
-				</div>
-
-				<div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-					<div>
-						<label
-							htmlFor="name"
-							className="mb-2 block text-xs font-semibold uppercase tracking-wider text-sky-200/75"
+					<div className="lh-url-shell relative">
+						<span
+							className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 select-none font-mono text-[13px] text-white/30"
+							aria-hidden
 						>
-							Your name
-						</label>
+							https://
+						</span>
 						<input
-							id="name"
-							name="name"
+							id="url"
+							name="url"
 							type="text"
 							required
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							placeholder="Jane Smith"
-							autoComplete="name"
-							className={inputClass}
-						/>
-					</div>
-					<div>
-						<label
-							htmlFor="company"
-							className="mb-2 block text-xs font-semibold uppercase tracking-wider text-sky-200/75"
-						>
-							Company
-						</label>
-						<input
-							id="company"
-							name="company"
-							type="text"
-							required
-							value={company}
-							onChange={(e) => setCompany(e.target.value)}
-							placeholder="Your business name"
-							autoComplete="organization"
-							className={inputClass}
+							value={url}
+							onChange={(e) => setUrl(e.target.value)}
+							placeholder="yoursite.com"
+							autoComplete="url"
+							className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.42)] bg-[rgba(10,14,22,0.88)] py-4 pl-[5.4rem] pr-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.15),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:text-white/45 placeholder:font-normal transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.72)] focus:bg-[rgba(12,16,25,0.96)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.22)]"
 						/>
 					</div>
 				</div>
 
-				<div>
-					<label
-						htmlFor="email"
-						className="mb-2 block text-xs font-semibold uppercase tracking-wider text-sky-200/75"
-					>
-						Email for your report
-					</label>
-					<input
-						id="email"
-						name="email"
-						type="email"
-						required
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="you@company.com"
-						autoComplete="email"
-						className={inputClass}
-					/>
-				</div>
-
-				<div>
-					<label
-						htmlFor="location"
-						className="mb-2 block text-xs font-semibold uppercase tracking-wider text-sky-200/75"
-					>
-						City &amp; state
-					</label>
-					<input
-						id="location"
-						name="location"
-						type="text"
-						required
-						value={location}
-						onChange={(e) => setLocation(e.target.value)}
-						placeholder="e.g. Syracuse, NY"
-						autoComplete="address-level2"
-						className={inputClass}
-					/>
-				</div>
+				<fieldset className="lh-fieldset">
+					<legend className="lh-legend">Where to send the report</legend>
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<div>
+							<label htmlFor="name" className={labelClass}>
+								Your name
+							</label>
+							<input
+								id="name"
+								name="name"
+								type="text"
+								required
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								placeholder="Jane Smith"
+								autoComplete="name"
+								className={inputClass}
+							/>
+						</div>
+						<div>
+							<label htmlFor="company" className={labelClass}>
+								Company
+							</label>
+							<input
+								id="company"
+								name="company"
+								type="text"
+								required
+								value={company}
+								onChange={(e) => setCompany(e.target.value)}
+								placeholder="Your business name"
+								autoComplete="organization"
+								className={inputClass}
+							/>
+						</div>
+						<div>
+							<label htmlFor="email" className={labelClass}>
+								Email for your report
+							</label>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								required
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								placeholder="you@company.com"
+								autoComplete="email"
+								className={inputClass}
+							/>
+						</div>
+						<div>
+							<label htmlFor="location" className={labelClass}>
+								City &amp; state
+							</label>
+							<input
+								id="location"
+								name="location"
+								type="text"
+								required
+								value={location}
+								onChange={(e) => setLocation(e.target.value)}
+								placeholder="e.g. Syracuse, NY"
+								autoComplete="address-level2"
+								className={inputClass}
+							/>
+						</div>
+					</div>
+				</fieldset>
 
 				{status === "error" && (
 					<div
@@ -270,17 +317,37 @@ export function AuditForm() {
 					</div>
 				)}
 
-				<button
-					type="submit"
-					disabled={status === "loading"}
-					aria-disabled={status === "loading"}
-					className="lighthouse-submit mt-2 w-full cursor-pointer rounded-xl border border-sky-400/40 bg-gradient-to-br from-sky-500/90 to-blue-700/95 px-4 py-4 text-base font-bold tracking-tight text-white shadow-[0_20px_48px_-24px_rgba(37,99,235,0.95)] transition-[transform,box-shadow,opacity] hover:-translate-y-px hover:shadow-[0_24px_56px_-22px_rgba(56,189,248,0.45)] disabled:cursor-not-allowed disabled:opacity-65"
-				>
-					{status === "loading" ? "Running audit…" : "Run free audit"}
-				</button>
-				<p className="text-center text-[11px] leading-relaxed text-white/38">
-					Lighthouse Scanner v2 · Shareable report when storage is enabled.
-				</p>
+				<div className="lh-submit-row">
+					<button
+						type="submit"
+						disabled={status === "loading"}
+						aria-disabled={status === "loading"}
+						className="lh-submit-btn group relative w-full cursor-pointer overflow-hidden rounded-lg px-4 py-4 text-[15px] font-bold tracking-normal text-[#100d08] transition-[transform,box-shadow,opacity] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[260px]"
+					>
+						<span className="relative inline-flex items-center justify-center gap-2">
+							{status === "loading" ? "Running audit…" : "Run free audit"}
+							{status !== "loading" && (
+								<span
+									className="transition-transform duration-300 group-hover:translate-x-0.5"
+									aria-hidden
+								>
+									→
+								</span>
+							)}
+						</span>
+					</button>
+
+					<div className="lh-submit-meta">
+						<p className="font-mono text-[11px] tracking-tight text-white/45">
+							~60-90s · Private report · Shareable URL
+						</p>
+						<p className="lh-recaptcha-note">
+							Protected by reCAPTCHA Enterprise. Google{" "}
+							<a href="https://policies.google.com/privacy">Privacy Policy</a>{" "}
+							and <a href="https://policies.google.com/terms">Terms</a> apply.
+						</p>
+					</div>
+				</div>
 			</form>
 		</div>
 	);

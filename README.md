@@ -17,6 +17,7 @@ accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
 | `GOOGLE_PAGESPEED_API_KEY`, `GEMINI_API_KEY` | Required for `/lighthouse` audits to actually run |
+| `RECAPTCHA_ENTERPRISE_API_KEY` (+ optional `RECAPTCHA_ENTERPRISE_PROJECT_ID`) | Optional Google reCAPTCHA Enterprise verification for **`POST /api/audit`**. Public site key defaults to the DBA key; set the server API key in Firebase to enforce token assessment. |
 | `LIGHTHOUSE_STRICT_TURNSTILE` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Optional strict bot gate for **`POST /api/audit`**. Default: audits run without Turnstile (rate limit only). When strict mode is on, add all preview hostnames in Cloudflare or challenges return **400**. |
 | `AUDIT_LOGGING_WEBHOOK_URL` | Optional: after each successful **`POST /api/audit`**, POST a JSON summary to your logging endpoint (e.g. Convex `.../webhook/audit`). Unset = disabled. |
 | `LEAD_WEBHOOK_URL` | Required for **`POST /api/contact`** to forward marketing leads (e.g. Convex → Slack). See `.env.example`. |

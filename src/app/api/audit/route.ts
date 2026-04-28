@@ -26,6 +26,10 @@ import {
 	scanCompetitors,
 	scanPlaces,
 } from "@lh/lib/places";
+import {
+	getRecaptchaEnterpriseConfigStatus,
+	verifyRecaptchaEnterpriseToken,
+} from "@lh/lib/recaptchaEnterprise";
 import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
 import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
 import { createProjectSheet, pushLeadRow } from "@lh/lib/sheetsSync";
@@ -41,6 +45,7 @@ import {
 	normalizeText,
 } from "@lh/lib/validation";
 import { after, NextResponse } from "next/server";
+import { postLeadIngest } from "@/lib/leadWebhook";
 
 export const runtime = "nodejs";
 
@@ -123,7 +128,32 @@ export async function POST(request: Request) {
 
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken : "";
+		const recaptchaToken =
+			typeof body.recaptchaToken === "string" ? body.recaptchaToken : "";
 		const clientIp = getClientAddress(request);
+		const recaptchaStatus = getRecaptchaEnterpriseConfigStatus();
+		if (recaptchaStatus === "incomplete") {
+			return NextResponse.json(
+				{ error: "Audit bot protection is misconfigured." },
+				{ status: 503, headers: responseHeaders },
+			);
+		}
+		if (recaptchaStatus === "ready") {
+			const recaptcha = await verifyRecaptchaEnterpriseToken(
+				recaptchaToken,
+				clientIp,
+			);
+			if (!recaptcha.success) {
+				return NextResponse.json(
+					{
+						error:
+							"Bot verification failed. Please refresh the page and try again.",
+					},
+					{ status: 403, headers: responseHeaders },
+				);
+			}
+		}
+
 		const strictTurnstile = isAuditTurnstileStrict();
 		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
 		if (strictTurnstile) {
@@ -745,15 +775,42 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Optional: POST audit summary to your HTTP webhook (e.g. Convex → Slack).
-			// No-op when URL + secret are not configured.
-			const osWebhook = process.env.AUDIT_LEAD_WEBHOOK_URL?.trim();
-			const osSecret = process.env.AUDIT_LEAD_WEBHOOK_SECRET?.trim();
+			// Convex / unified lead ingest (no secret required unless your HTTP action checks it).
+			const leadWebhook = process.env.LEAD_WEBHOOK_URL?.trim();
+			const leadWebhookSecret = process.env.LEAD_WEBHOOK_SECRET?.trim();
 			const reportPublicBase = (
 				process.env.REPORT_PUBLIC_BASE_URL || "https://designedbyanthony.com"
 			).replace(/\/$/, "");
 
-			if (osWebhook && osSecret) {
+			if (leadWebhook) {
+				tasks.push(
+					postLeadIngest(
+						leadWebhook,
+						{
+							source: "lighthouse_audit",
+							name,
+							email,
+							company,
+							websiteUrl: url,
+							auditReportUrl: `${reportPublicBase}/report/${reportId}`,
+							trustScore,
+							performanceScore: performanceScore ?? 0,
+							accessibilityScore: accessibilityScore ?? 0,
+							bestPracticesScore: bestPracticesScore ?? 0,
+							seoScore: seoScore ?? 0,
+						},
+						{ secret: leadWebhookSecret },
+					).catch((formError) => {
+						console.error("LEAD_WEBHOOK_URL submission failed:", formError);
+					}),
+				);
+			}
+
+			// Legacy: Agency OS webhook (requires URL + secret pair).
+			const osWebhook = process.env.AGENCY_OS_WEBHOOK_URL;
+			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET;
+
+			if (!leadWebhook && osWebhook && osSecret) {
 				tasks.push(
 					fetchWithTimeout(
 						osWebhook,
@@ -777,7 +834,7 @@ export async function POST(request: Request) {
 						},
 						10_000,
 					).catch((formError) => {
-						console.error("[audit] Audit lead webhook failed:", formError);
+						console.error("Agency OS Webhook submission failed:", formError);
 					}),
 				);
 			}

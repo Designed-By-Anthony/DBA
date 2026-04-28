@@ -19,8 +19,15 @@
 	--accent-blue: #5b9cf8;
 	--accent-blue-hover: #3b82f6;
 	--accent-blue-soft: rgba(91, 156, 248, 0.12);
-	--accent-brass: #c9a86c;
-	--accent-brass-soft: rgba(201, 168, 108, 0.35);
+	--accent-bronze-rgb: 201 168 108;
+	--accent-bronze: #c9a86c;
+	--accent-bronze-light: #fcf0d2;
+	--accent-bronze-muted: #e8d5a8;
+	--accent-bronze-soft: rgb(var(--accent-bronze-rgb) / 0.35);
+	--accent-bronze-hairline: rgb(var(--accent-bronze-rgb) / 0.22);
+	--accent-bronze-glow: rgb(var(--accent-bronze-rgb) / 0.45);
+	--accent-brass: var(--accent-bronze);
+	--accent-brass-soft: var(--accent-bronze-soft);
 	--border-soft: rgba(255, 252, 245, 0.07);
 	--border-strong: rgba(147, 197, 253, 0.22);
 	--success-green: #22c55e;

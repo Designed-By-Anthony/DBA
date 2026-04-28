@@ -80,37 +80,37 @@ export function AuditScanProgress({
 		<div className="space-y-6">
 			<MotionDiv
 				className="lighthouse-scan-hero glass-card relative overflow-hidden p-6 md:p-8"
-				initial={prefersReduced ? false : { opacity: 0, y: 16, scale: 0.985 }}
+				initial={prefersReduced ? false : { opacity: 0, y: 20, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
-				transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+				transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
 			>
 				<MotionDiv
-					className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-sky-500/15 blur-3xl"
+					className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-sky-400/20 to-blue-500/10 blur-3xl"
 					aria-hidden
 					animate={
 						prefersReduced
 							? undefined
 							: {
-									scale: [1, 1.06, 1],
-									opacity: [0.45, 0.65, 0.45],
+									scale: [1, 1.08, 1],
+									opacity: [0.4, 0.6, 0.4],
 								}
 					}
 					transition={
 						prefersReduced
 							? undefined
 							: {
-									duration: 6,
+									duration: 5,
 									repeat: Number.POSITIVE_INFINITY,
 									ease: "easeInOut",
 								}
 					}
 				/>
-				<p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-300/90">
+				<p className="mb-2 text-[11px] font-bold uppercase tracking-[0.24em] text-sky-300/85">
 					Deep scan in progress
 				</p>
 				<div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 					<div>
-						<h3 className="font-display text-xl font-bold tracking-tight text-white md:text-2xl">
+						<h3 className="font-display text-xl font-semibold tracking-tight text-white md:text-[1.65rem]">
 							Building your report
 						</h3>
 						<MotionDiv
@@ -124,24 +124,27 @@ export function AuditScanProgress({
 						</MotionDiv>
 					</div>
 					<MotionDiv
-						className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-sky-400/25 bg-sky-500/10"
+						className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-sky-400/20 bg-gradient-to-br from-sky-500/12 to-blue-500/8"
 						aria-hidden
 						animate={
 							prefersReduced
 								? undefined
-								: { rotate: [0, 3, -3, 0], scale: [1, 1.02, 1] }
+								: { rotate: [0, 2, -2, 0], scale: [1, 1.015, 1] }
 						}
 						transition={
 							prefersReduced
 								? undefined
 								: {
-										duration: 2.8,
+										duration: 3,
 										repeat: Number.POSITIVE_INFINITY,
 										ease: "easeInOut",
 									}
 						}
 					>
-						<div className="h-9 w-9 animate-spin rounded-full border-2 border-sky-400/25 border-t-sky-300" />
+						<div
+							className="h-8 w-8 animate-spin rounded-full border-[1.5px] border-sky-400/20 border-t-sky-300"
+							style={{ animationDuration: "1.2s" }}
+						/>
 					</MotionDiv>
 				</div>
 				<div className="mb-3">
@@ -149,21 +152,21 @@ export function AuditScanProgress({
 						<span>Overall progress</span>
 						<span>{progressPct}%</span>
 					</div>
-					<div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
+					<div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-inner">
 						<MotionDiv
-							className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500"
+							className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 shadow-[0_0_12px_rgba(56,189,248,0.35)]"
 							initial={false}
 							animate={{ width: `${progressPct}%` }}
-							transition={{ type: "spring", stiffness: 120, damping: 18 }}
+							transition={{ type: "spring", stiffness: 100, damping: 20 }}
 						/>
 					</div>
 				</div>
 				<MotionDiv
 					key={factIndex}
-					initial={prefersReduced ? false : { opacity: 0, y: 6 }}
+					initial={prefersReduced ? false : { opacity: 0, y: 8 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4 }}
-					className="text-sm leading-relaxed text-sky-100/75"
+					transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+					className="text-sm leading-relaxed text-sky-100/70"
 				>
 					{FACTS[factIndex]}
 				</MotionDiv>
@@ -203,20 +206,36 @@ export function AuditScanProgress({
 								</span>
 								{done ? (
 									<MotionDiv
-										initial={prefersReduced ? false : { scale: 0 }}
-										animate={{ scale: 1 }}
+										initial={prefersReduced ? false : { scale: 0, opacity: 0 }}
+										animate={{ scale: 1, opacity: 1 }}
+										transition={{ type: "spring", stiffness: 400, damping: 20 }}
 										className="text-emerald-400"
 										title="Complete"
 									>
-										✓
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 14 14"
+											fill="none"
+											aria-hidden="true"
+										>
+											<title>Complete</title>
+											<path
+												d="M2.5 7L5.5 10L11.5 4"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+										</svg>
 									</MotionDiv>
 								) : current ? (
 									<span
-										className="inline-block h-2 w-2 animate-pulse rounded-full bg-sky-400"
+										className="inline-flex h-2 w-2 animate-pulse rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
 										aria-hidden
 									/>
 								) : (
-									<span className="text-white/25">○</span>
+									<span className="text-white/20">○</span>
 								)}
 							</div>
 							<p className="font-display text-sm font-semibold text-white">

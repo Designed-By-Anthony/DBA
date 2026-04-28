@@ -114,9 +114,12 @@ export default function Home() {
 	return (
 		<>
 			{structuredData.map((entry) => (
-				<script key={jsonLdScriptKey(entry)} type="application/ld+json">
-					{JSON.stringify(entry)}
-				</script>
+				<script
+					key={jsonLdScriptKey(entry)}
+					type="application/ld+json"
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
+				/>
 			))}
 			<MarketingChrome footerCta={homeFooterCta}>
 				<HomePage />

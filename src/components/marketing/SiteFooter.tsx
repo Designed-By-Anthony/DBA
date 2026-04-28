@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_MARK_IMAGE } from "@/design-system/brand";
+import {
+	SITE_BRAND,
+	SITE_FOOTER_LINKS,
+	SITE_LEGAL_LINKS,
+	SITE_SOCIAL_LINKS,
+} from "@/design-system/site-config";
 
 export function SiteFooter() {
 	const year = new Date().getFullYear();
@@ -14,44 +19,33 @@ export function SiteFooter() {
 						aria-label="Designed by Anthony home"
 					>
 						<Image
-							src={BRAND_MARK_IMAGE}
-							alt="Designed by Anthony Logo"
-							width={BRAND_MARK_IMAGE.width}
-							height={BRAND_MARK_IMAGE.height}
+							src={SITE_BRAND.assets.mark}
+							alt={`${SITE_BRAND.name} Logo`}
+							width={36}
+							height={27}
 							className="footer-logo"
 						/>
 					</Link>
 
 					<nav className="footer-nav" aria-label="Footer navigation">
-						<Link href="/services">Services</Link>
-						<Link href="/pricing">Pricing</Link>
-						<Link href="/portfolio">Portfolio</Link>
-						<Link href="/blog">Blog</Link>
-						<Link href="/contact">Contact</Link>
+						{SITE_FOOTER_LINKS.map((link) => (
+							<Link key={link.href} href={link.href}>
+								{link.label}
+							</Link>
+						))}
 					</nav>
 
 					<div className="footer-social-links">
-						<a
-							href="https://share.google/c4NOQf9hkRWAN32rO"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Google
-						</a>
-						<a
-							href="https://www.facebook.com/profile.php?id=61574388797744"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Facebook
-						</a>
-						<a
-							href="https://www.instagram.com/dbastudio315/"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Instagram
-						</a>
+						{SITE_SOCIAL_LINKS.map((link) => (
+							<a
+								key={link.href}
+								href={link.href}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{link.label}
+							</a>
+						))}
 					</div>
 				</div>
 
@@ -70,33 +64,47 @@ export function SiteFooter() {
 						</li>
 						<li>
 							<a
-								href="https://firebase.google.com/products/app-hosting"
+								href="https://firebase.google.com/docs/hosting"
 								className="footer-stack-badge"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								Firebase App Hosting
+								Firebase Hosting
 							</a>
 						</li>
 						<li>
 							<a
-								href="https://tailwindcss.com"
+								href="https://www.cloudflare.com"
 								className="footer-stack-badge"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								Tailwind CSS
+								Cloudflare
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://cloud.google.com/recaptcha-enterprise"
+								className="footer-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								reCAPTCHA Enterprise
 							</a>
 						</li>
 					</ul>
 				</div>
 
 				<div className="footer-bottom">
-					<p>© {year} Designed by Anthony</p>
+					<p>
+						© {year} {SITE_BRAND.name}
+					</p>
 					<span className="footer-sep">·</span>
-					<Link href="/privacy">Privacy</Link>
-					<Link href="/terms">Terms</Link>
-					<Link href="/cookie">Cookies</Link>
+					{SITE_LEGAL_LINKS.map((link) => (
+						<Link key={link.href} href={link.href}>
+							{link.label}
+						</Link>
+					))}
 					<span className="footer-sep">·</span>
 					<button
 						type="button"

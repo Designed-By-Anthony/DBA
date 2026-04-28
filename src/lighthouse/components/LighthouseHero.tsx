@@ -1,183 +1,165 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
-import {
-	div as MotionDiv,
-	li as MotionLi,
-	ul as MotionUl,
-} from "framer-motion/client";
-import Link from "next/link";
-import { BRAND_NAME, BRAND_SITE_URL } from "@/design-system/brand";
+import { div as MotionDiv } from "framer-motion/client";
 
-const features = [
-	"PageSpeed Insights + on-page HTML signals",
-	"Sitemap, robots, and redirect sanity checks",
-	"Sharable report URL after each scan",
-	"Built for service-business sites in CNY and beyond",
+const proofPoints = [
+	{ k: "Runtime", v: "60-90 sec" },
+	{ k: "Lens", v: "6 audits" },
+	{ k: "Output", v: "Private report" },
 ];
 
-const listParent = {
-	hidden: {},
-	visible: {
-		transition: { staggerChildren: 0.08, delayChildren: 0.12 },
+const signalRows = [
+	{
+		label: "Performance drag",
+		value: "Largest Contentful Paint, scripts, image weight",
+		status: "Priority",
+		tone: "warm",
 	},
-};
+	{
+		label: "Search readiness",
+		value: "Titles, schema, headings, crawl paths",
+		status: "Mapped",
+		tone: "bronze",
+	},
+	{
+		label: "Trust friction",
+		value: "Local proof, accessibility, conversion cues",
+		status: "Scored",
+		tone: "green",
+	},
+] as const;
 
-const listChild = {
-	hidden: { opacity: 0, y: 14 },
-	visible: {
-		opacity: 1,
-		y: 0,
-		transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-	},
-};
+function DiagnosticPreview({ animate }: { animate: boolean }) {
+	return (
+		<MotionDiv
+			className="lh-diagnostic-board"
+			initial={animate ? { opacity: 0, y: 18 } : false}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.72, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+		>
+			<div className="lh-diagnostic-topline">
+				<div>
+					<p className="lh-mini-label">Executive signal</p>
+					<p className="lh-diagnostic-title">Revenue leak map</p>
+				</div>
+				<div className="lh-diagnostic-score">
+					<span className="sr-only">Sample audit score 87</span>
+					<span aria-hidden>87</span>
+				</div>
+			</div>
+
+			<div className="lh-diagnostic-meter" aria-hidden>
+				<span style={{ width: "87%" }} />
+			</div>
+
+			<div className="lh-diagnostic-rows">
+				{signalRows.map((row, index) => (
+					<MotionDiv
+						key={row.label}
+						className="lh-diagnostic-row"
+						initial={animate ? { opacity: 0, x: -10 } : false}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{
+							duration: 0.45,
+							delay: 0.48 + index * 0.08,
+							ease: [0.22, 1, 0.36, 1],
+						}}
+					>
+						<span
+							className={`lh-row-status lh-row-status--${row.tone}`}
+							aria-hidden
+						/>
+						<span className="min-w-0">
+							<span className="block font-report text-[15px] font-semibold leading-tight text-white/94">
+								{row.label}
+							</span>
+							<span className="mt-1 block text-[12px] leading-[1.5] text-white/52">
+								{row.value}
+							</span>
+						</span>
+						<span className="lh-diagnostic-pill">{row.status}</span>
+					</MotionDiv>
+				))}
+			</div>
+		</MotionDiv>
+	);
+}
 
 export function LighthouseHero() {
 	const prefersReduced = useReducedMotion();
-
-	if (prefersReduced) {
-		return (
-			<section
-				className="glass-card relative mb-0 overflow-hidden px-6 py-9 md:px-11 md:py-11"
-				aria-labelledby="lighthouse-hero-heading"
-			>
-				<div
-					className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl"
-					aria-hidden
-				/>
-				<div
-					className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[rgba(212,184,120,0.12)] blur-3xl"
-					aria-hidden
-				/>
-				<div className="relative">
-					<p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-foreground/95">
-						<span
-							className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"
-							aria-hidden
-						/>
-						Live now
-					</p>
-					<h1
-						id="lighthouse-hero-heading"
-						className="font-display text-[1.65rem] font-bold tracking-tight text-white sm:text-3xl md:text-[2.1rem] md:leading-tight"
-					>
-						Lighthouse Scanner{" "}
-						<span className="text-glow bg-gradient-to-r from-sky-200 via-blue-200 to-amber-100/90 bg-clip-text text-transparent">
-							v2
-						</span>
-					</h1>
-					<p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70 md:text-[15px]">
-						Free deep scan: Core Web Vitals, accessibility, SEO, crawl signals,
-						and an AI summary. Submit once — we email your report link and log
-						the run so you can follow up from your CRM.
-					</p>
-					<ul className="mt-5 grid gap-2 text-sm text-white/65 sm:grid-cols-2">
-						{features.map((text) => (
-							<li
-								key={text}
-								className="flex gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2"
-							>
-								<span className="text-emerald-400/90" aria-hidden>
-									✓
-								</span>
-								{text}
-							</li>
-						))}
-					</ul>
-					<p className="mt-6 text-xs text-white/45">
-						Prefer the main site?{" "}
-						<Link
-							href={BRAND_SITE_URL}
-							className="font-medium text-sky-300/90 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
-						>
-							{BRAND_NAME}
-						</Link>
-					</p>
-				</div>
-			</section>
-		);
-	}
+	const animate = !prefersReduced;
 
 	return (
 		<section
-			className="glass-card relative mb-0 overflow-hidden px-6 py-9 md:px-11 md:py-11"
+			className="lighthouse-hero relative"
 			aria-labelledby="lighthouse-hero-heading"
 		>
+			{/* Subtle ambient glow for visual richness */}
 			<div
-				className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl"
+				className="absolute -left-20 top-0 h-80 w-80 rounded-full opacity-20 blur-3xl pointer-events-none"
+				style={{
+					background:
+						"radial-gradient(circle, rgb(var(--accent-bronze-rgb) / 0.12), transparent 70%)",
+				}}
 				aria-hidden
 			/>
-			<div
-				className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[rgba(212,184,120,0.12)] blur-3xl"
-				aria-hidden
-			/>
-			<div className="relative">
-				<MotionDiv
-					initial={{ opacity: 0, y: 14 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-					className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-foreground/95"
-				>
-					<span
-						className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]"
-						aria-hidden
-					/>
-					Live now
-				</MotionDiv>
-				<MotionDiv
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-				>
-					<h1
-						id="lighthouse-hero-heading"
-						className="font-display text-[1.65rem] font-bold tracking-tight text-white sm:text-3xl md:text-[2.1rem] md:leading-tight"
-					>
-						Lighthouse Scanner{" "}
-						<span className="text-glow bg-gradient-to-r from-sky-200 via-blue-200 to-amber-100/90 bg-clip-text text-transparent">
-							v2
+			<MotionDiv
+				className="lh-place-marker"
+				initial={animate ? { opacity: 0, x: -6 } : false}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+			>
+				<span className="lh-place-marker-rule" aria-hidden />
+				<span>The Diagnostic Bench</span>
+			</MotionDiv>
+
+			<MotionDiv
+				initial={animate ? { opacity: 0, y: 16 } : false}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{
+					duration: 0.7,
+					delay: 0.05,
+					ease: [0.22, 1, 0.36, 1],
+				}}
+			>
+				<h1 id="lighthouse-hero-heading" className="lh-editorial-h1">
+					Website Audit Scanner
+				</h1>
+			</MotionDiv>
+
+			<MotionDiv
+				initial={animate ? { opacity: 0, y: 12 } : false}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.6, delay: 0.18 }}
+			>
+				<p className="lh-hero-copy">
+					A private diagnostic for the money leaks in your site: speed,
+					technical SEO, accessibility, local trust, and conversion friction.
+					You get the scores, the context, and the fix list without the generic
+					tool noise.
+				</p>
+			</MotionDiv>
+
+			<MotionDiv
+				className="lh-hero-proof-row"
+				initial={animate ? { opacity: 0, y: 10 } : false}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.55, delay: 0.32 }}
+			>
+				{proofPoints.map((point) => (
+					<div key={point.k} className="lh-hero-proof">
+						<span className="font-report text-[17px] font-semibold leading-none text-white">
+							{point.v}
 						</span>
-					</h1>
-					<p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70 md:text-[15px]">
-						Free deep scan: Core Web Vitals, accessibility, SEO, crawl signals,
-						and an AI summary. Submit once — we email your report link and log
-						the run so you can follow up from your CRM.
-					</p>
-				</MotionDiv>
-				<MotionUl
-					className="mt-5 grid gap-2 text-sm text-white/65 sm:grid-cols-2"
-					variants={listParent}
-					initial="hidden"
-					animate="visible"
-				>
-					{features.map((text) => (
-						<MotionLi
-							key={text}
-							variants={listChild}
-							className="flex gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 transition-colors hover:border-sky-400/20 hover:bg-sky-500/[0.06]"
-						>
-							<span className="text-emerald-400/90" aria-hidden>
-								✓
-							</span>
-							{text}
-						</MotionLi>
-					))}
-				</MotionUl>
-				<MotionDiv
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ delay: 0.45, duration: 0.4 }}
-					className="mt-6 text-xs text-white/45"
-				>
-					Prefer the main site?{" "}
-					<Link
-						href={BRAND_SITE_URL}
-						className="font-medium text-sky-300/90 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
-					>
-						{BRAND_NAME}
-					</Link>
-				</MotionDiv>
-			</div>
+						<span className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/42">
+							{point.k}
+						</span>
+					</div>
+				))}
+			</MotionDiv>
+
+			<DiagnosticPreview animate={animate} />
 		</section>
 	);
 }

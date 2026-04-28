@@ -1,5 +1,7 @@
 /**
  * Designed by Anthony — global theme entry.
  * Canonical tokens: src/styles/theme.css
+ * Shared brand chrome (header, footer, banner): ./brand-chrome.css
  */
 @import url("../styles/theme.css");
+@import url("./brand-chrome.css");

@@ -86,11 +86,17 @@ function MarketingPageJsonLd({
 
 	return (
 		<>
-			<script type="application/ld+json">{JSON.stringify(webPage)}</script>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(webPage) }}
+			/>
 			{breadcrumbJson ? (
-				<script type="application/ld+json">
-					{JSON.stringify(breadcrumbJson)}
-				</script>
+				<script
+					type="application/ld+json"
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
+				/>
 			) : null}
 		</>
 	);
@@ -281,9 +287,11 @@ export function PricingPage() {
 				description={copy.description}
 				breadcrumbLabel={copy.title}
 			/>
-			<script type="application/ld+json">
-				{JSON.stringify(pricingCatalog)}
-			</script>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingCatalog) }}
+			/>
 			<PageHero
 				kind="pricing"
 				title="Pricing"
@@ -540,7 +548,11 @@ export function FaqPage() {
 				description={copy.description}
 				breadcrumbLabel={copy.title}
 			/>
-			<script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+			/>
 			<PageHero
 				kind="faq"
 				title="FAQ"
