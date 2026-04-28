@@ -150,14 +150,11 @@ window.__dbaRevokeAnalyticsConsent = function () {
 									{link.label}
 								</Link>
 							))}
-							<Link href={SITE_CONTACT_LINK.href}>
-								{SITE_CONTACT_LINK.label}
-							</Link>
 							<Link
 								href={SITE_CONTACT_LINK.href}
 								className="mobile-nav-cta mobile-nav-cta--secondary"
 							>
-								Contact us
+								{SITE_CONTACT_LINK.label}
 							</Link>
 							<Link href={SITE_AUDIT_CTA.href} className="mobile-nav-cta">
 								{SITE_AUDIT_CTA.label}

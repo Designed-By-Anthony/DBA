@@ -18,8 +18,6 @@ export type BrandHeaderProps = {
 	 * `false` to render a slim mobile slot instead.
 	 */
 	includeHamburger?: boolean;
-	/** Optional content slotted to the far right of the header (above mobile nav). */
-	rightSlot?: React.ReactNode;
 };
 
 export function BrandHeader({
