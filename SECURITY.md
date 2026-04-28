@@ -40,7 +40,7 @@ Security fixes land on **`main`** and deploy through the normal Firebase App Hos
 
 - Run **`npm audit --omit=dev`** before releases; treat HIGH/CRITICAL advisories as release blockers unless explicitly risk-accepted.
 - **Do not** commit real API keys, webhook secrets, or service-account JSON; rotate anything that has ever appeared in git history.
-- After CSP or connect-src changes, run **`npm run sync:static-headers`** so `static-headers.json` and `netlify.toml` stay aligned with `build/csp.mjs`.
+- After CSP or connect-src changes, run **`npm run sync:static-headers`** so `static-headers.json` stays aligned with `build/csp.mjs`.
 
 ## Where defenses live in code (this repo)
 

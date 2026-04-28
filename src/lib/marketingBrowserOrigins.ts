@@ -1,7 +1,7 @@
 /**
  * Origins allowed to call same-site marketing lead APIs from the browser
  * (`/api/contact`, `/api/lead-email`). Includes production apex + Firebase App
- * Hosting / Netlify preview hosts.
+ * Hosting preview hosts.
  */
 
 const APEX_SUBDOMAIN_PATTERN =
@@ -20,10 +20,9 @@ const TRUSTED_HOST_SUFFIXES = [
 	".hosted.app",
 	".web.app",
 	".firebaseapp.com",
-	".netlify.app",
 ] as const;
 
-/** Firebase App Hosting, Firebase Hosting, Netlify previews, etc. */
+/** Firebase App Hosting and Firebase Hosting preview hosts. */
 export function isTrustedHostedPreviewHostname(hostname: string): boolean {
 	const h = hostname.toLowerCase();
 	return TRUSTED_HOST_SUFFIXES.some((suffix) => h.endsWith(suffix));

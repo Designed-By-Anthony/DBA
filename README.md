@@ -35,7 +35,7 @@ npm run dev       # :3000 (builds public/scripts/site.js first)
 npm run build     # site script + sync static headers + next build
 ```
 
-Deploy from the repo root on **Firebase App Hosting** with the **GitHub** repo linked in Firebase console. `npm run sync:static-headers` (runs in `prebuild`) still regenerates `netlify.toml` + `static-headers.json` from `build/csp.mjs` for CSP alignment.
+Deploy from the repo root on **Firebase App Hosting** with the **GitHub** repo linked in Firebase console. `npm run sync:static-headers` (runs in `prebuild`) regenerates `static-headers.json` from `build/csp.mjs` for Playwright CSP parity.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 

@@ -5,7 +5,7 @@ Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 
 Layout
 ------
-• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `netlify.toml`.
+• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `apphosting.yaml`.
 • Supporting folders at root (not separate deploys from this repo): `customer-site-embeds/`, `vertaflow-crm/` stubs or assets as applicable — see README.
 
 Global theme (single source of truth)
@@ -33,7 +33,7 @@ Open the folder "Designed_By_Anthony" as the workspace root.
 Firebase App Hosting
 --------------------
 • Root Directory: repository root (`.`).
-• Install / build: `npm ci` and `npm run build` (see `package.json`; `netlify.toml` is generated for CSP sync only).
+• Install / build: `npm ci` and `npm run build` (see `package.json`; `apphosting.yaml` at repo root configures the Cloud Run backend).
 • Connect the **GitHub** repo in Firebase console; set `LEAD_WEBHOOK_URL` and other env in App Hosting → Environment / Secrets.
 
 Cloudflare / GCP
