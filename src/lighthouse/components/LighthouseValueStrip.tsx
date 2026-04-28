@@ -7,27 +7,27 @@ const phases = [
 	{
 		num: "01",
 		title: "Lab performance",
-		body: "Core Web Vitals, Lighthouse scores, page weight, and render-blocking pressure.",
+		body: "PageSpeed lab scores, Core Web Vitals, mobile load time, and what's actually slowing your visitors down.",
 	},
 	{
 		num: "02",
 		title: "Search structure",
-		body: "Metadata, headings, schema hints, indexability, sitemap, and canonical signals.",
+		body: "Titles, meta descriptions, structured data, and crawlability — everything Google uses to rank and index your pages.",
 	},
 	{
 		num: "03",
 		title: "Trust signals",
-		body: "Accessibility, HTTPS posture, local proof, forms, calls to action, and social cues.",
+		body: "Accessibility basics, HTTPS posture, local credibility markers, forms, and calls to action.",
 	},
 	{
 		num: "04",
-		title: "Competitive context",
-		body: "Places and authority data when available, with graceful fallback when APIs are limited.",
+		title: "Local context",
+		body: "Google Business and local authority signals that matter for service-area businesses competing in your market.",
 	},
 	{
 		num: "05",
-		title: "Executive readout",
-		body: "A prioritized fix list written for decisions, not just developer trivia.",
+		title: "AI fix list",
+		body: "Plain-English next steps ranked by business impact — not raw numbers, but specific things to fix this week.",
 	},
 ];
 
@@ -42,14 +42,14 @@ export function LighthouseValueStrip() {
 		>
 			<div className="lh-process-heading">
 				<div>
-					<p className="lighthouse-result-eyebrow">Audit coverage</p>
+					<p className="lighthouse-result-eyebrow">What the scan covers</p>
 					<h2 id="lh-process-heading" className="lh-process-title">
-						The scan reads the page like a buyer and a crawler.
+						Five checks. One clear picture of where your site stands.
 					</h2>
 				</div>
 				<p className="lh-process-note">
-					Built for service businesses that need the next move, not a pile of
-					disconnected scores.
+					Built for local service businesses that need the next move, not a
+					pile of disconnected scores.
 				</p>
 			</div>
 
