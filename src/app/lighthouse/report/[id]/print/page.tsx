@@ -604,10 +604,189 @@ function PrintReport({
 					</SectionCard>
 				)}
 
+				{/* Strengths & weaknesses */}
+			{((data.aiInsight?.strengths?.length ?? 0) > 0 ||
+				(data.aiInsight?.weaknesses?.length ?? 0) > 0) && (
+				<SectionCard
+					eyebrow="AI analysis"
+					title="Strengths & gaps"
+					accent={PRINT_BRONZE}
+				>
+					<div
+						style={{
+							display: "grid",
+							gridTemplateColumns:
+								(data.aiInsight?.strengths?.length ?? 0) > 0 &&
+								(data.aiInsight?.weaknesses?.length ?? 0) > 0
+									? "1fr 1fr"
+									: "1fr",
+							gap: "1.25rem",
+						}}
+					>
+						{(data.aiInsight?.strengths?.length ?? 0) > 0 && (
+							<div>
+								<p
+									style={{
+										fontSize: "0.65rem",
+										fontWeight: 700,
+										textTransform: "uppercase",
+										letterSpacing: "0.12em",
+										color: "#166534",
+										marginBottom: "0.5rem",
+									}}
+								>
+									What&apos;s working
+								</p>
+								<ul style={{ paddingLeft: 0, margin: 0, listStyle: "none" }}>
+									{data.aiInsight!.strengths.map((s) => (
+										<li
+											key={s}
+											style={{
+												...bodyText,
+												display: "flex",
+												gap: "0.45rem",
+												alignItems: "flex-start",
+												marginBottom: "0.35rem",
+											}}
+										>
+											<span style={{ color: "#166534", flexShrink: 0 }}>✓</span>
+											{s}
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+						{(data.aiInsight?.weaknesses?.length ?? 0) > 0 && (
+							<div>
+								<p
+									style={{
+										fontSize: "0.65rem",
+										fontWeight: 700,
+										textTransform: "uppercase",
+										letterSpacing: "0.12em",
+										color: "#92400e",
+										marginBottom: "0.5rem",
+									}}
+								>
+									Gaps found
+								</p>
+								<ul style={{ paddingLeft: 0, margin: 0, listStyle: "none" }}>
+									{data.aiInsight!.weaknesses.map((w) => (
+										<li
+											key={w}
+											style={{
+												...bodyText,
+												display: "flex",
+												gap: "0.45rem",
+												alignItems: "flex-start",
+												marginBottom: "0.35rem",
+											}}
+										>
+											<span style={{ color: "#92400e", flexShrink: 0 }}>→</span>
+											{w}
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+					</div>
+				</SectionCard>
+			)}
+
+			{/* Competitors */}
+			{data.competitors && data.competitors.length > 0 && (
+				<SectionCard
+					eyebrow="Market context"
+					title="Competitive snapshot"
+					accent={PRINT_BRONZE}
+				>
+					<table style={{ width: "100%", borderCollapse: "collapse", ...bodyText }}>
+						<tbody>
+							{data.competitors.slice(0, 4).map((c) => (
+								<tr
+									key={`${c.name}-${c.reviewCount}`}
+									style={{ borderBottom: `1px solid ${PRINT_BORDER}` }}
+								>
+									<td
+										style={{
+											padding: "0.45rem 0",
+											fontWeight: 600,
+											color: PRINT_INK,
+											width: "50%",
+											paddingRight: "1rem",
+										}}
+									>
+										{c.name}
+									</td>
+									<td style={{ padding: "0.45rem 0", ...mutedText }}>
+										{c.rating != null ? `${c.rating.toFixed(1)}★` : ""}
+										{c.reviewCount > 0 ? ` · ${c.reviewCount} reviews` : ""}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</SectionCard>
+			)}
+
+			{/* Index coverage */}
+			{data.indexCoverage?.found && data.indexCoverage.estimatedIndexedPages != null && (
+				<SectionCard
+					eyebrow="Search footprint"
+					title="Index coverage"
+					accent={PRINT_BRONZE}
+				>
+					<p style={bodyText}>
+						~{data.indexCoverage.estimatedIndexedPages.toLocaleString()} pages
+						in Google&apos;s index ({data.indexCoverage.source})
+					</p>
+				</SectionCard>
+			)}
+
+			{/* Notable issue */}
+			{data.diagnostics?.criticalIssue ? (
+				<div
+					style={{
+						background: "#fffbeb",
+						border: `1px solid ${PRINT_BRONZE}`,
+						borderRadius: "0.75rem",
+						padding: "0.875rem 1rem",
+						marginBottom: "1.25rem",
+					}}
+				>
+					<p
+						style={{
+							fontSize: "0.6rem",
+							fontWeight: 700,
+							textTransform: "uppercase",
+							letterSpacing: "0.14em",
+							color: "#92400e",
+							marginBottom: "0.3rem",
+						}}
+					>
+						Notable issue
+					</p>
+					<p style={{ ...bodyText, color: "#6c4b16", margin: 0 }}>
+						{data.diagnostics.criticalIssue}
+					</p>
+				</div>
+			) : null}
+
+			{/* Copywriting analysis */}
+			{data.aiInsight?.copywritingAnalysis ? (
+				<SectionCard
+					eyebrow="Messaging & copy"
+					title="Copywriting analysis"
+					accent={PRINT_BRONZE}
+				>
+					<p style={bodyText}>{data.aiInsight.copywritingAnalysis}</p>
+				</SectionCard>
+			) : null}
+
 			{/* Footer */}
 			<div
 				style={{
-					borderTop: "1px solid #e2e8f0",
+					borderTop: `1px solid ${PRINT_BORDER}`,
 					paddingTop: "1rem",
 					marginTop: "2rem",
 					display: "flex",

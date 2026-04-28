@@ -185,11 +185,11 @@ export function AuditResults({
 			{/* ── Hero ── */}
 			<div className="lighthouse-results-hero lh-report-cover mb-10">
 				<div className="lh-report-cover-copy">
-					<p className="lh-report-kicker">Scan complete</p>
-					<h2 className="lh-report-title">Executive audit report</h2>
+					<p className="lh-report-kicker">Report ready</p>
+					<h2 className="lh-report-title">Your site audit</h2>
 					<p className="lh-report-subtitle">
-						A premium diagnostic snapshot of the site’s speed, search,
-						accessibility, trust, and conversion pressure.
+						Speed, SEO, accessibility, and trust — scored and ranked by
+						what matters most for your business.
 					</p>
 				</div>
 				<div className="lh-report-meta-card">
@@ -273,7 +273,7 @@ export function AuditResults({
 
 			{/* ── Score grid — all 6 in a unified 3-column grid ── */}
 			<div className="mb-3">
-				<p className="lh-section-label text-center">Scores at a glance</p>
+				<p className="lh-section-label text-center">How your site scored</p>
 			</div>
 			<MotionDiv
 				className="mb-12 grid grid-cols-3 gap-3 md:gap-4"
@@ -362,6 +362,53 @@ export function AuditResults({
 							</li>
 						))}
 					</ol>
+				</MotionDiv>
+			) : null}
+
+			{/* ── Strengths & weaknesses ── */}
+			{((data.aiInsight?.strengths?.length ?? 0) > 0 ||
+				(data.aiInsight?.weaknesses?.length ?? 0) > 0) ? (
+				<MotionDiv
+					className="mb-6 grid gap-4 sm:grid-cols-2"
+					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: "-40px" }}
+					transition={{ duration: 0.48 }}
+				>
+					{(data.aiInsight?.strengths?.length ?? 0) > 0 ? (
+						<div className="lighthouse-result-panel lh-panel--emerald p-5 md:p-6">
+							<p className="lighthouse-result-eyebrow">What&apos;s working</p>
+							<h3 className="lighthouse-result-heading text-lg">Strengths</h3>
+							<ul className="space-y-2">
+								{data.aiInsight!.strengths.map((s) => (
+									<li
+										key={s}
+										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"
+									>
+										<span className="mt-0.5 shrink-0 text-emerald-400" aria-hidden>✓</span>
+										{s}
+									</li>
+								))}
+							</ul>
+						</div>
+					) : null}
+					{(data.aiInsight?.weaknesses?.length ?? 0) > 0 ? (
+						<div className="lighthouse-result-panel lh-panel--amber p-5 md:p-6">
+							<p className="lighthouse-result-eyebrow">What needs work</p>
+							<h3 className="lighthouse-result-heading text-lg">Gaps found</h3>
+							<ul className="space-y-2">
+								{data.aiInsight!.weaknesses.map((w) => (
+									<li
+										key={w}
+										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"
+									>
+										<span className="mt-0.5 shrink-0 text-amber-400/80" aria-hidden>→</span>
+										{w}
+									</li>
+								))}
+							</ul>
+						</div>
+					) : null}
 				</MotionDiv>
 			) : null}
 
@@ -470,11 +517,28 @@ export function AuditResults({
 				>
 					<p className="lighthouse-result-eyebrow">Search footprint</p>
 					<h3 className="lighthouse-result-heading text-lg">
-						Index coverage (estimate)
+						Index coverage
 					</h3>
 					<p className="lighthouse-result-body">
-						~{index.estimatedIndexedPages.toLocaleString()} pages (
+						~{index.estimatedIndexedPages.toLocaleString()} pages in Google's index (
 						{index.source})
+					</p>
+				</MotionDiv>
+			) : null}
+
+			{/* ── Copywriting analysis ── */}
+			{data.aiInsight?.copywritingAnalysis ? (
+				<MotionDiv
+					className="lighthouse-result-panel lh-panel--violet mb-6 p-6 md:p-7"
+					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true }}
+					transition={{ duration: 0.45 }}
+				>
+					<p className="lighthouse-result-eyebrow">Messaging &amp; copy</p>
+					<h3 className="lighthouse-result-heading">Copywriting analysis</h3>
+					<p className="lighthouse-result-body lighthouse-result-muted leading-relaxed">
+						{data.aiInsight.copywritingAnalysis}
 					</p>
 				</MotionDiv>
 			) : null}

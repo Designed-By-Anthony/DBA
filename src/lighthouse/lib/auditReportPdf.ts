@@ -312,7 +312,7 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 	const actions = (data.aiInsight?.prioritizedActions ?? [])
 		.slice()
 		.sort((a, b) => a.priority - b.priority)
-		.slice(0, 8);
+		.slice(0, 5);
 
 	if (actions.length > 0) {
 		y = sectionHeader(
@@ -338,6 +338,52 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 			y += BODY_LINE + 1;
 		}
 		y += 4;
+	}
+
+	/* ── Strengths & weaknesses ── */
+	const strengths = data.aiInsight?.strengths ?? [];
+	const weaknesses = data.aiInsight?.weaknesses ?? [];
+	if (strengths.length > 0 || weaknesses.length > 0) {
+		y = sectionHeader(
+			doc,
+			y,
+			"AI analysis",
+			"Strengths & gaps",
+			C_BRONZE,
+		);
+		doc.setFontSize(9.5);
+		if (strengths.length > 0) {
+			doc.setFont("helvetica", "bold");
+			doc.setFontSize(8.5);
+			doc.setTextColor(...C_GREEN_700);
+			doc.text("What\u2019s working", MARGIN + 7, y);
+			y += 5;
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(9);
+			doc.setTextColor(...C_SLATE_700);
+			for (const s of strengths) {
+				y = ensureSpace(doc, y, BODY_LINE + 1);
+				y = wrapped(doc, `\u2714  ${s}`, MARGIN + 10, y, MAX_W - 17, BODY_LINE);
+				y += 1;
+			}
+			y += 3;
+		}
+		if (weaknesses.length > 0) {
+			doc.setFont("helvetica", "bold");
+			doc.setFontSize(8.5);
+			doc.setTextColor(...C_AMBER_700);
+			doc.text("Gaps found", MARGIN + 7, y);
+			y += 5;
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(9);
+			doc.setTextColor(...C_SLATE_700);
+			for (const w of weaknesses) {
+				y = ensureSpace(doc, y, BODY_LINE + 1);
+				y = wrapped(doc, `\u2192  ${w}`, MARGIN + 10, y, MAX_W - 17, BODY_LINE);
+				y += 1;
+			}
+			y += 4;
+		}
 	}
 
 	/* ── Authority & backlinks ── */
@@ -404,6 +450,76 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		y = divider(doc, y);
 	}
 
+	/* ── Local listing ── */
+	if (
+		data.places?.found &&
+		(data.places.rating != null || data.places.userRatingCount > 0)
+	) {
+		const pl = data.places;
+		y = sectionHeader(doc, y, "Maps & reputation", "Local listing", C_BRONZE);
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(9.5);
+		doc.setTextColor(...C_SLATE_700);
+		const plParts: string[] = [];
+		if (pl.rating != null) plParts.push(`${pl.rating.toFixed(1)}\u2605`);
+		if (pl.userRatingCount > 0)
+			plParts.push(
+				`${pl.userRatingCount} review${pl.userRatingCount === 1 ? "" : "s"}`,
+			);
+		if (pl.primaryType) plParts.push(pl.primaryType);
+		y = wrapped(doc, plParts.join("  \u00b7  "), MARGIN + 7, y, MAX_W - 7, BODY_LINE);
+		y += 6;
+		y = divider(doc, y);
+	}
+
+	/* ── Competitors ── */
+	if (data.competitors && data.competitors.length > 0) {
+		y = sectionHeader(
+			doc,
+			y,
+			"Market context",
+			"Competitive snapshot",
+			C_BRONZE,
+		);
+		doc.setFontSize(9.5);
+		for (const c of data.competitors.slice(0, 4)) {
+			y = ensureSpace(doc, y, BODY_LINE + 2);
+			doc.setFont("helvetica", "bold");
+			doc.setTextColor(...C_SLATE_900);
+			doc.text(c.name, MARGIN + 7, y);
+			const parts: string[] = [];
+			if (c.rating != null) parts.push(`${c.rating.toFixed(1)}\u2605`);
+			if (c.reviewCount > 0) parts.push(`${c.reviewCount} reviews`);
+			if (parts.length > 0) {
+				const detail = parts.join("  \u00b7  ");
+				doc.setFont("helvetica", "normal");
+				doc.setTextColor(...C_SLATE_500);
+				doc.text(detail, COL2, y);
+			}
+			y += BODY_LINE + 1;
+		}
+		y += 4;
+		y = divider(doc, y);
+	}
+
+	/* ── Index coverage ── */
+	if (data.indexCoverage?.found && data.indexCoverage.estimatedIndexedPages != null) {
+		y = sectionHeader(doc, y, "Search footprint", "Index coverage", C_BRONZE);
+		doc.setFont("helvetica", "normal");
+		doc.setFontSize(9.5);
+		doc.setTextColor(...C_SLATE_700);
+		y = wrapped(
+			doc,
+			`~${data.indexCoverage.estimatedIndexedPages.toLocaleString()} pages in Google\u2019s index (${data.indexCoverage.source})`,
+			MARGIN + 7,
+			y,
+			MAX_W - 7,
+			BODY_LINE,
+		);
+		y += 6;
+		y = divider(doc, y);
+	}
+
 	/* ── Site crawl ── */
 	if (data.sitewide) {
 		const sw = data.sitewide;
@@ -431,7 +547,7 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 			],
 			[
 				"HTTPS / redirects",
-				`${sw.redirectChain.httpToHttps ? "HTTP→HTTPS present" : "Check mixed content"}${sw.redirectChain.chainLength > 1 ? ` · ${sw.redirectChain.chainLength} hops` : ""}`,
+				`${sw.redirectChain.httpToHttps ? "HTTP\u2192HTTPS present" : "Check mixed content"}${sw.redirectChain.chainLength > 1 ? ` \u00b7 ${sw.redirectChain.chainLength} hops` : ""}`,
 			],
 		];
 		doc.setFontSize(9.5);
