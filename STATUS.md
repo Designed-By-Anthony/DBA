@@ -2,6 +2,35 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Codebase cleanup + pre-store security audit (2026-04-28)
+
+### Cleanup
+- **Biome formatting:** Auto-fixed 5 files with formatting violations (`ToolsPage.tsx`, `tools.module.css`, `BrandFooter.tsx`, `useStore.ts`, `audit-forms.ts`). Lint now passes clean across all 187 files.
+
+### Security audit findings
+| Surface | Status | Notes |
+|--------|--------|-------|
+| `npm audit` (production deps) | ✅ 0 vulnerabilities | |
+| `console.log` leaks | ✅ None | Only `console.error`/`warn` in server error paths |
+| TypeScript `any` | ✅ None | Strict typing throughout |
+| HSTS / security headers | ✅ Set | `next.config.ts` — HSTS, X-Frame-Options, X-Content-Type-Options, COOP, Referrer-Policy, Permissions-Policy |
+| CORS | ✅ Scoped | `/api/lead-email`, `/api/audit` use origin allowlists; never `*` |
+| Env validation | ✅ Zod | `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts` |
+| reCAPTCHA Enterprise | ✅ On all public POSTs | `/api/audit` + `/api/lead-email` verify tokens when `RECAPTCHA_ENTERPRISE_API_KEY` is set |
+| `/api/test/emails` | ✅ Guarded | Returns 404 unless `isGmailTestMode()` |
+| CSP `unsafe-eval` | ⚠️ Present | Required by Next.js client bundles; documented in `build/csp.mjs` |
+
+### Store readiness checklist (pre-implementation)
+Before adding a store, ensure:
+- [ ] Add Stripe (or chosen processor) keys to `src/lib/env/marketing.ts` Zod schema
+- [ ] Create `/api/store/webhook` with **HMAC signature verification** on every incoming webhook
+- [ ] Add per-IP rate limiting to any checkout/order API route (mirroring `src/lighthouse/lib/http.ts` pattern)
+- [ ] Extend CSP `connect-src` in `build/csp.mjs` for Stripe JS (`https://js.stripe.com`, `https://api.stripe.com`) + run `npm run sync:static-headers`
+- [ ] Add Stripe JS script origin to `script-src` in `build/csp.mjs`
+- [ ] Validate all store input with Zod (already the project standard)
+- [ ] Add `X-Stripe-Signature` or equivalent header verification to webhook handler
+- [ ] Ensure no customer PII is logged server-side
+
 ## Site-wide brand + stack unification (2026-04-28)
 
 - **Tech stack accuracy:** Updated footer badges (`SiteFooter.tsx`) → Next.js, Firebase Hosting, Cloudflare, reCAPTCHA Enterprise.

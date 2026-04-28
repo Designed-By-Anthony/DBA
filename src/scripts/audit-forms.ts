@@ -1,15 +1,6 @@
 import { buildPublicLeadPayloadFromFormData } from "@/lib/lead-form-contract";
 import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 
-/** Cloudflare Turnstile browser API (subset) — legacy when Enterprise is off. */
-interface TurnstileApi {
-	reset: (container: string | HTMLElement) => void;
-	execute: (container: string | HTMLElement) => void;
-	remove?: (widgetId: string) => void;
-}
-
-type WindowWithTurnstile = Window & { turnstile?: TurnstileApi };
-
 type GrecaptchaEnterprise = {
 	ready: (cb: () => void) => void;
 	execute: (siteKey: string, opts: { action: string }) => Promise<string>;
@@ -18,14 +9,6 @@ type GrecaptchaEnterprise = {
 type WindowWithGrecaptcha = Window & {
 	grecaptcha?: { enterprise?: GrecaptchaEnterprise };
 };
-
-type AuditFormElement = HTMLFormElement & {
-	__dbaTurnstileResolver?: (token: string | null) => void;
-};
-
-function getTurnstileApi(): TurnstileApi | undefined {
-	return (window as WindowWithTurnstile).turnstile;
-}
 
 function getGrecaptchaEnterprise(): GrecaptchaEnterprise | undefined {
 	return (window as WindowWithGrecaptcha).grecaptcha?.enterprise;
@@ -81,10 +64,7 @@ async function executeRecaptchaEnterprise(
 	}
 	return new Promise((resolve, reject) => {
 		enterprise.ready(() => {
-			void enterprise
-				.execute(siteKey, { action })
-				.then(resolve)
-				.catch(reject);
+			void enterprise.execute(siteKey, { action }).then(resolve).catch(reject);
 		});
 	});
 }
@@ -207,11 +187,6 @@ export function resetAuditFormState(
 
 	void syncGaClientId(form);
 
-	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-	const turnstile = getTurnstileApi();
-	if (turnstileEl && turnstile) {
-		turnstile.reset(turnstileEl);
-	}
 	const recaptchaInput = form.querySelector<HTMLInputElement>(
 		'input[name="g-recaptcha-response"]',
 	);
@@ -460,10 +435,7 @@ export function initFacebookOfferTracking(): void {
 	}
 }
 
-type CaptchaPayload =
-	| { type: "none" }
-	| { type: "turnstile"; token: string }
-	| { type: "recaptcha"; token: string };
+type CaptchaPayload = { type: "none" } | { type: "recaptcha"; token: string };
 
 async function finalizeAuditFormSubmission(
 	form: HTMLFormElement,
@@ -480,21 +452,13 @@ async function finalizeAuditFormSubmission(
 		submitButton.textContent = "Sending...";
 	}
 
-	const turnstileInput = form.querySelector<HTMLInputElement>(
-		'input[name="cf-turnstile-response"]',
-	);
 	const recaptchaInput = form.querySelector<HTMLInputElement>(
 		'input[name="g-recaptcha-response"]',
 	);
 
 	if (captcha.type === "recaptcha") {
 		if (recaptchaInput) recaptchaInput.value = captcha.token;
-		if (turnstileInput) turnstileInput.value = "";
-	} else if (captcha.type === "turnstile") {
-		if (turnstileInput) turnstileInput.value = captcha.token;
-		if (recaptchaInput) recaptchaInput.value = "";
 	} else {
-		if (turnstileInput) turnstileInput.value = "";
 		if (recaptchaInput) recaptchaInput.value = "";
 	}
 
@@ -505,15 +469,12 @@ async function finalizeAuditFormSubmission(
 	formData.set("page_title", document.title);
 	if (captcha.type === "recaptcha") {
 		formData.set("g-recaptcha-response", captcha.token);
-	} else if (captcha.type === "turnstile") {
-		formData.set("cf-turnstile-response", captcha.token);
 	}
 
 	const payload = buildPublicLeadPayloadFromFormData(formData);
 
 	// Read the Augusta tenant id off the form (data attribute) so a single
-	// marketing codebase can represent any tenant in the future. Defaults to
-	// whichever value was wired at build time via PUBLIC_TENANT_ID.
+	// marketing codebase can represent any tenant in the future.
 	const tenantId = form.dataset.tenantId?.trim();
 	const headers: Record<string, string> = {
 		Accept: "application/json",
@@ -571,21 +532,13 @@ async function finalizeAuditFormSubmission(
 			"We could not submit the form right now. Please try again in a moment.",
 		);
 		restoreAuditSubmitButton(submitButton, defaultLabel);
-	} finally {
-		if (captcha.type === "turnstile") {
-			const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-			const turnstile = getTurnstileApi();
-			if (turnstileEl && turnstile) {
-				turnstile.reset(turnstileEl);
-			}
-		}
 	}
 }
 
 /**
- * reCAPTCHA Enterprise (preferred): `grecaptcha.enterprise.execute` on submit.
- * Legacy: invisible Turnstile when `.cf-turnstile` is present. Otherwise submits
- * without a captcha token (server allows when bot keys are unset).
+ * reCAPTCHA Enterprise: `grecaptcha.enterprise.execute` on submit.
+ * When reCAPTCHA is not configured, submits without a token (server
+ * allows when bot keys are unset).
  */
 async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	const submitButton =
@@ -606,9 +559,8 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 		?.trim();
 	if (siteKey) {
 		const action =
-			document.documentElement
-				.getAttribute("data-recaptcha-action")
-				?.trim() || "contact_submit";
+			document.documentElement.getAttribute("data-recaptcha-action")?.trim() ||
+			"contact_submit";
 		try {
 			const token = await executeRecaptchaEnterprise(siteKey, action);
 			await finalizeAuditFormSubmission(form, { type: "recaptcha", token });
@@ -622,81 +574,7 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 		return;
 	}
 
-	const turnstileEl = form.querySelector<HTMLElement>(".cf-turnstile");
-	const tsAny = getTurnstileApi();
-
-	if (turnstileEl && tsAny) {
-		const auditForm = form as AuditFormElement;
-
-		await new Promise<void>((resolve) => {
-			auditForm.__dbaTurnstileResolver = (token: string | null) => {
-				auditForm.__dbaTurnstileResolver = undefined;
-				if (!token) {
-					showAuditFormError(
-						form,
-						"Security check failed. Please refresh the page and try again.",
-					);
-					restoreAuditSubmitButton(submitButton, defaultLabel);
-					try {
-						tsAny.reset(turnstileEl);
-					} catch {
-						/* ignore */
-					}
-					resolve();
-					return;
-				}
-
-				finalizeAuditFormSubmission(form, {
-					type: "turnstile",
-					token,
-				}).finally(resolve);
-			};
-
-			try {
-				tsAny.reset(turnstileEl);
-				tsAny.execute(turnstileEl);
-			} catch {
-				auditForm.__dbaTurnstileResolver = undefined;
-				showAuditFormError(
-					form,
-					"Security check could not start. Please refresh the page and try again.",
-				);
-				restoreAuditSubmitButton(submitButton, defaultLabel);
-				resolve();
-			}
-		});
-		return;
-	}
-
 	await finalizeAuditFormSubmission(form, { type: "none" });
-}
-
-type AuditFormWindow = Window & {
-	__dbaAuditFormTurnstileSuccess?: (token: string) => void;
-	__dbaAuditFormTurnstileFailure?: () => void;
-};
-
-function installAuditFormTurnstileCallbacks(): void {
-	const w = window as AuditFormWindow;
-	if (w.__dbaAuditFormTurnstileSuccess) return;
-
-	w.__dbaAuditFormTurnstileSuccess = (token: string) => {
-		document
-			.querySelectorAll<HTMLFormElement>("[data-audit-form]")
-			.forEach((f) => {
-				const resolver = (f as AuditFormElement).__dbaTurnstileResolver;
-				if (typeof resolver === "function") resolver(token);
-			});
-	};
-
-	w.__dbaAuditFormTurnstileFailure = () => {
-		document
-			.querySelectorAll<HTMLFormElement>("[data-audit-form]")
-			.forEach((f) => {
-				const resolver = (f as AuditFormElement).__dbaTurnstileResolver;
-				if (typeof resolver === "function") resolver(null);
-			});
-	};
 }
 
 function setAuditTrackingFields(form: HTMLFormElement): void {
@@ -710,8 +588,6 @@ function setAuditTrackingFields(form: HTMLFormElement): void {
 export function initAuditForms(): {
 	resetAllSuccessStates: (container?: ParentNode) => void;
 } {
-	installAuditFormTurnstileCallbacks();
-
 	const forms = Array.from(
 		document.querySelectorAll<HTMLFormElement>("[data-audit-form]"),
 	);

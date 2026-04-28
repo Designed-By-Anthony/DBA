@@ -43,8 +43,13 @@ const PREVIEW_TOOLS = [
 ] as const;
 
 export function ToolsPage() {
-	const { waitlistEmail, waitlistStatus, waitlistError, setWaitlistEmail, submitWaitlist } =
-		useToolsStore();
+	const {
+		waitlistEmail,
+		waitlistStatus,
+		waitlistError,
+		setWaitlistEmail,
+		submitWaitlist,
+	} = useToolsStore();
 
 	const isSubmitting = waitlistStatus === "submitting";
 	const isSuccess = waitlistStatus === "success";
@@ -60,14 +65,16 @@ export function ToolsPage() {
 					Small tools. Real leverage for web studios.
 				</h1>
 				<p className={styles.subheading}>
-					A curated set of single-purpose tools built for freelancers and small web agencies —
-					priced to be grabbed without a procurement process. No subscriptions, no bloat.
-					Join the waitlist to get early access and founding-rate pricing.
+					A curated set of single-purpose tools built for freelancers and small
+					web agencies — priced to be grabbed without a procurement process. No
+					subscriptions, no bloat. Join the waitlist to get early access and
+					founding-rate pricing.
 				</p>
 
 				{isSuccess ? (
 					<p className={styles.successMsg}>
-						<span aria-hidden>✓</span> You are on the list. We will email you at launch.
+						<span aria-hidden>✓</span> You are on the list. We will email you at
+						launch.
 					</p>
 				) : (
 					<form
@@ -87,27 +94,38 @@ export function ToolsPage() {
 							aria-label="Email address for waitlist"
 							disabled={isSubmitting}
 						/>
-						<button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+						<button
+							type="submit"
+							className={styles.submitBtn}
+							disabled={isSubmitting}
+						>
 							{isSubmitting ? "Joining…" : "Join Waitlist"}
 						</button>
 					</form>
 				)}
 
-				{waitlistError ? <p className={styles.errorMsg}>{waitlistError}</p> : null}
+				{waitlistError ? (
+					<p className={styles.errorMsg}>{waitlistError}</p>
+				) : null}
 
 				{!isSuccess && (
 					<p className={styles.formNote}>No spam. One email at launch.</p>
 				)}
 			</section>
 
-			<section className={styles.previewSection} aria-labelledby="tools-preview-heading">
+			<section
+				className={styles.previewSection}
+				aria-labelledby="tools-preview-heading"
+			>
 				<p id="tools-preview-heading" className={styles.previewHeading}>
 					What is coming
 				</p>
 				<div className={styles.grid}>
 					{PREVIEW_TOOLS.map((tool) => (
 						<article key={tool.title} className={styles.card}>
-							<span className={styles.cardIcon} aria-hidden>{tool.icon}</span>
+							<span className={styles.cardIcon} aria-hidden>
+								{tool.icon}
+							</span>
 							<span className={styles.cardTag}>{tool.tag}</span>
 							<h2 className={styles.cardTitle}>{tool.title}</h2>
 							<p className={styles.cardDesc}>{tool.desc}</p>

@@ -1545,28 +1545,6 @@ button.reach-out-action {
 	position: relative;
 }
 
-.audit-form-honeypot {
-	position: absolute;
-	left: -9999px;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	opacity: 0;
-	pointer-events: none;
-}
-
-/* Invisible Turnstile — takes no vertical space in the form.
-     Cloudflare still shows the challenge popup when a visitor is
-     flagged as suspicious; the container just has no resting layout. */
-.audit-form .cf-turnstile {
-	margin: 0;
-	padding: 0;
-	display: block;
-}
-.audit-form .cf-turnstile:empty {
-	display: none;
-}
-
 .audit-form-grid {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));

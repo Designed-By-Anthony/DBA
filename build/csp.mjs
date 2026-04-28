@@ -3,7 +3,7 @@
  * Run `npm run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
- * Always-on site needs: Cloudflare Turnstile (forms), Sentry, Lighthouse audit API, Agency OS lead ingest.
+ * Always-on site needs: reCAPTCHA Enterprise (forms), Lighthouse audit API, VertaFlow CRM lead ingest.
  */
 
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
@@ -20,7 +20,7 @@ const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
-/** GA4 + Turnstile loader; no data:/unsafe-eval (report-only probe). */
+/** GA4 + reCAPTCHA loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC = [
 	"'self'",
 	"'unsafe-inline'",
@@ -29,7 +29,6 @@ const REPORT_ONLY_SCRIPT_SRC = [
 	"https://*.googletagmanager.com",
 	"https://www.google.com",
 	"https://www.gstatic.com",
-	"https://challenges.cloudflare.com",
 ].join(" ");
 
 /**
@@ -45,21 +44,17 @@ const SCRIPT_SRC_ENFORCING = [
 	"https://*.googletagmanager.com",
 	"https://www.google.com",
 	"https://www.gstatic.com",
-	"https://challenges.cloudflare.com",
 	"https://client.crisp.chat",
 	"https://settings.crisp.chat",
-	/** Freshworks CRM web forms (form embed only; chat is Crisp). */
-	"https://*.myfreshworks.com",
-	"https://*.freshworks.com",
 ].join(" ");
 
 const DIRECTIVES = {
 	"default-src": "'self'",
 	"script-src": SCRIPT_SRC_ENFORCING,
 	"style-src":
-		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
+		"'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.gstatic.com https://client.crisp.chat",
 	"font-src":
-		"'self' data: https://fonts.gstatic.com https://client.crisp.chat https://*.myfreshworks.com https://*.freshworks.com",
+		"'self' data: https://fonts.gstatic.com https://client.crisp.chat",
 	"img-src":
 		"'self' data: https: blob: https://s3.amazonaws.com https://image.crisp.chat https://client.crisp.chat https://storage.crisp.chat",
 	"connect-src": [
@@ -75,19 +70,13 @@ const DIRECTIVES = {
 		LIGHTHOUSE_AUDIT_API_ORIGIN,
 		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
 		VERTAFLOW_CRM_ORIGIN,
-		"https://challenges.cloudflare.com",
-		"https://*.ingest.us.sentry.io",
-		"https://*.ingest.de.sentry.io",
 		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
 		"https://*.crisp.chat",
 		"wss://*.relay.crisp.chat",
 		"wss://*.relay.rescue.crisp.chat",
-		/** Freshworks CRM web form (no chat). */
-		"https://*.myfreshworks.com",
-		"https://*.freshworks.com",
 	].join(" "),
 	"frame-src":
-		"'self' https://www.google.com https://challenges.cloudflare.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat https://*.myfreshworks.com",
+		"'self' https://www.google.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat",
 	"media-src": "'self'",
 	/** Crisp loads short-lived workers from *.crisp.chat (see Crisp CSP docs). */
 	"worker-src": "'self' blob: https://*.crisp.chat",
@@ -95,7 +84,7 @@ const DIRECTIVES = {
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN} https://*.myfreshworks.com`,
+	"form-action": `'self' ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
 	/**
 	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
 	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that
@@ -106,39 +95,6 @@ const DIRECTIVES = {
 
 const REPORT_TO_GROUP = "csp-endpoint";
 
-/**
- * @param {string} dsn
- * @returns {{ key: string, projectId: string, host: string } | null}
- */
-export function parseSentryDsn(dsn) {
-	try {
-		const u = new URL(dsn);
-		const key = u.username;
-		const projectId = u.pathname.replace(/^\//, "").replace(/\/$/, "");
-		if (!key || !projectId) return null;
-		return { key, projectId, host: u.host };
-	} catch {
-		return null;
-	}
-}
-
-/**
- * Sentry ingest security endpoint for CSP violation reports.
- * @see https://docs.sentry.io/platforms/javascript/security-policy-reporting/
- */
-export function buildSentryCspReportUrl(dsn = process.env.PUBLIC_SENTRY_DSN) {
-	const parsed = parseSentryDsn(dsn ?? "");
-	if (!parsed) return null;
-	const url = new URL(
-		`https://${parsed.host}/api/${parsed.projectId}/security/`,
-	);
-	url.searchParams.set("sentry_key", parsed.key);
-	const env =
-		process.env.SENTRY_CSP_ENVIRONMENT ?? process.env.PUBLIC_SENTRY_ENVIRONMENT;
-	if (env) url.searchParams.set("sentry_environment", env);
-	return url.toString();
-}
-
 function joinDirectives(map) {
 	return Object.entries(map)
 		.map(([k, v]) => `${k} ${v}`)
@@ -146,7 +102,7 @@ function joinDirectives(map) {
 }
 
 /**
- * Enforcing CSP + reporting (report-uri for broad support, report-to for modern browsers).
+ * Enforcing CSP + optional reporting.
  */
 export function buildContentSecurityPolicyEnforcing(reportUrl) {
 	const withReporting = reportUrl
@@ -160,7 +116,7 @@ export function buildContentSecurityPolicyEnforcing(reportUrl) {
 }
 
 /**
- * Stricter policy: script-src without data: and without unsafe-eval (report-only → Sentry).
+ * Stricter policy: script-src without data: and without unsafe-eval (report-only).
  */
 export function buildContentSecurityPolicyReportOnly(reportUrl) {
 	const base = {
@@ -177,13 +133,13 @@ export function buildContentSecurityPolicyReportOnly(reportUrl) {
 	return joinDirectives(withReporting);
 }
 
-/** Enforcing CSP when Sentry reporting may be unavailable (no DSN in env). */
+/** Enforcing CSP when reporting may be unavailable (no endpoint in env). */
 export function buildContentSecurityPolicyEnforcingMaybe(reportUrl) {
 	if (!reportUrl) return joinDirectives(DIRECTIVES);
 	return buildContentSecurityPolicyEnforcing(reportUrl);
 }
 
-/** Report-only CSP when Sentry reporting may be unavailable. */
+/** Report-only CSP when reporting may be unavailable. */
 export function buildContentSecurityPolicyReportOnlyMaybe(reportUrl) {
 	if (!reportUrl) {
 		return joinDirectives({

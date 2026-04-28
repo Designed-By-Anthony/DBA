@@ -1,5 +1,5 @@
 /**
- * Single JSON contract for public leads → server `POST /api/contact`, which
+ * Single JSON contract for public leads → server `POST /api/lead-email`, which
  * forwards to `LEAD_WEBHOOK_URL` (e.g. Convex HTTP action → Slack).
  *
  * Marketing site:
@@ -8,7 +8,6 @@
  *
  * Server:
  *   - reCAPTCHA Enterprise: `RECAPTCHA_ENTERPRISE_API_KEY` + GCP project + site key — when set, `recaptchaToken` is verified.
- *   - Turnstile (legacy): `TURNSTILE_SECRET_KEY` — when set and Enterprise is off, `cfTurnstileResponse` is verified.
  */
 import { z } from "zod";
 
@@ -50,8 +49,6 @@ export const globalLeadIngestBodySchema = globalLeadCoreSchema
 	.innerType()
 	.extend({
 		tenantId: z.string().trim().min(1).max(120).optional(),
-		/** Honeypot — must be absent or empty. */
-		_hp: z.string().optional(),
 		/** Shared secret (body fallback; headers preferred). */
 		secret: z.string().optional(),
 		/** Everything else lands in `leads.metadata` JSONB. */
@@ -72,7 +69,6 @@ const GLOBAL_CORE_KEYS = new Set([
 	"agencyId",
 	"secret",
 	"metadata",
-	"_hp",
 ]);
 
 /**
@@ -97,7 +93,6 @@ export function parseGlobalLeadIngestBody(input: unknown): {
 	metadata: Record<string, unknown>;
 	tenantId?: string;
 	secret?: string;
-	_hp?: string;
 } {
 	const raw = globalLeadIngestBodySchema.parse(input) as Record<
 		string,
@@ -134,7 +129,6 @@ export function parseGlobalLeadIngestBody(input: unknown): {
 				? (raw.agencyId as string).trim()
 				: undefined;
 	const secret = typeof raw.secret === "string" ? raw.secret : undefined;
-	const _hp = typeof raw._hp === "string" ? raw._hp : undefined;
 
 	// Seed metadata with whatever was already under `metadata`, then fold in
 	// any unknown top-level fields (so `{ email, party_size: 4 }` works).
@@ -159,7 +153,6 @@ export function parseGlobalLeadIngestBody(input: unknown): {
 		metadata,
 		tenantId: tenantId || undefined,
 		secret,
-		_hp,
 	};
 }
 
@@ -200,7 +193,7 @@ const aliasString = z.string().optional();
  *
  * The schema is permissive about aliasing: it accepts canonical camelCase keys
  * plus the snake_case keys emitted by the marketing AuditForm (e.g. `first_name`,
- * `cta_source`, `g-recaptcha-response`, `cf-turnstile-response`). Use `parsePublicLeadIngestBody` to
+ * `cta_source`, `g-recaptcha-response`). Use `parsePublicLeadIngestBody` to
  * resolve to a normalized `PublicLeadIngestBody`.
  */
 export const publicLeadIngestBodySchema = z
@@ -221,10 +214,6 @@ export const publicLeadIngestBodySchema = z
 		auditUrl: aliasString,
 		auditReportUrl: aliasString,
 		agencyId: aliasString,
-		_hp: aliasString,
-		cfTurnstileResponse: aliasString,
-		"cf-turnstile-response": aliasString,
-		turnstileToken: aliasString,
 		recaptchaToken: aliasString,
 		"g-recaptcha-response": aliasString,
 		gRecaptchaResponse: aliasString,
@@ -250,7 +239,7 @@ export const publicLeadIngestBodySchema = z
 	})
 	.passthrough();
 
-/** Canonical body for `POST /api/lead` (JSON). Aliases are normalized server-side. */
+/** Canonical body for `POST /api/lead-email` (JSON). Aliases are normalized server-side. */
 export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
 	name: string;
 	email: string;
@@ -261,10 +250,6 @@ export type PublicLeadIngestBody = PublicLeadMarketingMeta & {
 	message?: string;
 	auditUrl?: string;
 	agencyId?: string;
-	/** Honeypot — must be empty */
-	_hp?: string;
-	/** Cloudflare Turnstile token (legacy; used when Enterprise is not configured) */
-	cfTurnstileResponse?: string;
 	/** reCAPTCHA Enterprise token from `grecaptcha.enterprise.execute` */
 	recaptchaToken?: string;
 };
@@ -348,12 +333,6 @@ export function parsePublicLeadIngestBody(
 		]),
 		auditUrl: firstNonEmpty(raw, ["auditUrl", "auditReportUrl"]),
 		agencyId: firstNonEmpty(raw, ["agencyId"]),
-		_hp: typeof raw._hp === "string" ? raw._hp : undefined,
-		cfTurnstileResponse: firstNonEmpty(raw, [
-			"cfTurnstileResponse",
-			"cf-turnstile-response",
-			"turnstileToken",
-		]),
 		recaptchaToken: firstNonEmpty(raw, [
 			"recaptchaToken",
 			"g-recaptcha-response",
@@ -385,8 +364,6 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 	page_title?: string;
 	source_page?: string;
 	ga_client_id?: string;
-	_hp?: string;
-	"cf-turnstile-response"?: string;
 	"g-recaptcha-response"?: string;
 }): PublicLeadIngestBody {
 	const name = trim(fields.first_name);
@@ -395,7 +372,6 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 	const message = trim(fields.biggest_issue);
 	const phone = trim(fields.phone);
 	const company = trim(fields.company);
-	const turnstile = trim(fields["cf-turnstile-response"]);
 	const recaptcha = trim(fields["g-recaptcha-response"]);
 
 	const meta: PublicLeadMarketingMeta = {
@@ -430,8 +406,6 @@ export function buildPublicLeadPayloadFromFormFields(fields: {
 		phone: phone || undefined,
 		company: company || undefined,
 		source,
-		_hp: trim(fields._hp),
-		cfTurnstileResponse: turnstile || undefined,
 		recaptchaToken: recaptcha || undefined,
 	};
 }
@@ -457,8 +431,6 @@ export function buildPublicLeadPayloadFromFormData(
 		page_title: get("page_title"),
 		source_page: get("source_page"),
 		ga_client_id: get("ga_client_id"),
-		_hp: get("_hp"),
-		"cf-turnstile-response": get("cf-turnstile-response"),
 		"g-recaptcha-response": get("g-recaptcha-response"),
 	});
 }

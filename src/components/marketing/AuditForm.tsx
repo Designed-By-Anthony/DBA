@@ -34,8 +34,8 @@ export interface AuditFormProps {
 
 /**
  * Native marketing lead form — wired by `src/scripts/audit-forms.ts`
- * (reCAPTCHA Enterprise or legacy Turnstile + JSON POST). Submits to `action`
- * or `/api/contact`, which forwards to `LEAD_WEBHOOK_URL` on the server.
+ * (reCAPTCHA Enterprise + JSON POST). Submits to `action`
+ * or `/api/lead-email`, which forwards to `LEAD_WEBHOOK_URL` on the server.
  */
 export function AuditForm({
 	ctaSource = "marketing",
@@ -56,7 +56,7 @@ export function AuditForm({
 	formEndpoint,
 }: AuditFormProps) {
 	const formId = useId();
-	const action = formEndpoint?.trim() || "/api/contact";
+	const action = formEndpoint?.trim() || "/api/lead-email";
 
 	return (
 		<form
@@ -77,15 +77,6 @@ export function AuditForm({
 			<input type="hidden" name="referrer_url" value="" />
 			<input type="hidden" name="page_title" value="" />
 			<input type="hidden" name="ga_client_id" value="" />
-			<input
-				type="text"
-				name="_hp"
-				autoComplete="off"
-				tabIndex={-1}
-				aria-hidden="true"
-				className="audit-form-honeypot"
-			/>
-
 			<div data-form-shell>
 				<div className="audit-form-grid">
 					<div className="audit-form-field">
@@ -154,18 +145,6 @@ export function AuditForm({
 				</div>
 
 				<input type="hidden" name="g-recaptcha-response" value="" />
-				{process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? (
-					<>
-						<div
-							className="cf-turnstile"
-							data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-							data-size="invisible"
-							data-callback="__dbaAuditFormTurnstileSuccess"
-							data-error-callback="__dbaTurnstileError"
-						/>
-						<input type="hidden" name="cf-turnstile-response" value="" />
-					</>
-				) : null}
 
 				<p className="audit-form-meta" data-form-error hidden />
 				<div className="audit-form-actions">

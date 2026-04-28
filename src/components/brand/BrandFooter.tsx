@@ -43,16 +43,22 @@ export function BrandFooter({ buildTag }: BrandFooterProps) {
 					</nav>
 
 					<div className="dba-footer-legal">
-						<p className="dba-footer-copy">© {year} {SITE_BRAND.name}</p>
+						<p className="dba-footer-copy">
+							© {year} {SITE_BRAND.name}
+						</p>
 						{SITE_LEGAL_LINKS.map((link) => (
 							<span key={link.href} className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>·</span>
+								<span className="dba-footer-sep" aria-hidden>
+									·
+								</span>
 								<Link href={link.href}>{link.label}</Link>
 							</span>
 						))}
 						{buildTag ? (
 							<span className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>·</span>
+								<span className="dba-footer-sep" aria-hidden>
+									·
+								</span>
 								<span className="dba-footer-meta font-mono">{buildTag}</span>
 							</span>
 						) : null}

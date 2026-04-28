@@ -1,25 +1,24 @@
 /**
- * Interim lead-email handler for the Designed by Anthony marketing forms.
+ * Lead handler for Designed by Anthony marketing forms.
  *
- * Accepts the same JSON payload the marketing AuditForm already posts (see
- * `src/scripts/audit-forms.ts` — it converts FormData to a
- * canonical `PublicLeadIngestBody` via `buildPublicLeadPayloadFromFormData`
- * and sends it with `Content-Type: application/json`) and, instead of
- * forwarding to a CRM, composes a transactional email via Resend and
- * delivers it to `LEAD_EMAIL_TO` (defaults to Anthony's inbox).
+ * Accepts JSON from the marketing AuditForm (`buildPublicLeadPayloadFromFormData`)
+ * and either POSTs to `LEAD_WEBHOOK_URL` (Convex / Slack) or sends a Resend
+ * transactional email to `LEAD_EMAIL_TO`.
  *
- * When **`LEAD_WEBHOOK_URL`** is set, each submission is **POSTed to Convex**
- * (or your URL) as JSON first; email via Resend is optional and runs after a
- * successful webhook when **`RESEND_API_KEY`** is set.
+ * Bot protection: reCAPTCHA Enterprise — enforced when `RECAPTCHA_ENTERPRISE_API_KEY`
+ * is set. Pass `recaptchaToken` (or `g-recaptcha-response`) in the JSON body.
  *
- * Contract match: responds with the same shape `AuditForm` already handles.
  *   - Success: 200 `{ ok: true }`
  *   - Validation: 400 `{ errors: [{ field?, message }] }`
- *   - Turnstile fail: 403 `{ errors: [{ message }] }`
- *   - Resend/config fail: 502/503 `{ errors: [{ message }] }`
+ *   - reCAPTCHA fail: 403 `{ errors: [{ message }] }`
+ *   - Webhook/email fail: 502/503 `{ errors: [{ message }] }`
  */
 
-import { verifyTurnstileToken } from "@lh/lib/turnstile";
+import { getClientAddress } from "@lh/lib/http";
+import {
+	getRecaptchaEnterpriseConfigStatus,
+	verifyRecaptchaEnterpriseToken,
+} from "@lh/lib/recaptchaEnterprise";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -111,15 +110,6 @@ export async function POST(request: Request) {
 		);
 	}
 
-	// Honeypot — silent success for bots to avoid advertising the filter.
-	const honeypot = (rawBody as Record<string, unknown>)._hp;
-	if (typeof honeypot === "string" && honeypot.trim().length > 0) {
-		return NextResponse.json(
-			{ ok: true },
-			{ status: 200, headers: corsHeaders },
-		);
-	}
-
 	let lead: PublicLeadIngestBody;
 	try {
 		lead = parsePublicLeadIngestBody(rawBody);
@@ -140,17 +130,21 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const turnstileToken = lead.cfTurnstileResponse ?? "";
-	const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-	if (turnstileSecret) {
-		if (!turnstileToken) {
-			return NextResponse.json(
-				{ errors: [{ message: "Security verification is required." }] },
-				{ status: 403, headers: corsHeaders },
-			);
-		}
-		const verifyRes = await verifyTurnstileToken(turnstileToken);
-		if (!verifyRes.success) {
+	const recaptchaToken = lead.recaptchaToken ?? "";
+	const clientIp = getClientAddress(request);
+	const recaptchaStatus = getRecaptchaEnterpriseConfigStatus();
+	if (recaptchaStatus === "incomplete") {
+		return NextResponse.json(
+			{ errors: [{ message: "Bot protection is misconfigured." }] },
+			{ status: 503, headers: corsHeaders },
+		);
+	}
+	if (recaptchaStatus === "ready") {
+		const recaptcha = await verifyRecaptchaEnterpriseToken(
+			recaptchaToken,
+			clientIp,
+		);
+		if (!recaptcha.success) {
 			return NextResponse.json(
 				{
 					errors: [
@@ -186,9 +180,8 @@ export async function POST(request: Request) {
 
 	if (leadWebhookUrl) {
 		try {
-			const { cfTurnstileResponse: _turnstile, ...leadForWebhook } = lead;
 			const hookRes = await postLeadIngest(leadWebhookUrl, {
-				...leadForWebhook,
+				...lead,
 				source: "marketing_site",
 			});
 			if (!hookRes.ok) {

@@ -17,7 +17,6 @@ import { businessProfile } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
 import { SiteContactDrawer } from "./SiteContactDrawer";
-import { StreamChatGate } from "./StreamChatGate";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
@@ -377,51 +376,6 @@ window.__dbaRevokeAnalyticsConsent = function () {
   }
 })();`}
 			</Script>
-
-			<Script id="turnstile-lazy" strategy="afterInteractive">
-				{`(function() {
-  var TURNSTILE_TEST_SITEKEY = '1x00000000000000000000AA';
-  window.__dbaTurnstileError = function () { document.querySelectorAll('.cf-turnstile').forEach(function (w) { var form = w.closest('[data-audit-form]'); if (form) { var box = form.querySelector('[data-form-error]'); if (box) { box.textContent = 'Security check could not load. Refresh the page.'; box.removeAttribute('hidden'); } } }); };
-  function applyLoopbackTurnstileSiteKey() {
-    var h = location.hostname;
-    if (h !== 'localhost' && h !== '127.0.0.1') return;
-    document.querySelectorAll('.cf-turnstile').forEach(function (el) { el.setAttribute('data-sitekey', TURNSTILE_TEST_SITEKEY); });
-  }
-  var turnstileLoaded = false;
-  function injectTurnstileScript() {
-    if (turnstileLoaded) return;
-    turnstileLoaded = true;
-    if (document.getElementById('dba-turnstile-loader')) return;
-    var script = document.createElement('script');
-    script.id = 'dba-turnstile-loader';
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-  }
-  function maybeLoadTurnstile(target) {
-    applyLoopbackTurnstileSiteKey();
-    if (!document.querySelector('.cf-turnstile')) return;
-    if (!target) return;
-    var host = target instanceof Element ? target.closest('[data-audit-form]') : null;
-    if (!host) return;
-    injectTurnstileScript();
-  }
-  var bound = false;
-  function bind() {
-    applyLoopbackTurnstileSiteKey();
-    if (bound) return;
-    if (!document.querySelector('.cf-turnstile')) return;
-    bound = true;
-    document.addEventListener('focusin', function (e) { maybeLoadTurnstile(e.target); });
-    document.addEventListener('pointerdown', function (e) { maybeLoadTurnstile(e.target); });
-  }
-  document.addEventListener('DOMContentLoaded', bind, { once: true });
-  if (document.readyState !== 'loading') bind();
-})();`}
-			</Script>
-
-			<StreamChatGate />
 		</>
 	);
 }

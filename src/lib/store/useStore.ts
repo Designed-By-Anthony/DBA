@@ -21,7 +21,10 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 	submitWaitlist: async () => {
 		const { waitlistEmail } = get();
 		if (!waitlistEmail.includes("@")) {
-			set({ waitlistError: "Please enter a valid email address.", waitlistStatus: "error" });
+			set({
+				waitlistError: "Please enter a valid email address.",
+				waitlistStatus: "error",
+			});
 			return;
 		}
 		set({ waitlistStatus: "submitting", waitlistError: null });
@@ -37,7 +40,10 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 			});
 			set({ waitlistStatus: "success" });
 		} catch {
-			set({ waitlistStatus: "error", waitlistError: "Something went wrong. Try again." });
+			set({
+				waitlistStatus: "error",
+				waitlistError: "Something went wrong. Try again.",
+			});
 		}
 	},
 
