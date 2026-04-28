@@ -3,8 +3,8 @@ import { optionalUrl, validateEnv } from "./shared";
 
 /**
  * Lighthouse audit API + report viewer env — same Next.js app on
- * `lighthouse.*` and `/lighthouse/*`. Optional `AUDIT_LEAD_WEBHOOK_*`
- * forwards a minimal audit lead payload to your HTTP webhook (e.g. Convex → Slack).
+ * `lighthouse.*` and `/lighthouse/*`. Qualified leads forward to Convex or
+ * Agency OS via `LEAD_WEBHOOK_URL` / `AGENCY_OS_WEBHOOK_URL`.
  */
 const lighthouseSchema = z
 	.object({
@@ -29,12 +29,22 @@ const lighthouseSchema = z
 		GOOGLE_CLOUD_LOCATION: z.string().trim().optional(),
 		ALLOWED_ORIGINS: z.string().trim().optional(),
 
-		/** POST minimal audit lead JSON after success (e.g. Convex → Slack). Pair with secret. */
-		AUDIT_LEAD_WEBHOOK_URL: optionalUrl,
-		AUDIT_LEAD_WEBHOOK_SECRET: z.string().trim().optional(),
+		/** Convex HTTP action or CRM ingest for audit + marketing leads. */
+		LEAD_WEBHOOK_URL: optionalUrl,
+		LEAD_WEBHOOK_SECRET: z.string().trim().optional(),
+
+		AGENCY_OS_WEBHOOK_URL: optionalUrl,
+		AGENCY_OS_WEBHOOK_SECRET: z.string().trim().optional(),
 		/** POST JSON audit summary after success (e.g. Convex logging pipeline). */
 		AUDIT_LOGGING_WEBHOOK_URL: optionalUrl,
 		REPORT_PUBLIC_BASE_URL: optionalUrl,
+
+		/** When `1`, POST successful audit leads to Freshsales (`FRESHWORKS_CRM_*`). */
+		FRESHWORKS_CRM_SYNC_ENABLED: z.string().trim().optional(),
+		FRESHWORKS_CRM_BASE_URL: optionalUrl,
+		FRESHWORKS_CRM_API_KEY: z.string().trim().optional(),
+		FRESHWORKS_CRM_AUTH_MODE: z.enum(["token", "bearer"]).optional(),
+		FRESHWORKS_CRM_CUSTOM_FIELD_KEYS: z.string().trim().optional(),
 
 		/**
 		 * Interim lead-email bridge (`/api/lead-email`). Active until the
@@ -57,7 +67,7 @@ const lighthouseSchema = z
 		// Only enforce on Vercel (`VERCEL=1`). Skip local/CI.
 		//
 		// This repo ships one Next.js app (marketing + `/lighthouse`). That deploy
-		// often shares Vercel env with other product secrets — same as
+		// often shares Vercel env with Agency OS secrets — same as
 		// `validateMarketingEnv` unified mode. Do **not** hard-fail here by default.
 		//
 		// Legacy: a **dedicated** Lighthouse-only Vercel project should set
@@ -84,7 +94,7 @@ const lighthouseSchema = z
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					path: [key],
-					message: `${key} must not be set on an isolated lighthouse project — env bleed from another product detected.`,
+					message: `${key} must not be set on an isolated lighthouse project — it belongs to Agency OS (env-bleed detected).`,
 				});
 			}
 		}

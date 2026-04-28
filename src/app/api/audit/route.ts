@@ -3,6 +3,7 @@ import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
 import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
 import { isAuditTurnstileStrict } from "@lh/lib/auditTurnstilePolicy";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
+import { createFreshworksLeadFromAudit } from "@lh/lib/freshworksCrm";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
@@ -40,6 +41,7 @@ import {
 	normalizeHttpUrl,
 	normalizeText,
 } from "@lh/lib/validation";
+import { postLeadIngest } from "@/lib/leadWebhook";
 import { after, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -745,15 +747,42 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Optional: POST audit summary to your HTTP webhook (e.g. Convex → Slack).
-			// No-op when URL + secret are not configured.
-			const osWebhook = process.env.AUDIT_LEAD_WEBHOOK_URL?.trim();
-			const osSecret = process.env.AUDIT_LEAD_WEBHOOK_SECRET?.trim();
+			// Convex / unified lead ingest (no secret required unless your HTTP action checks it).
+			const leadWebhook = process.env.LEAD_WEBHOOK_URL?.trim();
+			const leadWebhookSecret = process.env.LEAD_WEBHOOK_SECRET?.trim();
 			const reportPublicBase = (
 				process.env.REPORT_PUBLIC_BASE_URL || "https://designedbyanthony.com"
 			).replace(/\/$/, "");
 
-			if (osWebhook && osSecret) {
+			if (leadWebhook) {
+				tasks.push(
+					postLeadIngest(
+						leadWebhook,
+						{
+							source: "lighthouse_audit",
+							name,
+							email,
+							company,
+							websiteUrl: url,
+							auditReportUrl: `${reportPublicBase}/report/${reportId}`,
+							trustScore,
+							performanceScore: performanceScore ?? 0,
+							accessibilityScore: accessibilityScore ?? 0,
+							bestPracticesScore: bestPracticesScore ?? 0,
+							seoScore: seoScore ?? 0,
+						},
+						{ secret: leadWebhookSecret },
+					).catch((formError) => {
+						console.error("LEAD_WEBHOOK_URL submission failed:", formError);
+					}),
+				);
+			}
+
+			// Legacy: Agency OS webhook (requires URL + secret pair).
+			const osWebhook = process.env.AGENCY_OS_WEBHOOK_URL;
+			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET;
+
+			if (!leadWebhook && osWebhook && osSecret) {
 				tasks.push(
 					fetchWithTimeout(
 						osWebhook,
@@ -777,7 +806,36 @@ export async function POST(request: Request) {
 						},
 						10_000,
 					).catch((formError) => {
-						console.error("[audit] Audit lead webhook failed:", formError);
+						console.error("Agency OS Webhook submission failed:", formError);
+					}),
+				);
+			}
+
+			if (process.env.FRESHWORKS_CRM_SYNC_ENABLED === "1") {
+				tasks.push(
+					createFreshworksLeadFromAudit({
+						name,
+						email,
+						company,
+						location,
+						scannedUrl: url,
+						reportId,
+						reportPublicUrl: `${reportPublicBase}/report/${reportId}`,
+						trustScore,
+						performanceScore: performanceScore ?? 0,
+						accessibilityScore: accessibilityScore ?? 0,
+						bestPracticesScore: bestPracticesScore ?? 0,
+						seoScore: seoScore ?? 0,
+						conversionScore,
+						userAgent: request.headers.get("user-agent") || "",
+					}).then((crmRes) => {
+						if (!crmRes.ok) {
+							console.error(
+								"[audit] Freshworks CRM lead sync failed:",
+								crmRes.error,
+								crmRes.status ?? "",
+							);
+						}
 					}),
 				);
 			}

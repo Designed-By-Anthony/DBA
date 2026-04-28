@@ -1,3 +1,5 @@
+import { isTrustedHostedPreviewHostname } from "@/lib/marketingBrowserOrigins";
+
 const LOCAL_ALLOWED_ORIGINS = new Set([
 	"https://designedbyanthony.com",
 	"https://www.designedbyanthony.com",
@@ -101,6 +103,10 @@ function isAllowedOrigin(origin: string): boolean {
 		(url.hostname === "designedbyanthony.com" ||
 			url.hostname.endsWith(".designedbyanthony.com"))
 	) {
+		return true;
+	}
+
+	if (url.protocol === "https:" && isTrustedHostedPreviewHostname(url.hostname)) {
 		return true;
 	}
 

@@ -8,56 +8,32 @@
  * forwarding to a CRM, composes a transactional email via Resend and
  * delivers it to `LEAD_EMAIL_TO` (defaults to Anthony's inbox).
  *
- * This route is a **bridge** while the VertaFlow CRM tenant is still being
- * provisioned. When the CRM is ready, flip `PUBLIC_INGEST_URL` on the
- * marketing Vercel project back to the VertaFlow ingest URL and this route
- * stops receiving traffic — no code change needed to retire it.
+ * When **`LEAD_WEBHOOK_URL`** is set, each submission is **POSTed to Convex**
+ * (or your URL) as JSON first; email via Resend is optional and runs after a
+ * successful webhook when **`RESEND_API_KEY`** is set.
  *
  * Contract match: responds with the same shape `AuditForm` already handles.
  *   - Success: 200 `{ ok: true }`
  *   - Validation: 400 `{ errors: [{ field?, message }] }`
- *   - Bot check fail: 403 `{ errors: [{ message }] }`
+ *   - Turnstile fail: 403 `{ errors: [{ message }] }`
  *   - Resend/config fail: 502/503 `{ errors: [{ message }] }`
  */
 
+import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
 	type PublicLeadIngestBody,
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
-import { verifyMarketingLeadBotProtection } from "@/lib/marketingBotVerification";
-
-const APEX_SUBDOMAIN_PATTERN =
-	/^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
-const LOCAL_ORIGINS = new Set<string>([
-	"http://localhost:4321",
-	"http://127.0.0.1:4321",
-	"http://localhost:3000", // pragma: allowlist secret
-	"http://127.0.0.1:3000", // pragma: allowlist secret
-	"http://localhost:3100", // pragma: allowlist secret
-	"http://127.0.0.1:3100", // pragma: allowlist secret
-]);
-
-function getClientIp(request: Request): string | null {
-	const xff = request.headers.get("x-forwarded-for");
-	if (xff) {
-		const first = xff.split(",")[0]?.trim();
-		if (first) return first;
-	}
-	return request.headers.get("x-real-ip");
-}
+import { postLeadIngest } from "@/lib/leadWebhook";
+import { buildMarketingLeadApiCorsHeaders } from "@/lib/marketingBrowserOrigins";
 
 function buildCorsHeaders(origin: string | null): Record<string, string> {
-	const isAllowed =
-		!!origin &&
-		(APEX_SUBDOMAIN_PATTERN.test(origin) || LOCAL_ORIGINS.has(origin));
-	const allow = isAllowed && origin ? origin : "https://designedbyanthony.com";
+	const base = buildMarketingLeadApiCorsHeaders(origin);
 	return {
-		"Access-Control-Allow-Origin": allow,
+		...base,
 		"Access-Control-Allow-Methods": "POST, OPTIONS",
-		"Access-Control-Allow-Headers": "Content-Type, Authorization",
-		Vary: "Origin",
 	};
 }
 
@@ -164,39 +140,102 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const bot = await verifyMarketingLeadBotProtection({
-		lead,
-		userAgent: request.headers.get("user-agent"),
-		userIpAddress: getClientIp(request),
-	});
-	if (!bot.ok) {
-		return NextResponse.json(
-			{ errors: [{ message: bot.message }] },
-			{ status: 403, headers: corsHeaders },
-		);
+	const turnstileToken = lead.cfTurnstileResponse ?? "";
+	const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+	if (turnstileSecret) {
+		if (!turnstileToken) {
+			return NextResponse.json(
+				{ errors: [{ message: "Security verification is required." }] },
+				{ status: 403, headers: corsHeaders },
+			);
+		}
+		const verifyRes = await verifyTurnstileToken(turnstileToken);
+		if (!verifyRes.success) {
+			return NextResponse.json(
+				{
+					errors: [
+						{
+							message: "Bot verification failed. Please refresh and try again.",
+						},
+					],
+				},
+				{ status: 403, headers: corsHeaders },
+			);
+		}
 	}
 
+	const leadWebhookUrl = process.env.LEAD_WEBHOOK_URL?.trim();
 	const resendApiKey = process.env.RESEND_API_KEY;
-	const fromEmail =
-		process.env.RESEND_FROM_EMAIL?.trim() || "outreach@designedbyanthony.com";
-	const toEmail = process.env.LEAD_EMAIL_TO || "anthony@designedbyanthony.com";
 
-	if (!resendApiKey) {
+	if (!leadWebhookUrl && !resendApiKey) {
 		console.error(
-			"[lead-email] RESEND_API_KEY is not configured on the lighthouse project; rejecting lead",
+			"[lead-email] Neither LEAD_WEBHOOK_URL nor RESEND_API_KEY is configured; rejecting lead",
 		);
 		return NextResponse.json(
 			{
 				errors: [
 					{
 						message:
-							"Lead email bridge is not configured on this deployment. Please try again later.",
+							"Lead ingest is not configured on this deployment. Please try again later.",
 					},
 				],
 			},
 			{ status: 503, headers: corsHeaders },
 		);
 	}
+
+	if (leadWebhookUrl) {
+		try {
+			const { cfTurnstileResponse: _turnstile, ...leadForWebhook } = lead;
+			const hookRes = await postLeadIngest(leadWebhookUrl, {
+				...leadForWebhook,
+				source: "marketing_site",
+			});
+			if (!hookRes.ok) {
+				const errText = await hookRes.text().catch(() => "");
+				console.error(
+					"[lead-email] LEAD_WEBHOOK_URL rejected",
+					hookRes.status,
+					errText.slice(0, 500),
+				);
+				return NextResponse.json(
+					{
+						errors: [
+							{
+								message:
+									"Could not save your request. Please try again later.",
+							},
+						],
+					},
+					{ status: 502, headers: corsHeaders },
+				);
+			}
+		} catch (err) {
+			console.error(
+				"[lead-email] LEAD_WEBHOOK_URL network error",
+				err instanceof Error ? err.message : err,
+			);
+			return NextResponse.json(
+				{
+					errors: [
+						{
+							message:
+								"Could not save your request. Please try again later.",
+						},
+					],
+				},
+				{ status: 502, headers: corsHeaders },
+			);
+		}
+	}
+
+	if (!resendApiKey) {
+		return NextResponse.json({ ok: true }, { status: 200, headers: corsHeaders });
+	}
+
+	const fromEmail =
+		process.env.RESEND_FROM_EMAIL?.trim() || "outreach@designedbyanthony.com";
+	const toEmail = process.env.LEAD_EMAIL_TO || "anthony@designedbyanthony.com";
 
 	const { text, html } = renderEmail(lead);
 	const subject = `New lead · ${lead.name} · ${lead.leadSource || lead.offerType || "designedbyanthony.com"}`;
@@ -228,6 +267,12 @@ export async function POST(request: Request) {
 				resendRes.status,
 				body,
 			);
+			if (leadWebhookUrl) {
+				return NextResponse.json(
+					{ ok: true, emailDelivered: false },
+					{ status: 200, headers: corsHeaders },
+				);
+			}
 			return NextResponse.json(
 				{
 					errors: [
@@ -245,6 +290,12 @@ export async function POST(request: Request) {
 			"[lead-email] Resend network error",
 			err instanceof Error ? err.message : err,
 		);
+		if (leadWebhookUrl) {
+			return NextResponse.json(
+				{ ok: true, emailDelivered: false },
+				{ status: 200, headers: corsHeaders },
+			);
+		}
 		return NextResponse.json(
 			{
 				errors: [
