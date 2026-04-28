@@ -2,6 +2,14 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Local machine sync with main (2026-04-28)
+
+- **Repository Parity:** Synchronized local `main` branch with `origin/main` using `git reset --hard`.
+- **Environment:** Performed `npm install` and `npm run sync:static-headers` to ensure local alignment with lockfile and security headers.
+- **Lockfile:** Updated `package-lock.json` to reflect current environment and committed for integrity.
+- **Biome:** Updated `biome.json` to exclude agent-specific directories from linting.
+- Validation: `npm run lint` and `npm run build` pass from repo root.
+
 ## Codebase cleanup + pre-store security audit (2026-04-28)
 
 ### Cleanup

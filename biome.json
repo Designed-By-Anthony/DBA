@@ -18,6 +18,11 @@
 			"!**/cypress/screenshots",
 			"!**/cypress/videos",
 			"!**/public/scripts",
+			"!**/.agents",
+			"!**/.claude",
+			"!**/.devin",
+			"!**/.junie",
+			"!**/.windsurf",
 			"!google-cloud-sdk",
 			"!google-cloud-cli-darwin-arm.tar.gz",
 			"!static-headers.json"
