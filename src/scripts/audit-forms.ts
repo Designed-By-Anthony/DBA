@@ -81,10 +81,7 @@ async function executeRecaptchaEnterprise(
 	}
 	return new Promise((resolve, reject) => {
 		enterprise.ready(() => {
-			void enterprise
-				.execute(siteKey, { action })
-				.then(resolve)
-				.catch(reject);
+			void enterprise.execute(siteKey, { action }).then(resolve).catch(reject);
 		});
 	});
 }
@@ -606,9 +603,8 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 		?.trim();
 	if (siteKey) {
 		const action =
-			document.documentElement
-				.getAttribute("data-recaptcha-action")
-				?.trim() || "contact_submit";
+			document.documentElement.getAttribute("data-recaptcha-action")?.trim() ||
+			"contact_submit";
 		try {
 			const token = await executeRecaptchaEnterprise(siteKey, action);
 			await finalizeAuditFormSubmission(form, { type: "recaptcha", token });
