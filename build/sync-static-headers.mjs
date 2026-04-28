@@ -13,35 +13,24 @@ import { fileURLToPath } from "node:url";
 import {
 	buildContentSecurityPolicyEnforcingMaybe,
 	buildContentSecurityPolicyReportOnlyMaybe,
-	buildReportToHeader,
-	buildSentryCspReportUrl,
 } from "./csp.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const staticHeadersPath = join(root, "static-headers.json");
 
-const reportUrl = buildSentryCspReportUrl();
-if (!reportUrl) {
-	console.warn(
-		"sync-static-headers: PUBLIC_SENTRY_DSN unset — CSP will omit report-uri/report-to (for violation reporting).",
-	);
-}
-
-const cspEnforcing = buildContentSecurityPolicyEnforcingMaybe(reportUrl);
-const cspReportOnly = buildContentSecurityPolicyReportOnlyMaybe(reportUrl);
-const reportTo = reportUrl ? buildReportToHeader(reportUrl) : null;
+const cspEnforcing = buildContentSecurityPolicyEnforcingMaybe(null);
+const cspReportOnly = buildContentSecurityPolicyReportOnlyMaybe(null);
 
 /** hstspreload.org requires this exact policy on responses (not only on static assets). */
 const HSTS_PRELOAD = "max-age=63072000; includeSubDomains; preload";
 
-/** HTML-document headers (CSP + cache-busting + reporting). */
+/** HTML-document headers (CSP + cache-busting). */
 const htmlHeaders = [
 	{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
 	{ key: "Strict-Transport-Security", value: HSTS_PRELOAD },
 	{ key: "Content-Security-Policy", value: cspEnforcing },
 	{ key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
-	...(reportTo ? [{ key: "Report-To", value: reportTo }] : []),
 ];
 
 // ---------------------------------------------------------------------------

@@ -1,36 +1,9 @@
-import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import { validateLighthouseEnv } from "@/lib/env/lighthouse";
 import { validateMarketingEnv } from "@/lib/env/marketing";
 
 validateMarketingEnv();
 validateLighthouseEnv();
-
-/**
- * `@sentry/nextjs` merges `experimental.clientTraceMetadata` for tracing; Next 16
- * then prints it under "Experiments (use with caution)". We keep Sentry but drop
- * that flag so production builds stay quiet (pageload trace headers are optional here).
- */
-function withoutExperimentalClientTraceMetadata(
-	config: NextConfig,
-): NextConfig {
-	const experimental = config.experimental;
-	if (
-		!experimental ||
-		experimental.clientTraceMetadata === undefined ||
-		experimental.clientTraceMetadata.length === 0
-	) {
-		return config;
-	}
-	const { clientTraceMetadata: _trace, ...restExperimental } = experimental;
-	const keys = Object.keys(restExperimental);
-	return {
-		...config,
-		...(keys.length > 0
-			? { experimental: restExperimental }
-			: { experimental: undefined }),
-	};
-}
 
 const nextConfig: NextConfig = {
 	trailingSlash: false,
@@ -94,22 +67,4 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withoutExperimentalClientTraceMetadata(
-	withSentryConfig(nextConfig, {
-		org: process.env.SENTRY_ORG ?? "designed-by-anthony",
-		project: process.env.SENTRY_PROJECT ?? "marketing",
-		authToken: process.env.SENTRY_AUTH_TOKEN,
-		widenClientFileUpload: true,
-		tunnelRoute: "/monitoring",
-		silent: !process.env.CI,
-		errorHandler: (err) => {
-			console.warn("[Sentry build plugin]", err.message);
-		},
-		webpack: {
-			automaticVercelMonitors: false,
-			treeshake: {
-				removeDebugLogging: true,
-			},
-		},
-	}) as NextConfig,
-);
+export default nextConfig;

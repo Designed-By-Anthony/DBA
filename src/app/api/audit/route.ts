@@ -1,7 +1,6 @@
 import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
 import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
 import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
-import { isAuditTurnstileStrict } from "@lh/lib/auditTurnstilePolicy";
 import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
 import {
 	buildReceiptEmail,
@@ -12,7 +11,6 @@ import { type HtmlScanResult, scanHtml } from "@lh/lib/htmlScanner";
 import {
 	buildCorsHeaders,
 	checkLocalRateLimit,
-	fetchWithTimeout,
 	getClientAddress,
 } from "@lh/lib/http";
 import {
@@ -32,13 +30,11 @@ import {
 } from "@lh/lib/recaptchaEnterprise";
 import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
 import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
-import { createProjectSheet, pushLeadRow } from "@lh/lib/sheetsSync";
 import { type SitewideScanResult, scanSitewide } from "@lh/lib/sitewideScan";
 import {
 	isResendConfigured,
 	sendTransactionalEmail,
 } from "@lh/lib/transactionalResend";
-import { verifyTurnstileToken } from "@lh/lib/turnstile";
 import {
 	normalizeEmail,
 	normalizeHttpUrl,
@@ -126,8 +122,6 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const turnstileToken =
-			typeof body.turnstileToken === "string" ? body.turnstileToken : "";
 		const recaptchaToken =
 			typeof body.recaptchaToken === "string" ? body.recaptchaToken : "";
 		const clientIp = getClientAddress(request);
@@ -144,30 +138,6 @@ export async function POST(request: Request) {
 				clientIp,
 			);
 			if (!recaptcha.success) {
-				return NextResponse.json(
-					{
-						error:
-							"Bot verification failed. Please refresh the page and try again.",
-					},
-					{ status: 403, headers: responseHeaders },
-				);
-			}
-		}
-
-		const strictTurnstile = isAuditTurnstileStrict();
-		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
-		if (strictTurnstile) {
-			if (!turnstileSecret) {
-				return NextResponse.json(
-					{
-						error:
-							"Audit bot protection is misconfigured (strict Turnstile without secret).",
-					},
-					{ status: 503, headers: responseHeaders },
-				);
-			}
-			const turnstile = await verifyTurnstileToken(turnstileToken, clientIp);
-			if (!turnstile.success) {
 				return NextResponse.json(
 					{
 						error:
@@ -702,26 +672,7 @@ export async function POST(request: Request) {
 		}
 
 		after(async () => {
-			const tasks: Promise<unknown>[] = [
-				pushLeadRow({
-					reportId,
-					name,
-					email,
-					company,
-					location,
-					url,
-					trustScore,
-					performance: performanceScore ?? 0,
-					accessibility: accessibilityScore ?? 0,
-					bestPractices: bestPracticesScore ?? 0,
-					seo: seoScore ?? 0,
-					conversion: conversionScore,
-					rating: placesData.rating,
-					lcp,
-					failedAuditCount,
-					criticalIssue,
-				}),
-			];
+			const tasks: Promise<unknown>[] = [];
 
 			// Automatically trigger email receipt on completion if Gmail is setup
 			if (reportPersisted && (isGmailConfigured() || isResendConfigured())) {
@@ -805,71 +756,6 @@ export async function POST(request: Request) {
 					}),
 				);
 			}
-
-			// Legacy: Agency OS webhook (requires URL + secret pair).
-			const osWebhook = process.env.AGENCY_OS_WEBHOOK_URL;
-			const osSecret = process.env.AGENCY_OS_WEBHOOK_SECRET;
-
-			if (!leadWebhook && osWebhook && osSecret) {
-				tasks.push(
-					fetchWithTimeout(
-						osWebhook,
-						{
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								Accept: "application/json",
-								"x-lead-secret": osSecret,
-							},
-							body: JSON.stringify({
-								email,
-								name,
-								company,
-								websiteUrl: url,
-								source: "audit",
-								auditReportUrl: `${reportPublicBase}/report/${reportId}`,
-								trustScore,
-								performanceScore: performanceScore ?? 0,
-							}),
-						},
-						10_000,
-					).catch((formError) => {
-						console.error("Agency OS Webhook submission failed:", formError);
-					}),
-				);
-			}
-
-			// Create project-level Google Sheet for this lead
-			await createProjectSheet({
-				projectCode: reportId,
-				source: "audit",
-				name,
-				email,
-				company,
-				url,
-				location,
-				trustScore,
-				performance: performanceScore ?? 0,
-				accessibility: accessibilityScore ?? 0,
-				bestPractices: bestPracticesScore ?? 0,
-				seo: seoScore ?? 0,
-				conversion: conversionScore,
-				rating: placesData.rating,
-				reviewCount: placesData.userRatingCount,
-				fcp,
-				lcp,
-				tbt,
-				cls,
-				failedAuditCount,
-				criticalIssue,
-				executiveSummary: aiInsightResult.executiveSummary,
-				strengths: aiInsightResult.strengths,
-				weaknesses: aiInsightResult.weaknesses,
-				prioritizedActions: aiInsightResult.prioritizedActions,
-			}).catch((sheetErr) => {
-				console.error("Project sheet creation failed:", sheetErr);
-				return null;
-			});
 
 			if (process.env.AUDIT_LOGGING_WEBHOOK_URL?.trim()) {
 				tasks.push(

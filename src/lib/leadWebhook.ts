@@ -1,16 +1,10 @@
 /**
- * Server-side Convex / CRM lead ingest. Set `LEAD_WEBHOOK_URL` to your HTTP
- * action (e.g. `https://….convex.site/webhook/lead`). Optional
- * `LEAD_WEBHOOK_SECRET` is sent as `x-lead-secret` when set.
+ * Server-side lead ingest. Set `LEAD_WEBHOOK_URL` to your HTTP action
+ * (e.g. `https://….convex.site/webhook/lead`). Optional `LEAD_WEBHOOK_SECRET`
+ * is sent as `x-lead-secret` when set.
  */
 
 const INGEST_TIMEOUT_MS = 15_000;
-
-export function resolveContactLeadIngestUrl(): string | undefined {
-	const primary = process.env.LEAD_WEBHOOK_URL?.trim();
-	if (primary) return primary;
-	return process.env.AGENCY_OS_LEAD_INGEST_URL?.trim() || undefined;
-}
 
 export function resolveLeadWebhookSecret(): string | undefined {
 	return process.env.LEAD_WEBHOOK_SECRET?.trim() || undefined;
