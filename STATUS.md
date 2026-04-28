@@ -14,14 +14,11 @@
 | `console.log` leaks | ✅ None | Only `console.error`/`warn` in server error paths |
 | TypeScript `any` | ✅ None | Strict typing throughout |
 | HSTS / security headers | ✅ Set | `next.config.ts` — HSTS, X-Frame-Options, X-Content-Type-Options, COOP, Referrer-Policy, Permissions-Policy |
-| CORS | ✅ Scoped | `/api/contact`, `/api/stream-chat-token` use origin allowlists; never `*` |
+| CORS | ✅ Scoped | `/api/lead-email`, `/api/audit` use origin allowlists; never `*` |
 | Env validation | ✅ Zod | `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts` |
-| Turnstile bot protection | ✅ On public POSTs | `/api/contact` always requires token; `/api/audit` opt-in via `LIGHTHOUSE_STRICT_TURNSTILE` |
-| `/api/debug/sentry` | ✅ Guarded | Returns 404 outside `NODE_ENV=development` |
+| reCAPTCHA Enterprise | ✅ On all public POSTs | `/api/audit` + `/api/lead-email` verify tokens when `RECAPTCHA_ENTERPRISE_API_KEY` is set |
 | `/api/test/emails` | ✅ Guarded | Returns 404 unless `isGmailTestMode()` |
 | CSP `unsafe-eval` | ⚠️ Present | Required by Next.js client bundles; documented in `build/csp.mjs` |
-| `/api/stream-chat-token` | ⚠️ No rate limit | Token endpoint has no per-IP limiting; acceptable for low-traffic widget but add before scaling |
-| `/api/contact` | ℹ️ Deprecated | Marked sunset `2026-11-01`; still live and guarded |
 
 ### Store readiness checklist (pre-implementation)
 Before adding a store, ensure:
