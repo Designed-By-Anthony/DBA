@@ -380,7 +380,7 @@ export function AuditResults({
 							<p className="lighthouse-result-eyebrow">What&apos;s working</p>
 							<h3 className="lighthouse-result-heading text-lg">Strengths</h3>
 							<ul className="space-y-2">
-								{data.aiInsight!.strengths.map((s) => (
+								{data.aiInsight?.strengths?.map((s) => (
 									<li
 										key={s}
 										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"
@@ -397,7 +397,7 @@ export function AuditResults({
 							<p className="lighthouse-result-eyebrow">What needs work</p>
 							<h3 className="lighthouse-result-heading text-lg">Gaps found</h3>
 							<ul className="space-y-2">
-								{data.aiInsight!.weaknesses.map((w) => (
+								{data.aiInsight?.weaknesses?.map((w) => (
 									<li
 										key={w}
 										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"

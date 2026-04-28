@@ -638,7 +638,7 @@ function PrintReport({
 									What&apos;s working
 								</p>
 								<ul style={{ paddingLeft: 0, margin: 0, listStyle: "none" }}>
-									{data.aiInsight!.strengths.map((s) => (
+									{data.aiInsight?.strengths?.map((s) => (
 										<li
 											key={s}
 											style={{
@@ -671,7 +671,7 @@ function PrintReport({
 									Gaps found
 								</p>
 								<ul style={{ paddingLeft: 0, margin: 0, listStyle: "none" }}>
-									{data.aiInsight!.weaknesses.map((w) => (
+									{data.aiInsight?.weaknesses?.map((w) => (
 										<li
 											key={w}
 											style={{
