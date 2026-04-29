@@ -1,5 +1,14 @@
 import { constants } from "node:fs";
-import { access, cp, mkdir, readdir, rename, rm, stat, unlink } from "node:fs/promises";
+import {
+	access,
+	cp,
+	mkdir,
+	readdir,
+	rename,
+	rm,
+	stat,
+	unlink,
+} from "node:fs/promises";
 import { join, relative } from "node:path";
 
 /** Cloudflare Pages rejects individual static files larger than this (deploy validation). */

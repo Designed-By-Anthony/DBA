@@ -23,7 +23,7 @@
 - Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `npm install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
 - Aligned the web package `build` script and Wrangler Pages config with Cloudflare's `/apps/web` root plus `/.vercel/output/static` output directory.
 - **`prepare-pages-bundle.mjs`:** strip static files over Cloudflare Pages’ **25 MiB** per-file cap from `.vercel/output/static` before deploy (safety net if large media is reintroduced under `public/`).
-- Removed unused tracked asset `public/media/designed-by-anthony-showreel.mp4` (~40 MiB) which exceeded the Pages limit and was not referenced in app source.
+- Removed `/brand/mark.webp` route handler and filesystem hashing in `MarketingChrome` (Workers lack a reliable disk mirror of `public/`); `/brand/mark.webp` is served as a static asset; script URL cache-bust uses `NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID` from `CF_PAGES_COMMIT_SHA` / `VERCEL_GIT_COMMIT_SHA` at build time.
 - Validation: Cloudflare-equivalent `npx bun install && npx bun x turbo run build --filter=@dba/web` from `apps/web`, plus root `npx bun run build` and `npx bun run lint`, all pass; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
 
 ## Local machine sync with main (2026-04-28)
