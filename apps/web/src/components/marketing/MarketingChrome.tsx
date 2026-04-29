@@ -1,6 +1,3 @@
-import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -20,15 +17,9 @@ import { SiteContactDrawer } from "./SiteContactDrawer";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
-let siteScriptVersion = "dev";
-try {
-	siteScriptVersion = createHash("sha256")
-		.update(readFileSync(join(process.cwd(), "public/scripts/site.js")))
-		.digest("hex")
-		.slice(0, 12);
-} catch {
-	/* preview without built script */
-}
+/** Build-time id (see `next.config.ts` env); avoids filesystem reads on Cloudflare Workers. */
+const siteScriptVersion =
+	process.env.NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID ?? "local";
 
 export function MarketingChrome({
 	children,

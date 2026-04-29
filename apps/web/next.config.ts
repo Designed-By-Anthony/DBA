@@ -6,6 +6,13 @@ validateMarketingEnv();
 validateLighthouseEnv();
 
 const nextConfig: NextConfig = {
+	/** Cache-bust `/scripts/site.js` — inlined at build time (Cloudflare Pages injects CF_PAGES_COMMIT_SHA). */
+	env: {
+		NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID:
+			process.env.CF_PAGES_COMMIT_SHA?.slice(0, 12) ??
+			process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ??
+			"local",
+	},
 	trailingSlash: false,
 	reactStrictMode: true,
 	// sharp is not available in Cloudflare Workers; use unoptimized images
