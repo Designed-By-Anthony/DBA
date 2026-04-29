@@ -1,5 +1,5 @@
 import { constants } from "node:fs";
-import { access, cp, mkdir, readdir, rm, stat, unlink } from "node:fs/promises";
+import { access, cp, mkdir, readdir, rename, rm, stat, unlink } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 /** Cloudflare Pages rejects individual static files larger than this (deploy validation). */
@@ -8,7 +8,6 @@ const PAGES_MAX_STATIC_ASSET_BYTES = 25 * 1024 * 1024;
 const appRoot = process.cwd();
 const openNextDir = join(appRoot, ".open-next");
 const workerEntry = join(openNextDir, "worker.js");
-const assetsDir = join(openNextDir, "assets");
 const pagesOutputDir = join(appRoot, ".vercel/output/static");
 
 async function assertExists(path) {
@@ -42,13 +41,18 @@ async function dropOversizedPagesAssets(dir) {
 
 async function main() {
 	await assertExists(workerEntry);
-	await assertExists(assetsDir);
+	await assertExists(join(openNextDir, "assets"));
 
+	// Cloudflare Pages expects `_worker.js` next to every module it imports.
+	// Copy the full OpenNext bundle (not only `assets/`), then rename the worker entry.
 	await rm(pagesOutputDir, { recursive: true, force: true });
 	await mkdir(pagesOutputDir, { recursive: true });
-	await cp(assetsDir, pagesOutputDir, { recursive: true });
+	await cp(openNextDir, pagesOutputDir, { recursive: true });
 	await dropOversizedPagesAssets(pagesOutputDir);
-	await cp(workerEntry, join(pagesOutputDir, "_worker.js"));
+	await rename(
+		join(pagesOutputDir, "worker.js"),
+		join(pagesOutputDir, "_worker.js"),
+	);
 }
 
 main().catch((error) => {
