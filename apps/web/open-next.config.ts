@@ -1,3 +1,9 @@
-import { defineCloudflareConfig } from "@opennextjs/cloudflare";
+import {
+	defineCloudflareConfig,
+	type OpenNextConfig,
+} from "@opennextjs/cloudflare";
 
-export default defineCloudflareConfig();
+export default {
+	...defineCloudflareConfig(),
+	buildCommand: "bun run build:next",
+} satisfies OpenNextConfig;

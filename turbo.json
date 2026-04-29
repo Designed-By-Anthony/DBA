@@ -8,6 +8,8 @@
 				".next/**",
 				"!.next/cache/**",
 				".open-next/**",
+				".vercel/output/static/**",
+				".pages-output/**",
 				"dist/**",
 				"public/scripts/**"
 			]

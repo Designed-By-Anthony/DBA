@@ -6,7 +6,7 @@ const appRoot = process.cwd();
 const openNextDir = join(appRoot, ".open-next");
 const workerEntry = join(openNextDir, "worker.js");
 const assetsDir = join(openNextDir, "assets");
-const pagesOutputDir = join(appRoot, ".pages-output");
+const pagesOutputDir = join(appRoot, ".vercel/output/static");
 
 async function assertExists(path) {
 	await access(path, constants.F_OK);

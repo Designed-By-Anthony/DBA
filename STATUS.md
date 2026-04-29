@@ -20,7 +20,8 @@
 - Confirmed the target architecture as Turborepo + `apps/web` Next.js on Cloudflare Pages + `apps/api` ElysiaJS on Cloudflare Workers; updated operator docs, footer stack badges, and hidden tech fingerprints to remove stale Firebase/npm references.
 - Switched host redirects from Next.js `proxy.ts` to Edge `middleware.ts` so OpenNext can build for Cloudflare Pages.
 - Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `npm install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
-- Validation: `npx bun run build` and `npx bun run lint` pass from repo root; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
+- Aligned the web package `build` script and Wrangler Pages config with Cloudflare's `/apps/web` root plus `/.vercel/output/static` output directory.
+- Validation: Cloudflare-equivalent `npx bun install && npx bun x turbo run build --filter=@dba/web` from `apps/web`, plus root `npx bun run build` and `npx bun run lint`, all pass; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
 
 ## Local machine sync with main (2026-04-28)
 

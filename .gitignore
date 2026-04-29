@@ -21,6 +21,7 @@ apps/web-viewer/zapier-platform-example-app-github/
 # Cloudflare Workers build output and local dev secrets
 apps/web/.open-next/
 apps/web/.pages-output/
+apps/web/.vercel/
 apps/web/.dev.vars
 .dev.vars
 

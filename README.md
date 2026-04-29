@@ -34,7 +34,7 @@ bun install
 bun run dev       # turbo: Next.js (:3000) + Elysia Worker (:8787)
 bun run dev:web   # Next.js frontend only
 bun run dev:api   # ElysiaJS Worker only
-bun run build     # turbo: full production build
+bun run build     # turbo: full production build (web emits .vercel/output/static for Pages)
 ```
 
 Deploy commands:
@@ -44,7 +44,7 @@ bun run deploy:web     # Cloudflare Pages frontend
 bun run deploy:api     # Cloudflare Worker API
 ```
 
-`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages → Settings → Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity.
+`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages → Settings → Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. Cloudflare Pages should use root `/apps/web`, build command `bun install && bun x turbo run build --filter=@dba/web`, and output `/.vercel/output/static`.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 
