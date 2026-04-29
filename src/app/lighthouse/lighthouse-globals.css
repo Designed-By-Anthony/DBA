@@ -1954,6 +1954,17 @@
 		background-color 0.25s ease;
 }
 
+/* Suppress Chrome's yellow/light autofill overlay on dark inputs */
+.lh-field:-webkit-autofill,
+.lh-field:-webkit-autofill:hover,
+.lh-field:-webkit-autofill:focus {
+	-webkit-box-shadow:
+		0 0 0 1000px rgba(7, 10, 17, 0.95) inset,
+		inset 0 1px 0 rgba(255, 255, 255, 0.035);
+	-webkit-text-fill-color: #fff;
+	caret-color: #fff;
+}
+
 .lh-field:focus {
 	box-shadow:
 		0 0 0 2px rgb(var(--accent-bronze-rgb) / 0.12),
@@ -1967,6 +1978,17 @@
 		border-color 0.3s ease,
 		box-shadow 0.3s ease,
 		background-color 0.3s ease;
+}
+
+.lh-url-input:-webkit-autofill,
+.lh-url-input:-webkit-autofill:hover,
+.lh-url-input:-webkit-autofill:focus {
+	-webkit-box-shadow:
+		0 0 0 1000px rgba(10, 14, 22, 0.95) inset,
+		0 18px 40px -20px rgba(201, 168, 108, 0.15),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	-webkit-text-fill-color: #fff;
+	caret-color: #fff;
 }
 
 .lh-url-input:focus {
