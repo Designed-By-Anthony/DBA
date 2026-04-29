@@ -8,6 +8,10 @@ validateLighthouseEnv();
 const nextConfig: NextConfig = {
 	trailingSlash: false,
 	reactStrictMode: true,
+	// sharp is not available in Cloudflare Workers; use unoptimized images
+	images: {
+		unoptimized: true,
+	},
 	experimental: {
 		/** Tree-shake `framer-motion` re-exports so only used motion primitives ship. */
 		optimizePackageImports: ["framer-motion"],

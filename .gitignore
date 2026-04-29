@@ -18,6 +18,10 @@ dba-website-prod-*.json
 apps/web-viewer/zapier-platform-example-app-github/
 .env*.local
 
+# Cloudflare Workers build output and local dev secrets
+.open-next/
+.dev.vars
+
 # Removed app; delete locally if present (some installs had root-owned node_modules):
 apps/lighthouse/
 

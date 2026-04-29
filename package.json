@@ -35,6 +35,9 @@
 		"prebuild": "npm run build:site-script && npm run sync:static-headers",
 		"dev": "npm run build:site-script && next dev",
 		"build": "next build",
+		"build:worker": "opennextjs-cloudflare build",
+		"preview:worker": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
 		"start": "next start",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write --unsafe",
@@ -65,6 +68,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
+		"@opennextjs/cloudflare": "^1.19.4",
 		"@playwright/test": "^1.52.0",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^22.10.2",
@@ -74,6 +78,7 @@
 		"cypress": "^15.14.0",
 		"esbuild": "^0.28.0",
 		"tailwindcss": "^4",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"wrangler": "^4.86.0"
 	}
 }

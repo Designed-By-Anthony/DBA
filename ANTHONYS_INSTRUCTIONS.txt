@@ -32,9 +32,16 @@ Open the folder "Designed_By_Anthony" as the workspace root.
 
 Firebase App Hosting
 --------------------
-• Root Directory: repository root (`.`).
-• Install / build: `npm ci` and `npm run build` (see `package.json`; `apphosting.yaml` at repo root configures the Cloud Run backend).
-• Connect the **GitHub** repo in Firebase console; set `LEAD_WEBHOOK_URL` and other env in App Hosting → Environment / Secrets.
+(Removed — app now deploys to Cloudflare Workers)
+
+Cloudflare Workers
+------------------
+• Build command: `npm run build:worker`  (runs `opennextjs-cloudflare build`)
+• Deploy:        `npm run deploy`         (build + deploy via Wrangler)
+• Preview local: `npm run preview:worker` (Cloudflare Workers emulation)
+• Auth:          `npx wrangler login` once — then deploy from CLI or CI.
+• Secrets:       `wrangler secret put <KEY>`  OR  Cloudflare dashboard →
+                 Workers & Pages → designed-by-anthony → Settings → Variables & Secrets.
 
 Cloudflare / GCP
 -----------------
