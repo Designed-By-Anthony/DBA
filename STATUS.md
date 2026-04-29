@@ -4,6 +4,8 @@
 
 ## Pages frontend + Worker API decoupling rollout (2026-04-29)
 
+- Cloudflare Pages **deploy command** must stay **empty** (or a no-op): **`wrangler versions upload`** targets standalone Workers and fails with “Missing entry-point”; Pages uploads `_worker.js` from `pages_build_output_dir` after build.
+
 - Added root `packageManager` metadata to unblock Turbo workspace resolution in Bun/CI.
 - Switched `apps/web` default deploy path to Cloudflare Pages (`deploy:pages`) while keeping a Worker fallback script (`deploy:worker`).
 - Added `apps/web/build/prepare-pages-bundle.mjs` to package OpenNext output into `.vercel/output/static` (full `.open-next` copy + `worker.js` → `_worker.js`) so Pages’ Wrangler step can resolve `./cloudflare/*`, `middleware/`, and `server-functions/` imports; copying only `assets/` previously broke the upload bundle step.
