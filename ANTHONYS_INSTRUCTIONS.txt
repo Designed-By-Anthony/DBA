@@ -1,40 +1,59 @@
-Designed by Anthony — single Next.js app (root) — operator notes
-================================================================
+Designed by Anthony — Turborepo monorepo (apps/web + apps/api) — operator notes
+================================================================================
 
 Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 
 Layout
 ------
-• One Next.js 16 app at the repo root: `src/` (marketing + `/lighthouse`), `public/`, `next.config.ts`, `apphosting.yaml`.
-• Supporting folders at root (not separate deploys from this repo): `customer-site-embeds/`, `vertaflow-crm/` stubs or assets as applicable — see README.
+• Turborepo monorepo at the repo root (Bun workspaces).
+• apps/web  — Next.js 16 app (marketing + /lighthouse), deployed on Cloudflare Pages: src/, public/, next.config.ts, wrangler.jsonc
+• apps/api  — ElysiaJS Cloudflare Worker (api.designedbyanthony.com): src/routes/, wrangler.jsonc
+• packages/shared (@dba/shared) — shared business logic: lighthouse/lib/, lib/
+• Supporting folders at root (not separate deploys): customer-site-embeds/, vertaflow-crm/
 
 Global theme (single source of truth)
 -------------------------------------
-• Author global tokens in: `src/styles/theme.css`
-• Keep in sync: `src/design-system/tokens.css` (same :root variables/values).
-• App CSS entry: `src/design-system/dba-global.css`
+• Author global tokens in: apps/web/src/styles/theme.css
+• Keep in sync: apps/web/src/design-system/tokens.css (same :root variables/values).
+• App CSS entry: apps/web/src/design-system/dba-global.css
 
 First-time setup
 ----------------
 1. cd to Designed_By_Anthony
-2. npm install
+2. bun install
 3. Copy `.env.example` → `.env` / `.env.local` as needed for local dev.
 
 Development
 -----------
 From repo root:
-  npm run dev     — builds `public/scripts/site.js`, then Next on :3000
-  npm run build   — prebuild (site script + sync headers) + production build
+  bun run dev        — turbo: starts both Next.js (:3000) and Wrangler API (:8787) in parallel
+  bun run dev:web    — Next.js only on :3000
+  bun run dev:api    — Wrangler ElysiaJS API only on :8787
+  bun run build      — turbo: full production build of both apps
+  bun run typecheck  — turbo: tsc --noEmit across all packages
 
-Cursor / IDE
-------------
-Open the folder "Designed_By_Anthony" as the workspace root.
+Cloudflare Pages + Workers
+--------------------------
+• Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
+• Next.js Worker fallback: bun run --cwd apps/web deploy:worker
+• API Worker:       bun run deploy:api   (wrangler deploy from apps/api)
+• Auth:             npx wrangler login once — then deploy from CLI or CI.
+• Secrets/vars (web): Cloudflare Pages project settings
+• Secrets (api):    wrangler secret put <KEY> --cwd apps/api
 
-Firebase App Hosting
---------------------
-• Root Directory: repository root (`.`).
-• Install / build: `npm ci` and `npm run build` (see `package.json`; `apphosting.yaml` at repo root configures the Cloud Run backend).
-• Connect the **GitHub** repo in Firebase console; set `LEAD_WEBHOOK_URL` and other env in App Hosting → Environment / Secrets.
+API Worker secrets (apps/api)
+------------------------------
+GOOGLE_PAGESPEED_API_KEY, GEMINI_API_KEY, GMAIL_SERVICE_ACCOUNT_KEY,
+RESEND_API_KEY, RESEND_FROM_EMAIL, LEAD_EMAIL_TO, LEAD_WEBHOOK_URL,
+LEAD_WEBHOOK_SECRET, AUDIT_LOGGING_WEBHOOK_URL, REPORT_PUBLIC_BASE_URL,
+GOOGLE_PLACES_API_KEY, MOZ_API_CREDENTIALS, RECAPTCHA_ENTERPRISE_API_KEY,
+RECAPTCHA_ENTERPRISE_PROJECT_ID, RECAPTCHA_ENTERPRISE_SITE_KEY,
+GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, ALLOWED_ORIGINS
+
+Next.js frontend env (apps/web)
+-------------------------------
+NEXT_PUBLIC_API_BASE_URL   (e.g. https://api.designedbyanthony.com)
+NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY, NEXT_PUBLIC_CRISP_WEBSITE_ID
 
 Cloudflare / GCP
 -----------------
@@ -46,5 +65,5 @@ VertaFlow CRM (separate product)
 
 Public leads
 ------------
-• Marketing forms POST to **`/api/contact`**, which forwards JSON to **`LEAD_WEBHOOK_URL`** (e.g. Convex → Slack). Env: `src/lib/env/marketing.ts`, routes under `src/app/api/`.
-• Lead payload contract: `src/lib/lead-form-contract.ts`
+• Marketing forms POST to **`/api/lead-email`** (routed to the Elysia Worker at api.designedbyanthony.com), which forwards JSON to **`LEAD_WEBHOOK_URL`** (e.g. Convex → Slack). Env: apps/web/src/lib/env/marketing.ts, routes in apps/api/src/routes/.
+• Lead payload contract: packages/shared/src/lib/lead-form-contract.ts

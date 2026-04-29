@@ -1,13 +1,15 @@
 # AGENTS.md — Designed by Anthony
 
 ## Architectural Guardrails
-- **Root-Only Execution:** All builds and installs run from the repo root (`./`).
-- **GitHub + CI Only:** NEVER deploy manually outside the hosted CI path. Production rolls out from **GitHub** (Firebase App Hosting linked repo). If code isn't on `main`, it doesn't ship to production.
-- **Lockfile Integrity:** After ANY change to `package.json`, run `npm install` and commit the updated `package-lock.json` in the **same commit**. Verify with `npm ci` before pushing. A lockfile mismatch is a build-breaking bug — treat it as P0.
+- **Root-Only Execution:** All builds and installs run from the repo root (`./`) via Turbo.
+- **GitHub + CI Only:** NEVER deploy manually outside the hosted CI path. Production rolls out from **GitHub** (Cloudflare Pages + Workers). If code isn't on `main`, it doesn't ship to production.
+- **Lockfile Integrity:** After ANY change to `package.json` (root or any workspace), run `bun install` and commit the updated `bun.lock` in the **same commit**. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## Infrastructure Context
-- **Routing (apex):** Handled by `src/proxy.ts` on the Next.js runtime (Firebase App Hosting in production).
-- **Public web:** Single Next.js app — apex + `www`. Lighthouse audit lives on the apex at `/lighthouse` (no subdomain).
+- **Routing (apex):** Handled by `apps/web/src/proxy.ts` on the Next.js Pages worker runtime.
+- **Public web:** Next.js app at `apps/web/` — apex + `www`. Lighthouse audit lives at `/lighthouse`.
+- **API:** ElysiaJS Cloudflare Worker at `apps/api/` — `api.designedbyanthony.com`.
+- **Shared code:** `packages/shared` (`@dba/shared`) — lighthouse business logic + shared lib helpers.
 
 ## Code Quality & Purge Rules
 - **Search Before Write:** Before adding a feature, check if a legacy or duplicate implementation exists. If it does, delete it first.
@@ -21,7 +23,7 @@
 
 ## Definition of Done
 A task is only **Done** when all three are true:
-1. It passes `npm run build` from the repo root with zero errors.
+1. It passes `bun run build` from the repo root with zero errors.
 2. It has been audited by BugBot (self-review pass: no `any`, no stray `console.log`, no unused imports).
 3. The logo / branding renders **unbroken** on every affected surface — `/brand/logo.png` and `/brand/mark.webp` resolve, design-system tokens are intact, and no subdomain is serving a fallback mark.
 
@@ -29,18 +31,30 @@ A task is only **Done** when all three are true:
 
 ## Repo orientation
 
-Single **Next.js 16** app at the repository root. Node `>=22.12.0`, **npm** (lockfile: `package-lock.json`).
+**Turborepo monorepo.** Bun `>=1.1.0`, Node `>=22.12.0` (lockfile: `bun.lock`).
 
 ```
-/                          # Next.js app root
-├── src/
-│   ├── app/               # App Router (marketing + /lighthouse)
-│   ├── lighthouse/        # Lighthouse audit UI + server libs (`@lh/*`)
-│   ├── design-system/     # tokens, brand, dba-global.css
-│   └── lib/               # env validation, lead contract, shared helpers
-├── build/                 # CSP + sync-static-headers (static-headers.json)
-├── public/
-└── apphosting.yaml        # Firebase App Hosting runtime config
+/                               # monorepo root
+├── apps/
+│   ├── web/                    # Next.js 16 (designedbyanthony.com)
+│   │   ├── src/
+│   │   │   ├── app/            # App Router (marketing + /lighthouse)
+│   │   │   ├── lighthouse/     # Audit UI + auditReport types (@lh/*)
+│   │   │   ├── design-system/  # tokens, brand, dba-global.css
+│   │   │   └── lib/            # env validation, re-exports from @dba/shared
+│   │   ├── build/              # CSP + sync-static-headers
+│   │   ├── public/
+│   │   └── wrangler.jsonc      # opennextjs-cloudflare (build artifact source for Pages bundle)
+│   └── api/                    # ElysiaJS Worker (api.designedbyanthony.com)
+│       ├── src/routes/         # 6 Elysia routes (/api/audit, /api/report, etc.)
+│       └── wrangler.jsonc
+├── packages/
+│   └── shared/                 # @dba/shared — shared between web + api
+│       └── src/
+│           ├── lighthouse/lib/ # ai, gmail, http, places, report-store, ...
+│           └── lib/            # lead-form-contract, leadWebhook, marketingBrowserOrigins
+├── turbo.json
+└── biome.json
 ```
 
 Operator playbook: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`.
@@ -48,17 +62,20 @@ Operator playbook: `ANTHONYS_INSTRUCTIONS.txt` and `README.md`.
 ### Common commands
 
 ```bash
-npm install           # first-time setup
+bun install           # first-time setup
 
-npm run dev           # build site bundle, then Next dev server (:3000)
-npm run build         # prebuild (site script + sync headers) + next build
-npm run lint          # Biome
-npm run test:e2e      # Cypress (see cypress.config.ts)
+bun run dev           # turbo: Next dev (:3000) + Wrangler API (:8787) in parallel
+bun run dev:web       # Next.js only
+bun run dev:api       # ElysiaJS Wrangler only
+bun run build         # turbo: full production build
+bun run typecheck     # turbo: tsc --noEmit across all packages
+bun run lint          # Biome (root — applies to all packages)
+bun run test:e2e      # Cypress (see cypress.config.ts)
 ```
 
 ### Host-based routing — Next.js proxy
 
-`src/proxy.ts` branches on `Host`.
+`apps/web/src/proxy.ts` branches on `Host`.
 
 - `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
 - `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`
@@ -66,20 +83,20 @@ npm run test:e2e      # Cypress (see cypress.config.ts)
 
 ### Theme + brand (single source of truth)
 
-- Canonical CSS tokens: `src/styles/theme.css` (`:root { ... }`).
-- Tailwind bridge + mirrored variables: `src/design-system/tokens.css`, `src/design-system/tailwind-v4-bridge.css`.
-- App entry: `src/design-system/dba-global.css` (imports `src/styles/theme.css`).
-- Brand assets: `public/brand/*` (and `src/design-system/brand.ts` for paths in code).
+- Canonical CSS tokens: `apps/web/src/styles/theme.css` (`:root { ... }`).
+- Tailwind bridge + mirrored variables: `apps/web/src/design-system/tokens.css`, `apps/web/src/design-system/tailwind-v4-bridge.css`.
+- App entry: `apps/web/src/design-system/dba-global.css` (imports `src/styles/theme.css`).
+- Brand assets: `apps/web/public/brand/*` (and `apps/web/src/design-system/brand.ts` for paths in code).
 
-When changing tokens: edit `src/styles/theme.css` and keep `src/design-system/tokens.css` aligned (same variable names + values). Brand verification is part of **Definition of Done**.
+When changing tokens: edit `apps/web/src/styles/theme.css` and keep `apps/web/src/design-system/tokens.css` aligned (same variable names + values). Brand verification is part of **Definition of Done**.
 
-### Firebase App Hosting
+### Cloudflare Pages + Workers
 
-- **Base directory:** repository root (this Next.js app). Connect the **GitHub** repo in Firebase console; set env vars and secrets there (or `firebase apphosting:secrets`).
-- **`apphosting.yaml`:** Runtime config (Node 22, Cloud Run scaling). Edit there for concurrency/memory changes.
-- **`static-headers.json`:** Generated by `npm run sync:static-headers` from `build/csp.mjs` for Playwright CSP parity — run after CSP edits.
+- **Web (Pages):** `apps/web/wrangler.jsonc` + `apps/web/build/prepare-pages-bundle.mjs` — OpenNext builds worker/assets, then deploys via `wrangler pages deploy`.
+- **API Worker:** `apps/api/wrangler.jsonc` — Elysia on `nodejs_compat`.
+- **`apps/web/static-headers.json`:** Generated by `bun run --cwd apps/web sync:static-headers` from `apps/web/build/csp.mjs` — run after CSP edits.
 
 ### Cursor Cloud specific instructions
 
-- Run `npm install` (or `npm ci`) at the repo root before any build/test if `node_modules` is missing.
+- Run `bun install` at the repo root before any build/test if `node_modules` is missing.
 - Branch + PR conventions for cloud agents: create branches as `cursor/<descriptive-name>-<suffix>`, commit small logical changes, and open a PR per branch.

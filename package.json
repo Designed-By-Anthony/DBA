@@ -1,41 +1,22 @@
 {
-	"name": "designed-by-anthony",
+	"name": "dba-monorepo",
 	"version": "0.0.1",
 	"private": true,
-	"type": "module",
-	"engines": {
-		"node": ">=22.12.0"
-	},
-	"browserslist": {
-		"production": [
-			"last 2 Chrome major versions",
-			"last 2 Firefox major versions",
-			"last 2 Edge major versions",
-			"last 2 Safari major versions",
-			"not dead",
-			"not ie <= 11",
-			"not op_mini all"
-		],
-		"development": [
-			"last 1 Chrome major version",
-			"last 1 Firefox major version",
-			"last 1 Safari major version"
-		]
-	},
-	"overrides": {
-		"yaml@<2.8.3": "^2.8.3",
-		"postcss": "^8.4.38",
-		"uuid": "^14.0.0"
-	},
+	"packageManager": "bun@1.3.13",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"scripts": {
-		"generate:gbp-playbook-cover": "node build/generate-gbp-playbook-cover.mjs",
-		"generate:gbp-playbook-hero": "node build/generate-gbp-playbook-hero.mjs",
-		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
-		"sync:static-headers": "node build/sync-static-headers.mjs",
-		"prebuild": "npm run build:site-script && npm run sync:static-headers",
-		"dev": "npm run build:site-script && next dev",
-		"build": "next build",
-		"start": "next start",
+		"dev": "turbo run dev --parallel",
+		"dev:web": "turbo run dev --filter=@dba/web",
+		"dev:api": "turbo run dev --filter=@dba/api",
+		"build": "turbo run build",
+		"build:web": "turbo run build --filter=@dba/web",
+		"build:api": "turbo run build --filter=@dba/api",
+		"deploy:web": "turbo run deploy --filter=@dba/web",
+		"deploy:api": "turbo run deploy --filter=@dba/api",
+		"typecheck": "turbo run typecheck",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write --unsafe",
 		"test:e2e": "cypress run",
@@ -45,35 +26,11 @@
 		"test:playwright:render": "playwright test playwright/pages-render.spec.ts",
 		"test:playwright:zap": "cross-env PLAYWRIGHT_ZAP=1 playwright test"
 	},
-	"dependencies": {
-		"@fontsource-variable/fraunces": "^5.2.9",
-		"@fontsource-variable/inter": "^5.2.8",
-		"@fontsource-variable/outfit": "^5.2.8",
-		"@fontsource/abril-fatface": "^5.2.7",
-		"@google/genai": "^1.48.0",
-		"cheerio": "^1.0.0",
-		"framer-motion": "^12.38.0",
-		"googleapis": "^148.0.0",
-		"gsap": "^3.15.0",
-		"jspdf": "^4.2.1",
-		"next": "16.2.3",
-		"react": "19.2.4",
-		"react-dom": "19.2.4",
-		"sharp": "^0.34.5",
-		"zod": "^3.25.76",
-		"zustand": "^5.0.12"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.12",
 		"@playwright/test": "^1.52.0",
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^22.10.2",
-		"@types/react": "^19.2.0",
-		"@types/react-dom": "^19.2.0",
 		"cross-env": "^7.0.3",
 		"cypress": "^15.14.0",
-		"esbuild": "^0.28.0",
-		"tailwindcss": "^4",
-		"typescript": "^5.9.3"
+		"turbo": "^2.9.6"
 	}
 }

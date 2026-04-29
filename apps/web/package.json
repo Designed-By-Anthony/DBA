@@ -1,0 +1,78 @@
+{
+	"name": "@dba/web",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"bun": ">=1.1.0",
+		"node": ">=22.12.0"
+	},
+	"browserslist": {
+		"production": [
+			"last 2 Chrome major versions",
+			"last 2 Firefox major versions",
+			"last 2 Edge major versions",
+			"last 2 Safari major versions",
+			"not dead",
+			"not ie <= 11",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 Chrome major version",
+			"last 1 Firefox major version",
+			"last 1 Safari major version"
+		]
+	},
+	"overrides": {
+		"yaml@<2.8.3": "^2.8.3",
+		"postcss": "^8.4.38",
+		"uuid": "^14.0.0"
+	},
+	"scripts": {
+		"generate:gbp-playbook-cover": "bun build/generate-gbp-playbook-cover.mjs",
+		"generate:gbp-playbook-hero": "bun build/generate-gbp-playbook-hero.mjs",
+		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
+		"sync:static-headers": "bun build/sync-static-headers.mjs",
+		"prebuild": "bun run build:site-script && bun run sync:static-headers",
+		"dev": "bun run build:site-script && next dev",
+		"build": "next build",
+		"build:worker": "opennextjs-cloudflare build",
+		"build:pages": "bun run build:worker && bun build/prepare-pages-bundle.mjs",
+		"preview:worker": "bun run build:worker && opennextjs-cloudflare preview",
+		"deploy:worker": "bun run build:worker && opennextjs-cloudflare deploy",
+		"deploy": "bun run deploy:pages",
+		"deploy:pages": "bun run build:pages && wrangler pages deploy .pages-output --project-name ${CLOUDFLARE_PAGES_PROJECT_NAME:-designed-by-anthony}",
+		"start": "next start",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@dba/shared": "workspace:*",
+		"@fontsource-variable/fraunces": "^5.2.9",
+		"@fontsource-variable/inter": "^5.2.8",
+		"@fontsource-variable/outfit": "^5.2.8",
+		"@fontsource/abril-fatface": "^5.2.7",
+		"@google/genai": "^1.48.0",
+		"cheerio": "^1.0.0",
+		"framer-motion": "^12.38.0",
+		"googleapis": "^148.0.0",
+		"gsap": "^3.15.0",
+		"jspdf": "^4.2.1",
+		"next": "16.2.3",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"sharp": "^0.34.5",
+		"zod": "^3.25.76",
+		"zustand": "^5.0.12"
+	},
+	"devDependencies": {
+		"@opennextjs/cloudflare": "^1.19.4",
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^22.10.2",
+		"@types/react": "^19.2.0",
+		"@types/react-dom": "^19.2.0",
+		"esbuild": "^0.28.0",
+		"tailwindcss": "^4",
+		"typescript": "^5.9.3",
+		"wrangler": "^4.86.0"
+	}
+}
