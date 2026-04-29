@@ -34,10 +34,10 @@ From repo root:
 
 Cloudflare Pages + Workers
 --------------------------
+• Production deploys from GitHub CI only; local deploy commands are for CI/emergency operator use.
 • Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
 • Next.js Worker fallback: bun run --cwd apps/web deploy:worker
 • API Worker:       bun run deploy:api   (wrangler deploy from apps/api)
-• Auth:             npx wrangler login once — then deploy from CLI or CI.
 • Secrets/vars (web): Cloudflare Pages project settings
 • Secrets (api):    wrangler secret put <KEY> --cwd apps/api
 
@@ -52,7 +52,7 @@ GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, ALLOWED_ORIGINS
 
 Next.js frontend env (apps/web)
 -------------------------------
-NEXT_PUBLIC_API_BASE_URL   (e.g. https://api.designedbyanthony.com)
+NEXT_PUBLIC_API_BASE_URL   optional override; defaults to https://api.designedbyanthony.com
 NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY, NEXT_PUBLIC_CRISP_WEBSITE_ID
 
 Cloudflare / GCP
@@ -61,7 +61,7 @@ Follow your platform blueprint; env vars are scoped per backend.
 
 VertaFlow CRM (separate product)
 --------------------------------
-• Admin and accounts subdomains redirect to **vertaflow.io** from `src/proxy.ts`. This marketing app does not ship the CRM codebase.
+• Admin and accounts subdomains redirect to **vertaflow.io** from `apps/web/src/proxy.ts`. This marketing app does not ship the CRM codebase.
 
 Public leads
 ------------

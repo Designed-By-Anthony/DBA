@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 
 type WaitlistStatus = "idle" | "submitting" | "success" | "error";
 
@@ -29,18 +30,15 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 		}
 		set({ waitlistStatus: "submitting", waitlistError: null });
 		try {
-			await fetch(
-				`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/lead-email`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email: waitlistEmail,
-						source: "tools-waitlist",
-						message: "Signed up for the Tools store waitlist.",
-					}),
-				},
-			);
+			await fetch(buildPublicApiUrl("/api/lead-email"), {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: waitlistEmail,
+					source: "tools-waitlist",
+					message: "Signed up for the Tools store waitlist.",
+				}),
+			});
 			set({ waitlistStatus: "success" });
 		} catch {
 			set({

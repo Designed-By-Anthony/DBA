@@ -123,7 +123,7 @@ export default function LighthouseLayout({
 						label: "Gemini 2.0",
 						href: "https://deepmind.google/technologies/gemini/",
 					},
-					{ label: "Firebase", href: "https://firebase.google.com" },
+					{ label: "ElysiaJS", href: "https://elysiajs.com" },
 					{ label: "Next.js", href: "https://nextjs.org" },
 				]}
 			/>

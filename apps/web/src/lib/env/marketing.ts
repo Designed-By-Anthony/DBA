@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_PUBLIC_API_BASE_URL } from "../publicApi";
 import { optionalUrl, validateEnv } from "./shared";
 
 /**
@@ -29,15 +30,9 @@ const marketingSchema = z
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,
 	})
 	.passthrough()
-	.superRefine((env, ctx) => {
-		if (env.NODE_ENV === "production" && !env.NEXT_PUBLIC_API_BASE_URL) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ["NEXT_PUBLIC_API_BASE_URL"],
-				message:
-					"NEXT_PUBLIC_API_BASE_URL is required in production for frontend to API Worker calls.",
-			});
-		}
+	.superRefine((env) => {
+		if (env.NODE_ENV === "production" && !env.NEXT_PUBLIC_API_BASE_URL)
+			env.NEXT_PUBLIC_API_BASE_URL = DEFAULT_PUBLIC_API_BASE_URL;
 	});
 
 export type MarketingEnv = z.infer<typeof marketingSchema>;

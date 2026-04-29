@@ -1,4 +1,4 @@
-import { fetchWithTimeout } from "@lh/lib/http";
+import { fetchWithTimeout } from "./http";
 
 /** Google `runPagespeed` often exceeds 20s on slow or JS-heavy sites. */
 const PSI_FETCH_TIMEOUT_MS = 55_000;

@@ -10,8 +10,8 @@ const BUILT_WITH = [
 	{ label: "Next.js", href: "https://nextjs.org" },
 	{ label: "React 19", href: "https://react.dev" },
 	{ label: "Tailwind v4", href: "https://tailwindcss.com" },
-	{ label: "Firebase", href: "https://firebase.google.com" },
-	{ label: "Cloudflare", href: "https://cloudflare.com" },
+	{ label: "Cloudflare Pages", href: "https://pages.cloudflare.com" },
+	{ label: "Cloudflare Workers", href: "https://workers.cloudflare.com" },
 ] as const;
 
 export type BrandFooterProps = {

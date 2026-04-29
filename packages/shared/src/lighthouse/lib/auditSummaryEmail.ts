@@ -1,4 +1,4 @@
-import { escapeHtml } from "@lh/lib/validation";
+import { escapeHtml } from "./validation";
 
 export type AuditSummaryEmailParams = {
 	firstName: string;

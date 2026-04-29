@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 import { businessProfile } from "@/lib/seo";
 
 export interface AuditFormProps {
@@ -56,9 +57,7 @@ export function AuditForm({
 	formEndpoint,
 }: AuditFormProps) {
 	const formId = useId();
-	const action =
-		formEndpoint?.trim() ||
-		`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/lead-email`;
+	const action = formEndpoint?.trim() || buildPublicApiUrl("/api/lead-email");
 
 	return (
 		<form

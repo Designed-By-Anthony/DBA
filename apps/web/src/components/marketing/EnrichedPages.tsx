@@ -586,11 +586,14 @@ export function OurEdgePage() {
 							<div className="stack-chips">
 								{[
 									{
-										label: "Firebase App Hosting",
-										href: "https://firebase.google.com/docs/app-hosting",
+										label: "Cloudflare Pages",
+										href: "https://pages.cloudflare.com",
 									},
-									{ label: "Cloud Run", href: "https://cloud.google.com/run" },
-									{ label: "Cloudflare", href: "https://cloudflare.com" },
+									{
+										label: "Cloudflare Workers",
+										href: "https://workers.cloudflare.com",
+									},
+									{ label: "ElysiaJS", href: "https://elysiajs.com" },
 									{
 										label: "Gemini 2.0",
 										href: "https://deepmind.google/technologies/gemini/",

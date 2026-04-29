@@ -4,6 +4,7 @@ import type { AuditAiInsight, AuditData } from "@lh/auditReport";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 
 /* ─── Helpers ─── */
 function sanitizeHtml(html: string): string {
@@ -821,7 +822,7 @@ export default function LighthouseReportPrintPage() {
 		(async () => {
 			try {
 				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/report/${encodeURIComponent(id)}`,
+					buildPublicApiUrl(`/api/report/${encodeURIComponent(id)}`),
 					{
 						cache: "no-store",
 					},

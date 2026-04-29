@@ -5,6 +5,7 @@ import { buildAuditPdf } from "@lh/lib/auditReportPdf";
 import { useReducedMotion } from "framer-motion";
 import { div as MotionDiv } from "framer-motion/client";
 import { useCallback, useState } from "react";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 import { ScoreRing } from "./ScoreRing";
 
 export type { AuditAiInsight, AuditData } from "@lh/auditReport";
@@ -129,25 +130,22 @@ export function AuditResults({
 		setEmailStatus("sending");
 		setEmailErr("");
 		try {
-			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/audit/email-summary`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email: to,
-						name: contactName ?? "",
-						reportId: reportId ?? null,
-						url: data.url,
-						trustScore: data.trustScore,
-						performance: data.performance,
-						accessibility: data.accessibility,
-						bestPractices: data.bestPractices,
-						seo: data.seo,
-						psiDegradedReason: data.psiDegradedReason ?? null,
-					}),
-				},
-			);
+			const res = await fetch(buildPublicApiUrl("/api/audit/email-summary"), {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: to,
+					name: contactName ?? "",
+					reportId: reportId ?? null,
+					url: data.url,
+					trustScore: data.trustScore,
+					performance: data.performance,
+					accessibility: data.accessibility,
+					bestPractices: data.bestPractices,
+					seo: data.seo,
+					psiDegradedReason: data.psiDegradedReason ?? null,
+				}),
+			});
 			const j = (await res.json().catch(() => ({}))) as { error?: string };
 			if (!res.ok) {
 				throw new Error(j.error || "Could not send email.");

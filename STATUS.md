@@ -11,6 +11,15 @@
 - Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
 - Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
 
+## Local GitHub parity + CI build fix (2026-04-29)
+
+- Fast-forwarded local `main` to `origin/main` after the cloud rework, then branched `codex/fix-public-api-base-default` for the fix.
+- Added a production-safe public API default (`https://api.designedbyanthony.com`) so Cloudflare Pages builds no longer fail when `NEXT_PUBLIC_API_BASE_URL` is unset; explicit env overrides still win.
+- Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.
+- Fixed Worker bundling by removing shared-package `@lh/*` self-alias imports that Wrangler could not resolve.
+- Confirmed the target architecture as Turborepo + `apps/web` Next.js on Cloudflare Pages + `apps/api` ElysiaJS on Cloudflare Workers; updated operator docs, footer stack badges, and hidden tech fingerprints to remove stale Firebase/npm references.
+- Validation: `npx bun run build` and `npx bun run lint` pass from repo root; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
+
 ## Local machine sync with main (2026-04-28)
 
 - **Repository Parity:** Synchronized local `main` branch with `origin/main` using `git reset --hard`.

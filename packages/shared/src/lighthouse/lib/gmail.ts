@@ -1,5 +1,5 @@
-import { escapeHtml, normalizeEmail } from "@lh/lib/validation";
 import { google } from "googleapis";
+import { escapeHtml, normalizeEmail } from "./validation";
 
 const GMAIL_SENDER = "anthony@designedbyanthony.com";
 

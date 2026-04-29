@@ -1,4 +1,4 @@
-import { fetchPageSpeedRunPagespeed } from "@lh/lib/pageSpeedInsights";
+import { fetchPageSpeedRunPagespeed } from "./pageSpeedInsights";
 
 export type LighthouseCategoryBlock = { score?: number | null };
 export type LighthouseAuditEntry = {

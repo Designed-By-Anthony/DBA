@@ -8,6 +8,7 @@ import {
 } from "@lh/lib/recaptchaEnterpriseConfig";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
@@ -121,23 +122,20 @@ export function AuditForm() {
 					"Security check could not finish. Please refresh and try again.",
 				);
 			}
-			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/audit`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						url: finalUrl,
-						email,
-						name,
-						company,
-						location,
-						recaptchaToken,
-					}),
+			const res = await fetch(buildPublicApiUrl("/api/audit"), {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
 				},
-			);
+				body: JSON.stringify({
+					url: finalUrl,
+					email,
+					name,
+					company,
+					location,
+					recaptchaToken,
+				}),
+			});
 
 			let data: {
 				error?: string;

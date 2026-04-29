@@ -1,8 +1,8 @@
-import { fetchWithTimeout } from "@lh/lib/http";
+import { fetchWithTimeout } from "./http";
 import {
 	RECAPTCHA_ENTERPRISE_ACTION,
 	RECAPTCHA_ENTERPRISE_SITE_KEY,
-} from "@lh/lib/recaptchaEnterpriseConfig";
+} from "./recaptchaEnterpriseConfig";
 
 type RecaptchaConfigStatus = "disabled" | "ready" | "incomplete";
 

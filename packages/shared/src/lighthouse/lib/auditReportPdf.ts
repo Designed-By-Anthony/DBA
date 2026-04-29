@@ -1,5 +1,5 @@
-import type { AuditData } from "@lh/auditReport";
 import { jsPDF } from "jspdf";
+import type { AuditData } from "../auditReport";
 
 const MARGIN = 16;
 const PAGE_W = 210;
