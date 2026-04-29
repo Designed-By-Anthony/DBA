@@ -19,7 +19,8 @@ apps/web-viewer/zapier-platform-example-app-github/
 .env*.local
 
 # Cloudflare Workers build output and local dev secrets
-.open-next/
+apps/web/.open-next/
+apps/web/.dev.vars
 .dev.vars
 
 # Removed app; delete locally if present (some installs had root-owned node_modules):
@@ -30,7 +31,7 @@ google-cloud-sdk/
 google-cloud-cli-darwin-arm.tar.gz
 
 # TypeScript incremental build info
-tsconfig.tsbuildinfo
+apps/web/tsconfig.tsbuildinfo
 
 # pnpm lock (project uses bun)
 pnpm-lock.yaml
@@ -38,5 +39,12 @@ pnpm-lock.yaml
 package-lock.json
 
 # worker package
-worker/node_modules
-worker/.wrangler
+apps/api/node_modules
+packages/shared/node_modules
+
+# Turbo cache
+.turbo
+
+# Monorepo workspace build artifacts
+apps/api/.wrangler
+apps/web/.next

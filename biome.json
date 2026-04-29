@@ -25,7 +25,7 @@
 			"!**/.windsurf",
 			"!google-cloud-sdk",
 			"!google-cloud-cli-darwin-arm.tar.gz",
-			"!static-headers.json"
+			"!**/static-headers.json"
 		]
 	},
 	"formatter": {
@@ -66,7 +66,7 @@
 	},
 	"overrides": [
 		{
-			"includes": ["src/styles/freshworks-chat-widget.css"],
+			"includes": ["apps/web/src/styles/freshworks-chat-widget.css"],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -76,7 +76,10 @@
 			}
 		},
 		{
-			"includes": ["src/styles/theme.css", "src/styles/layout-shell.css"],
+			"includes": [
+				"apps/web/src/styles/theme.css",
+				"apps/web/src/styles/layout-shell.css"
+			],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -89,7 +92,7 @@
 			}
 		},
 		{
-			"includes": ["emails/**/*.html"],
+			"includes": ["apps/web/emails/**/*.html"],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -99,7 +102,7 @@
 			}
 		},
 		{
-			"includes": ["src/app/lighthouse/lighthouse-globals.css"],
+			"includes": ["apps/web/src/app/lighthouse/lighthouse-globals.css"],
 			"linter": {
 				"rules": {
 					"complexity": {
