@@ -12,6 +12,11 @@ playwright-report
 test-results
 cypress/screenshots/
 .superpowers/
+.agents/
+.claude/
+.devin/
+.junie/
+.windsurf/
 # Local tooling / secrets (never commit)
 cloud-sql-proxy
 dba-website-prod-*.json
@@ -49,4 +54,6 @@ packages/shared/node_modules
 
 # Monorepo workspace build artifacts
 apps/api/.wrangler
+apps/web/.wrangler
 apps/web/.next
+tsconfig.tsbuildinfo

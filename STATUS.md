@@ -5,6 +5,9 @@
 ## Pages frontend + Worker API decoupling rollout (2026-04-29)
 
 - Cloudflare Pages **deploy command** must stay **empty** (or a no-op): **`wrangler versions upload`** targets standalone Workers and fails with “Missing entry-point”; Pages uploads `_worker.js` from `pages_build_output_dir` after build.
+- Added root `wrangler.jsonc` as the canonical Git-connected Cloudflare Pages config for monorepo root deploys: `pages_build_output_dir = "apps/web/.vercel/output/static"` plus `nodejs_compat`. This removes the dashboard ambiguity that can build successfully but run the deployed `_worker.js` without the required compatibility flag, causing 500s on `/` and `/favicon.ico`.
+- Added `.nvmrc` (`22.12.0`) and tightened README/operator docs to use repo root **`.`**, build command `bun install --frozen-lockfile && bun x turbo run build --filter=@dba/web`, output `apps/web/.vercel/output/static`, and an empty deploy command.
+- Runtime smoke test: rebuilt from the repo root, served `apps/web/.vercel/output/static` with `wrangler pages dev`, and confirmed 200 for `/`, `/lighthouse`, `/favicon.ico`, `/brand/logo.png`, and `/brand/mark.webp`.
 
 - Added root `packageManager` metadata to unblock Turbo workspace resolution in Bun/CI.
 - Switched `apps/web` default deploy path to Cloudflare Pages (`deploy:pages`) while keeping a Worker fallback script (`deploy:worker`).

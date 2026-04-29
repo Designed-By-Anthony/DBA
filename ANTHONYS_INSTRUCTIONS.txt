@@ -35,6 +35,7 @@ From repo root:
 Cloudflare Pages + Workers
 --------------------------
 • Production deploys from GitHub CI only; local deploy commands are for CI/emergency operator use.
+• Cloudflare Pages project root is the repository root (`.`). Root `wrangler.jsonc` is canonical for Pages and points at `apps/web/.vercel/output/static` with `nodejs_compat`.
 • Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
 • Next.js Worker fallback: bun run --cwd apps/web deploy:worker
 • API Worker:       bun run deploy:api   (wrangler deploy from apps/api)

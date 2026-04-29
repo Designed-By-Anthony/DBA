@@ -4,7 +4,7 @@
 
 | Surface | What | Repo | Deploy |
 |--------|------|------|--------|
-| **Cloudflare Pages** | Next.js 16 (OpenNext) — HTML, assets, **`_worker.js`** for SSR/middleware | `apps/web/` | Git-connected **Pages** project → build outputs **`apps/web/.vercel/output/static`** (or **`.vercel/output/static`** if Pages root is **`apps/web`**) · **`deploy` command empty** |
+| **Cloudflare Pages** | Next.js 16 (OpenNext) — HTML, assets, **`_worker.js`** for SSR/middleware | `apps/web/` | Git-connected **Pages** project with repo root **`.`** → build outputs **`apps/web/.vercel/output/static`** · **deploy command empty** |
 | **Cloudflare Worker** | ElysiaJS API — **`POST /api/*`** etc. | `apps/api/` | **Separate** Worker deploy — **`bun run deploy:api`** / **`wrangler deploy`** from **`apps/api`** · Worker name **`dba-api`** · hostname **`api.designedbyanthony.com`** |
 
 The browser talks to the API via **`NEXT_PUBLIC_API_BASE_URL`** (defaults to `https://api.designedbyanthony.com`). Pages does **not** replace the API Worker.
@@ -53,9 +53,9 @@ bun run deploy:web     # Cloudflare Pages frontend
 bun run deploy:api     # Cloudflare Worker API
 ```
 
-**Cloudflare Pages (dashboard):** Build command **`bun install --frozen-lockfile && bun run build`** (or **`bun x turbo run build --filter=@dba/web`** if you skip the API package). **Deploy command:** leave **empty** — Pages uploads `apps/web/wrangler.jsonc` → **`pages_build_output_dir`** (`.vercel/output/static` with `_worker.js`) automatically. Do **not** set deploy to **`wrangler versions upload`** (that targets Workers and fails with “Missing entry-point”).
+**Cloudflare Pages (dashboard):** Use repository root **`.`**. Build command **`bun install --frozen-lockfile && bun x turbo run build --filter=@dba/web`**. **Deploy command:** leave **empty** — Pages reads root [`wrangler.jsonc`](./wrangler.jsonc) and uploads **`apps/web/.vercel/output/static`** (`_worker.js` + assets) automatically. Do **not** set deploy to **`wrangler versions upload`** (that targets standalone Workers and fails with “Missing entry-point”).
 
-`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages -> Settings -> Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. Cloudflare Pages should use root `/apps/web`, build command `bun install && bun x turbo run build --filter=@dba/web`, and output `/.vercel/output/static`. Keep build commands in the Pages dashboard/CI settings; `apps/web/wrangler.jsonc` is only for Pages-supported runtime config such as `pages_build_output_dir`, compatibility date, flags, and bindings.
+`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages -> Settings -> Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. The root `wrangler.jsonc` is the canonical Pages config for Git-connected Cloudflare builds; `apps/web/wrangler.jsonc` is kept for local/manual deploys run from `apps/web`.
 
 ### Cloudflare dashboard checklist (Pages + API Worker)
 
@@ -63,13 +63,15 @@ bun run deploy:api     # Cloudflare Worker API
 
 | Setting | Value |
 |--------|--------|
-| Root directory | Repository root **`.`** with build `cd apps/web && …`, **or** root **`apps/web`** with commands run from there |
-| Install command | **`bun install --frozen-lockfile`** (from chosen root) |
-| Build command | **`bun x turbo run build --filter=@dba/web`** (or **`cd ../.. && bun x turbo run build --filter=@dba/web`** if cwd is `apps/web`) |
-| Build output directory | **`apps/web/.vercel/output/static`** if Pages root is repo **`.`** — **``.vercel/output/static`** if Pages root is **`apps/web`** |
+| Root directory | Repository root **`.`** |
+| Install command | **`bun install --frozen-lockfile`** |
+| Build command | **`bun x turbo run build --filter=@dba/web`** |
+| Build output directory | **`apps/web/.vercel/output/static`** |
 | Deploy command | **Empty** — Pages uploads `_worker.js` + assets from `pages_build_output_dir` after build. Do **not** run **`wrangler versions upload`** here (that targets standalone Workers). |
+| Node version | **22.12.0** (`.nvmrc`) |
+| Compatibility | **`nodejs_compat`** from root `wrangler.jsonc` |
 
-**Wrangler config path:** point Pages at **`apps/web/wrangler.jsonc`** (repo root) or ensure a copy exists under `apps/web` with **`pages_build_output_dir`**: **`.vercel/output/static`**.
+**Wrangler config path:** root [`wrangler.jsonc`](./wrangler.jsonc). This is what prevents Pages from missing `nodejs_compat` and serving a 500 from an otherwise valid OpenNext bundle.
 
 **API Worker (`apps/api`)** — separate from Pages: deploy with **`bun run deploy:api`** or **`wrangler deploy`** from **`apps/api`** (Worker name in **`apps/api/wrangler.jsonc`**: **`dba-api`**). Custom domains (e.g. **`api.designedbyanthony.com`**) are attached in the dashboard to that Worker script.
 
