@@ -6,6 +6,9 @@
 - **Lockfile Integrity:** After ANY change to `package.json` (root or any workspace), run `bun install` and commit the updated `bun.lock` in the **same commit**. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## Infrastructure Context
+
+**Always two deploy targets:** (1) **Cloudflare Pages** = Next.js app in **`apps/web`** (OpenNext bundle + `_worker.js`). (2) **Cloudflare Worker** = Elysia API in **`apps/api`** (script **`dba-api`**), **not** part of the Pages build — deploy separately and attach **`api.designedbyanthony.com`** to that Worker.
+
 - **Routing (apex):** Handled by `apps/web/src/middleware.ts` on the Cloudflare Pages edge runtime.
 - **Public web:** Next.js app at `apps/web/` — apex + `www`. Lighthouse audit lives at `/lighthouse`.
 - **API:** ElysiaJS Cloudflare Worker at `apps/api/` — `api.designedbyanthony.com`.

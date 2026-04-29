@@ -11,9 +11,14 @@
 - Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
 - Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
 
-## Cloudflare MCP verification (2026-04-29)
+## Architecture (two Cloudflare surfaces — required setup)
 
-- **`workers_list`:** account lists Worker **`designedbyanthony`** (likely Pages bundle). Worker **`dba-api`** (`apps/api/wrangler.jsonc`) did **not** appear — confirm API Worker deploy + **`api.designedbyanthony.com`** routing in the dashboard.
+| Surface | Repo | Worker / bundle name | Hostname |
+|---------|------|----------------------|----------|
+| **Pages** (Next.js + OpenNext `_worker.js`) | `apps/web/` | Pages upload (dashboard may show e.g. **`designedbyanthony`**) | **`designedbyanthony.com`** |
+| **Worker** (Elysia API) | `apps/api/` | **`dba-api`** in `wrangler.jsonc` | **`api.designedbyanthony.com`** |
+
+- **`workers_list` (MCP):** saw **`designedbyanthony`**; **`dba-api`** not listed — deploy API from **`apps/api`** and attach **`api`** subdomain to **`dba-api`**.
 
 ## Local GitHub parity + CI build fix (2026-04-29)
 

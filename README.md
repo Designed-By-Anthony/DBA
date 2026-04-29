@@ -1,5 +1,14 @@
 # Designed by Anthony — Turborepo web
 
+## Architecture (two Cloudflare surfaces — required setup)
+
+| Surface | What | Repo | Deploy |
+|--------|------|------|--------|
+| **Cloudflare Pages** | Next.js 16 (OpenNext) — HTML, assets, **`_worker.js`** for SSR/middleware | `apps/web/` | Git-connected **Pages** project → build outputs **`apps/web/.vercel/output/static`** (or **`.vercel/output/static`** if Pages root is **`apps/web`**) · **`deploy` command empty** |
+| **Cloudflare Worker** | ElysiaJS API — **`POST /api/*`** etc. | `apps/api/` | **Separate** Worker deploy — **`bun run deploy:api`** / **`wrangler deploy`** from **`apps/api`** · Worker name **`dba-api`** · hostname **`api.designedbyanthony.com`** |
+
+The browser talks to the API via **`NEXT_PUBLIC_API_BASE_URL`** (defaults to `https://api.designedbyanthony.com`). Pages does **not** replace the API Worker.
+
 Public frontend is deployed via **Cloudflare Pages** (advanced mode with `_worker.js`), while APIs run on the separate **Cloudflare Worker** in `apps/api`.
 
 ## Routing — `apps/web/src/middleware.ts`
