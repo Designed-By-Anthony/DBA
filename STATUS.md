@@ -13,6 +13,7 @@
 
 ## Local GitHub parity + CI build fix (2026-04-29)
 
+- Removed the unsupported `build` block from `apps/web/wrangler.jsonc` so Cloudflare Pages can validate the project config; Pages build command remains a dashboard/CI setting (`bun install && bun x turbo run build --filter=@dba/web`) while Wrangler owns output/runtime settings.
 - Fast-forwarded local `main` to `origin/main` after the cloud rework, then branched `codex/fix-public-api-base-default` for the fix.
 - Added a production-safe public API default (`https://api.designedbyanthony.com`) so Cloudflare Pages builds no longer fail when `NEXT_PUBLIC_API_BASE_URL` is unset; explicit env overrides still win.
 - Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.

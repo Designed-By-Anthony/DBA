@@ -44,7 +44,7 @@ bun run deploy:web     # Cloudflare Pages frontend
 bun run deploy:api     # Cloudflare Worker API
 ```
 
-`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages → Settings → Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. Cloudflare Pages should use root `/apps/web`, build command `bun install && bun x turbo run build --filter=@dba/web`, and output `/.vercel/output/static`.
+`NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages -> Settings -> Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. Cloudflare Pages should use root `/apps/web`, build command `bun install && bun x turbo run build --filter=@dba/web`, and output `/.vercel/output/static`. Keep build commands in the Pages dashboard/CI settings; `apps/web/wrangler.jsonc` is only for Pages-supported runtime config such as `pages_build_output_dir`, compatibility date, flags, and bindings.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 
