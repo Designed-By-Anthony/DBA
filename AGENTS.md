@@ -57,6 +57,7 @@ A task is only **Done** when all three are true:
 │           ├── lighthouse/lib/ # ai, gmail, http, places, report-store, ...
 │           └── lib/            # lead-form-contract, leadWebhook, marketingBrowserOrigins
 ├── turbo.json
+├── wrangler.jsonc              # Pages: pages_build_output_dir when dashboard Root is repo `.`
 └── biome.json
 ```
 
@@ -95,7 +96,7 @@ When changing tokens: edit `apps/web/src/styles/theme.css` and keep `apps/web/sr
 
 ### Cloudflare Pages + Workers
 
-- **Web (Pages):** `apps/web/wrangler.jsonc` + `apps/web/build/prepare-pages-bundle.mjs` — OpenNext builds worker/assets, then deploys via `wrangler pages deploy`.
+- **Web (Pages):** repo root **`wrangler.jsonc`** when Pages **Root directory** is **`.`** (`pages_build_output_dir`: **`apps/web/.vercel/output/static`**); else **`apps/web/wrangler.jsonc`** — plus **`apps/web/build/prepare-pages-bundle.mjs`** — OpenNext builds worker/assets, then deploys via `wrangler pages deploy`.
 - **Pages deploy command must be empty** — do **not** use **`wrangler versions upload`** on the Pages project (that targets standalone Workers and errors with “Missing entry-point”). Pages publishes **`pages_build_output_dir`** (`.vercel/output/static` with `_worker.js`) after the build.
 - **Output path:** If the Pages **root directory** is the **repo root**, set **Build output** to **`apps/web/.vercel/output/static`**. If the root is **`apps/web`**, use **`.vercel/output/static`**.
 - **API Worker:** `apps/api/wrangler.jsonc` — script name **`dba-api`**; deploy with **`wrangler deploy`** from `apps/api`, not via the Pages pipeline (use **`wrangler versions upload`** only if you intentionally ship that Worker from CI with an explicit entry config).

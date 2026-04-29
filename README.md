@@ -66,10 +66,10 @@ bun run deploy:api     # Cloudflare Worker API
 | Root directory | Repository root **`.`** with build `cd apps/web && …`, **or** root **`apps/web`** with commands run from there |
 | Install command | **`bun install --frozen-lockfile`** (from chosen root) |
 | Build command | **`bun x turbo run build --filter=@dba/web`** (or **`cd ../.. && bun x turbo run build --filter=@dba/web`** if cwd is `apps/web`) |
-| Build output directory | **`apps/web/.vercel/output/static`** if Pages root is repo **`.`** — **``.vercel/output/static`** if Pages root is **`apps/web`** |
+| Build output directory | Set in **Wrangler**: repo root **`wrangler.jsonc`** → **`pages_build_output_dir`**: **`apps/web/.vercel/output/static`** when Root is **`.`**. When Root is **`apps/web`**, use **`apps/web/wrangler.jsonc`** → **`.vercel/output/static`**. |
 | Deploy command | **Empty** — Pages uploads `_worker.js` + assets from `pages_build_output_dir` after build. Do **not** run **`wrangler versions upload`** here (that targets standalone Workers). |
 
-**Wrangler config path:** point Pages at **`apps/web/wrangler.jsonc`** (repo root) or ensure a copy exists under `apps/web` with **`pages_build_output_dir`**: **`.vercel/output/static`**.
+When **Root directory** is the repository root (**`.`**), Cloudflare reads **`wrangler.jsonc` at the repo root** for **`pages_build_output_dir`** (dashboard “Build output” is driven by this file — see tooltip *Modify build output directory in wrangler.toml*). That path must be **`apps/web/.vercel/output/static`** so it matches OpenNext output from **`apps/web`**. For builds run with cwd **`apps/web`** only, **`apps/web/wrangler.jsonc`** still uses **`.vercel/output/static`** relative to that folder.
 
 **API Worker (`apps/api`)** — separate from Pages: deploy with **`bun run deploy:api`** or **`wrangler deploy`** from **`apps/api`** (Worker name in **`apps/api/wrangler.jsonc`**: **`dba-api`**). Custom domains (e.g. **`api.designedbyanthony.com`**) are attached in the dashboard to that Worker script.
 

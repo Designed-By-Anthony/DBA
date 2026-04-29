@@ -12,6 +12,7 @@
 - Hardened frontend/backend boundary by requiring `NEXT_PUBLIC_API_BASE_URL` during production web env validation.
 - Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
 - Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
+- Repo root **`wrangler.jsonc`** with **`pages_build_output_dir`**: **`apps/web/.vercel/output/static`** when Pages dashboard **Root directory** is repo **`.`** (greyed “Build output” follows Wrangler; avoids uploading wrong path).
 
 ## Architecture (two Cloudflare surfaces — required setup)
 
@@ -25,7 +26,6 @@
 ## Local GitHub parity + CI build fix (2026-04-29)
 
 - Removed the unsupported `build` block from `apps/web/wrangler.jsonc` so Cloudflare Pages can validate the project config; Pages build command remains a dashboard/CI setting (`bun install && bun x turbo run build --filter=@dba/web`) while Wrangler owns output/runtime settings.
-- Fast-forwarded local `main` to `origin/main` after the cloud rework, then branched `codex/fix-public-api-base-default` for the fix.
 - Added a production-safe public API default (`https://api.designedbyanthony.com`) so Cloudflare Pages builds no longer fail when `NEXT_PUBLIC_API_BASE_URL` is unset; explicit env overrides still win.
 - Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.
 - Fixed Worker bundling by removing shared-package `@lh/*` self-alias imports that Wrangler could not resolve.
