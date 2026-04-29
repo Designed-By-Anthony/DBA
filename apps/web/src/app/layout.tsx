@@ -44,7 +44,12 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 	},
 	icons: {
-		icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+		icon: [
+			{ url: "/favicon.ico", sizes: "16x16", type: "image/x-icon" },
+			{ url: "/favicon.svg", type: "image/svg+xml" },
+			{ url: "/favicon.png", sizes: "16x16", type: "image/png" },
+		],
+		shortcut: "/favicon.ico",
 		apple: "/apple-touch-icon-180.png",
 	},
 };

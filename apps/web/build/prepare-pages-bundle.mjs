@@ -16,6 +16,7 @@ const PAGES_MAX_STATIC_ASSET_BYTES = 25 * 1024 * 1024;
 
 const appRoot = process.cwd();
 const openNextDir = join(appRoot, ".open-next");
+const openNextAssetsDir = join(openNextDir, "assets");
 const workerEntry = join(openNextDir, "worker.js");
 const pagesOutputDir = join(appRoot, ".vercel/output/static");
 const pagesWorkerDest = join(pagesOutputDir, "_worker.js");
@@ -64,6 +65,10 @@ async function main() {
 	await cp(openNextDir, pagesOutputDir, { recursive: true });
 
 	await rename(join(pagesOutputDir, "worker.js"), pagesWorkerDest);
+	await cp(openNextAssetsDir, pagesOutputDir, {
+		recursive: true,
+		force: true,
+	});
 
 	await dropOversizedPagesAssets(pagesOutputDir);
 }

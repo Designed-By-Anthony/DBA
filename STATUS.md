@@ -34,8 +34,10 @@
 - Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `bun install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
 - Aligned the web package `build` script and Wrangler Pages config with Cloudflare's `/apps/web` root plus `/.vercel/output/static` output directory.
 - **`prepare-pages-bundle.mjs`:** strip static files over Cloudflare Pages’ **25 MiB** per-file cap from `.vercel/output/static` before deploy (safety net if large media is reintroduced under `public/`).
+- **`prepare-pages-bundle.mjs`:** mirror OpenNext `assets/` into `.vercel/output/static` root so Cloudflare Pages serves public files at their real URLs (`/favicon.ico`, `/brand/logo.png`, `/_next/static/*`) before the worker runs.
+- Added a real `public/favicon.ico` and advertised it in Next metadata to stop `/favicon.ico` from falling through to the worker and returning 500.
 - Removed `/brand/mark.webp` route handler and filesystem hashing in `MarketingChrome` (Workers lack a reliable disk mirror of `public/`); `/brand/mark.webp` is served as a static asset; script URL cache-bust uses `NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID` from `CF_PAGES_COMMIT_SHA` / `VERCEL_GIT_COMMIT_SHA` at build time.
-- Validation: Cloudflare-equivalent `bun install && bun x turbo run build --filter=@dba/web` from `apps/web`, plus root `bun run build` and `bun run lint`, all pass; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
+- Validation: root `bun run build` and `bun run lint` pass; Pages output now contains `/favicon.ico`, `/brand/logo.png`, `/brand/mark.webp`, and `/_next/static/*`; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
 
 ## Local machine sync with main (2026-04-28)
 
