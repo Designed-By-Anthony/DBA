@@ -1599,6 +1599,17 @@ button.reach-out-action {
 	color: rgba(255, 255, 255, 0.34);
 }
 
+.audit-form input:-webkit-autofill,
+.audit-form input:-webkit-autofill:hover,
+.audit-form input:-webkit-autofill:focus,
+.audit-form textarea:-webkit-autofill,
+.audit-form textarea:-webkit-autofill:hover,
+.audit-form textarea:-webkit-autofill:focus {
+	-webkit-box-shadow: 0 0 0 1000px #0a0f1a inset;
+	-webkit-text-fill-color: #fff;
+	caret-color: #fff;
+}
+
 .audit-form input:focus,
 .audit-form textarea:focus {
 	outline: none;
