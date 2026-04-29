@@ -22,11 +22,11 @@ function redirectToVertaflow(
 }
 
 /**
- * Host-based routing for the apex deployment.
+ * Edge middleware for the Cloudflare Pages deployment.
  * `admin.*` and `accounts.*` redirect to VertaFlow; everything else is the
  * single Next.js marketing app (including `/lighthouse`).
  */
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
 	const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
 	const { pathname } = request.nextUrl;
 

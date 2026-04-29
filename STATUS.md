@@ -18,6 +18,8 @@
 - Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.
 - Fixed Worker bundling by removing shared-package `@lh/*` self-alias imports that Wrangler could not resolve.
 - Confirmed the target architecture as Turborepo + `apps/web` Next.js on Cloudflare Pages + `apps/api` ElysiaJS on Cloudflare Workers; updated operator docs, footer stack badges, and hidden tech fingerprints to remove stale Firebase/npm references.
+- Switched host redirects from Next.js `proxy.ts` to Edge `middleware.ts` so OpenNext can build for Cloudflare Pages.
+- Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `npm install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
 - Validation: `npx bun run build` and `npx bun run lint` pass from repo root; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
 
 ## Local machine sync with main (2026-04-28)

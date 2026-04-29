@@ -25,7 +25,7 @@ const marketingSchema = z
 		INDEXNOW_FALLBACK_ENDPOINTS: z.string().trim().optional(),
 
 		// Reserved for VertaFlow redirect targets if we ever need to override
-		// the hard-coded admin/accounts hostnames in `src/proxy.ts`.
+		// the hard-coded admin/accounts hostnames in `src/middleware.ts`.
 		ADMIN_UPSTREAM_URL: optionalUrl,
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,
 	})

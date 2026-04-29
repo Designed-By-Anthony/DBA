@@ -16,7 +16,7 @@
       "name": "@dba/api",
       "version": "0.0.1",
       "dependencies": {
-        "@dba/shared": "workspace:*",
+        "@dba/shared": "file:../../packages/shared",
         "@elysiajs/cors": "^1.4.2",
         "elysia": "^1.4.26",
         "zod": "^3.25.76",
@@ -32,7 +32,7 @@
       "name": "@dba/web",
       "version": "0.0.1",
       "dependencies": {
-        "@dba/shared": "workspace:*",
+        "@dba/shared": "file:../../packages/shared",
         "@fontsource-variable/fraunces": "^5.2.9",
         "@fontsource-variable/inter": "^5.2.8",
         "@fontsource-variable/outfit": "^5.2.8",
@@ -1493,6 +1493,10 @@
     "@aws-sdk/xml-builder/tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
 
     "@cypress/xvfb/debug": ["debug@3.2.7", "", { "dependencies": { "ms": "^2.1.1" } }, "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ=="],
+
+    "@dba/api/@dba/shared": ["@dba/shared@file:packages/shared", {}],
+
+    "@dba/web/@dba/shared": ["@dba/shared@file:packages/shared", {}],
 
     "@dotenvx/dotenvx/commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 

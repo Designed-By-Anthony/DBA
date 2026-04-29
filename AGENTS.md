@@ -6,7 +6,7 @@
 - **Lockfile Integrity:** After ANY change to `package.json` (root or any workspace), run `bun install` and commit the updated `bun.lock` in the **same commit**. A lockfile mismatch is a build-breaking bug — treat it as P0.
 
 ## Infrastructure Context
-- **Routing (apex):** Handled by `apps/web/src/proxy.ts` on the Next.js Pages worker runtime.
+- **Routing (apex):** Handled by `apps/web/src/middleware.ts` on the Cloudflare Pages edge runtime.
 - **Public web:** Next.js app at `apps/web/` — apex + `www`. Lighthouse audit lives at `/lighthouse`.
 - **API:** ElysiaJS Cloudflare Worker at `apps/api/` — `api.designedbyanthony.com`.
 - **Shared code:** `packages/shared` (`@dba/shared`) — lighthouse business logic + shared lib helpers.
@@ -73,9 +73,9 @@ bun run lint          # Biome (root — applies to all packages)
 bun run test:e2e      # Cypress (see cypress.config.ts)
 ```
 
-### Host-based routing — Next.js proxy
+### Host-based routing — Next.js middleware
 
-`apps/web/src/proxy.ts` branches on `Host`.
+`apps/web/src/middleware.ts` branches on `Host`.
 
 - `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
 - `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`

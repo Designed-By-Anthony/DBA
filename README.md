@@ -2,9 +2,9 @@
 
 Public frontend is deployed via **Cloudflare Pages** (advanced mode with `_worker.js`), while APIs run on the separate **Cloudflare Worker** in `apps/api`.
 
-## Routing — `apps/web/src/proxy.ts`
+## Routing — `apps/web/src/middleware.ts`
 
-[`apps/web/src/proxy.ts`](./apps/web/src/proxy.ts) runs on the Next.js 16 **proxy** convention. It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
+[`apps/web/src/middleware.ts`](./apps/web/src/middleware.ts) runs as Edge middleware for Cloudflare Pages. It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
 
 ```
 admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*

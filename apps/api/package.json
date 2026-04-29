@@ -13,7 +13,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@dba/shared": "workspace:*",
+		"@dba/shared": "file:../../packages/shared",
 		"elysia": "^1.4.26",
 		"@elysiajs/cors": "^1.4.2",
 		"zod": "^3.25.76"
