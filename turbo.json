@@ -14,6 +14,20 @@
 				"public/scripts/**"
 			]
 		},
+		"@dba/api#build": {
+			"dependsOn": ["^build"],
+			"outputs": [".wrangler/tmp/**"]
+		},
+		"@dba/web#build": {
+			"dependsOn": ["^build"],
+			"outputs": [
+				".next/**",
+				"!.next/cache/**",
+				".open-next/**",
+				".vercel/output/static/**",
+				"public/scripts/**"
+			]
+		},
 		"dev": {
 			"cache": false,
 			"persistent": true

@@ -46,6 +46,22 @@ bun run deploy:api     # Cloudflare Worker API
 
 `NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.designedbyanthony.com`; set it only when a preview or alternate API Worker should be used. Environment variables and secrets are managed in Cloudflare (Workers & Pages -> Settings -> Variables & Secrets). `bun run --cwd apps/web sync:static-headers` (also run by web prebuild) regenerates `apps/web/static-headers.json` from `apps/web/build/csp.mjs` for Playwright CSP parity. Cloudflare Pages should use root `/apps/web`, build command `bun install && bun x turbo run build --filter=@dba/web`, and output `/.vercel/output/static`. Keep build commands in the Pages dashboard/CI settings; `apps/web/wrangler.jsonc` is only for Pages-supported runtime config such as `pages_build_output_dir`, compatibility date, flags, and bindings.
 
+### Cloudflare dashboard checklist (Pages + API Worker)
+
+**Pages (marketing frontend)** — project name in repo defaults: `designed-by-anthony` (`CLOUDFLARE_PAGES_PROJECT_NAME`).
+
+| Setting | Value |
+|--------|--------|
+| Root directory | Repository root **`.`** with build `cd apps/web && …`, **or** root **`apps/web`** with commands run from there |
+| Install command | **`bun install --frozen-lockfile`** (from chosen root) |
+| Build command | **`bun x turbo run build --filter=@dba/web`** (or **`cd ../.. && bun x turbo run build --filter=@dba/web`** if cwd is `apps/web`) |
+| Build output directory | **`apps/web/.vercel/output/static`** if Pages root is repo **`.`** — **``.vercel/output/static`** if Pages root is **`apps/web`** |
+| Deploy command | **Empty** — Pages uploads `_worker.js` + assets from `pages_build_output_dir` after build. Do **not** run **`wrangler versions upload`** here (that targets standalone Workers). |
+
+**Wrangler config path:** point Pages at **`apps/web/wrangler.jsonc`** (repo root) or ensure a copy exists under `apps/web` with **`pages_build_output_dir`**: **`.vercel/output/static`**.
+
+**API Worker (`apps/api`)** — separate from Pages: deploy with **`bun run deploy:api`** or **`wrangler deploy`** from **`apps/api`** (Worker name in **`apps/api/wrangler.jsonc`**: **`dba-api`**). Custom domains (e.g. **`api.designedbyanthony.com`**) are attached in the dashboard to that Worker script.
+
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 
 ## Global theme + brand

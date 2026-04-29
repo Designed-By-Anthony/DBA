@@ -11,6 +11,10 @@
 - Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
 - Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
 
+## Cloudflare MCP verification (2026-04-29)
+
+- **`workers_list`:** account lists Worker **`designedbyanthony`** (likely Pages bundle). Worker **`dba-api`** (`apps/api/wrangler.jsonc`) did **not** appear — confirm API Worker deploy + **`api.designedbyanthony.com`** routing in the dashboard.
+
 ## Local GitHub parity + CI build fix (2026-04-29)
 
 - Removed the unsupported `build` block from `apps/web/wrangler.jsonc` so Cloudflare Pages can validate the project config; Pages build command remains a dashboard/CI setting (`bun install && bun x turbo run build --filter=@dba/web`) while Wrangler owns output/runtime settings.
