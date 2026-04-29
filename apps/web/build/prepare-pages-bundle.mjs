@@ -4,10 +4,12 @@ import {
 	cp,
 	mkdir,
 	readdir,
+	readFile,
 	rename,
 	rm,
 	stat,
 	unlink,
+	writeFile,
 } from "node:fs/promises";
 import { join, relative } from "node:path";
 
@@ -50,6 +52,64 @@ async function dropOversizedPagesAssets(dir) {
 	}
 }
 
+async function patchPagesWorkerStaticFallback() {
+	const source = await readFile(pagesWorkerDest, "utf8");
+	const helper = `const PAGES_INTERNAL_ASSET_PREFIXES = [
+    "/.build/",
+    "/assets/",
+    "/cache/",
+    "/cloudflare/",
+    "/cloudflare-templates/",
+    "/dynamodb-provider/",
+    "/middleware/",
+    "/server-functions/",
+];
+const PUBLIC_FILE_EXTENSION_PATTERN = /\\/[\\w.-]+\\.[a-z0-9][a-z0-9-]{0,15}$/i;
+function shouldTryPagesStaticAsset(pathname) {
+    if (PAGES_INTERNAL_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+        return false;
+    }
+    return pathname.startsWith("/_next/static/") || PUBLIC_FILE_EXTENSION_PATTERN.test(pathname);
+}
+async function maybeServePagesStaticAsset(request, env) {
+    if (!shouldTryPagesStaticAsset(new URL(request.url).pathname)) {
+        return null;
+    }
+    if (typeof env?.ASSETS?.fetch !== "function") {
+        return null;
+    }
+    const response = await env.ASSETS.fetch(request);
+    return response.status === 404 ? null : response;
+}
+`;
+	const withHelper = source.replace(
+		"export default {",
+		`${helper}export default {`,
+	);
+	if (withHelper === source) {
+		throw new Error(
+			"Could not inject Pages static asset helper into _worker.js.",
+		);
+	}
+
+	const requestContext = "const url = new URL(request.url);\n";
+	const withFallback = withHelper.replace(
+		requestContext,
+		`${requestContext}            const pagesStaticAssetResponse = await maybeServePagesStaticAsset(request, env);
+            if (pagesStaticAssetResponse) {
+                return pagesStaticAssetResponse;
+            }
+`,
+	);
+	if (withFallback === withHelper) {
+		throw new Error(
+			"Could not inject Pages static asset fallback into _worker.js.",
+		);
+	}
+
+	await writeFile(pagesWorkerDest, withFallback);
+}
+
 async function main() {
 	await assertExists(workerEntry);
 	await assertExists(openNextDir);
@@ -69,6 +129,7 @@ async function main() {
 		recursive: true,
 		force: true,
 	});
+	await patchPagesWorkerStaticFallback();
 
 	await dropOversizedPagesAssets(pagesOutputDir);
 }

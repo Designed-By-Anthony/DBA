@@ -79,6 +79,6 @@ writeFileSync(
 	"utf8",
 );
 
-console.log(
+console.info(
 	"sync-static-headers: wrote static-headers.json (HTML CSP blocks for Playwright parity; live headers + CSP come from next.config.ts)",
 );

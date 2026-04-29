@@ -82,4 +82,4 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
 await mkdir(join(root, "public/images"), { recursive: true });
 await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(outPath);
 
-console.log("Wrote", outPath);
+console.info("Wrote", outPath);

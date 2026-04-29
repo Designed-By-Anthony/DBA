@@ -7,6 +7,10 @@
 		"apps/*",
 		"packages/*"
 	],
+	"overrides": {
+		"postcss": "^8.5.12",
+		"uuid": "^14.0.0"
+	},
 	"scripts": {
 		"dev": "turbo run dev --parallel",
 		"dev:web": "turbo run dev --filter=@dba/web",
