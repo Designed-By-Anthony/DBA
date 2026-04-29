@@ -22,7 +22,7 @@ const pwArgs =
 				? ["test", "-c", hostingConfig, ...args.slice(1)]
 				: ["test", "-c", hostingConfig, ...args];
 
-const child = spawn("npx", ["playwright", ...pwArgs], {
+const child = spawn("bunx", ["playwright", ...pwArgs], {
 	stdio: "inherit",
 	shell: process.platform === "win32",
 	env: process.env,
