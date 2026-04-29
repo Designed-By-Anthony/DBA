@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"engines": {
+		"bun": ">=1.1.0",
 		"node": ">=22.12.0"
 	},
 	"browserslist": {
@@ -28,16 +29,19 @@
 		"uuid": "^14.0.0"
 	},
 	"scripts": {
-		"generate:gbp-playbook-cover": "node build/generate-gbp-playbook-cover.mjs",
-		"generate:gbp-playbook-hero": "node build/generate-gbp-playbook-hero.mjs",
+		"generate:gbp-playbook-cover": "bun build/generate-gbp-playbook-cover.mjs",
+		"generate:gbp-playbook-hero": "bun build/generate-gbp-playbook-hero.mjs",
 		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
-		"sync:static-headers": "node build/sync-static-headers.mjs",
-		"prebuild": "npm run build:site-script && npm run sync:static-headers",
-		"dev": "npm run build:site-script && next dev",
+		"sync:static-headers": "bun build/sync-static-headers.mjs",
+		"prebuild": "bun run build:site-script && bun run sync:static-headers",
+		"dev": "bun run build:site-script && next dev",
+		"dev:api": "cd worker && wrangler dev",
 		"build": "next build",
 		"build:worker": "opennextjs-cloudflare build",
-		"preview:worker": "npm run build:worker && opennextjs-cloudflare preview",
-		"deploy": "npm run build:worker && opennextjs-cloudflare deploy",
+		"build:api": "cd worker && wrangler deploy --dry-run",
+		"preview:worker": "bun run build:worker && opennextjs-cloudflare preview",
+		"deploy": "bun run build:worker && opennextjs-cloudflare deploy",
+		"deploy:api": "cd worker && wrangler deploy",
 		"start": "next start",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write --unsafe",

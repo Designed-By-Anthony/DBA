@@ -32,5 +32,11 @@ google-cloud-cli-darwin-arm.tar.gz
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
 
-# pnpm lock (project uses npm)
+# pnpm lock (project uses bun)
 pnpm-lock.yaml
+# npm lock (project migrated to bun)
+package-lock.json
+
+# worker package
+worker/node_modules
+worker/.wrangler
