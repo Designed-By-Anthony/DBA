@@ -1,7 +1,8 @@
 /**
- * Origins allowed to call same-site marketing lead APIs from the browser
- * (`/api/contact`, `/api/lead-email`). Includes production apex + Firebase App
- * Hosting preview hosts.
+ * Origins allowed to call same-site marketing lead APIs from the browser.
+ * Production: designedbyanthony.com (+ subdomains)
+ * Staging: Cloudflare Pages preview hosts (*.pages.dev)
+ * Local dev: localhost/127.0.0.1 ports used by the monorepo.
  */
 
 const APEX_SUBDOMAIN_PATTERN =
@@ -16,17 +17,7 @@ const LOCAL_ORIGINS = new Set<string>([
 	"http://127.0.0.1:3100", // pragma: allowlist secret
 ]);
 
-const TRUSTED_HOST_SUFFIXES = [
-	".hosted.app",
-	".web.app",
-	".firebaseapp.com",
-] as const;
-
-/** Firebase App Hosting and Firebase Hosting preview hosts. */
-export function isTrustedHostedPreviewHostname(hostname: string): boolean {
-	const h = hostname.toLowerCase();
-	return TRUSTED_HOST_SUFFIXES.some((suffix) => h.endsWith(suffix));
-}
+const PAGES_PREVIEW_HOST_PATTERN = /\.pages\.dev$/i;
 
 export function isTrustedMarketingBrowserOrigin(
 	origin: string | null,
@@ -37,7 +28,7 @@ export function isTrustedMarketingBrowserOrigin(
 	try {
 		const url = new URL(origin);
 		if (url.protocol !== "https:" && url.protocol !== "http:") return false;
-		return isTrustedHostedPreviewHostname(url.hostname);
+		return PAGES_PREVIEW_HOST_PATTERN.test(url.hostname);
 	} catch {
 		return false;
 	}

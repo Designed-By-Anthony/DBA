@@ -37,8 +37,11 @@
 		"dev": "bun run build:site-script && next dev",
 		"build": "next build",
 		"build:worker": "opennextjs-cloudflare build",
+		"build:pages": "bun run build:worker && bun build/prepare-pages-bundle.mjs",
 		"preview:worker": "bun run build:worker && opennextjs-cloudflare preview",
-		"deploy": "bun run build:worker && opennextjs-cloudflare deploy",
+		"deploy:worker": "bun run build:worker && opennextjs-cloudflare deploy",
+		"deploy": "bun run deploy:pages",
+		"deploy:pages": "bun run build:pages && wrangler pages deploy .pages-output --project-name ${CLOUDFLARE_PAGES_PROJECT_NAME:-designed-by-anthony}",
 		"start": "next start",
 		"typecheck": "tsc --noEmit"
 	},

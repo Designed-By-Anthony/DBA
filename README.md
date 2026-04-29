@@ -1,6 +1,6 @@
 # Designed by Anthony — web
 
-Single **Next.js 16** application: marketing site, APIs, and the Lighthouse audit segment (same deploy).
+Public frontend is deployed via **Cloudflare Pages** (advanced mode with `_worker.js`), while APIs run on the separate **Cloudflare Worker** in `apps/api`.
 
 ## Routing — `src/proxy.ts`
 
@@ -12,7 +12,7 @@ accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
 * (everything else, including /lighthouse) → this Next app (fallthrough)
 ```
 
-### Optional env (Cloudflare Workers / local)
+### Optional env (Cloudflare Pages + Workers / local)
 
 | Name                      | When needed                                              |
 | ------------------------- | -------------------------------------------------------- |
@@ -35,7 +35,14 @@ npm run dev       # :3000 (builds public/scripts/site.js first)
 npm run build     # site script + sync static headers + next build
 ```
 
-Deploy to **Cloudflare Workers** via `npm run deploy` (requires `wrangler` authenticated with `npx wrangler login`). Environment variables and secrets are managed in the Cloudflare dashboard (Workers & Pages → Settings → Variables & Secrets) or with `wrangler secret put <KEY>`. `npm run sync:static-headers` (runs in `prebuild`) regenerates `static-headers.json` from `build/csp.mjs` for Playwright CSP parity.
+Deploy commands:
+
+```bash
+npm run deploy         # Cloudflare Pages (frontend)
+npm run deploy:api     # Cloudflare Worker (API)
+```
+
+`NEXT_PUBLIC_API_BASE_URL` must be set for production web builds so frontend requests target the API Worker directly. Environment variables and secrets are managed in Cloudflare (Workers & Pages → Settings → Variables & Secrets). `npm run sync:static-headers` (runs in `prebuild`) regenerates `static-headers.json` from `build/csp.mjs` for Playwright CSP parity.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 

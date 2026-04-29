@@ -4,13 +4,13 @@ import { optionalUrl, validateEnv } from "./shared";
 /**
  * Marketing site — designedbyanthony.com (Next.js).
  *
- * Single-deploy: marketing + Lighthouse + APIs all live in this one Next.js
- * app on Firebase App Hosting (and local dev). Schema validates the surface
- * that this app actually reads; everything else passes through (`.passthrough()`).
+ * Marketing app env surface for the public frontend.
+ * Backend APIs are served by the separate `apps/api` Cloudflare Worker.
  */
 const marketingSchema = z
 	.object({
 		NODE_ENV: z.enum(["development", "test", "production"]).optional(),
+		NEXT_PUBLIC_API_BASE_URL: optionalUrl,
 
 		PUBLIC_CRM_LEAD_URL: optionalUrl,
 		PUBLIC_API_URL: optionalUrl,
@@ -27,6 +27,16 @@ const marketingSchema = z
 		// the hard-coded admin/accounts hostnames in `src/proxy.ts`.
 		ADMIN_UPSTREAM_URL: optionalUrl,
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,
+	})
+	.superRefine((env, ctx) => {
+		if (env.NODE_ENV === "production" && !env.NEXT_PUBLIC_API_BASE_URL) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ["NEXT_PUBLIC_API_BASE_URL"],
+				message:
+					"NEXT_PUBLIC_API_BASE_URL is required in production for frontend to API Worker calls.",
+			});
+		}
 	})
 	.passthrough();
 

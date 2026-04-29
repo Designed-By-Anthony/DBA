@@ -2,6 +2,15 @@
 
 > **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Pages frontend + Worker API decoupling rollout (2026-04-29)
+
+- Added root `packageManager` metadata to unblock Turbo workspace resolution in Bun/CI.
+- Switched `apps/web` default deploy path to Cloudflare Pages (`deploy:pages`) while keeping a Worker fallback script (`deploy:worker`).
+- Added `apps/web/build/prepare-pages-bundle.mjs` to package OpenNext output into `.pages-output` (`_worker.js` + static assets) for Pages advanced-mode deploys.
+- Hardened frontend/backend boundary by requiring `NEXT_PUBLIC_API_BASE_URL` during production web env validation.
+- Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
+- Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
+
 ## Local machine sync with main (2026-04-28)
 
 - **Repository Parity:** Synchronized local `main` branch with `origin/main` using `git reset --hard`.

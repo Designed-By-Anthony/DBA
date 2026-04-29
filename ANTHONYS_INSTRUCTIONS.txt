@@ -6,7 +6,7 @@ Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 Layout
 ------
 • Turborepo monorepo at the repo root (Bun workspaces).
-• apps/web  — Next.js 16 app (marketing + /lighthouse): src/, public/, next.config.ts, wrangler.jsonc
+• apps/web  — Next.js 16 app (marketing + /lighthouse), deployed on Cloudflare Pages: src/, public/, next.config.ts, wrangler.jsonc
 • apps/api  — ElysiaJS Cloudflare Worker (api.designedbyanthony.com): src/routes/, wrangler.jsonc
 • packages/shared (@dba/shared) — shared business logic: lighthouse/lib/, lib/
 • Supporting folders at root (not separate deploys): customer-site-embeds/, vertaflow-crm/
@@ -32,12 +32,13 @@ From repo root:
   bun run build      — turbo: full production build of both apps
   bun run typecheck  — turbo: tsc --noEmit across all packages
 
-Cloudflare Workers
-------------------
-• Next.js Worker:   bun run deploy:web   (opennextjs-cloudflare build + deploy from apps/web)
+Cloudflare Pages + Workers
+--------------------------
+• Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
+• Next.js Worker fallback: bun run --cwd apps/web deploy:worker
 • API Worker:       bun run deploy:api   (wrangler deploy from apps/api)
 • Auth:             npx wrangler login once — then deploy from CLI or CI.
-• Secrets (web):    wrangler secret put <KEY> --cwd apps/web
+• Secrets/vars (web): Cloudflare Pages project settings
 • Secrets (api):    wrangler secret put <KEY> --cwd apps/api
 
 API Worker secrets (apps/api)
@@ -49,8 +50,8 @@ GOOGLE_PLACES_API_KEY, MOZ_API_CREDENTIALS, RECAPTCHA_ENTERPRISE_API_KEY,
 RECAPTCHA_ENTERPRISE_PROJECT_ID, RECAPTCHA_ENTERPRISE_SITE_KEY,
 GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, ALLOWED_ORIGINS
 
-Next.js Worker env (apps/web)
-------------------------------
+Next.js frontend env (apps/web)
+-------------------------------
 NEXT_PUBLIC_API_BASE_URL   (e.g. https://api.designedbyanthony.com)
 NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY, NEXT_PUBLIC_CRISP_WEBSITE_ID
 
