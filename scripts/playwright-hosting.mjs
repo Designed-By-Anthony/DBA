@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Cross-platform: runs Playwright with `playwright.hosting.config.ts` (static parity server + production headers).
- * Use: npm run test:e2e:hosting
- * Extra args: npm run test:e2e:hosting -- e2e/security-headers.spec.ts
+ * Use: bun run test:e2e:hosting
+ * Extra args: bun run test:e2e:hosting -- e2e/security-headers.spec.ts
  */
 import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -22,7 +22,7 @@ const pwArgs =
 				? ["test", "-c", hostingConfig, ...args.slice(1)]
 				: ["test", "-c", hostingConfig, ...args];
 
-const child = spawn("npx", ["playwright", ...pwArgs], {
+const child = spawn("bunx", ["playwright", ...pwArgs], {
 	stdio: "inherit",
 	shell: process.platform === "win32",
 	env: process.env,

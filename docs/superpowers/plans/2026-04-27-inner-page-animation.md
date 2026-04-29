@@ -109,7 +109,7 @@ Append after the existing `.btn-secondary-proof:hover` block (around line 912):
 
 ```bash
 cd "/Users/anthonyjones/Web Design/Designed_By_Anthony"
-npm run build 2>&1 | tail -20
+bun run build 2>&1 | tail -20
 ```
 
 Expected: build completes with no errors.
@@ -293,7 +293,7 @@ Append at the end of `marketing-site-pages.css`:
 - [ ] **Step 4: Verify build passes**
 
 ```bash
-npm run build 2>&1 | tail -20
+bun run build 2>&1 | tail -20
 ```
 
 Expected: no errors.
@@ -433,7 +433,7 @@ Append after the `.article-pullquote` block:
 - [ ] **Step 4: Verify build passes**
 
 ```bash
-npm run build 2>&1 | tail -20
+bun run build 2>&1 | tail -20
 ```
 
 Expected: no errors.
@@ -621,8 +621,8 @@ In `ServiceDetailPage`, the CTA section at the bottom uses `reveal-up` on the co
 - [ ] **Step 6: Run TypeScript check and build**
 
 ```bash
-npx tsc --noEmit 2>&1 | head -30
-npm run build 2>&1 | tail -20
+bun x tsc --noEmit 2>&1 | head -30
+bun run build 2>&1 | tail -20
 ```
 
 Expected: no TypeScript errors, build passes.
@@ -854,8 +854,8 @@ Find the location card grid in `ServiceAreasPage` and wrap similarly. Look for a
 - [ ] **Step 8: Run TypeScript check and build**
 
 ```bash
-npx tsc --noEmit 2>&1 | head -30
-npm run build 2>&1 | tail -20
+bun x tsc --noEmit 2>&1 | head -30
+bun run build 2>&1 | tail -20
 ```
 
 Expected: no TypeScript errors, build passes. Fix any errors before committing.
@@ -876,7 +876,7 @@ git commit -m "feat(anim): add MotionReveal/MotionStagger to enriched page compo
 - [ ] **Step 1: Start dev server**
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 - [ ] **Step 2: Check each page type**

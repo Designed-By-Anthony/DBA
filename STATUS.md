@@ -1,15 +1,26 @@
 # Migration Status Report
 
-> **Note:** This file tracks migration and release notes for the **single root Next.js** app (`npm`, `package-lock.json`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
+> **Note:** This file tracks migration and release notes for the **single root Next.js** app (`bun`, `bun.lock`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
 ## Pages frontend + Worker API decoupling rollout (2026-04-29)
 
+- Cloudflare Pages **deploy command** must stay **empty** (or a no-op): **`wrangler versions upload`** targets standalone Workers and fails with “Missing entry-point”; Pages uploads `_worker.js` from `pages_build_output_dir` after build.
+
 - Added root `packageManager` metadata to unblock Turbo workspace resolution in Bun/CI.
 - Switched `apps/web` default deploy path to Cloudflare Pages (`deploy:pages`) while keeping a Worker fallback script (`deploy:worker`).
-- Added `apps/web/build/prepare-pages-bundle.mjs` to package OpenNext output into `.vercel/output/static` (full `.open-next` copy + `worker.js` → `_worker.js`) so Pages’ Wrangler step can resolve `./cloudflare/*`, `middleware/`, and `server-functions/` imports; copying only `assets/` previously broke the upload bundle step.
+- Added `apps/web/build/prepare-pages-bundle.mjs` to copy the **full** `.open-next` tree into `.vercel/output/static`, rename `worker.js` → `_worker.js`, and strip files over **25 MiB** so Wrangler resolves `./cloudflare/*`, `./middleware/*`, `./server-functions/*`, and `./.build/*` next to `_worker.js` (copying only `assets/` previously broke Pages deploy).
 - Hardened frontend/backend boundary by requiring `NEXT_PUBLIC_API_BASE_URL` during production web env validation.
 - Tightened browser-origin trust rules to apex + Cloudflare Pages previews (`*.pages.dev`) + localhost dev and reused this shared logic in API CORS setup.
 - Updated operator docs (`README.md`, `.env.example`, `AGENTS.md`, `ANTHONYS_INSTRUCTIONS.txt`) to document Pages (frontend) + Worker (backend) architecture.
+
+## Architecture (two Cloudflare surfaces — required setup)
+
+| Surface | Repo | Worker / bundle name | Hostname |
+|---------|------|----------------------|----------|
+| **Pages** (Next.js + OpenNext `_worker.js`) | `apps/web/` | Pages upload (dashboard may show e.g. **`designedbyanthony`**) | **`designedbyanthony.com`** |
+| **Worker** (Elysia API) | `apps/api/` | **`dba-api`** in `wrangler.jsonc` | **`api.designedbyanthony.com`** |
+
+- **`workers_list` (MCP):** saw **`designedbyanthony`**; **`dba-api`** not listed — deploy API from **`apps/api`** and attach **`api`** subdomain to **`dba-api`**.
 
 ## Local GitHub parity + CI build fix (2026-04-29)
 
@@ -18,21 +29,21 @@
 - Added a production-safe public API default (`https://api.designedbyanthony.com`) so Cloudflare Pages builds no longer fail when `NEXT_PUBLIC_API_BASE_URL` is unset; explicit env overrides still win.
 - Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.
 - Fixed Worker bundling by removing shared-package `@lh/*` self-alias imports that Wrangler could not resolve.
-- Confirmed the target architecture as Turborepo + `apps/web` Next.js on Cloudflare Pages + `apps/api` ElysiaJS on Cloudflare Workers; updated operator docs, footer stack badges, and hidden tech fingerprints to remove stale Firebase/npm references.
+- Confirmed the target architecture as Turborepo + `apps/web` Next.js on Cloudflare Pages + `apps/api` ElysiaJS on Cloudflare Workers; updated operator docs, footer stack badges, and hidden tech fingerprints to remove stale Firebase references.
 - Switched host redirects from Next.js `proxy.ts` to Edge `middleware.ts` so OpenNext can build for Cloudflare Pages.
-- Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `npm install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
+- Made `@dba/shared` a portable `file:../../packages/shared` dependency so Cloudflare Pages' `bun install` step can resolve the monorepo from `apps/web`; split Pages and Worker Wrangler configs.
 - Aligned the web package `build` script and Wrangler Pages config with Cloudflare's `/apps/web` root plus `/.vercel/output/static` output directory.
 - **`prepare-pages-bundle.mjs`:** strip static files over Cloudflare Pages’ **25 MiB** per-file cap from `.vercel/output/static` before deploy (safety net if large media is reintroduced under `public/`).
 - Removed `/brand/mark.webp` route handler and filesystem hashing in `MarketingChrome` (Workers lack a reliable disk mirror of `public/`); `/brand/mark.webp` is served as a static asset; script URL cache-bust uses `NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID` from `CF_PAGES_COMMIT_SHA` / `VERCEL_GIT_COMMIT_SHA` at build time.
-- Validation: Cloudflare-equivalent `npx bun install && npx bun x turbo run build --filter=@dba/web` from `apps/web`, plus root `npx bun run build` and `npx bun run lint`, all pass; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
+- Validation: Cloudflare-equivalent `bun install && bun x turbo run build --filter=@dba/web` from `apps/web`, plus root `bun run build` and `bun run lint`, all pass; no authored `console.log` or explicit `any` found under `apps/*/src` or `packages/shared/src`.
 
 ## Local machine sync with main (2026-04-28)
 
 - **Repository Parity:** Synchronized local `main` branch with `origin/main` using `git reset --hard`.
-- **Environment:** Performed `npm install` and `npm run sync:static-headers` to ensure local alignment with lockfile and security headers.
-- **Lockfile:** Updated `package-lock.json` to reflect current environment and committed for integrity.
+- **Environment:** Performed `bun install` and `bun run sync:static-headers` to ensure local alignment with lockfile and security headers.
+- **Lockfile:** Updated `bun.lock` to reflect current environment and committed for integrity.
 - **Biome:** Updated `biome.json` to exclude agent-specific directories from linting.
-- Validation: `npm run lint` and `npm run build` pass from repo root.
+- Validation: `bun run lint` and `bun run build` pass from repo root.
 
 ## Codebase cleanup + pre-store security audit (2026-04-28)
 
@@ -42,7 +53,7 @@
 ### Security audit findings
 | Surface | Status | Notes |
 |--------|--------|-------|
-| `npm audit` (production deps) | ✅ 0 vulnerabilities | |
+| `bun audit` (production deps) | ✅ 0 vulnerabilities | |
 | `console.log` leaks | ✅ None | Only `console.error`/`warn` in server error paths |
 | TypeScript `any` | ✅ None | Strict typing throughout |
 | HSTS / security headers | ✅ Set | `next.config.ts` — HSTS, X-Frame-Options, X-Content-Type-Options, COOP, Referrer-Policy, Permissions-Policy |
@@ -57,7 +68,7 @@ Before adding a store, ensure:
 - [ ] Add Stripe (or chosen processor) keys to `src/lib/env/marketing.ts` Zod schema
 - [ ] Create `/api/store/webhook` with **HMAC signature verification** on every incoming webhook
 - [ ] Add per-IP rate limiting to any checkout/order API route (mirroring `src/lighthouse/lib/http.ts` pattern)
-- [ ] Extend CSP `connect-src` in `build/csp.mjs` for Stripe JS (`https://js.stripe.com`, `https://api.stripe.com`) + run `npm run sync:static-headers`
+- [ ] Extend CSP `connect-src` in `build/csp.mjs` for Stripe JS (`https://js.stripe.com`, `https://api.stripe.com`) + run `bun run sync:static-headers`
 - [ ] Add Stripe JS script origin to `script-src` in `build/csp.mjs`
 - [ ] Validate all store input with Zod (already the project standard)
 - [ ] Add `X-Stripe-Signature` or equivalent header verification to webhook handler
@@ -69,7 +80,7 @@ Before adding a store, ensure:
 - **Tech fingerprints (`LighthouseTechFingerprints.tsx`):** Corrected `data-builtwith-tech-stack` to reflect production stack (Firebase Hosting, Cloudflare, reCAPTCHA Enterprise).
 - **Color palette unification:** Enhanced `theme.css` body atmospheric gradients to match Lighthouse premium depth — sky blue primary glow (0.12 opacity), bronze warm accent (0.06), tertiary blue depth layer, unified ink base gradient.
 - **Brand consistency:** Entire site now shares the same bronze/sky color language as the Lighthouse audit page.
-- Validation: `npm run build` and `npm run lint` pass from repo root.
+- Validation: `bun run build` and `bun run lint` pass from repo root.
 
 ## Lighthouse final premium brand polish (2026-04-28)
 
@@ -78,7 +89,7 @@ Before adding a store, ensure:
 - **Editorial typography:** H1 gradient text treatment matching marketing heroes, refined Fraunces optical sizing, tighter letter-spacing and line-height for premium hierarchy.
 - **Component refinements:** Refined glass card border/gradient finishes, enhanced score ring spring animations with hover state, instrument-panel feel for scan progress with spring physics, premium phase cards with smoother transitions.
 - **Files:** `lighthouse-globals.css`, `ScoreRing.tsx`, `AuditForm.tsx`, `AuditScanProgress.tsx`, new `cursorGlow.ts`.
-- Validation: `npm run build` and `npm run lint` pass from repo root.
+- Validation: `bun run build` and `bun run lint` pass from repo root.
 
 ## Lighthouse premium scanner + reCAPTCHA Enterprise (2026-04-28)
 
@@ -91,7 +102,7 @@ Before adding a store, ensure:
 
 - Migrated the main marketing chrome toward the newer Lighthouse header treatment: branded mark + wordmark lockup, brass banner/header rule, quieter nav typography, and aligned mobile brand behavior.
 - Tightened `/lighthouse`: removed the headline overlap badge/glow clutter, reduced vertical void space, contained the report preview, compacted the process strip/form, and softened the audit form copy toward a more premium service tone.
-- Verified with `npm run build`, `npm run lint` (2 sanitized HTML warnings only), Playwright desktop/mobile checks for `/` and `/lighthouse`, and brand asset presence checks for `/brand/logo.png` + `/brand/mark.webp`.
+- Verified with `bun run build`, `bun run lint` (2 sanitized HTML warnings only), Playwright desktop/mobile checks for `/` and `/lighthouse`, and brand asset presence checks for `/brand/logo.png` + `/brand/mark.webp`.
 - Added `src/design-system/site-config.ts` as the shared brand/nav/banner/footer/social source of truth for marketing + Lighthouse chrome.
 - Promoted bronze to canonical design tokens (`--accent-bronze*`) with legacy brass aliases, then swept authored CSS to consume the tokenized bronze RGB instead of hand-coded bronze values.
 
@@ -151,24 +162,24 @@ Before adding a store, ensure:
 
 - **`/lighthouse` landing:** `LighthouseHero` splash (“Lighthouse Scanner v2 · Live now”), glass card wrap for the form, tightened loading copy, footer note on report links. Metadata titles/descriptions mention v2.
 - **Freshsales lead from audit:** When `FRESHWORKS_CRM_SYNC_ENABLED=1` and `FRESHWORKS_CRM_BASE_URL` + `FRESHWORKS_CRM_API_KEY` are set, `POST /api/audit` `after()` calls `createFreshworksLeadFromAudit()` (`src/lighthouse/lib/freshworksCrm.ts`) — `POST {base}/api/leads` with `Token token=` or `Bearer` auth. Optional `FRESHWORKS_CRM_CUSTOM_FIELD_KEYS` for `cf_*` fields; otherwise full context lives in lead **description**. Env keys documented in `.env.example` and `validateLighthouseEnv` schema.
-- Verified with `npm run lint` + `npm run build`.
+- Verified with `bun run lint` + `bun run build`.
 
 ## Contact drawer + crawl discovery (2026-04-27)
 
 - **Left contact drawer:** `SiteContactDrawer` (formerly quick-rail) is a **Contact** tab with a high-contrast panel, **Technical examples and best practices** snippet (includes `-webkit-transform-origin: 0% 100%` guidance), audit + contact + Calendly + email + `tel:` actions, Escape to close, dimmed backdrop on mobile, and **bottom sheet** under 1200px with scroll lock. `public/robots.txt` + `public/llms.txt` point to **`/sitemap.xml`**. **`src/app/sitemap.ts`** + **`src/lib/marketing-path-registry.ts`** keep crawl URLs aligned with SSG.
-- **Lint / code hygiene (2026-04-27):** `npm run lint` is clean (zero diagnostics). Biome excludes generated **`static-headers.json`** / **`netlify.toml`** from formatting checks; theme + layout-shell CSS allow intentional `!important` / specificity patterns. **`src/scripts/audit-forms.ts`** uses typed Turnstile + `AuditFormElement` (no `any`). Lighthouse: removed unused React default imports, optional chaining, `Number.isNaN`, `node:crypto` import, Sheets API guard without non-null assertions.
+- **Lint / code hygiene (2026-04-27):** `bun run lint` is clean (zero diagnostics). Biome excludes generated **`static-headers.json`** / **`netlify.toml`** from formatting checks; theme + layout-shell CSS allow intentional `!important` / specificity patterns. **`src/scripts/audit-forms.ts`** uses typed Turnstile + `AuditFormElement` (no `any`). Lighthouse: removed unused React default imports, optional chaining, `Number.isNaN`, `node:crypto` import, Sheets API guard without non-null assertions.
 
 ## Site shell + content audit (2026-04-25)
 
 - **Layout repair:** Removed root `freshworks-widget` script (floating embed was painting above the header). Homepage no longer embeds the Freshworks form inline — CTA card links to `/contact`. Marketing chrome uses **`SiteContactDrawer`** (left rail / mobile bottom sheet) + main column; desktop nav adds FAQ, Blog, Service Areas. Contact page uses a styled `contact-form-shell`; Freshworks embed only loads on pages that render `AuditForm`.
 - Added CSS-only aurora layers on the homepage hero and inner marketing heroes (`hero-drift`, `marketing-hero-aurora`) for a richer look without extra JS; motion respects `prefers-reduced-motion`.
-- Added Playwright (`@playwright/test`) with `playwright/security-crawl.spec.ts` to walk high-signal GET routes. When `PLAYWRIGHT_ZAP=1`, Chromium uses the ZAP proxy and `afterAll` triggers a ZAP spider plus HTML/JSON reports under `test-results/zap/` (requires ZAP listening with `ZAP_API_KEY`). Scripts: `npm run test:playwright`, `npm run test:playwright:zap`.
-- **Blank-page hardening:** Reveal animations now force `.reveal-active` after 3.4s if IntersectionObserver never fires. `/404` → proxy rewrite to `/page-not-found` for the branded not-found page. Legacy `/free-seo-audit` **308 → `/contact`** via `next.config.ts` redirects while on-site audit tooling is paused. `playwright/pages-render.spec.ts` asserts every marketing URL has visible `#main-content` text (`npm run test:playwright:render`). Playwright starts `next start` on **port 3001** by default (`PLAYWRIGHT_TEST_PORT`) so it does not collide with a dev server on :3000; set `PLAYWRIGHT_REUSE_SERVER=1` only when you intentionally reuse an already-running server.
+- Added Playwright (`@playwright/test`) with `playwright/security-crawl.spec.ts` to walk high-signal GET routes. When `PLAYWRIGHT_ZAP=1`, Chromium uses the ZAP proxy and `afterAll` triggers a ZAP spider plus HTML/JSON reports under `test-results/zap/` (requires ZAP listening with `ZAP_API_KEY`). Scripts: `bun run test:playwright`, `bun run test:playwright:zap`.
+- **Blank-page hardening:** Reveal animations now force `.reveal-active` after 3.4s if IntersectionObserver never fires. `/404` → proxy rewrite to `/page-not-found` for the branded not-found page. Legacy `/free-seo-audit` **308 → `/contact`** via `next.config.ts` redirects while on-site audit tooling is paused. `playwright/pages-render.spec.ts` asserts every marketing URL has visible `#main-content` text (`bun run test:playwright:render`). Playwright starts `next start` on **port 3001** by default (`PLAYWRIGHT_TEST_PORT`) so it does not collide with a dev server on :3000; set `PLAYWRIGHT_REUSE_SERVER=1` only when you intentionally reuse an already-running server.
 - Fixed the client-side page lifecycle so shared marketing behaviors re-initialize after Next.js route changes instead of only on the first load. That removes the DOM-mutation timing issue that was throwing hydration mismatches and leaving shell interactions unreliable across internal navigation.
 - Hardened the reveal animation system with a timed fallback so below-the-fold sections and footer content no longer stay visually blank when the intersection observer is late or skipped.
 - Removed Astro-era naming and copy from the live Next.js app surface: homepage section classes, footer badge styling, blog metadata, image asset names, env comments, and related source comments now reflect the current stack.
 - Updated the blog index/article metadata so the former Astro-focused posts now ship as Next.js content with matching slugs and assets.
-- Verified with `npm run build` from the repo root plus targeted checks against `http://localhost:3000`, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
+- Verified with `bun run build` from the repo root plus targeted checks against `http://localhost:3000`, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
 - **Pricing + schema polish:** Offer-catalog JSON-LD for standard rebuilds references `STANDARD_WEBSITE_INSTALLMENT_EACH` and `PUBLIC_LAUNCH_BUNDLE_MONTHS` so it stays aligned with `offers.ts`. Homepage metadata, hero variants, process strip, and pitch strip use the same "contact us for your free audit" CTA language. FAQPage JSON-LD has a stable `@id`; homepage JSON-LD script keys derive from `@id` / type instead of array indexes (Biome-clean).
 - **Service area landing pages:** `src/data/serviceAreaLocations.ts` drives `/service-areas/[slug]` (Rome, Utica, New Hartford, Clinton, Syracuse, Watertown, Naples, Houston) with long-form copy, breadcrumbs, WebPage + BreadcrumbList JSON-LD (`buildMarketingWebPageSchema`), clickable cards on `/service-areas`, `generateStaticParams` + meta descriptions in `[...path]/page.tsx`, and Playwright route coverage via `getAllServiceAreaSlugs()` in `marketing-routes.ts`.
 - **GBP 2026 blog cover:** Post uses `public/images/gbp_2026_cny_playbook_cover.png` (1024×1024) with `coverPresentation: "liftOnDark"` so the dark map artwork reads on the marketing shell (see `.blog-cover--lift-on-dark` in `marketing-site-pages.css`).
@@ -185,16 +196,16 @@ Before adding a store, ensure:
 
 - **Layout repair:** Removed root `freshworks-widget` script (floating embed was painting above the header). Homepage no longer embeds the Freshworks form inline — CTA card links to `/contact`. Marketing chrome uses a **left sticky quick-action rail** (desktop) + main column; desktop nav adds FAQ, Blog, Service Areas. Contact page uses a styled `contact-form-shell`; Freshworks embed only loads on pages that render `AuditForm`.
 - Added CSS-only aurora layers on the homepage hero and inner marketing heroes (`hero-drift`, `marketing-hero-aurora`) for a richer look without extra JS; motion respects `prefers-reduced-motion`.
-- Added Playwright (`@playwright/test`) with `playwright/security-crawl.spec.ts` to walk high-signal GET routes. When `PLAYWRIGHT_ZAP=1`, Chromium uses the ZAP proxy and `afterAll` triggers a ZAP spider plus HTML/JSON reports under `test-results/zap/` (requires ZAP listening with `ZAP_API_KEY`). Scripts: `npm run test:playwright`, `npm run test:playwright:zap`.
-- **Blank-page hardening:** Reveal animations now force `.reveal-active` after 3.4s if IntersectionObserver never fires. `/404` → proxy rewrite to `/page-not-found` for the branded not-found page. Legacy `/free-seo-audit` **308 → `/contact`** via `next.config.ts` redirects while on-site audit tooling is paused. `playwright/pages-render.spec.ts` asserts every marketing URL has visible `#main-content` text (`npm run test:playwright:render`). Playwright starts `next start` on **port 3001** by default (`PLAYWRIGHT_TEST_PORT`) so it does not collide with a dev server on :3000; set `PLAYWRIGHT_REUSE_SERVER=1` only when you intentionally reuse an already-running server.
+- Added Playwright (`@playwright/test`) with `playwright/security-crawl.spec.ts` to walk high-signal GET routes. When `PLAYWRIGHT_ZAP=1`, Chromium uses the ZAP proxy and `afterAll` triggers a ZAP spider plus HTML/JSON reports under `test-results/zap/` (requires ZAP listening with `ZAP_API_KEY`). Scripts: `bun run test:playwright`, `bun run test:playwright:zap`.
+- **Blank-page hardening:** Reveal animations now force `.reveal-active` after 3.4s if IntersectionObserver never fires. `/404` → proxy rewrite to `/page-not-found` for the branded not-found page. Legacy `/free-seo-audit` **308 → `/contact`** via `next.config.ts` redirects while on-site audit tooling is paused. `playwright/pages-render.spec.ts` asserts every marketing URL has visible `#main-content` text (`bun run test:playwright:render`). Playwright starts `next start` on **port 3001** by default (`PLAYWRIGHT_TEST_PORT`) so it does not collide with a dev server on :3000; set `PLAYWRIGHT_REUSE_SERVER=1` only when you intentionally reuse an already-running server.
 - Fixed the client-side page lifecycle so shared marketing behaviors re-initialize after Next.js route changes instead of only on the first load. That removes the DOM-mutation timing issue that was throwing hydration mismatches and leaving shell interactions unreliable across internal navigation.
 - Hardened the reveal animation system with a timed fallback so below-the-fold sections and footer content no longer stay visually blank when the intersection observer is late or skipped.
 - Removed Astro-era naming and copy from the live Next.js app surface: homepage section classes, footer badge styling, blog metadata, image asset names, env comments, and related source comments now reflect the current stack.
 - Updated the blog index/article metadata so the former Astro-focused posts now ship as Next.js content with matching slugs and assets.
-- Verified with `npm run build` from the repo root plus targeted checks on the production marketing host, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
+- Verified with `bun run build` from the repo root plus targeted checks on the production marketing host, `/contact`, and `/blog` to confirm the corrected footer/content and the new Next.js blog entries are present in served HTML.
 - **Pricing + schema polish:** Offer-catalog JSON-LD for standard rebuilds references `STANDARD_WEBSITE_INSTALLMENT_EACH` and `PUBLIC_LAUNCH_BUNDLE_MONTHS` so it stays aligned with `offers.ts`. Homepage metadata, hero variants, process strip, and pitch strip use the same "contact us for your free audit" CTA language. FAQPage JSON-LD has a stable `@id`; homepage JSON-LD script keys derive from `@id` / type instead of array indexes (Biome-clean).
 - **Service area landing pages:** `src/data/serviceAreaLocations.ts` drives `/service-areas/[slug]` (Rome, Utica, New Hartford, Clinton, Syracuse, Watertown, Naples, Houston) with long-form copy, breadcrumbs, WebPage + BreadcrumbList JSON-LD (`buildMarketingWebPageSchema`), clickable cards on `/service-areas`, `generateStaticParams` + meta descriptions in `[...path]/page.tsx`, and Playwright route coverage via `getAllServiceAreaSlugs()` in `marketing-routes.ts`.
-- **GBP 2026 blog hero:** Post cover uses `public/images/gbp_2026_cny_playbook_hero.png` (1920×960) plus infographic-style alt text. Regenerate placeholder with `npm run generate:gbp-playbook-hero`, or replace that file with the final exported artwork (keep the same path).
+- **GBP 2026 blog hero:** Post cover uses `public/images/gbp_2026_cny_playbook_hero.png` (1920×960) plus infographic-style alt text. Regenerate placeholder with `bun run generate:gbp-playbook-hero`, or replace that file with the final exported artwork (keep the same path).
 - **Marketing SEO completeness:** `resolveMarketingMetadata()` in `src/lib/marketing-metadata.ts` supplies per-route `description`, `alternates.canonical`, Open Graph (and Twitter where useful), plus `noindex` for thank-you / Facebook offer. `MarketingJsonLd` + `EnrichedPages` emit WebPage + BreadcrumbList, ItemList (services, blog index), Service (service detail), BlogPosting (posts), FAQPage + OfferCatalog on `/faq` and `/pricing` respectively, without duplicate graphs on enriched routes.
 - **Viewport + responsive polish:** Root `export const viewport` (device-width, initial scale 1, `viewport-fit: cover`, theme-color) so phones get a proper meta viewport. `html { overflow-x: clip }`, section containers `max-width: 100%`, pilot banner link wraps on small screens, marketing CTA rows stack full-width under 520px, blog index lazy-loads images after the first card, article hero uses `fetchPriority="high"` + `decoding="async"`.
 - **Premium inner-page polish:** `@font-face` for Fraunces Variable (woff2); `PageHero` uses `marketing-page-hero--editorial` — centered editorial headline (gradient text), softer aurora, scoped `::after` vignette. Pilot banner + left quick rail restyled (glass, brass accent, narrower rail) for a quieter chrome vs. content hierarchy.
@@ -208,7 +219,7 @@ Before adding a store, ensure:
 ## Marketing lead-email bridge — interim Resend handler until VertaFlow CRM tenant is live (2026-04-22)
 ## Pre-Netlify migration archive (superseded)
 
-Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turborepo** layout (`apps/marketing`, `apps/lighthouse`, `apps/web-viewer`, `packages/*`), **Astro** marketing, and **Vercel** multi-project routing. That tree is **not** present in this repository anymore.
+Detailed STATUS entries before **2026-04-26** described an older **multi-app + Turborepo** layout (`apps/marketing`, `apps/lighthouse`, `apps/web-viewer`, `packages/*`), **Astro** marketing, and **Vercel** multi-project routing. That tree is **not** present in this repository anymore.
 
 **Current source of truth (this repo):**
 
@@ -216,7 +227,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
 - **Marketing + APIs:** `src/app/(site)/`, `src/app/api/`, shared `src/components/marketing/`.
 - **Lighthouse segment:** `src/app/lighthouse/`, audit UI + libs under `src/lighthouse/`, audit API `src/app/api/audit/route.ts`, optional lead email `src/app/api/lead-email/route.ts`.
 - **Env schemas:** `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, `src/lib/env/shared.ts` (not `packages/env`).
-- **CSP / Netlify headers:** `build/csp.mjs`, `npm run sync:static-headers` → `static-headers.json` + `netlify.toml`.
+- **CSP / Netlify headers:** `build/csp.mjs`, `bun run sync:static-headers` → `static-headers.json` + `netlify.toml`.
 - **Operator docs:** [README.md](README.md), [AGENTS.md](AGENTS.md), [lighthouse2.md](lighthouse2.md).
 
 ---
@@ -226,7 +237,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
 - Updated `README.md` deploy section to reflect Netlify Next runtime (`@netlify/plugin-nextjs`) and removed outdated static `.next` publish guidance.
 - Disabled Vercel-only Sentry monitor automation in `next.config.ts` (`automaticVercelMonitors: false`) to match Netlify production.
 - Removed root `vercel.json` from the repo to prevent cross-platform config drift.
-- Validation: `npm run build` passes from repo root after these changes.
+- Validation: `bun run build` passes from repo root after these changes.
 
 ## 2026-04-26 Pre-Launch UX + Content Hardening (MR #134)
 
@@ -236,7 +247,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
 - Removed footer `id="contact"` collision risk that could hijack anchor/form targeting.
 - Hardened Crisp bootstrap in `src/app/layout.tsx` with duplicate-load guard (`window.__dbaCrispLoaded`) and safe `$crisp` initialization.
 - Expanded long-form content system for `services`, `service-areas`, and `blog` pages via `src/data/longformContent.ts`, including a universal depth addendum to ensure dense, conversion-oriented page depth.
-- Validation: `npm run build` passes from repo root after these changes. Biome check on touched files reports no errors (warnings only for existing global `!important` rules in shared CSS).
+- Validation: `bun run build` passes from repo root after these changes. Biome check on touched files reports no errors (warnings only for existing global `!important` rules in shared CSS).
 
 ## 2026-04-26 Footer UX Polish (MR #134 follow-up)
 
@@ -244,7 +255,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
 - Added mobile-first styles for `footer--slim`, `footer-container--slim`, `footer-row`, and `footer-nav` with proper wrapping, spacing, and responsive behavior.
 - Improved desktop alignment (logo / nav / socials) and tighter small-screen stacking for cleaner rendering.
 - Removed duplicate `min-height` declaration in `src/styles/theme.css` flagged by Biome as an error.
-- Validation: `npm run build` passes after footer updates.
+- Validation: `bun run build` passes after footer updates.
 
 ## 2026-04-26 UX Polish Pass (Home / Services / Service Areas / About)
 
@@ -260,7 +271,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - Divider glow, editorial card surface, accent rails for paragraphs
 - Tightened tucked quick-actions rail (closed state shows less tab width).
 - Removed last name from About copy (now “Anthony” instead of “Anthony Jones”) in both About page content and static marketing copy.
-- Validation: `npm run build` passes.
+- Validation: `bun run build` passes.
 
 ## 2026-04-26 GitLab CI Security Scan Wiring (DAST + SAST)
 
@@ -271,7 +282,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - `Jobs/Dependency-Scanning.gitlab-ci.yml`
 - Hardened DAST job rules so it runs for MRs/default branch only when `DAST_TARGET_URL` is defined (prevents silent misfire and noisy failures).
 - Set DAST to `allow_failure: true` so scan results still surface without blocking delivery while tuning target/auth setup.
-- Validation: `npm run build` passes from repo root after CI updates.
+- Validation: `bun run build` passes from repo root after CI updates.
 
 ## 2026-04-26 Full-Repo Biome Lint Stabilization
 
@@ -284,7 +295,7 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - Fixed `forEach` callback returns in sheets sync logic.
   - Removed duplicate `min-height` declaration in lighthouse global CSS.
   - Formatted `src/design-system/tailwind-v4-bridge.css` to satisfy Biome formatter checks.
-- Validation: `npm run lint` now exits successfully for the full repo (warnings remain for style-hardening follow-up).
+- Validation: `bun run lint` now exits successfully for the full repo (warnings remain for style-hardening follow-up).
 
 ## 2026-04-26 GitLab Security Jobs Forced Per Pipeline
 
@@ -307,18 +318,18 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - `scripts/static-parity-server.mjs`
 - Dependency remediation:
   - Added root overrides for `postcss` and `uuid` in `package.json`.
-  - Ran `npm install` and updated `package-lock.json`.
+  - Ran `bun install` and updated `bun.lock`.
   - Verified resolved versions in tree: `postcss@8.5.12`, `uuid@11.1.0`.
 - Validation:
-  - `npm run lint` passes (warnings only).
-  - `npm run build` passes from repo root.
+  - `bun run lint` passes (warnings only).
+  - `bun run build` passes from repo root.
 
 ## 2026-04-26 Repo-Wide Biome Baseline
 
 - Expanded Biome scan coverage to true repo-wide scope in `biome.json` (with explicit exclusions for generated/output folders like `node_modules`, `.next`, `dist`, `playwright-report`, `test-results`, Cypress media artifacts, and built scripts).
 - Enabled Biome HTML interpolation parsing so template placeholders in email HTML no longer hard-fail parsing.
 - Ran repo-wide formatter pass and normalized Cypress specs/support + static header artifacts for consistent lint behavior.
-- Current baseline outcome: `npm run lint` now succeeds across repo-wide coverage with warnings only (no blocking errors), giving us a clean starting point for MR triage.
+- Current baseline outcome: `bun run lint` now succeeds across repo-wide coverage with warnings only (no blocking errors), giving us a clean starting point for MR triage.
 
 ## 2026-04-26 Branch Audit + Salvage Before Prune
 
@@ -331,8 +342,8 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - `a542c97` exclude `/404` from render smoke test + remove unused GBP cover generator
   - `2592f81` align ZAP spider seed URL default port
 - Validation after salvage:
-  - `npm run build` passes.
-  - `npm run lint` passes (warnings only).
+  - `bun run build` passes.
+  - `bun run lint` passes (warnings only).
 
 ## 2026-04-26 Lighthouse Recovery Pass (Critical Path + LCP)
 
@@ -347,8 +358,8 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - `src/data/serviceAreaLocations.ts`: replaced `Object.fromEntries` path with loop-based object build.
   - `package.json`: added explicit modern `browserslist` targets to reduce legacy transforms/polyfills in production bundles.
 - Validation:
-  - `npm install` run to keep lockfile integrity after `package.json` change.
-  - `npm run build` passes from repo root.
+  - `bun install` run to keep lockfile integrity after `package.json` change.
+  - `bun run build` passes from repo root.
 
 ## 2026-04-26 Security Follow-up (SAST/Dependency Reduction)
 
@@ -365,11 +376,11 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - `src/components/marketing/HeroCanvas.tsx` now uses `crypto.getRandomValues` helper for orb initialization.
 - Dependency scan hardening:
   - Upgraded root override `uuid` to `^14.0.0` in `package.json` and refreshed lockfile.
-  - Verified tree resolves to `uuid@14.0.0` via `npm ls uuid`.
+  - Verified tree resolves to `uuid@14.0.0` via `bun pm ls uuid`.
 - SSRF/regex findings: added targeted `nosemgrep` annotations where request targets are explicitly validated/allowlisted (`zap-crawl`, `fetchWithTimeout`, `audit-forms`, lockfile fixer, static parity server regex guard).
 - Validation:
-  - `npm run build` passes.
-  - `npm install` reports 0 vulnerabilities.
+  - `bun run build` passes.
+  - `bun install` reports 0 vulnerabilities.
 
 ## 2026-04-27 GitLab Branch Cleanup (MR Triage Follow-through)
 
@@ -394,9 +405,9 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
   - Added ScrollTrigger-driven section progress rails, media parallax variables, and pricing tier signal bars.
   - Added inner-page card glare sweeps, stronger FAQ open states, portfolio/blog image lift, and CTA press polish.
 - Validation:
-  - `npm ci` passes after adding `gsap`.
-  - `npm run build` passes.
-  - Changed files pass targeted `npx biome check`.
+  - `bun install --frozen-lockfile` passes after adding `gsap`.
+  - `bun run build` passes.
+  - Changed files pass targeted `bunx biome check`.
   - HTML smoke checked `/services`, `/pricing`, `/faq`, `/service-areas`, `/blog`, and `/portfolio` on localhost for hero/motion markup.
   - Brand assets verified: `/brand/logo.png` and `/brand/mark.webp` return 200 on localhost.
   - Playwright browser session was blocked by an existing locked MCP Chrome profile; production build and localhost HTML/asset checks passed.
@@ -409,38 +420,38 @@ Detailed STATUS entries before **2026-04-26** described an older **pnpm + Turbor
 - **`.env.example`:** Dropped Turborepo / `turbo.json` / `packages/env` / `apps/**` references; documented `src/lib/env/*.ts` as the schema source.
 - **`lighthouse2.md`:** Renamed “this monorepo” → “this repository”.
 - **`src/lib/env/shared.ts`:** Comment no longer claims a monorepo layout.
-- Validation: `npm run build` from repo root (green).
+- Validation: `bun run build` from repo root (green).
 
 ## 2026-04-28 Biome repo-wide pass (zero diagnostics)
 
-- Ran **`npx biome check . --write --unsafe`** from the repo root (format + organize imports + safe/unsafe autofixes across TS/TSX/JS/CSS/HTML).
+- Ran **`bunx biome check . --write --unsafe`** from the repo root (format + organize imports + safe/unsafe autofixes across TS/TSX/JS/CSS/HTML).
 - **`biome.json`:** Excluded generated **`static-headers.json`** and **`netlify.toml`** from lint/format scope; restored CSS overrides for **`theme.css`**, **`layout-shell.css`**, and **`emails/**/*.html`** (`noImportantStyles` / `noDescendingSpecificity` where intentional).
 - **Code:** Removed remaining **`any`** in `src/scripts/audit-forms.ts` (Turnstile types), replaced non-null assertions in **`src/lighthouse/lib/sheetsSync.ts`**, removed dead **`revealElement`** from **`src/scripts/ui/reveal.ts`**, plus Biome-driven cleanups in Lighthouse components/libs, **`FooterCta.tsx`**, lockfile stub script, and offer email HTML.
-- **Bundle:** Rebuilt **`public/scripts/site.js`** via `npm run build:site-script` so the committed bundle matches sources.
-- **`package.json`:** Added **`npm run lint:fix`** → `biome check . --write --unsafe` for one-shot autofix (lockfile refreshed with `npm install` after the script line change).
-- Validation: **`npm run lint`** (`biome check .`) reports **no warnings/errors**; **`npm run build`** passes from repo root.
+- **Bundle:** Rebuilt **`public/scripts/site.js`** via `bun run build:site-script` so the committed bundle matches sources.
+- **`package.json`:** Added **`bun run lint:fix`** → `biome check . --write --unsafe` for one-shot autofix (lockfile refreshed with `bun install` after the script line change).
+- Validation: **`bun run lint`** (`biome check .`) reports **no warnings/errors**; **`bun run build`** passes from repo root.
 
 ## 2026-04-28 Footer stack badges + lint baseline on `main`
 
 - **`SiteFooter`:** Added a **“Built with”** row of text-only links (**Next.js**, **Netlify**, **Tailwind CSS**) to each official site — no trademark logos, factual stack copy only.
 - **`theme.css`:** New `.footer-tech-badges` layout; generalized `.footer-stack-badge` so badges work outside `.footer-bottom` only.
-- **`biome.json`:** Restored excludes for **`static-headers.json`** / **`netlify.toml`** and CSS/email overrides so `npm run lint` stays clean with generated + vendor-heavy files.
+- **`biome.json`:** Restored excludes for **`static-headers.json`** / **`netlify.toml`** and CSS/email overrides so `bun run lint` stays clean with generated + vendor-heavy files.
 - **Hygiene:** `sheetsSync` spreadsheet id guard, typed Turnstile in `audit-forms.ts`, removed dead `reveal` helper, optional-chain in lockfile stub script, Biome autofixes on touched files; rebuilt **`public/scripts/site.js`**.
-- Validation: `npm run lint` and `npm run build` from repo root.
+- Validation: `bun run lint` and `bun run build` from repo root.
 
 ## 2026-04-28 Runtime + bundle performance pass
 
 - **`MotionReveal.tsx`:** Switched motion primitives to **`framer-motion/client`** (lighter DOM bundle than the full `motion` namespace) while keeping **`useReducedMotion`** from `framer-motion`.
 - **`next.config.ts`:** Enabled **`experimental.optimizePackageImports: ["framer-motion"]`** for tree-shaking friendly imports, and **`compiler.removeConsole`** in production (keeps **`console.error`** / **`console.warn`**).
-- **`biome.json`:** Restored excludes for **`static-headers.json`** / **`netlify.toml`** and CSS/email overrides so `npm run lint` stays clean after prebuild regenerates those files.
+- **`biome.json`:** Restored excludes for **`static-headers.json`** / **`netlify.toml`** and CSS/email overrides so `bun run lint` stays clean after prebuild regenerates those files.
 - **Hygiene:** Typed Turnstile in `audit-forms.ts`, guarded `sheetsSync` spreadsheet ids, removed dead `reveal` helper; rebuilt **`public/scripts/site.js`**.
-- Validation: `npm run lint` (zero diagnostics) and `npm run build` from repo root.
+- Validation: `bun run lint` (zero diagnostics) and `bun run build` from repo root.
 
 ## 2026-04-27 Consolidation MR (all 11 open MRs into one)
 
 - Started a fresh `consolidation/all-mrs` off `gitlab/main` and merged the open MRs in this order: **!149 → !146 → !143 → !142 → !148 (already-up-to-date) → !147 → !145 → !152 → !144 → !151 (cherry-picked)**. Skipped **!141** (empty placeholder) and **!150** (its only unique commit was a regression vs main's evolved AuditForm + home-page CSS).
 - **Chat strategy:** Kept `FreshworksChatBootstrap` (sophisticated env-driven Freshworks integration from !149) as the canonical chat surface. Dropped the !151-introduced `ThirdPartyChatWidgets` wrapper to avoid double-loading; kept the `.env.example` chat env var docs and the CSP `font-src` extension for `https://fw-cdn.com` / `https://*.myfreshworks.com` / `https://*.freshworks.com`.
 - **Vercel cleanup:** Removed `vercel.json` (we're on Netlify auto-deploy); confirmed `.vercelignore` already absent. `crisp-loader.js` removed; CSP entries for Crisp endpoints retained as a no-op allowance.
-- **Stale monorepo dirs:** Confirmed `apps/` and `packages/` directories are untracked (only host orphan `node_modules/.bin` symlinks from old pnpm workspaces); not removing physically since git doesn't track them.
+- **Stale monorepo dirs:** Confirmed `apps/` and `packages/` directories are untracked (only host orphan `node_modules/.bin` symlinks from old workspace installs); not removing physically since git doesn't track them.
 - **Conflict resolutions:** Mostly union (STATUS.md, README, public/scripts/site.js, build/csp.mjs, .env.example) or prefer-HEAD where main was the more evolved baseline. `lighthouse2.md` kept marketing description as H1 with the v2 operator playbook demoted to H2 underneath.
-- **Validation:** `npm install` clean, `npm run lint` clean, `npm run build` passes from repo root.
+- **Validation:** `bun install` clean, `bun run lint` clean, `bun run build` passes from repo root.

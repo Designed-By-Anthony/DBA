@@ -48,7 +48,7 @@ Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-a
 | Bot protection | **Rate limiting** always; **Cloudflare Turnstile** only when `LIGHTHOUSE_STRICT_TURNSTILE=1` + `TURNSTILE_SECRET_KEY` (default: `/lighthouse` runs without Turnstile) |
 | AI | **Google Gemini** (API key or Vertex) |
 | Performance data | **Google PageSpeed Insights API** |
-| Deploy | **Firebase App Hosting** (GitHub-connected; CSP still synced via `npm run sync:static-headers`) |
+| Deploy | **Cloudflare Pages** (OpenNext; CSP synced via `bun run sync:static-headers` from the web app) |
 
 ---
 
@@ -127,7 +127,7 @@ Public documentation for category leaders describes stacks roughly like this:
 - **Moz optional:** If the Moz API does not return real data, the audit uses **`buildInternalAuthorityMetrics()`** (`src/lighthouse/lib/authorityEstimate.ts`) so scores and UI still populate. Labels say **internal estimate**, not Moz DA.
 - **Index estimate:** Uses **sitemap + Moz pages-crawled only when Moz actually returned**; otherwise sitemap-only (avoids inflating index with fake `pagesCrawled`).
 - **AI prompts** updated to treat internal authority differently from Moz (`authorityDataSource` in `generateAiInsight`).
-- **`biome.json`** restored with ignores/overrides so `npm run lint` stays usable (includes ignoring generated `static-headers.json` formatting noise).
+- **`biome.json`** restored with ignores/overrides so `bun run lint` stays usable (includes ignoring generated `static-headers.json` formatting noise).
 
 ---
 

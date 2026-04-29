@@ -1,6 +1,6 @@
 /**
  * Single source of truth for marketing CSP (used by `next.config.ts` and synced into `static-headers.json`).
- * Run `npm run sync:static-headers` after changing directives.
+ * Run `bun run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
  * Always-on site needs: reCAPTCHA Enterprise (forms), Lighthouse audit API, VertaFlow CRM lead ingest.

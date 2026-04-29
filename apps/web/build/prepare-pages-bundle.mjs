@@ -18,6 +18,7 @@ const appRoot = process.cwd();
 const openNextDir = join(appRoot, ".open-next");
 const workerEntry = join(openNextDir, "worker.js");
 const pagesOutputDir = join(appRoot, ".vercel/output/static");
+const pagesWorkerDest = join(pagesOutputDir, "_worker.js");
 
 async function assertExists(path) {
 	await access(path, constants.F_OK);
@@ -50,18 +51,21 @@ async function dropOversizedPagesAssets(dir) {
 
 async function main() {
 	await assertExists(workerEntry);
-	await assertExists(join(openNextDir, "assets"));
+	await assertExists(openNextDir);
 
-	// Cloudflare Pages expects `_worker.js` next to every module it imports.
-	// Copy the full OpenNext bundle (not only `assets/`), then rename the worker entry.
 	await rm(pagesOutputDir, { recursive: true, force: true });
 	await mkdir(pagesOutputDir, { recursive: true });
+
+	/**
+	 * Copy the full OpenNext output tree. `_worker.js` imports `./cloudflare/*`,
+	 * `./middleware/*`, `./server-functions/*`, and `./.build/*` — those paths must exist
+	 * next to the worker entry or Wrangler's bundler fails at deploy time.
+	 */
 	await cp(openNextDir, pagesOutputDir, { recursive: true });
+
+	await rename(join(pagesOutputDir, "worker.js"), pagesWorkerDest);
+
 	await dropOversizedPagesAssets(pagesOutputDir);
-	await rename(
-		join(pagesOutputDir, "worker.js"),
-		join(pagesOutputDir, "_worker.js"),
-	);
 }
 
 main().catch((error) => {
