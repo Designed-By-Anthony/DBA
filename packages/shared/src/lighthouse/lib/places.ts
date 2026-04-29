@@ -15,6 +15,23 @@ export interface Competitor {
 	address: string;
 }
 
+interface PlacesApiDisplayName {
+	text?: string;
+}
+
+interface PlacesApiPlace {
+	rating?: number;
+	userRatingCount?: number;
+	businessStatus?: string;
+	primaryType?: string;
+	displayName?: PlacesApiDisplayName;
+	formattedAddress?: string;
+}
+
+interface PlacesApiResponse {
+	places?: PlacesApiPlace[];
+}
+
 /**
  * Queries Google Places API (New) to find reputation data for a business.
  */
@@ -64,7 +81,7 @@ export async function scanPlaces(
 			return result;
 		}
 
-		const data = await res.json();
+		const data = (await res.json()) as PlacesApiResponse;
 		if (data.places && data.places.length > 0) {
 			const place = data.places[0];
 			result.found = true;
@@ -199,7 +216,7 @@ export async function scanCompetitors(
 			return [];
 		}
 
-		const data = await res.json();
+		const data = (await res.json()) as PlacesApiResponse;
 		if (!data.places || data.places.length === 0) return [];
 
 		const normalizedCompany = companyName.toLowerCase().trim();

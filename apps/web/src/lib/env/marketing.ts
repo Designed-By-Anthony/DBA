@@ -28,6 +28,7 @@ const marketingSchema = z
 		ADMIN_UPSTREAM_URL: optionalUrl,
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,
 	})
+	.passthrough()
 	.superRefine((env, ctx) => {
 		if (env.NODE_ENV === "production" && !env.NEXT_PUBLIC_API_BASE_URL) {
 			ctx.addIssue({
@@ -37,8 +38,7 @@ const marketingSchema = z
 					"NEXT_PUBLIC_API_BASE_URL is required in production for frontend to API Worker calls.",
 			});
 		}
-	})
-	.passthrough();
+	});
 
 export type MarketingEnv = z.infer<typeof marketingSchema>;
 

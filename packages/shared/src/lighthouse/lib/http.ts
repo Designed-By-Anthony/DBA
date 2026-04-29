@@ -1,4 +1,4 @@
-import { isTrustedHostedPreviewHostname } from "../../../lib/marketingBrowserOrigins";
+import { isTrustedHostedPreviewHostname } from "../../lib/marketingBrowserOrigins";
 
 const LOCAL_ALLOWED_ORIGINS = new Set([
 	"https://designedbyanthony.com",

@@ -25,7 +25,6 @@ export async function fetchPageSpeedRunPagespeed(
 ): Promise<Response> {
 	const psiUrl = buildRunPagespeedUrl(targetUrl, apiKey);
 	const init: RequestInit = {
-		cache: "no-store",
 		headers: { Accept: "application/json" },
 	};
 

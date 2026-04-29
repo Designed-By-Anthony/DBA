@@ -23,7 +23,9 @@ async function main() {
 }
 
 main().catch((error) => {
-	console.error("[prepare-pages-bundle] Failed to prepare Cloudflare Pages bundle.");
+	console.error(
+		"[prepare-pages-bundle] Failed to prepare Cloudflare Pages bundle.",
+	);
 	console.error(error instanceof Error ? error.message : error);
 	process.exit(1);
 });

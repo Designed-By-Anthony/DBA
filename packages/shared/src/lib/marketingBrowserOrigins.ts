@@ -19,6 +19,11 @@ const LOCAL_ORIGINS = new Set<string>([
 
 const PAGES_PREVIEW_HOST_PATTERN = /\.pages\.dev$/i;
 
+/** Backwards-compatible helper for modules that check preview hostnames directly. */
+export function isTrustedHostedPreviewHostname(hostname: string): boolean {
+	return PAGES_PREVIEW_HOST_PATTERN.test(hostname);
+}
+
 export function isTrustedMarketingBrowserOrigin(
 	origin: string | null,
 ): boolean {
@@ -28,7 +33,7 @@ export function isTrustedMarketingBrowserOrigin(
 	try {
 		const url = new URL(origin);
 		if (url.protocol !== "https:" && url.protocol !== "http:") return false;
-		return PAGES_PREVIEW_HOST_PATTERN.test(url.hostname);
+		return isTrustedHostedPreviewHostname(url.hostname);
 	} catch {
 		return false;
 	}

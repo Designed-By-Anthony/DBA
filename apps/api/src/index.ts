@@ -11,7 +11,8 @@ import { testEmailsRoute } from "./routes/testEmails";
 const app = new Elysia()
 	.use(
 		cors({
-			origin: (origin) => isTrustedMarketingBrowserOrigin(origin),
+			origin: (request) =>
+				isTrustedMarketingBrowserOrigin(request.headers.get("origin")),
 			allowedHeaders: ["Content-Type", "Authorization"],
 			methods: ["GET", "POST", "DELETE", "OPTIONS"],
 		}),
