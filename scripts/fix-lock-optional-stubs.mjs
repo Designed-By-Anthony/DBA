@@ -1,7 +1,7 @@
 /**
  * Fill package-lock.json "packages" entries that are only `{ optional: true }`
  * with version, resolved, and integrity from the registry.
- * Stub-only entries break `npm ci` on Linux (npm semver: Invalid Version: ).
+ * Stub-only entries can break `bun install --frozen-lockfile` on Linux (semver: Invalid Version: ).
  */
 import { readFile, writeFile } from "node:fs/promises";
 
