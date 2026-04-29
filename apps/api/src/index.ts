@@ -8,7 +8,7 @@ import { reportRoute } from "./routes/report";
 import { reportEmailRoute } from "./routes/reportEmail";
 import { testEmailsRoute } from "./routes/testEmails";
 
-const app = new Elysia()
+const app = new Elysia({ aot: false })
 	.use(
 		cors({
 			origin: (request) =>
@@ -16,6 +16,22 @@ const app = new Elysia()
 			allowedHeaders: ["Content-Type", "Authorization"],
 			methods: ["GET", "POST", "DELETE", "OPTIONS"],
 		}),
+	)
+	.get("/", ({ set }) => {
+		set.headers["Cache-Control"] = "no-store";
+		return { ok: true, service: "dba-api" };
+	})
+	.get("/health", ({ set }) => {
+		set.headers["Cache-Control"] = "no-store";
+		return { ok: true, service: "dba-api" };
+	})
+	.get(
+		"/favicon.ico",
+		() =>
+			new Response(null, {
+				status: 204,
+				headers: { "Cache-Control": "public, max-age=86400" },
+			}),
 	)
 	.use(auditRoute)
 	.use(auditEmailSummaryRoute)

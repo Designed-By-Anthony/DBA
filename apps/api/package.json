@@ -8,21 +8,21 @@
 		"bun": ">=1.1.0"
 	},
 	"scripts": {
-		"dev": "wrangler dev",
-		"build": "wrangler deploy --dry-run",
-		"deploy": "wrangler deploy",
+		"dev": "wrangler dev -c wrangler.json",
+		"build": "wrangler deploy --dry-run -c wrangler.json",
+		"deploy": "wrangler deploy -c wrangler.json",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@dba/shared": "file:../../packages/shared",
-		"elysia": "^1.4.26",
 		"@elysiajs/cors": "^1.4.2",
-		"zod": "^3.25.76"
+		"elysia": "^1.4.28",
+		"zod": "^4.4.0"
 	},
 	"devDependencies": {
-		"typescript": "^5.9.3",
-		"wrangler": "^4.86.0",
-		"@cloudflare/workers-types": "^4.20250429.0",
-		"@types/node": "^22.10.2"
+		"@cloudflare/workers-types": "^4.20260429.1",
+		"@types/node": "^24",
+		"typescript": "^6.0.3",
+		"wrangler": "^4.86.0"
 	}
 }

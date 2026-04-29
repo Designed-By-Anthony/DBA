@@ -68,7 +68,7 @@ function renderEmail(lead: PublicLeadIngestBody): {
 	return { text: textLines.join("\n"), html };
 }
 
-export const leadEmailRoute = new Elysia()
+export const leadEmailRoute = new Elysia({ aot: false })
 	.post("/api/lead-email", async ({ request, set }) => {
 		const origin = request.headers.get("origin");
 		const corsHeaders: Record<string, string> = {

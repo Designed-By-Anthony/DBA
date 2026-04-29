@@ -1,12 +1,24 @@
 # Migration Status Report
 
-> **Note:** This file tracks migration and release notes for the **single root Next.js** app (`bun`, `bun.lock`). Older multi-app / Astro-era detail was removed and summarized under **Pre-Netlify migration archive** — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
+> **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
+
+## Cloudflare Worker eval fix + local audit cleanup (2026-04-29)
+
+- Disabled Elysia AOT/code generation on the API root app and nested route modules so Cloudflare Workers no longer hit `EvalError: Code generation from strings disallowed for this context`.
+- Added lightweight API Worker smoke routes: `/` and `/health` return `{ ok: true, service: "dba-api" }`; `/favicon.ico` returns an explicit null-body 204 so browser/favicon probes do not show Worker 500s.
+- Local frontend API calls now default to same-origin `/api/*` in non-production, using the Next.js dev rewrite to `http://localhost:8787`; production still defaults to `https://api.designedbyanthony.com` unless `NEXT_PUBLIC_API_BASE_URL` is set.
+- Cleaned the pasted dev-console warnings by adding `data-scroll-behavior="smooth"` to the root `<html>` and explicit auto sizing to brand mark `<Image>` instances touched by CSS.
+- Cloudflare PR preview logs showed the dashboard command running `bun x turbo run build --filter=@dba/web` without a dependency install; added a web build preflight that runs `bun install --frozen-lockfile` from the repo root only when required workspace bins are absent.
+- Cloudflare preview runtime logs then showed OpenNext failing against Turbopack output (`ComponentMod.handler is not a function` / `app-page-turbo.runtime.prod.js`); production `next build` now explicitly uses `--webpack` until the Cloudflare adapter supports this Next/Turbopack output, with font URLs adjusted for webpack CSS module resolution.
+- Reproduced the remaining hosted 500 with Wrangler 3.101 (Cloudflare's current Git upload runtime) and materialized OpenNext prerender cache files into the Pages output so static app routes are served by Pages assets before the incompatible server function path.
+- Added a generated-bundle whitespace trim step after `esbuild` so `apps/web/public/scripts/site.js` stays `git diff --check` clean even when bundled dependency internals contain padded template literals.
+- Verification: `bun install --frozen-lockfile`, `bun run build`, `bun run typecheck`, `bun run lint`, and `bun audit` pass from the repo root. Wrangler API smoke checks return 200 for `/`, 204 for `/favicon.ico`, and 204 CORS preflight for `/api/audit`. Browser pass on `http://localhost:3000/lighthouse` reports no relevant warning/error logs for `mark.webp`, scroll behavior, DNS, or favicon. Brand assets resolve locally and exist in the Pages output at `/brand/logo.png`, `/brand/mark.webp`, and `/favicon.ico`.
 
 ## Pages frontend + Worker API decoupling rollout (2026-04-29)
 
 - Cloudflare Pages **deploy command** must stay **empty** (or a no-op): **`wrangler versions upload`** targets standalone Workers and fails with “Missing entry-point”; Pages uploads `_worker.js` from `pages_build_output_dir` after build.
-- Added root `wrangler.jsonc` as the canonical Git-connected Cloudflare Pages config for monorepo root deploys: `pages_build_output_dir = "apps/web/.vercel/output/static"` plus `nodejs_compat`. This removes the dashboard ambiguity that can build successfully but run the deployed `_worker.js` without the required compatibility flag, causing 500s on `/` and `/favicon.ico`.
-- Added `.nvmrc` (`22.12.0`) and tightened README/operator docs to use repo root **`.`**, build command `bun install --frozen-lockfile && bun x turbo run build --filter=@dba/web`, output `apps/web/.vercel/output/static`, and an empty deploy command.
+- Added root `wrangler.json` as the canonical Git-connected Cloudflare Pages config for monorepo root deploys: `pages_build_output_dir = "apps/web/.vercel/output/static"` plus `nodejs_compat`. This removes the dashboard ambiguity that can build successfully but run the deployed `_worker.js` without the required compatibility flag, causing 500s on `/` and `/favicon.ico`.
+- Added `.nvmrc` (`24 LTS`) and tightened README/operator docs to use repo root **`.`**, build command `bun install --frozen-lockfile && bun x turbo run build --filter=@dba/web`, output `apps/web/.vercel/output/static`, and an empty deploy command.
 - Runtime smoke test: rebuilt from the repo root, served `apps/web/.vercel/output/static` with `wrangler pages dev`, and confirmed 200 for `/`, `/lighthouse`, `/favicon.ico`, `/brand/logo.png`, and `/brand/mark.webp`.
 
 - Added root `packageManager` metadata to unblock Turbo workspace resolution in Bun/CI.
@@ -21,13 +33,13 @@
 | Surface | Repo | Worker / bundle name | Hostname |
 |---------|------|----------------------|----------|
 | **Pages** (Next.js + OpenNext `_worker.js`) | `apps/web/` | Pages upload (dashboard may show e.g. **`designedbyanthony`**) | **`designedbyanthony.com`** |
-| **Worker** (Elysia API) | `apps/api/` | **`dba-api`** in `wrangler.jsonc` | **`api.designedbyanthony.com`** |
+| **Worker** (Elysia API) | `apps/api/` | **`dba-api`** in `wrangler.json` | **`api.designedbyanthony.com`** |
 
 - **`workers_list` (MCP):** saw **`designedbyanthony`**; **`dba-api`** not listed — deploy API from **`apps/api`** and attach **`api`** subdomain to **`dba-api`**.
 
 ## Local GitHub parity + CI build fix (2026-04-29)
 
-- Removed the unsupported `build` block from `apps/web/wrangler.jsonc` so Cloudflare Pages can validate the project config; Pages build command remains a dashboard/CI setting (`bun install && bun x turbo run build --filter=@dba/web`) while Wrangler owns output/runtime settings.
+- Removed the unsupported `build` block from `apps/web/wrangler.json` so Cloudflare Pages can validate the project config; Pages build command remains a dashboard/CI setting (`bun install && bun x turbo run build --filter=@dba/web`) while Wrangler owns output/runtime settings.
 - Fast-forwarded local `main` to `origin/main` after the cloud rework, then branched `codex/fix-public-api-base-default` for the fix.
 - Added a production-safe public API default (`https://api.designedbyanthony.com`) so Cloudflare Pages builds no longer fail when `NEXT_PUBLIC_API_BASE_URL` is unset; explicit env overrides still win.
 - Updated frontend API call sites and CSP/static headers to use the public API Worker origin consistently.

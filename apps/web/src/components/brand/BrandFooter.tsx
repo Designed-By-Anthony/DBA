@@ -40,6 +40,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							width={22}
 							height={16}
 							className="dba-footer-mark"
+							style={{ width: "auto" }}
 						/>
 						<span className="dba-footer-brand-name">{SITE_BRAND.name}</span>
 					</Link>
