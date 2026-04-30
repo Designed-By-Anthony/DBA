@@ -6,6 +6,7 @@ import { blogPosts } from "@/data/blogPosts";
 import { homeFooterCta } from "@/data/home";
 import {
 	getBlogLongformSections,
+	getServiceDetailLongformSections,
 	getServiceLongformSections,
 } from "@/data/longformContent";
 import { isServiceAreaSlug } from "@/data/serviceAreaLocations";
@@ -136,7 +137,9 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 	);
 	if (!service) notFound();
 	const extra = SERVICE_PAGE_EXTRA_SECTIONS[slug];
-	const longform = getServiceLongformSections(service.name);
+	/* Phase-3 #26: detail pages use the depth-only longform so the shared
+	   "Strategy before design" block doesn't duplicate across every service. */
+	const longform = getServiceDetailLongformSections(service.name);
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<PageHero

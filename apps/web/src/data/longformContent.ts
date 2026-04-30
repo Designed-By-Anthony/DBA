@@ -151,6 +151,14 @@ const universalDepthAddendum: LongformSection[] = [
 	},
 ];
 
+/**
+ * Index-page longform: includes the shared `serviceFoundation` philosophy block.
+ *
+ * Phase-3 fix #26: only the two index pages (`/services` and `/service-areas`)
+ * are allowed to render the `serviceFoundation` block, because the body is
+ * identical across pages and Google was treating duplicates as thin content.
+ * Detail pages use the `*Detail` variants below which omit `serviceFoundation`.
+ */
 export function getServiceLongformSections(
 	serviceName: string,
 ): LongformSection[] {
@@ -167,6 +175,16 @@ export function getServiceLongformSections(
 	return [...base, ...depth];
 }
 
+/** Service detail page: depth addendum only (no shared `serviceFoundation`). */
+export function getServiceDetailLongformSections(
+	serviceName: string,
+): LongformSection[] {
+	return universalDepthAddendum.map((section) => ({
+		heading: `${section.heading} — ${serviceName}`,
+		paragraphs: section.paragraphs,
+	}));
+}
+
 export function getServiceAreaLongformSections(
 	areaName: string,
 ): LongformSection[] {
@@ -181,6 +199,16 @@ export function getServiceAreaLongformSections(
 	}));
 
 	return [...base, ...depth];
+}
+
+/** Service-area detail page: depth addendum only (no shared `serviceFoundation`). */
+export function getServiceAreaDetailLongformSections(
+	areaName: string,
+): LongformSection[] {
+	return universalDepthAddendum.map((section) => ({
+		heading: `${section.heading} — ${areaName}`,
+		paragraphs: section.paragraphs,
+	}));
 }
 
 export function getBlogLongformSections(postTitle: string): LongformSection[] {

@@ -140,8 +140,11 @@ export function AuditForm() {
 		);
 	}
 
+	/* WCAG: placeholder contrast bumped from white/28 → white/45 so the
+	   hint text passes 4.5:1 on the dark input fill. Focus ring also
+	   strengthened for keyboard a11y. */
 	const inputClass =
-		"lh-field w-full rounded-lg border border-white/[0.09] bg-[rgba(7,10,17,0.74)] px-4 py-3 text-[14.5px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] placeholder:text-white/28 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.58)] focus:bg-[rgba(10,13,21,0.88)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.14)]";
+		"lh-field w-full rounded-lg border border-white/[0.14] bg-[rgba(7,10,17,0.74)] px-4 py-3 text-[14.5px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] placeholder:text-white/45 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.66)] focus:bg-[rgba(10,13,21,0.92)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.32)]";
 
 	const labelClass =
 		"mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent-bronze-muted)]";
@@ -175,20 +178,26 @@ export function AuditForm() {
 					<label htmlFor="url" className={labelClass}>
 						Website to scan
 					</label>
+					{/* Phase-3 follow-up: removed the absolute-positioned `https://`
+					    overlay span — it visually overlapped the placeholder
+					    ("ghost" effect). The handler still prepends `https://`
+					    automatically if the user omits it, so we keep
+					    type="text" (type="url" would block bare-domain inputs
+					    with native browser validation before submit). */}
 					<input
 						id="url"
 						name="url"
-						type="url"
+						type="text"
+						inputMode="url"
 						required
 						value={url}
 						onChange={(e) => setUrl(e.target.value)}
 						placeholder="https://yoursite.com"
-						inputMode="url"
 						autoComplete="url"
 						autoCorrect="off"
 						autoCapitalize="off"
 						spellCheck={false}
-						className="lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.45)] bg-[rgba(10,14,22,0.9)] px-4 py-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.18),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:text-white/30 placeholder:font-normal transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.78)] focus:bg-[rgba(12,16,25,0.97)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.22)]"
+						className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.45)] bg-[rgba(10,14,22,0.9)] px-4 py-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.18),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:font-normal placeholder:text-white/35 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.78)] focus:bg-[rgba(12,16,25,0.97)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.32)]"
 					/>
 				</div>
 

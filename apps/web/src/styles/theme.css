@@ -68,6 +68,19 @@
 	--section-space-tight: clamp(3.5rem, 5.5vw, 5rem);
 	--radius-card: 1.25rem;
 	--radius-card-lg: 1.4rem;
+	/* Spacing scale — single source of truth for vertical / horizontal rhythm. */
+	--space-section: clamp(4rem, 8vw, 6rem); /* between major sections */
+	--space-block: clamp(2rem, 4vw, 3rem); /* between blocks within a section */
+	--space-element: clamp(
+		1rem,
+		2vw,
+		1.5rem
+	); /* between elements within a block */
+	--space-inline: 0.75rem; /* between inline elements */
+	/* Card body padding — must be >= the largest border-radius so text never clips
+	   at rounded corners. Matches phase-3 fix list section #4. */
+	--card-pad: clamp(1.5rem, 1rem + 1.4vw, 1.75rem);
+	--card-pad-lg: clamp(1.75rem, 1.25rem + 1.4vw, 2rem);
 	--shadow-soft: 0 18px 36px -22px rgba(15, 23, 42, 0.95);
 	--shadow-card: 0 28px 70px -38px rgba(15, 23, 42, 0.95);
 	--motion-duration-fast: 0.15s;
@@ -731,6 +744,47 @@ main {
 	.surface-card:hover {
 		transform: none;
 	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Global text-bubble / card-body padding rule (phase-3 fix list #4 + #15)
+ *
+ * Any card-shaped container that holds prose text MUST have internal
+ * padding >= its border-radius so headings/body never clip at rounded
+ * corners (the visible "F" cropping issue Anthony reported).
+ *
+ * - `.text-bubble` is the explicit utility class (use on prose blocks).
+ * - The default rule below also patches every card class that already
+ *   exists in the design system, so legacy markup is fixed without a
+ *   site-wide refactor.
+ *
+ * The minimum used here (`max(1.25rem, var(--radius-card-lg))`) is
+ * 1.4rem (22.4px) — equal to the largest rounded corner used on cards.
+ * ────────────────────────────────────────────────────────────────────── */
+.text-bubble,
+.text-bubble--lg,
+.surface-card.has-text,
+.home-proof-card,
+.home-email-cta__card,
+.lh-process-step,
+.glass-card.has-text,
+.marketing-prose-card,
+.lh-finding-card,
+.lh-result-card {
+	padding: max(var(--card-pad), var(--radius-card-lg));
+}
+
+.text-bubble--lg {
+	padding: max(var(--card-pad-lg), var(--radius-card-lg));
+}
+
+/* Outline-only / bare prose blocks must also clear their corners — use
+ * the non-clipping variant when the container DOESN'T have overflow:hidden
+ * (so we still want the visual gutter to feel right). */
+.text-bubble.is-bordered {
+	border: 1px solid var(--border-soft);
+	border-radius: var(--radius-card-lg);
+	background: rgba(14, 18, 28, 0.55);
 }
 
 .feature-grid {

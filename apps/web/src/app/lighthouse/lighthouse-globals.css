@@ -2198,7 +2198,8 @@
 			rgba(255, 255, 255, 0.012)
 		),
 		rgba(9, 11, 16, 0.78);
-	padding: 1rem;
+	/* Phase-3 #4 corner-clip rule: padding must clear the rounded radius. */
+	padding: clamp(1.1rem, 1vw + 0.85rem, 1.4rem);
 	backdrop-filter: blur(12px);
 }
 
@@ -2397,5 +2398,131 @@
 
 	a {
 		color: #0369a1;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Magic-link report viewer — loading / error placeholders
+ * Phase-3 #8 (report link redirect fix). Keeps the state UI on-brand
+ * while the API request is in-flight or has failed.
+ * ────────────────────────────────────────────────────────────────────── */
+.lh-report-viewer-state {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: clamp(1.5rem, 4vw, 3rem);
+	text-align: center;
+	color: rgba(247, 244, 238, 0.78);
+}
+
+.lh-report-viewer-state .lh-report-viewer-loading {
+	font-size: 0.95rem;
+	color: rgba(247, 244, 238, 0.5);
+}
+
+.lh-report-viewer-state .lh-report-viewer-error {
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgba(248, 220, 188, 0.92);
+}
+
+.lh-report-viewer-state .lh-report-viewer-help {
+	max-width: 32rem;
+	font-size: 0.86rem;
+	line-height: 1.6;
+	color: rgba(247, 244, 238, 0.55);
+}
+
+.lh-report-viewer-state .lh-report-viewer-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-top: 0.5rem;
+	padding: 0.7rem 1.2rem;
+	border-radius: 0.85rem;
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.6);
+	background: var(--accent-bronze-light);
+	color: #171008;
+	font-size: 0.9rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: transform var(--motion-duration) var(--ease-out);
+}
+
+.lh-report-viewer-state .lh-report-viewer-back:hover {
+	transform: translateY(-1px);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Phase-3 #3 — horizontal scan-phase carousel
+ *
+ * Replaces the old vertically-stacked grid of phase cards with a single
+ * horizontal row that gently auto-scrolls left while the audit runs.
+ * The track is duplicated visually via a wide gap so motion stays smooth
+ * even if the user has fewer than 5 phases visible. Reduced-motion users
+ * see a static, scrollable row (no animation).
+ * ────────────────────────────────────────────────────────────────────── */
+.lh-phase-carousel {
+	position: relative;
+	overflow: hidden;
+	mask-image: linear-gradient(
+		to right,
+		transparent 0,
+		#000 6%,
+		#000 94%,
+		transparent 100%
+	);
+}
+
+.lh-phase-track {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 1rem;
+	padding: 0.25rem 0.25rem 0.5rem;
+	width: max-content;
+	animation: lhPhaseSlide 22s linear infinite;
+}
+
+.lh-phase-track--paused {
+	animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lh-phase-track {
+		animation: none;
+	}
+}
+
+.lh-phase-carousel:hover .lh-phase-track {
+	animation-play-state: paused;
+}
+
+@keyframes lhPhaseSlide {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		/* Half of the track scrolls out — pair with duplicated tiles
+		   for a seamless loop in a future iteration. */
+		transform: translateX(-25%);
+	}
+}
+
+@media (max-width: 720px) {
+	.lh-phase-carousel {
+		mask-image: none;
+	}
+	.lh-phase-track {
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+		animation: none;
+		width: auto;
+	}
+	.lh-phase-track > .lighthouse-phase-card {
+		scroll-snap-align: start;
 	}
 }

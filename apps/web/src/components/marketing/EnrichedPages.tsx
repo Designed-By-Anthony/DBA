@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { homeFaqEntries, homeFooterCta } from "@/data/home";
-import { getServiceAreaLongformSections } from "@/data/longformContent";
+import {
+	getServiceAreaDetailLongformSections,
+	getServiceAreaLongformSections,
+} from "@/data/longformContent";
 import {
 	getServiceAreaLocation,
 	serviceAreaLocations,
@@ -841,7 +844,9 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 	const pathname = `/service-areas/${loc.slug}`;
 	const crumbs = buildBreadcrumbs(pathname, loc.name);
 	const otherAreas = serviceAreaLocations.filter((a) => a.slug !== loc.slug);
-	const longform = getServiceAreaLongformSections(loc.name);
+	/* Phase-3 #26: per-area detail pages use the depth-only longform so the
+	   shared "Strategy before design" block doesn't duplicate across cities. */
+	const longform = getServiceAreaDetailLongformSections(loc.name);
 
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
