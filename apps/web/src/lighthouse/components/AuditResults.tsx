@@ -94,22 +94,38 @@ export function AuditResults({
 	const [emailErr, setEmailErr] = useState("");
 	const prefersReduced = useReducedMotion();
 
+	const [pdfStatus, setPdfStatus] = useState<"idle" | "generating" | "error">(
+		"idle",
+	);
+
 	const handleDownloadPdf = useCallback(async () => {
-		const { buildAuditPdf } = await import("@lh/lib/auditReportPdf");
-		const blob = buildAuditPdf(data, reportId ?? null);
-		const a = document.createElement("a");
-		a.href = URL.createObjectURL(blob);
-		const host = (() => {
-			try {
-				return new URL(data.url).hostname.replace(/^www\./, "") || "audit";
-			} catch {
-				return "audit";
+		if (!reportId) return;
+		setPdfStatus("generating");
+		try {
+			const res = await fetch(
+				buildPublicApiUrl(`/api/report/${encodeURIComponent(reportId)}/pdf`),
+			);
+			if (!res.ok) {
+				throw new Error("PDF generation failed");
 			}
-		})();
-		a.download = `audit-${host}-${reportId ?? "report"}.pdf`;
-		a.click();
-		URL.revokeObjectURL(a.href);
-	}, [data, reportId]);
+			const blob = await res.blob();
+			const a = document.createElement("a");
+			a.href = URL.createObjectURL(blob);
+			const host = (() => {
+				try {
+					return new URL(data.url).hostname.replace(/^www\./, "") || "audit";
+				} catch {
+					return "audit";
+				}
+			})();
+			a.download = `audit-${host}-${reportId}.pdf`;
+			a.click();
+			URL.revokeObjectURL(a.href);
+			setPdfStatus("idle");
+		} catch {
+			setPdfStatus("error");
+		}
+	}, [data.url, reportId]);
 
 	const handlePrintView = useCallback(() => {
 		if (!reportId) return;
@@ -226,9 +242,14 @@ export function AuditResults({
 					<button
 						type="button"
 						onClick={handleDownloadPdf}
+						disabled={!reportId || pdfStatus === "generating"}
 						className="lighthouse-btn-primary w-full"
 					>
-						Download PDF
+						{pdfStatus === "generating"
+							? "Generating…"
+							: pdfStatus === "error"
+								? "Retry PDF"
+								: "Download PDF"}
 					</button>
 				</MotionDiv>
 				<MotionDiv

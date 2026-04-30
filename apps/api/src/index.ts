@@ -9,6 +9,7 @@ import { auditEmailSummaryRoute } from "./routes/auditEmailSummary";
 import { leadEmailRoute } from "./routes/leadEmail";
 import { reportRoute } from "./routes/report";
 import { reportEmailRoute } from "./routes/reportEmail";
+import { reportPdfRoute } from "./routes/reportPdf";
 import { testEmailsRoute } from "./routes/testEmails";
 
 const kvBinding = (env as Record<string, unknown>).AUDIT_REPORTS_KV;
@@ -46,6 +47,7 @@ const app = new Elysia({ adapter: CloudflareAdapter })
 	.use(leadEmailRoute)
 	.use(reportRoute)
 	.use(reportEmailRoute)
+	.use(reportPdfRoute)
 	.use(testEmailsRoute)
 	// This is required to make Elysia work on Cloudflare Worker
 	.compile();

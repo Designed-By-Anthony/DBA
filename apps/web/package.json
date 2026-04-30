@@ -24,11 +24,6 @@
 			"last 1 Safari major version"
 		]
 	},
-	"overrides": {
-		"yaml@<2.8.3": "^2.8.3",
-		"postcss": "^8.4.38",
-		"uuid": "^14.0.0"
-	},
 	"scripts": {
 		"generate:gbp-playbook-cover": "bun build/generate-gbp-playbook-cover.mjs",
 		"generate:gbp-playbook-hero": "bun build/generate-gbp-playbook-hero.mjs",
@@ -53,11 +48,8 @@
 		"@fontsource-variable/inter": "^5.2.8",
 		"@fontsource-variable/outfit": "^5.2.8",
 		"@fontsource/abril-fatface": "^5.2.7",
-		"@google/genai": "^1.48.0",
-		"cheerio": "^1.2.0",
 		"framer-motion": "^12.38.0",
 		"gsap": "^3.15.0",
-		"jspdf": "^4.2.1",
 		"next": "16.2.4",
 		"react": "19.2.5",
 		"react-dom": "19.2.5",

@@ -24,7 +24,7 @@ Security fixes land on **`main`** and deploy through the normal Cloudflare Pages
 |---------|------|
 | Marketing routes | Public content under `apps/web/src/app/(site)/` |
 | Lighthouse segment | `apps/web/src/app/lighthouse/` |
-| API Worker | `apps/api/src/routes/` (audit, report, lead-email, audit-email-summary, report-email, test-emails) |
+| API Worker | `apps/api/src/routes/` (audit, report, report-pdf, lead-email, audit-email-summary, report-email, test-emails) |
 | Request routing | `apps/web/src/middleware.ts` (host-based redirects) |
 | Shared logic | `packages/shared/src/` (origins, rate limiting, report-store) |
 
