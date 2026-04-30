@@ -109,7 +109,7 @@ function SectionCard({
 					background: `linear-gradient(90deg, ${accent}, transparent)`,
 				}}
 			/>
-			<div style={{ padding: "1.25rem 1.5rem" }}>
+			<div style={{ padding: "1.25rem 1.5rem 1.25rem 2rem" }}>
 				<p
 					style={{
 						fontSize: "0.6rem",
@@ -176,7 +176,7 @@ function PrintReport({
 				color: PRINT_INK,
 				background: PRINT_PAPER,
 				minHeight: "100vh",
-				padding: "2.5rem 2rem 4rem",
+				padding: "2.5rem 3rem 4rem",
 			}}
 		>
 			{/* Header */}
@@ -791,18 +791,16 @@ function PrintReport({
 			<div
 				style={{
 					borderTop: `1px solid ${PRINT_BORDER}`,
-					paddingTop: "1rem",
-					marginTop: "2rem",
+					paddingTop: "0.75rem",
+					marginTop: "1.5rem",
 					display: "flex",
-					justifyContent: "space-between",
+					justifyContent: "center",
 					alignItems: "center",
+					gap: "0.5rem",
 				}}
 			>
 				<p style={{ fontSize: "0.7rem", color: PRINT_MUTED, margin: 0 }}>
-					Designed by Anthony · designedbyanthony.com
-				</p>
-				<p style={{ fontSize: "0.7rem", color: PRINT_MUTED, margin: 0 }}>
-					Lighthouse Scanner v2
+					designedbyanthony.com · Lighthouse Scanner v2
 				</p>
 			</div>
 		</div>
@@ -954,7 +952,7 @@ export default function LighthouseReportPrintPage() {
 
 			{/* Report body — padded below fixed toolbar on screen */}
 			<div className="print:pt-0 pt-[64px]">
-				<div className="mx-auto max-w-3xl">
+				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
 					<PrintReport data={data} reportId={id} />
 				</div>
 			</div>

@@ -11,6 +11,7 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
+import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
 import "@/app/home-page.css";
@@ -56,7 +57,7 @@ export function HomePage() {
 							</span>
 						</p>
 						<p className="page-eyebrow page-eyebrow--rule" data-hero-eyebrow>
-							Mohawk Valley Web Design Studio · Utica · Rome · Syracuse · CNY
+							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY
 						</p>
 						<div className="hero-launch-pill" role="status">
 							<span className="hero-launch-dot" aria-hidden="true" />
@@ -69,29 +70,27 @@ export function HomePage() {
 							</span>
 						</div>
 						<h1 data-hero-h1>
-							Mohawk Valley web design for service businesses that want a site
-							that actually books work.
+							Strategic web design for service businesses that demand measurable
+							growth and lasting market presence.
 						</h1>
 						<p data-hero-sub>
-							Custom websites for contractors, home-service pros, medspas,
-							salons, boutiques, and every other small business across Utica,
-							Rome, Syracuse, and greater Central New York. Fast on a phone,
-							friendly to read, and built so people searching for what you do
-							actually land, trust you, and call. Contact us to request a free
-							manual site audit.
+							Enterprise-grade websites for contractors, home-service professionals,
+							medical aesthetics, salons, and scaling businesses throughout Utica,
+							Rome, Syracuse, and Central New York. Performance-optimized architecture,
+							conversion-focused design, and SEO infrastructure that positions you
+							at the top of local search results.
 						</p>
 						<p className="hero-pricing-anchor">
-							Most standard rebuilds:{" "}
+							Standard engagements:{" "}
 							<strong>
-								3 easy payments of {STANDARD_WEBSITE_INSTALLMENT_EACH}
+								3 quarterly payments of {STANDARD_WEBSITE_INSTALLMENT_EACH}
 							</strong>{" "}
-							at launch (typical total {STANDARD_WEBSITE_TYPICAL_RANGE}) — we
-							host and tune SEO for the first three months, then you can roll
-							into the {FOUNDING_PARTNER_SEO_MONTHLY}/mo{" "}
-							{FOUNDING_PARTNER_SEO_LABEL}. Founding-partner pilot pairs a{" "}
-							<strong>complimentary build</strong> with that plan while any of
-							the {FOUNDING_PARTNER_BUILD_SLOTS} launch spots remain. Simple
-							single-service sites from {STANDARD_WEBSITE_STARTING_PRICE}.
+							(investment typically {STANDARD_WEBSITE_TYPICAL_RANGE}) — includes
+							enterprise hosting and strategic SEO for the first quarter, then
+							continue with the {FOUNDING_PARTNER_SEO_MONTHLY}/mo{" "}
+							{FOUNDING_PARTNER_SEO_LABEL}. Founding partner program: complimentary
+							build with SEO commitment — {FOUNDING_PARTNER_BUILD_SLOTS} exclusive
+							positions available. Single-service solutions from {STANDARD_WEBSITE_STARTING_PRICE}.
 						</p>
 						<div className="hero-actions">
 							<Link
@@ -495,6 +494,7 @@ export function HomePage() {
   });
 })();`}
 			</Script>
+			<FirstVisitSplash />
 		</>
 	);
 }

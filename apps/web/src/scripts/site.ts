@@ -14,6 +14,7 @@ import {
 	initRevealAnimations,
 	initTabbedProof,
 } from "./ui";
+import { initWebMCP } from "./webmcp";
 
 /** Abort previous window-level listeners when re-running after page transitions. */
 let pageLifecycleAbort: AbortController | undefined;
@@ -40,6 +41,7 @@ function runPageScripts(): void {
 	initGbpRoiCalculator();
 	initCookieSettingsLinks();
 	initMagneticLinks();
+	initWebMCP();
 }
 
 function scheduleRunPageScripts(): void {

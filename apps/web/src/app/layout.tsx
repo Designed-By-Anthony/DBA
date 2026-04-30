@@ -54,9 +54,12 @@ export const metadata: Metadata = {
 	},
 };
 
+const DEFAULT_LEAD_WEBHOOK =
+	"https://tremendous-emu-522.convex.site/webhook/lead";
+
 export default function RootLayout({ children }: { children: ReactNode }) {
 	const leadWebhookDefault =
-		process.env.NEXT_PUBLIC_LEAD_WEBHOOK_URL?.trim() ?? "";
+		process.env.NEXT_PUBLIC_LEAD_WEBHOOK_URL?.trim() || DEFAULT_LEAD_WEBHOOK;
 	const recaptchaSiteKey =
 		process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
 	const recaptchaAction =

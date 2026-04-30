@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json.schemastore.org/linkset.json",
+  "linkset": [
+    {
+      "anchor": "https://api.designedbyanthony.com",
+      "rel": "service-desc",
+      "href": "https://api.designedbyanthony.com/docs",
+      "type": "application/json",
+      "title": "API Documentation"
+    },
+    {
+      "anchor": "https://api.designedbyanthony.com",
+      "rel": "service-doc",
+      "href": "https://api.designedbyanthony.com/docs",
+      "type": "text/html",
+      "title": "API Documentation (HTML)"
+    },
+    {
+      "anchor": "https://api.designedbyanthony.com",
+      "rel": "status",
+      "href": "https://api.designedbyanthony.com/health",
+      "type": "application/json",
+      "title": "API Health Check"
+    },
+    {
+      "anchor": "https://designedbyanthony.com",
+      "rel": "service-doc",
+      "href": "https://designedbyanthony.com/lighthouse",
+      "type": "text/html",
+      "title": "Lighthouse Scanner - Free SEO & Performance Audit"
+    }
+  ]
+}
