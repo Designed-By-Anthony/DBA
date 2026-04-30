@@ -1366,7 +1366,8 @@
 }
 
 /* Progress track */
-.lh-scan-progress {
+.lh-scan-progress,
+.lh-scan-progress__track {
 	position: relative;
 	height: 0.4rem;
 	overflow: hidden;
@@ -1685,6 +1686,14 @@
 		rgb(var(--accent-bronze-rgb) / 0.5),
 		transparent
 	);
+}
+
+.lh-report-cover {
+	/* Alias — primary styling lives on .lighthouse-results-hero */
+}
+
+.lh-report-cover-copy {
+	min-width: 0;
 }
 
 .lh-report-kicker {
