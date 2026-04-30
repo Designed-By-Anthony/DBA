@@ -47,15 +47,19 @@ function PreorderForm({
 		if (!email.includes("@")) return;
 		setStatus("submitting");
 		try {
-			await fetch(buildPublicApiUrl("/api/lead-email"), {
+			const res = await fetch(buildPublicApiUrl("/api/lead-email"), {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					email,
+					name: email.split("@")[0] || "Pre-order",
 					source: "tools-preorder",
+					leadSource: "tools-preorder",
+					ctaSource: `${productName} — ${tierName}`,
 					message: `Pre-order interest: ${productName} — ${tierName} tier`,
 				}),
 			});
+			if (!res.ok) throw new Error(`Server responded ${res.status}`);
 			setStatus("success");
 		} catch {
 			setStatus("error");
