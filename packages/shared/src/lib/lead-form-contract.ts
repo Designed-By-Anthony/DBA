@@ -20,20 +20,23 @@ export const planSuiteSchema = z.enum(["starter", "full"]);
  * fixed (non-JSONB) columns on `leads` and let any vertical feed the same
  * ingest endpoint.
  */
-export const globalLeadCoreSchema = z
-	.object({
-		firstName: z.string().trim().min(1).max(120).optional(),
-		lastName: z.string().trim().min(1).max(120).optional(),
-		/** Optional; server will synthesize from first+last if omitted. */
-		name: z.string().trim().min(1).max(240).optional(),
-		email: z.string().email("Invalid email"),
-		phone: z.string().trim().min(3).max(40).optional(),
-		source: z.string().trim().min(1).max(80).optional(),
-	})
-	.refine((v) => Boolean(v.name || v.firstName || v.lastName), {
+const globalLeadCoreObjectSchema = z.object({
+	firstName: z.string().trim().min(1).max(120).optional(),
+	lastName: z.string().trim().min(1).max(120).optional(),
+	/** Optional; server will synthesize from first+last if omitted. */
+	name: z.string().trim().min(1).max(240).optional(),
+	email: z.string().email("Invalid email"),
+	phone: z.string().trim().min(3).max(40).optional(),
+	source: z.string().trim().min(1).max(80).optional(),
+});
+
+export const globalLeadCoreSchema = globalLeadCoreObjectSchema.refine(
+	(v) => Boolean(v.name || v.firstName || v.lastName),
+	{
 		message: "name, firstName, or lastName is required",
 		path: ["name"],
-	});
+	},
+);
 
 /**
  * Body for `POST /api/leads/ingest` — the Global Ingest Engine.
@@ -45,8 +48,7 @@ export const globalLeadCoreSchema = z
  * - `secret` is the shared `LEAD_WEBHOOK_SECRET` (also accepted via
  *   `x-webhook-secret` / `x-lead-secret` headers).
  */
-export const globalLeadIngestBodySchema = globalLeadCoreSchema
-	.innerType()
+export const globalLeadIngestBodySchema = globalLeadCoreObjectSchema
 	.extend({
 		tenantId: z.string().trim().min(1).max(120).optional(),
 		/** Shared secret (body fallback; headers preferred). */
@@ -54,7 +56,11 @@ export const globalLeadIngestBodySchema = globalLeadCoreSchema
 		/** Everything else lands in `leads.metadata` JSONB. */
 		metadata: z.record(z.string(), z.unknown()).default({}),
 	})
-	.passthrough();
+	.passthrough()
+	.refine((v) => Boolean(v.name || v.firstName || v.lastName), {
+		message: "name, firstName, or lastName is required",
+		path: ["name"],
+	});
 
 export type GlobalLeadIngestBody = z.infer<typeof globalLeadIngestBodySchema>;
 

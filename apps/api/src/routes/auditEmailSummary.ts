@@ -28,7 +28,7 @@ const bodySchema = z.object({
 	psiDegradedReason: z.string().max(2000).nullable().optional(),
 });
 
-export const auditEmailSummaryRoute = new Elysia()
+export const auditEmailSummaryRoute = new Elysia({ aot: false })
 	.post("/api/audit/email-summary", async ({ request, set }) => {
 		set.headers["Cache-Control"] = "no-store";
 

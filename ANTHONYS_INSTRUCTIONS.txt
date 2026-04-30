@@ -6,8 +6,8 @@ Location: /Users/anthonyjones/Web Design/Designed_By_Anthony
 Layout
 ------
 • Turborepo monorepo at the repo root (Bun workspaces).
-• apps/web  — Next.js 16 app (marketing + /lighthouse), deployed on Cloudflare Pages: src/, public/, next.config.ts, wrangler.jsonc
-• apps/api  — ElysiaJS Cloudflare Worker (api.designedbyanthony.com): src/routes/, wrangler.jsonc
+• apps/web  — Next.js 16 app (marketing + /lighthouse), deployed on Cloudflare Pages: src/, public/, next.config.ts, wrangler.json
+• apps/api  — ElysiaJS Cloudflare Worker (api.designedbyanthony.com): src/routes/, wrangler.json
 • packages/shared (@dba/shared) — shared business logic: lighthouse/lib/, lib/
 • Supporting folders at root (not separate deploys): customer-site-embeds/, vertaflow-crm/
 
@@ -35,7 +35,7 @@ From repo root:
 Cloudflare Pages + Workers
 --------------------------
 • Production deploys from GitHub CI only; local deploy commands are for CI/emergency operator use.
-• Cloudflare Pages project root is the repository root (`.`). Root `wrangler.jsonc` is canonical for Pages and points at `apps/web/.vercel/output/static` with `nodejs_compat`.
+• Cloudflare Pages project root is the repository root (`.`). Root `wrangler.json` is canonical for Pages and points at `apps/web/.vercel/output/static` with `nodejs_compat`.
 • Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
 • Next.js Worker fallback: bun run --cwd apps/web deploy:worker
 • API Worker:       bun run deploy:api   (wrangler deploy from apps/api)

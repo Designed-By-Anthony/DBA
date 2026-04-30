@@ -7,7 +7,7 @@ import {
 import { isValidReportId } from "@lh/lib/reportId";
 import { Elysia } from "elysia";
 
-export const reportRoute = new Elysia().get(
+export const reportRoute = new Elysia({ aot: false }).get(
 	"/api/report/:id",
 	async ({ params, set }) => {
 		set.headers["Cache-Control"] = "no-store";

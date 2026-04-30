@@ -6,7 +6,7 @@
 	font-family: "Inter Variable";
 	font-style: normal;
 	font-weight: 100 900;
-	src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+	src: url("~@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
 		format("woff2-variations");
 	font-display: swap;
 }
@@ -15,7 +15,7 @@
 	font-family: "Fraunces Variable";
 	font-style: normal;
 	font-weight: 200 900;
-	src: url("@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2")
+	src: url("~@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2")
 		format("woff2-variations");
 	font-display: swap;
 }

@@ -74,7 +74,7 @@ async function createReportWithUniqueId(
 	throw new Error("Failed to generate unique report ID after 3 attempts");
 }
 
-export const auditRoute = new Elysia().post(
+export const auditRoute = new Elysia({ aot: false }).post(
 	"/api/audit",
 	async ({ request, set }) => {
 		set.headers["Cache-Control"] = "no-store";

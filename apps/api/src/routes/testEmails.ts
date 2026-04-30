@@ -5,7 +5,7 @@ import {
 } from "@lh/lib/gmail";
 import { Elysia } from "elysia";
 
-export const testEmailsRoute = new Elysia()
+export const testEmailsRoute = new Elysia({ aot: false })
 	.get("/api/test/emails", ({ set }) => {
 		if (!isGmailTestMode()) {
 			set.status = 404;

@@ -50,21 +50,25 @@ export const requiredPostgresUrl = z
 		"DATABASE_URL must be a postgres:// or postgresql:// connection string",
 	);
 
-export const optionalUrl = z.preprocess(
-	(raw) => {
-		if (raw == null) return undefined;
-		if (typeof raw !== "string") return raw;
-		const value = raw.trim();
-		if (value === "" || value === "undefined" || value === "null")
-			return undefined;
-		return value;
-	},
-	z
-		.string()
-		.trim()
-		.refine((v) => /^https?:\/\//i.test(v), "Must be an http(s) URL")
-		.optional(),
-);
+export const optionalUrl = z
+	.preprocess(
+		(raw) => {
+			if (raw == null) return undefined;
+			if (typeof raw !== "string") return raw;
+			const value = raw.trim();
+			if (value === "" || value === "undefined" || value === "null")
+				return undefined;
+			return value;
+		},
+		z.union([
+			z.undefined(),
+			z
+				.string()
+				.trim()
+				.refine((v) => /^https?:\/\//i.test(v), "Must be an http(s) URL"),
+		]),
+	)
+	.optional();
 
 export const requiredUrl = z.string().trim().url("Must be an http(s) URL");
 
