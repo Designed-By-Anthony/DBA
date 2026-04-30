@@ -282,8 +282,8 @@ export const auditRoute = new Elysia({ aot: false }).post(
 					placesData.primaryType,
 					3,
 				);
-			} catch (compErr) {
-				console.warn("Competitor scan failed:", compErr);
+			} catch {
+				/* competitor scan is best-effort — swallow errors silently */
 			}
 
 			const categories = lighthouse.categories;

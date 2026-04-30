@@ -1,6 +1,6 @@
 # Lighthouse Scanner — product description & operator guide
 
-This document is the **single source of truth** for how we **describe** the scanner (marketing, OG tags, splash copy) and what **you** configure in **Firebase App Hosting** / env. Structure is inspired by common open-source SEO audit READMEs (for example [vchaitanyachowdari/seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator)) — clear feature blocks, stack, env, usage — adapted to **this repo’s real implementation**, not a generic SaaS template.
+This document is the **single source of truth** for how we **describe** the scanner (marketing, OG tags, splash copy) and what **you** configure in **Cloudflare Pages / Workers** env. Structure is inspired by common open-source SEO audit READMEs (for example [vchaitanyachowdari/seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator)) — clear feature blocks, stack, env, usage — adapted to **this repo’s real implementation**, not a generic SaaS template.
 
 ---
 
@@ -21,7 +21,7 @@ This document is the **single source of truth** for how we **describe** the scan
 | **Authority / links** | “Backlink snapshot when configured” | **Moz API** when `MOZ_API_CREDENTIALS` / token is set; otherwise omit or show “not configured” in UI |
 | **Conversion / UX** | “Trust + conversion lens” | AI **conversionScore** + CTA/schema/tel/form signals from HTML |
 | **AI report** | Plain-English executive summary + top fixes | **Gemini** (`generateAiInsight`) with fallback |
-| **Persistence** | Sharable report when storage works | Firestore report store when configured |
+| **Persistence** | Sharable report when storage works | KV / D1 report store when configured |
 | **CRM / leads** | Optional | Convex webhooks, Sheets, Gmail — see `.env.example` (`AUDIT_LEAD_WEBHOOK_*`, `LEAD_WEBHOOK_URL`) |
 
 Do **not** claim: unlimited full-site crawl like Semrush/Ahrefs, JS-rendered crawl of every route, or “Moz DA” unless Moz is configured.
