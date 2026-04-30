@@ -1,39 +1,67 @@
 /**
  * Maps DBA :root tokens to Tailwind v4 @theme names (marketing + Lighthouse).
+ *
+ * Brand palette: Midnight Obsidian (#0a0c10 → #0f1218) + Bronze (#C9A86C / #D4AF37).
+ * All --color-brand-* tokens are bronze-first. Blue survives only in the
+ * Lighthouse-specific block (--color-primary / --color-accent / --color-label)
+ * until that segment is migrated in a later phase.
  */
 @theme {
+	/* ── Backgrounds ─────────────────────────────────────────────── */
 	--color-bg-dark: var(--bg-dark);
 	--color-bg-deeper: var(--bg-deeper);
 	--color-bg-ink: var(--bg-ink);
-	--color-text-white: var(--text-white);
-	--color-text-cream: var(--text-cream);
-	--color-text-gray: var(--text-gray);
-	--color-text-muted: var(--text-muted);
-	--color-accent-blue: var(--accent-blue);
-	--color-accent-blue-hover: var(--accent-blue-hover);
-	--color-accent-bronze: var(--accent-bronze);
-	--color-accent-bronze-light: var(--accent-bronze-light);
-	--color-accent-brass: var(--accent-brass);
-	--font-main: var(--font-main);
-	--font-display: var(--font-display);
-	--color-brand: var(--accent-blue-hover);
-	--color-brand-hover: #2563eb;
-	--color-brand-subtle: rgb(59 130 246 / 0.14);
-	--color-brand-glow: rgb(37 99 235 / 0.22);
-	--color-brand-ring: rgb(96 165 250 / 0.5);
 	--color-surface-0: var(--bg-ink);
 	--color-surface-1: var(--surface-1);
 	--color-surface-2: var(--surface-2);
 	--color-surface-3: var(--surface-3);
+
+	/* ── Type ────────────────────────────────────────────────────── */
+	--color-text-white: var(--text-white);
+	--color-text-cream: var(--text-cream);
+	--color-text-soft: var(--text-soft);
+	--color-text-gray: var(--text-gray);
+	--color-text-muted: var(--text-muted);
+
+	/* ── Bronze accent (Midnight & Bronze palette) ───────────────── */
+	--color-accent-bronze: var(--accent-bronze);
+	--color-accent-bronze-light: var(--accent-bronze-light);
+	--color-accent-bronze-muted: var(--accent-bronze-muted);
+	--color-accent-bronze-soft: var(--accent-bronze-soft);
+	--color-accent-bronze-hairline: var(--accent-bronze-hairline);
+	--color-accent-bronze-glow: var(--accent-bronze-glow);
+	--color-accent-brass: var(--accent-brass);
+
+	/* ── Blue (legacy; used by Lighthouse segment only) ─────────── */
+	--color-accent-blue: var(--accent-blue);
+	--color-accent-blue-hover: var(--accent-blue-hover);
+
+	/* ── Brand tokens — bronze-first ────────────────────────────── */
+	--color-brand: var(--accent-bronze);
+	--color-brand-hover: #b58a14;
+	--color-brand-subtle: rgb(201 168 108 / 0.14);
+	--color-brand-glow: rgb(201 168 108 / 0.22);
+	--color-brand-ring: rgb(201 168 108 / 0.5);
+
+	/* ── Borders ─────────────────────────────────────────────────── */
+	--color-border-soft: var(--border-soft);
+
+	/* ── Glass surfaces ──────────────────────────────────────────── */
 	--color-glass-bg: rgba(255, 255, 255, 0.03);
 	--color-glass-border: rgba(255, 255, 255, 0.06);
 	--color-glass-border-hover: rgba(255, 255, 255, 0.12);
+
+	/* ── Status ──────────────────────────────────────────────────── */
 	--color-success: var(--success-green);
 	--color-warning: #f59e0b;
 	--color-danger: #ef4444;
-	--color-info: var(--accent-blue-hover);
+	--color-info: var(--accent-bronze);
 
-	/* Lighthouse app */
+	/* ── Fonts ───────────────────────────────────────────────────── */
+	--font-main: var(--font-main);
+	--font-display: var(--font-display);
+
+	/* ── Lighthouse app (blue preserved until Phase 3+ migration) ── */
 	--color-foreground: var(--text-white);
 	--color-primary: var(--accent-blue-hover);
 	--color-accent: var(--accent-blue);
