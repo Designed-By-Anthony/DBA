@@ -3,13 +3,13 @@ import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { ToolsPage } from "./ToolsPage";
 
 export const metadata: Metadata = {
-	title: "Tools — Micro SaaS Store for Web Studios",
+	title: "Tools — Micro SaaS for Local Service Businesses",
 	description:
-		"A curated set of single-purpose tools for freelancers and small web agencies. Priced to grab without a procurement process. Join the waitlist for early access.",
+		"Six purpose-built tools for freelancers and small web agencies: website health reports, AI review response, client portals, local SEO dashboards, testimonial collection, and AI social content. Founding member pricing available.",
 	openGraph: {
 		title: "Tools — Micro SaaS Store | Designed by Anthony",
 		description:
-			"Single-purpose tools for web studios. No subscriptions, no bloat. Founding-rate pricing for waitlist members.",
+			"Purpose-built tools for local service businesses. SEO monitoring, AI review response, client portals, and more. Founding member pricing available.",
 		url: "https://designedbyanthony.com/tools",
 		type: "website",
 	},
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Tools — Micro SaaS Store | Designed by Anthony",
 		description:
-			"Single-purpose tools for web studios. No subscriptions, no bloat. Founding-rate pricing for waitlist members.",
+			"Purpose-built tools for local service businesses. SEO monitoring, AI review response, client portals, and more.",
 	},
 	alternates: { canonical: "/tools" },
 };
