@@ -49,10 +49,10 @@ export function BrandHeader({
 
 			{/* ── Header ── */}
 			<header className="dba-header">
-				<div className="dba-header-inner">
+				<div className="dba-header-inner mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 md:gap-6 lg:px-8">
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="dba-brand-lockup"
+						className="dba-brand-lockup min-w-0 flex-1 md:flex-none"
 						aria-label={`${SITE_BRAND.name} — home`}
 					>
 						<Image
@@ -75,7 +75,7 @@ export function BrandHeader({
 					</Link>
 
 					<nav
-						className="dba-nav dba-nav--desktop"
+						className="dba-nav dba-nav--desktop hidden md:ml-auto md:flex md:items-center md:gap-6"
 						aria-label="Designed by Anthony main navigation"
 					>
 						{SITE_HEADER_NAV_LINKS.map((link) => (
@@ -103,7 +103,7 @@ export function BrandHeader({
 					</nav>
 
 					{/* Mobile slot — either hamburger (marketing site) or current chip (lighthouse) */}
-					<div className="dba-nav dba-nav--mobile">
+					<div className="dba-nav dba-nav--mobile flex items-center gap-3 md:hidden">
 						{isAudit ? (
 							<span className="dba-nav-current" aria-current="page">
 								<span className="dba-nav-current-dot" aria-hidden />
@@ -119,7 +119,7 @@ export function BrandHeader({
 						)}
 						{includeHamburger ? (
 							<button
-								className="hamburger dba-hamburger"
+								className="hamburger dba-hamburger inline-flex h-11 w-11 items-center justify-center"
 								id="hamburger-btn"
 								type="button"
 								aria-label="Open navigation menu"

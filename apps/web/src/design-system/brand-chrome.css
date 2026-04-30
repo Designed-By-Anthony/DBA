@@ -196,7 +196,7 @@
 	gap: 1.25rem;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 768px) {
 	.dba-nav--desktop {
 		display: flex;
 	}
@@ -292,7 +292,7 @@
 	gap: 0.6rem;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 768px) {
 	.dba-nav--mobile {
 		display: none;
 	}

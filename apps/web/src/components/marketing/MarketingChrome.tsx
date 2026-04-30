@@ -108,7 +108,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 			</div>
 
 			<div
-				className="mobile-nav-overlay"
+				className="mobile-nav-overlay fixed inset-0 z-[10060] flex flex-col bg-black/95"
 				id="mobile-nav"
 				role="dialog"
 				aria-modal="true"
@@ -116,38 +116,51 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				aria-hidden="true"
 			>
 				<div
-					className="mobile-nav-backdrop"
+					className="mobile-nav-backdrop absolute inset-0 bg-black/95"
 					data-mobile-nav-dismiss
 					aria-hidden="true"
 				/>
-				<div className="mobile-nav-scroll-wrap">
-					<div className="mobile-nav-panel">
-						<div className="mobile-nav-panel__top">
-							<h2 id="mobile-nav-title" className="sr-only">
+				<div className="mobile-nav-scroll-wrap relative z-[1] flex flex-1 flex-col">
+					<div className="mobile-nav-panel flex min-h-full w-full flex-1 flex-col">
+						<div className="mobile-nav-panel__top flex items-center justify-between p-6 sm:px-8">
+							<h2
+								id="mobile-nav-title"
+								className="text-xs font-semibold uppercase tracking-[0.22em] text-white/72"
+							>
 								Main menu
 							</h2>
 							<button
 								type="button"
-								className="mobile-nav-close"
+								className="mobile-nav-close inline-flex h-11 w-11 items-center justify-center"
 								data-mobile-nav-close
 								aria-label="Close navigation menu"
 							>
 								<span aria-hidden="true">×</span>
 							</button>
 						</div>
-						<nav className="mobile-nav-links" aria-label="Mobile">
+						<nav
+							className="mobile-nav-links flex flex-1 flex-col items-center justify-center gap-6 px-6 pb-10 text-center sm:px-8"
+							aria-label="Mobile"
+						>
 							{SITE_HEADER_NAV_LINKS.map((link) => (
-								<Link key={link.href} href={link.href}>
+								<Link
+									key={link.href}
+									href={link.href}
+									className="w-full max-w-sm"
+								>
 									{link.label}
 								</Link>
 							))}
 							<Link
 								href={SITE_CONTACT_LINK.href}
-								className="mobile-nav-cta mobile-nav-cta--secondary"
+								className="mobile-nav-cta mobile-nav-cta--secondary w-full max-w-sm"
 							>
 								{SITE_CONTACT_LINK.label}
 							</Link>
-							<Link href={SITE_AUDIT_CTA.href} className="mobile-nav-cta">
+							<Link
+								href={SITE_AUDIT_CTA.href}
+								className="mobile-nav-cta w-full max-w-sm"
+							>
 								{SITE_AUDIT_CTA.label}
 							</Link>
 						</nav>
@@ -157,8 +170,10 @@ window.__dbaRevokeAnalyticsConsent = function () {
 
 			<div className="site-body-canvas">
 				<SiteContactDrawer />
-				<div className="site-main-wrap">
-					<main id="main-content">{children}</main>
+				<div className="site-main-wrap w-full min-w-0">
+					<main id="main-content" className="relative w-full min-w-0">
+						{children}
+					</main>
 					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
 					<BrandFooter />
 				</div>
