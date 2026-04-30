@@ -48,7 +48,6 @@
         "react-dom": "19.2.5",
         "sharp": "^0.34.5",
         "zod": "^4.4.0",
-        "zustand": "^5.0.12",
       },
       "devDependencies": {
         "@opennextjs/cloudflare": "^1.19.4",
@@ -1379,8 +1378,6 @@
 
     "zod": ["zod@4.4.0", "", {}, "sha512-932TE3dEKhhYkEZFv6meaxLaCyg1m6LSI0ETKCIyUqIim+KgIsB/kha/4CKwDEbYgMzS5QxAe2mtDPpaHLHdsQ=="],
 
-    "zustand": ["zustand@5.0.12", "", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["immer", "use-sync-external-store"] }, "sha512-i77ae3aZq4dhMlRhJVCYgMLKuSiZAaUPAct2AksxQ+gOtimhGMdXljRT21P5BNpeT4kXlLIckvkPM029OljD7g=="],
-
     "@aws-crypto/crc32/tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
 
     "@aws-crypto/crc32c/tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
@@ -1489,9 +1486,9 @@
 
     "@cypress/xvfb/debug": ["debug@3.2.7", "", { "dependencies": { "ms": "^2.1.1" } }, "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ=="],
 
-    "@dba/api/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "zod": "^4.3.6" } }],
+    "@dba/api/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "zod": "^4.4.0" } }],
 
-    "@dba/web/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "zod": "^4.3.6" } }],
+    "@dba/web/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "zod": "^4.4.0" } }],
 
     "@dotenvx/dotenvx/commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 

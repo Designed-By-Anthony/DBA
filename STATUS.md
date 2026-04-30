@@ -2,6 +2,16 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Micro SaaS store /tools page build-out (2026-04-30)
+
+- Replaced the "Coming Soon" waitlist on `/tools` with a full product catalog showcasing 6 Stripe-backed micro-SaaS products: SiteScan, ReviewPilot, ClientHub, LocalRank, TestiFlow, and ContentMill.
+- Each product card displays 3 pricing tiers with a monthly/annual billing toggle (annual billing = 2 months free).
+- Promo banners for FOUNDING50 (50% off forever, first 20 per product) and BOGO50 (50% off second tool).
+- Quick-nav pill links for jumping between products; bottom CTA section summarizing stacking strategy.
+- Created `apps/web/src/data/tools-products.ts` as the single source of truth for product data, tiers, pricing, and Stripe Payment Link URLs (placeholder until Viktor delivers final links).
+- Removed unused zustand dependency and waitlist store (`useToolsStore`) — tools page is now a pure client component with local `useState` for billing toggle.
+- Verification: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+
 ## Cloudflare Worker eval fix + local audit cleanup (2026-04-29)
 
 - Disabled Elysia AOT/code generation on the API root app and nested route modules so Cloudflare Workers no longer hit `EvalError: Code generation from strings disallowed for this context`.
