@@ -80,11 +80,13 @@ export const reportPdfRoute = new Elysia({ aot: false }).get(
 				}
 			})();
 
-			set.headers["Content-Type"] = "application/pdf";
-			set.headers["Content-Disposition"] =
-				`attachment; filename="audit-${host}-${id}.pdf"`;
-			set.headers["Cache-Control"] = "private, max-age=300";
-			return new Response(buf);
+			return new Response(buf, {
+				headers: {
+					"Content-Type": "application/pdf",
+					"Content-Disposition": `attachment; filename="audit-${host}-${id}.pdf"`,
+					"Cache-Control": "private, max-age=300",
+				},
+			});
 		} catch (err) {
 			console.error(
 				"PDF generation failed:",

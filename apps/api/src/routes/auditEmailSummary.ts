@@ -1,9 +1,5 @@
 import { buildAuditSummaryEmail } from "@lh/lib/auditSummaryEmail";
-import {
-	buildCorsHeaders as buildLhCors,
-	checkLocalRateLimit,
-	getClientAddress,
-} from "@lh/lib/http";
+import { checkLocalRateLimit, getClientAddress } from "@lh/lib/http";
 import {
 	isResendConfigured,
 	sendTransactionalEmail,
@@ -28,8 +24,9 @@ const bodySchema = z.object({
 	psiDegradedReason: z.string().max(2000).nullable().optional(),
 });
 
-export const auditEmailSummaryRoute = new Elysia({ aot: false })
-	.post("/api/audit/email-summary", async ({ request, set }) => {
+export const auditEmailSummaryRoute = new Elysia({ aot: false }).post(
+	"/api/audit/email-summary",
+	async ({ request, set }) => {
 		set.headers["Cache-Control"] = "no-store";
 
 		try {
@@ -100,8 +97,5 @@ export const auditEmailSummaryRoute = new Elysia({ aot: false })
 			set.status = 502;
 			return { error: "Could not send email right now. Try again shortly." };
 		}
-	})
-	.options("/api/audit/email-summary", ({ request }) => {
-		const corsHeaders = buildLhCors(request, "POST, OPTIONS");
-		return new Response(null, { status: 204, headers: corsHeaders });
-	});
+	},
+);
