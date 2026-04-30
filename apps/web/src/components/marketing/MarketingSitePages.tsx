@@ -15,6 +15,7 @@ import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
 import { MARKETING_SERVICES } from "@/lib/seo";
 import { ArticleBody } from "./ArticleBody";
 import { AuditForm } from "./AuditForm";
+import { SalesforceContactForm } from "./SalesforceContactForm";
 import { BlogArticleEnhancements } from "./BlogArticleEnhancements";
 import {
 	AboutPage,
@@ -518,25 +519,9 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 							<h2 className="contact-form-shell__title">Send a message</h2>
 							<p className="contact-form-shell__lede">
 								Tell us what you are trying to fix — we reply within one
-								business day. Same secure path as the homepage quick form.
+								business day.
 							</p>
-							<AuditForm
-								ctaSource="contact_page"
-								pageContext="contact"
-								sourcePath="/contact"
-								offerType="contact_page"
-								subjectLine="Contact form — Designed by Anthony"
-								pageTitle="Contact — Designed by Anthony"
-								successRedirect="/thank-you?offer=contact"
-								submitLabel="Send message"
-								metaMessage="Bot-checked. No spam."
-								websiteRequired={false}
-								issueRequired
-								issueLabel="How can we help?"
-								issuePlaceholder="Project type, timeline, and best way to reach you."
-								issueRows={5}
-								showPhoneField
-							/>
+							<SalesforceContactForm />
 						</div>
 					</div>
 				</section>
