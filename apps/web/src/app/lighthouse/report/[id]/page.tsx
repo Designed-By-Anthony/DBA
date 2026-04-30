@@ -123,16 +123,24 @@ export default function LighthouseReportViewerPage() {
 				);
 				/* Defend against non-JSON error responses (e.g. proxy HTML 502s)
 				   so the user never sees a raw `Unexpected token '<'` parser
-				   message. Mirrors the pattern in AuditForm.tsx. */
+				   message. If the body fails to parse we surface a friendly
+				   error regardless of status, otherwise a 200 with HTML
+				   would silently render an empty zeroed-out report. */
 				let json: Record<string, unknown> = {};
+				let jsonParseFailed = false;
 				try {
 					json = (await res.json()) as Record<string, unknown>;
 				} catch {
-					/* leave json empty; res.ok branch will surface a friendly error */
+					jsonParseFailed = true;
 				}
 				if (!res.ok) {
 					throw new Error(
 						typeof json.error === "string" ? json.error : "Report not found.",
+					);
+				}
+				if (jsonParseFailed) {
+					throw new Error(
+						"Report data could not be read. Please try again.",
 					);
 				}
 				if (!cancelled) setData(toAuditData(json));
