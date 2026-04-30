@@ -30,7 +30,6 @@ export function SalesforceContactForm() {
 						id={`${formId}-first_name`}
 						maxLength={40}
 						name="first_name"
-						size={20}
 						type="text"
 						autoComplete="given-name"
 						required
@@ -43,7 +42,6 @@ export function SalesforceContactForm() {
 						id={`${formId}-email`}
 						maxLength={80}
 						name="email"
-						size={20}
 						type="email"
 						autoComplete="email"
 						required
@@ -56,7 +54,6 @@ export function SalesforceContactForm() {
 						id={`${formId}-phone`}
 						maxLength={40}
 						name="phone"
-						size={20}
 						type="tel"
 						autoComplete="tel"
 					/>
@@ -68,7 +65,6 @@ export function SalesforceContactForm() {
 						id={`${formId}-url`}
 						maxLength={80}
 						name="url"
-						size={20}
 						type="url"
 						inputMode="url"
 						autoComplete="url"
