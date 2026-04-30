@@ -3,9 +3,9 @@
 import { useId } from "react";
 
 /**
- * Salesforce Web-to-Lead contact form
- * Submits directly to Salesforce with reCAPTCHA v2
- * Note: reCAPTCHA script is loaded globally in layout.tsx
+ * Salesforce Web-to-Lead contact form. Submits directly to Salesforce.
+ * No client-side captcha: the previous reCAPTCHA v2 widget required
+ * Salesforce-side validation that was silently dropping leads.
  */
 export function SalesforceContactForm() {
 	const formId = useId();
@@ -16,11 +16,6 @@ export function SalesforceContactForm() {
 			method="POST"
 			className="salesforce-contact-form"
 		>
-			<input
-				type="hidden"
-				name="captcha_settings"
-				value='{"keyname":"DBA","fallback":"true","orgId":"00Dao00001YO4nx","ts":""}'
-			/>
 			<input type="hidden" name="oid" value="00Dao00001YO4nx" />
 			<input
 				type="hidden"
@@ -93,11 +88,6 @@ export function SalesforceContactForm() {
 				</div>
 			</div>
 
-			<div
-				className="g-recaptcha"
-				data-sitekey="6LfnB9EsAAAAAPhbLN_enDV4s07F00YiLYANq3-Y"
-			/>
-
 			<div className="salesforce-form-actions">
 				<button type="submit" className="btn btn-primary-audit">
 					Send Message
@@ -105,7 +95,7 @@ export function SalesforceContactForm() {
 			</div>
 
 			<p className="salesforce-form-privacy">
-				Protected by reCAPTCHA. We reply within one business day.
+				We reply within one business day.
 			</p>
 		</form>
 	);

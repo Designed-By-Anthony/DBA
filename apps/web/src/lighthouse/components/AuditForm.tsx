@@ -2,10 +2,6 @@
 
 import type { AuditData } from "@lh/auditReport";
 import { initCursorGlow } from "@lh/lib/cursorGlow";
-import {
-	RECAPTCHA_ENTERPRISE_ACTION,
-	RECAPTCHA_ENTERPRISE_SITE_KEY,
-} from "@lh/lib/recaptchaEnterpriseConfig";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
@@ -19,37 +15,6 @@ const LOADING_MESSAGES = [
 	"Pulling optional local/maps context when configured…",
 	"Running the AI pass for your executive summary and top fixes…",
 ];
-
-type RecaptchaEnterpriseApi = {
-	ready(callback: () => void): void;
-	execute(siteKey: string, options: { action: string }): Promise<string>;
-};
-
-declare global {
-	interface Window {
-		grecaptcha?: {
-			enterprise?: RecaptchaEnterpriseApi;
-		};
-	}
-}
-
-async function getRecaptchaEnterpriseToken(): Promise<string> {
-	if (typeof window === "undefined") return "";
-
-	const enterprise = window.grecaptcha?.enterprise;
-	if (!enterprise) return "";
-
-	return new Promise((resolve, reject) => {
-		enterprise.ready(() => {
-			enterprise
-				.execute(RECAPTCHA_ENTERPRISE_SITE_KEY, {
-					action: RECAPTCHA_ENTERPRISE_ACTION,
-				})
-				.then(resolve)
-				.catch(reject);
-		});
-	});
-}
 
 export function AuditForm() {
 	const [url, setUrl] = useState("");
@@ -114,14 +79,6 @@ export function AuditForm() {
 		setErrorMsg("");
 
 		try {
-			let recaptchaToken = "";
-			try {
-				recaptchaToken = await getRecaptchaEnterpriseToken();
-			} catch {
-				throw new Error(
-					"Security check could not finish. Please refresh and try again.",
-				);
-			}
 			const res = await fetch(buildPublicApiUrl("/api/audit"), {
 				method: "POST",
 				headers: {
@@ -133,7 +90,6 @@ export function AuditForm() {
 					name,
 					company,
 					location,
-					recaptchaToken,
 				}),
 			});
 
@@ -224,8 +180,10 @@ export function AuditForm() {
 					</label>
 					{/* Phase-3 follow-up: removed the absolute-positioned `https://`
 					    overlay span — it visually overlapped the placeholder
-					    ("ghost" effect). The handler at line 108 still prepends
-					    `https://` automatically if the user omits it. */}
+					    ("ghost" effect). The handler still prepends `https://`
+					    automatically if the user omits it, so we keep
+					    type="text" (type="url" would block bare-domain inputs
+					    with native browser validation before submit). */}
 					<input
 						id="url"
 						name="url"
@@ -239,7 +197,7 @@ export function AuditForm() {
 						autoCorrect="off"
 						autoCapitalize="off"
 						spellCheck={false}
-						className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.42)] bg-[rgba(10,14,22,0.88)] px-4 py-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.15),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:font-normal placeholder:text-white/35 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.72)] focus:bg-[rgba(12,16,25,0.96)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.32)]"
+						className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.45)] bg-[rgba(10,14,22,0.9)] px-4 py-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.18),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:font-normal placeholder:text-white/35 transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.78)] focus:bg-[rgba(12,16,25,0.97)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.32)]"
 					/>
 				</div>
 
@@ -346,11 +304,6 @@ export function AuditForm() {
 					<div className="lh-submit-meta">
 						<p className="font-mono text-[11px] tracking-tight text-white/45">
 							~60-90s · Private report · Shareable URL
-						</p>
-						<p className="lh-recaptcha-note">
-							Protected by reCAPTCHA Enterprise. Google{" "}
-							<a href="https://policies.google.com/privacy">Privacy Policy</a>{" "}
-							and <a href="https://policies.google.com/terms">Terms</a> apply.
 						</p>
 					</div>
 				</div>

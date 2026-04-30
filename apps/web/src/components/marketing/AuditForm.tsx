@@ -35,7 +35,7 @@ export interface AuditFormProps {
 
 /**
  * Native marketing lead form — wired by `src/scripts/audit-forms.ts`
- * (reCAPTCHA Enterprise + JSON POST). Submits to `action`
+ * (no client-side captcha; JSON POST). Submits to `action`
  * or `/api/lead-email`, which forwards to `LEAD_WEBHOOK_URL` on the server.
  */
 export function AuditForm({
@@ -144,8 +144,6 @@ export function AuditForm({
 						/>
 					</div>
 				</div>
-
-				<input type="hidden" name="g-recaptcha-response" value="" />
 
 				<p className="audit-form-meta" data-form-error hidden />
 				<div className="audit-form-actions">
