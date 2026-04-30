@@ -81,10 +81,24 @@ function toAuditData(json: Record<string, unknown>): AuditData {
 				: null,
 		aiInsight,
 		diagnostics,
-		sitewide: json.sitewide as AuditData["sitewide"],
-		backlinks: json.backlinks as AuditData["backlinks"],
-		indexCoverage: json.indexCoverage as AuditData["indexCoverage"],
-		places: json.places as AuditData["places"],
+		/* The report API returns `data.sitewide || {}` for legacy reports,
+		   and AuditResults dereferences `sitewide.robotsTxt.exists` without
+		   optional chaining once the outer truthiness check passes. Only
+		   pass sitewide through when it actually has the expected shape. */
+		sitewide:
+			isObject(json.sitewide) &&
+			isObject((json.sitewide as Record<string, unknown>).robotsTxt)
+				? (json.sitewide as unknown as AuditData["sitewide"])
+				: undefined,
+		backlinks: isObject(json.backlinks)
+			? (json.backlinks as unknown as AuditData["backlinks"])
+			: undefined,
+		indexCoverage: isObject(json.indexCoverage)
+			? (json.indexCoverage as unknown as AuditData["indexCoverage"])
+			: undefined,
+		places: isObject(json.places)
+			? (json.places as unknown as AuditData["places"])
+			: undefined,
 		competitors: Array.isArray(json.competitors)
 			? (json.competitors as AuditData["competitors"])
 			: [],
@@ -107,7 +121,15 @@ export default function LighthouseReportViewerPage() {
 					buildPublicApiUrl(`/api/report/${encodeURIComponent(id)}`),
 					{ cache: "no-store" },
 				);
-				const json = (await res.json()) as Record<string, unknown>;
+				/* Defend against non-JSON error responses (e.g. proxy HTML 502s)
+				   so the user never sees a raw `Unexpected token '<'` parser
+				   message. Mirrors the pattern in AuditForm.tsx. */
+				let json: Record<string, unknown> = {};
+				try {
+					json = (await res.json()) as Record<string, unknown>;
+				} catch {
+					/* leave json empty; res.ok branch will surface a friendly error */
+				}
 				if (!res.ok) {
 					throw new Error(
 						typeof json.error === "string" ? json.error : "Report not found.",
