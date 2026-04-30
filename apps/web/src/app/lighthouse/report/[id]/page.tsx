@@ -21,15 +21,43 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 
+function isObject(v: unknown): v is Record<string, unknown> {
+	return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
 function toAuditData(json: Record<string, unknown>): AuditData {
 	const scores = (json.scores as Record<string, unknown>) ?? {};
 	const metrics = (json.metrics as Record<string, unknown>) ?? {};
-	const ai = (json.aiInsight as Record<string, unknown>) ?? {};
-	const diag = (json.diagnostics as Record<string, unknown>) ?? {};
 	const lead = (json.lead as Record<string, unknown>) ?? {};
-	const actionsRaw = Array.isArray(ai.prioritizedActions)
-		? (ai.prioritizedActions as AuditAiInsight["prioritizedActions"])
-		: [];
+
+	/* Only synthesize aiInsight / diagnostics when the API actually returned
+	   them — `AuditData` declares both as optional, and `AuditResults` uses
+	   optional chaining to hide the corresponding sections when absent. */
+	let aiInsight: AuditAiInsight | undefined;
+	if (isObject(json.aiInsight)) {
+		const ai = json.aiInsight;
+		aiInsight = {
+			executiveSummary: String(ai.executiveSummary ?? ""),
+			conversionScore: Number(ai.conversionScore ?? 0),
+			strengths: Array.isArray(ai.strengths) ? (ai.strengths as string[]) : [],
+			weaknesses: Array.isArray(ai.weaknesses)
+				? (ai.weaknesses as string[])
+				: [],
+			prioritizedActions: Array.isArray(ai.prioritizedActions)
+				? (ai.prioritizedActions as AuditAiInsight["prioritizedActions"])
+				: [],
+			copywritingAnalysis: String(ai.copywritingAnalysis ?? ""),
+		};
+	}
+
+	let diagnostics: AuditData["diagnostics"];
+	if (isObject(json.diagnostics)) {
+		const diag = json.diagnostics;
+		diagnostics = {
+			failedAuditCount: Number(diag.failedAuditCount ?? 0),
+			criticalIssue: String(diag.criticalIssue ?? ""),
+		};
+	}
 
 	return {
 		url: String(lead.url ?? ""),
@@ -51,20 +79,8 @@ function toAuditData(json: Record<string, unknown>): AuditData {
 			typeof json.psiDegradedReason === "string"
 				? json.psiDegradedReason
 				: null,
-		aiInsight: {
-			executiveSummary: String(ai.executiveSummary ?? ""),
-			conversionScore: Number(ai.conversionScore ?? 0),
-			strengths: Array.isArray(ai.strengths) ? (ai.strengths as string[]) : [],
-			weaknesses: Array.isArray(ai.weaknesses)
-				? (ai.weaknesses as string[])
-				: [],
-			prioritizedActions: actionsRaw,
-			copywritingAnalysis: String(ai.copywritingAnalysis ?? ""),
-		},
-		diagnostics: {
-			failedAuditCount: Number(diag.failedAuditCount ?? 0),
-			criticalIssue: String(diag.criticalIssue ?? ""),
-		},
+		aiInsight,
+		diagnostics,
 		sitewide: json.sitewide as AuditData["sitewide"],
 		backlinks: json.backlinks as AuditData["backlinks"],
 		indexCoverage: json.indexCoverage as AuditData["indexCoverage"],
