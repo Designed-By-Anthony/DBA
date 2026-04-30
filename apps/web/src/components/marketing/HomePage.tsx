@@ -18,6 +18,11 @@ import "@/app/home-page.css";
 
 const homeFeaturedWorkItems = showcaseFeaturedItems.slice(0, 3);
 
+/**
+ * Hero A/B variants. Default copy always renders in SSR for SEO; the
+ * afterInteractive script swaps only when `?v=<key>` is present (ad
+ * campaign landing pages). Search engines always see the default.
+ */
 const heroVariants = {
 	wellness: {
 		eyebrow:

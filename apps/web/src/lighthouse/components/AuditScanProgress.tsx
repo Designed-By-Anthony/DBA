@@ -2,14 +2,12 @@
 
 import { useReducedMotion } from "framer-motion";
 import { div as MotionDiv } from "framer-motion/client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Rotating fact carousel shown while an audit is running.
- * Replaces the previous five-up step grid (which forced the user to
- * scroll while the report was being built). The single hero card now
- * cycles SEO / web-design / internet trivia + the live phase the
- * scanner is on, all gold-led.
+ * Horizontal fact-tile carousel shown while an audit is running.
+ * Phase-3 1C: converted from single fading hero card to a sliding
+ * horizontal track of visible tiles with phase progress bar above.
  */
 
 type Fact = {
@@ -95,6 +93,7 @@ export function AuditScanProgress({
 	const prefersReduced = useReducedMotion();
 	const [factIndex, setFactIndex] = useState(0);
 	const idx = phaseIndex(activePhase);
+	const trackRef = useRef<HTMLDivElement>(null);
 	const progressPct = useMemo(() => {
 		const step = 100 / PHASES.length;
 		return Math.min(100, Math.round((idx + 0.65) * step));
@@ -107,40 +106,13 @@ export function AuditScanProgress({
 		return () => window.clearInterval(t);
 	}, []);
 
-	const fact = FACTS[factIndex];
-
 	return (
 		<div className="lh-scan-shell">
-			<MotionDiv
-				className="lh-scan-hero glass-card relative overflow-hidden"
-				initial={prefersReduced ? false : { opacity: 0, y: 16, scale: 0.985 }}
-				animate={{ opacity: 1, y: 0, scale: 1 }}
-				transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-			>
-				{/* Gold ambient glow */}
-				<MotionDiv
-					className="lh-scan-hero__glow"
-					aria-hidden
-					animate={
-						prefersReduced
-							? undefined
-							: { opacity: [0.45, 0.7, 0.45], scale: [1, 1.06, 1] }
-					}
-					transition={
-						prefersReduced
-							? undefined
-							: {
-									duration: 6,
-									repeat: Number.POSITIVE_INFINITY,
-									ease: "easeInOut",
-								}
-					}
-				/>
-
-				<div className="lh-scan-hero__row">
-					<div className="lh-scan-hero__heading">
+			{/* Phase progress bar (sits above carousel) */}
+			<div className="lh-scan-phase-bar glass-card">
+				<div className="lh-scan-phase-bar__header">
+					<div className="lh-scan-phase-bar__left">
 						<p className="lh-scan-hero__eyebrow">Deep scan in progress</p>
-						<h3 className="lh-scan-hero__title">Building your report</h3>
 						<MotionDiv
 							key={message}
 							initial={prefersReduced ? false : { opacity: 0, x: -4 }}
@@ -151,88 +123,76 @@ export function AuditScanProgress({
 							{message}
 						</MotionDiv>
 					</div>
+					<span className="lh-scan-phase-bar__pct">{progressPct}%</span>
+				</div>
+
+				<div className="lh-scan-progress__track">
 					<MotionDiv
-						className="lh-scan-hero__spinner"
-						aria-hidden
-						animate={
-							prefersReduced
-								? undefined
-								: { rotate: [0, 1.5, -1.5, 0], scale: [1, 1.02, 1] }
-						}
-						transition={
-							prefersReduced
-								? undefined
-								: {
-										duration: 3,
-										repeat: Number.POSITIVE_INFINITY,
-										ease: "easeInOut",
-									}
-						}
-					>
-						<div
-							className="lh-scan-hero__spinner-ring"
-							style={{ animationDuration: "1.2s" }}
-						/>
-					</MotionDiv>
+						className="lh-scan-progress__fill"
+						initial={false}
+						animate={{ width: `${progressPct}%` }}
+						transition={{ type: "spring", stiffness: 110, damping: 22 }}
+					/>
 				</div>
 
-				{/* Phase pips + progress bar */}
-				<div className="lh-scan-progress">
-					<div className="lh-scan-progress__row">
-						<span>Overall progress</span>
-						<span>{progressPct}%</span>
-					</div>
-					<div className="lh-scan-progress__track">
-						<MotionDiv
-							className="lh-scan-progress__fill"
-							initial={false}
-							animate={{ width: `${progressPct}%` }}
-							transition={{ type: "spring", stiffness: 110, damping: 22 }}
-						/>
-					</div>
-					<ol className="lh-scan-pips" aria-label="Audit phases">
-						{PHASES.map((p, i) => {
-							const done = i < idx;
-							const current = i === idx;
-							const state = done ? "done" : current ? "active" : "pending";
-							return (
-								<li key={p.id} className={`lh-scan-pip lh-scan-pip--${state}`}>
-									<span className="lh-scan-pip__dot" aria-hidden />
-									<span className="lh-scan-pip__label">{p.label}</span>
-								</li>
-							);
-						})}
-					</ol>
-				</div>
-			</MotionDiv>
+				<ol className="lh-scan-pips" aria-label="Audit phases">
+					{PHASES.map((p, i) => {
+						const done = i < idx;
+						const current = i === idx;
+						const state = done ? "done" : current ? "active" : "pending";
+						return (
+							<li key={p.id} className={`lh-scan-pip lh-scan-pip--${state}`}>
+								<span className="lh-scan-pip__dot" aria-hidden />
+								<span className="lh-scan-pip__label">{p.label}</span>
+							</li>
+						);
+					})}
+				</ol>
+			</div>
 
-			{/* Rotating fact tile */}
-			<div className="lh-fact-stage">
+			{/* Horizontal fact tile carousel */}
+			<div className="lh-carousel-viewport" aria-live="polite">
 				<MotionDiv
-					key={factIndex}
-					className="lh-fact-card glass-card"
-					initial={prefersReduced ? false : { opacity: 0, y: 14, scale: 0.985 }}
-					animate={{ opacity: 1, y: 0, scale: 1 }}
-					exit={prefersReduced ? undefined : { opacity: 0, y: -10 }}
-					transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+					ref={trackRef}
+					className="lh-carousel-track"
+					animate={
+						prefersReduced
+							? undefined
+							: {
+									x: `calc(-${factIndex} * (min(28vw, 320px) + var(--space-element)))`,
+								}
+					}
+					transition={
+						prefersReduced
+							? undefined
+							: { type: "spring", stiffness: 180, damping: 28 }
+					}
 				>
-					<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>
-					<h4 className="lh-fact-card__title">{fact.title}</h4>
-					<p className="lh-fact-card__body">{fact.body}</p>
-				</MotionDiv>
-				<div className="lh-fact-dots" role="tablist" aria-label="Fact carousel">
-					{FACTS.map((f, i) => (
-						<button
-							key={f.title}
-							type="button"
-							role="tab"
-							aria-selected={i === factIndex}
-							aria-label={`Fact ${i + 1} of ${FACTS.length}`}
-							className={`lh-fact-dot${i === factIndex ? " lh-fact-dot--active" : ""}`}
-							onClick={() => setFactIndex(i)}
-						/>
+					{FACTS.map((fact, i) => (
+						<div
+							key={fact.title}
+							className={`lh-carousel-tile glass-card${i === factIndex ? " lh-carousel-tile--active" : ""}`}
+						>
+							<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>
+							<h4 className="lh-fact-card__title">{fact.title}</h4>
+							<p className="lh-fact-card__body">{fact.body}</p>
+						</div>
 					))}
-				</div>
+				</MotionDiv>
+			</div>
+
+			<div className="lh-fact-dots" role="tablist" aria-label="Fact carousel">
+				{FACTS.map((f, i) => (
+					<button
+						key={f.title}
+						type="button"
+						role="tab"
+						aria-selected={i === factIndex}
+						aria-label={`Fact ${i + 1} of ${FACTS.length}`}
+						className={`lh-fact-dot${i === factIndex ? " lh-fact-dot--active" : ""}`}
+						onClick={() => setFactIndex(i)}
+					/>
+				))}
 			</div>
 		</div>
 	);

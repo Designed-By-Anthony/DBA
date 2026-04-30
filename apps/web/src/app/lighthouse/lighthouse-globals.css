@@ -3,11 +3,11 @@
 @import "../../styles/theme.css";
 @import "tailwindcss";
 
-/* Tailwind v4 @theme directive - valid for v4 syntax */
+/* Tailwind v4 @theme directive — bridge canonical tokens from theme.css */
 @theme {
-	--font-sans: var(--font-inter);
-	--font-display: var(--font-outfit);
-	--font-report: var(--font-fraunces, var(--font-display));
+	--font-sans: var(--font-main);
+	--font-display: var(--font-display);
+	--font-report: var(--font-report-display, var(--font-display));
 
 	--color-background: transparent;
 	--color-primary-foreground: #ffffff;
@@ -74,13 +74,13 @@
 	width: 100%;
 	color: var(--color-foreground);
 	position: relative;
-	background: /* Primary atmospheric glow - sky blue */
+	background: /* Primary atmospheric glow - sky blue (matches body in theme.css) */
 			radial-gradient(
 				ellipse 120% 50% at 50% -10%,
 				rgba(91, 156, 248, 0.12),
 				transparent 55%
 			),
-			/* Secondary warm accent - bronze */
+			/* Secondary warm accent - bronze (matches body in theme.css) */
 			radial-gradient(
 				ellipse 80% 40% at 85% 30%,
 				rgb(var(--accent-bronze-rgb) / 0.06),
@@ -92,13 +92,8 @@
 				rgba(59, 130, 246, 0.04),
 				transparent 45%
 			),
-			/* Base gradient */
-			linear-gradient(
-				180deg,
-				rgba(6, 10, 18, 0.98) 0%,
-				rgba(8, 11, 16, 1) 35%,
-				rgba(6, 8, 12, 1) 100%
-			);
+			/* Base: canonical --bg-ink → --bg-dark */
+			linear-gradient(180deg, var(--bg-ink) 0%, var(--bg-dark) 100%);
 	padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
 }
 
@@ -146,7 +141,18 @@
 .lighthouse-main-inner {
 	display: flex;
 	flex-direction: column;
-	gap: clamp(1.75rem, 4vw, 2.75rem);
+	gap: var(--space-section);
+}
+
+/* Audit results output — spacing between major result blocks */
+.lh-report-output {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-block);
+}
+
+.lh-report-output > * {
+	margin-bottom: 0;
 }
 
 /*
@@ -159,6 +165,13 @@
 	--lh-tile-padding: clamp(1.4rem, 3.5vw, 2.25rem);
 	--lh-tile-padding-tight: clamp(1.1rem, 2.6vw, 1.65rem);
 	--lh-tile-radius: 1.15rem;
+}
+
+/* Global card/panel/tile padding floor (P1D) — text must never clip corners */
+.lighthouse-segment [class*="card"],
+.lighthouse-segment [class*="panel"],
+.lighthouse-segment [class*="tile"] {
+	padding: var(--card-pad);
 }
 
 /* ─── Glass base card — premium finish, gold-led ─── */
@@ -332,7 +345,7 @@
 	border-radius: 0.875rem;
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	background: rgba(6, 10, 18, 0.5);
-	padding: 1rem 0.75rem;
+	padding: var(--card-pad);
 	transition: border-color 0.2s ease;
 }
 
@@ -344,7 +357,7 @@
 .lighthouse-result-panel {
 	position: relative;
 	overflow: hidden;
-	border-radius: 1.25rem;
+	border-radius: var(--radius-card);
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.12);
 	background: linear-gradient(
 		160deg,
@@ -359,7 +372,7 @@
 		transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
 		box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
 		border-color 0.3s ease;
-	padding-left: 1.75rem;
+	padding: var(--card-pad) var(--card-pad) var(--card-pad) var(--card-pad-lg);
 }
 
 .lighthouse-result-panel:hover {
@@ -674,7 +687,7 @@
 	font-weight: 800;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.38);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-report-url {
@@ -833,7 +846,7 @@
 	font-weight: 600;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.45);
+	color: rgba(247, 244, 238, 0.58);
 	margin-bottom: 0.45rem;
 }
 
@@ -872,7 +885,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45rem;
-	color: rgba(247, 244, 238, 0.4);
+	color: rgba(247, 244, 238, 0.58);
 	transition: color 0.25s ease;
 }
 
@@ -920,17 +933,46 @@
 	}
 }
 
-/* ─── Fact carousel ─── */
-.lh-fact-stage {
-	display: flex;
-	flex-direction: column;
-	gap: 0.9rem;
-	align-items: center;
+/* ─── Phase progress bar (sits above carousel) ─── */
+.lh-scan-phase-bar {
+	padding: var(--lh-tile-padding);
 }
 
-.lh-fact-card {
-	width: 100%;
-	max-width: 100%;
+.lh-scan-phase-bar__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.lh-scan-phase-bar__left {
+	min-width: 0;
+}
+
+.lh-scan-phase-bar__pct {
+	flex-shrink: 0;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--accent-bronze-light);
+	letter-spacing: -0.02em;
+}
+
+/* ─── Horizontal fact carousel ─── */
+.lh-carousel-viewport {
+	overflow: hidden;
+	border-radius: var(--lh-tile-radius);
+}
+
+.lh-carousel-track {
+	display: flex;
+	gap: var(--space-element);
+}
+
+.lh-carousel-tile {
+	min-width: clamp(200px, 28vw, 320px);
+	flex-shrink: 0;
 	padding: var(--lh-tile-padding);
 	border-radius: var(--lh-tile-radius);
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.2);
@@ -939,10 +981,22 @@
 		rgba(22, 17, 12, 0.96) 0%,
 		rgba(12, 10, 8, 0.94) 100%
 	);
-	min-height: 10.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	opacity: 0.5;
+	transition: opacity 0.4s ease;
+}
+
+.lh-carousel-tile--active {
+	opacity: 1;
+	border-color: rgb(var(--accent-bronze-rgb) / 0.38);
+}
+
+@media (max-width: 639px) {
+	.lh-carousel-tile {
+		min-width: 100%;
+	}
 }
 
 .lh-fact-card__tag {
@@ -1426,7 +1480,7 @@
 	gap: 0.75rem;
 	padding-top: 1.25rem;
 	font-size: 0.72rem;
-	color: rgba(247, 244, 238, 0.42);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-footer-bottom a {
@@ -1440,7 +1494,7 @@
 }
 
 .lh-footer-sep {
-	color: rgba(247, 244, 238, 0.25);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-footer-copy {
@@ -1672,7 +1726,7 @@
 	font-weight: 700;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: rgba(148, 163, 184, 0.55);
+	color: rgba(148, 163, 184, 0.65);
 	margin-bottom: 0.7rem;
 	padding-bottom: 0.5rem;
 	border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
@@ -2018,7 +2072,7 @@
 	font-weight: 800;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.38);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-diagnostic-title {
@@ -2236,7 +2290,7 @@
 }
 
 .lh-legend {
-	color: rgba(247, 244, 238, 0.46);
+	color: rgba(247, 244, 238, 0.58);
 	border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 

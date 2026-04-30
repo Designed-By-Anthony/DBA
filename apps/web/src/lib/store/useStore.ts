@@ -4,19 +4,23 @@ import { buildPublicApiUrl } from "@/lib/publicApi";
 type WaitlistStatus = "idle" | "submitting" | "success" | "error";
 
 type ToolsStore = {
+	waitlistName: string;
 	waitlistEmail: string;
 	waitlistStatus: WaitlistStatus;
 	waitlistError: string | null;
+	setWaitlistName: (name: string) => void;
 	setWaitlistEmail: (email: string) => void;
 	submitWaitlist: () => Promise<void>;
 	reset: () => void;
 };
 
 export const useToolsStore = create<ToolsStore>((set, get) => ({
+	waitlistName: "",
 	waitlistEmail: "",
 	waitlistStatus: "idle",
 	waitlistError: null,
 
+	setWaitlistName: (name) => set({ waitlistName: name }),
 	setWaitlistEmail: (email) => set({ waitlistEmail: email }),
 
 	submitWaitlist: async () => {
@@ -34,6 +38,7 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
+					name: get().waitlistName,
 					email: waitlistEmail,
 					source: "tools-waitlist",
 					message: "Signed up for the Tools store waitlist.",
@@ -49,5 +54,10 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 	},
 
 	reset: () =>
-		set({ waitlistEmail: "", waitlistStatus: "idle", waitlistError: null }),
+		set({
+			waitlistName: "",
+			waitlistEmail: "",
+			waitlistStatus: "idle",
+			waitlistError: null,
+		}),
 }));

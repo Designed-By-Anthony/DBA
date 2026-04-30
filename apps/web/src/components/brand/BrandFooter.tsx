@@ -36,7 +36,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					>
 						<Image
 							src={SITE_BRAND.assets.mark}
-							alt=""
+							alt="Designed by Anthony logo"
 							width={22}
 							height={16}
 							className="dba-footer-mark"

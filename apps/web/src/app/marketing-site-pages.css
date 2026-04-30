@@ -1923,3 +1923,44 @@ a.marketing-service-card:hover {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* ─── HighlightStrip — horizontal info tiles ─── */
+.highlight-strip {
+	display: flex;
+	gap: var(--space-element, 1rem);
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+	padding-bottom: 0.5rem;
+}
+
+.highlight-strip__tile {
+	flex: 0 0 auto;
+	min-width: clamp(140px, 18vw, 200px);
+	padding: var(--card-pad);
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	text-align: center;
+}
+
+.highlight-strip__value {
+	font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+	font-weight: 700;
+	color: var(--accent-bronze-light, var(--accent-bronze));
+	letter-spacing: -0.02em;
+}
+
+.highlight-strip__label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: rgba(247, 244, 238, 0.55);
+}
+
+.highlight-strip__note {
+	font-size: 0.8rem;
+	color: rgba(247, 244, 238, 0.5);
+	line-height: 1.4;
+}

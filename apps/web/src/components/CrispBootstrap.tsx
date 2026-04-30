@@ -27,8 +27,17 @@ export function CrispBootstrap() {
 		const websiteId =
 			process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID?.trim() || DEFAULT_WEBSITE_ID;
 
+		const hasCookieConsent = () => {
+			try {
+				return document.cookie.includes("dba_cookie_consent=accepted");
+			} catch {
+				return true;
+			}
+		};
+
 		const load = () => {
 			if (window.__dbaCrispLoaded) return;
+			if (!hasCookieConsent()) return;
 			window.__dbaCrispLoaded = true;
 			window.$crisp = window.$crisp ?? [];
 			window.CRISP_RUNTIME_CONFIG = {

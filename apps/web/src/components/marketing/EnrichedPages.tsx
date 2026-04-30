@@ -835,6 +835,29 @@ export function ServiceAreasPage() {
 	);
 }
 
+const SERVICE_AREA_FAQ_ENTRIES = [
+	{
+		question: "How long does a new website build take?",
+		answer:
+			"Most projects ship in four to six weeks from signed proposal. Complex builds with custom integrations may take longer — we scope that upfront so there are no surprises.",
+	},
+	{
+		question: "Do you handle local SEO or just the website?",
+		answer:
+			"Both. Every build includes on-page SEO foundations — heading hierarchy, schema markup, page speed, and mobile responsiveness. Monthly local SEO plans (GBP management, citation building, review strategy) are available as an add-on.",
+	},
+	{
+		question: "What if I already have a site but it just needs help?",
+		answer:
+			"We offer rescue engagements — we audit the existing site, fix what we can, and recommend a targeted plan. If the platform is too far gone, we'll say so and quote a rebuild.",
+	},
+	{
+		question: "Do I own the site when it's done?",
+		answer:
+			"Yes. You own the code, the domain, and the hosting account. We set everything up so you can move to another provider if you ever want to — no vendor lock-in.",
+	},
+];
+
 export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 	const loc = getServiceAreaLocation(slug);
 	if (!loc) {
@@ -931,6 +954,40 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					</MotionReveal>
 				</section>
 			))}
+			{/* FAQ accordion */}
+			<section className="section-shell section-shell--wash">
+				<div className="section-container">
+					<MotionReveal
+						className="section-header centered"
+						y={24}
+						duration={0.7}
+					>
+						<p className="section-eyebrow">Common questions</p>
+						<h2>FAQ — {loc.name}</h2>
+					</MotionReveal>
+					<MotionStagger
+						className="home-faq-list"
+						staggerDelay={0.08}
+						data-exclusive-details
+					>
+						{SERVICE_AREA_FAQ_ENTRIES.map((entry) => (
+							<MotionStaggerChild
+								as="details"
+								key={entry.question}
+								className="surface-card home-faq-item reveal-up"
+							>
+								<summary>
+									<span className="home-faq-question">{entry.question}</span>
+									<span className="home-faq-toggle" aria-hidden="true" />
+								</summary>
+								<div className="home-faq-answer">
+									<p>{entry.answer}</p>
+								</div>
+							</MotionStaggerChild>
+						))}
+					</MotionStagger>
+				</div>
+			</section>
 			<section className="section-shell">
 				<div className="section-container">
 					<div className="section-divider-glow" aria-hidden="true" />

@@ -4,5 +4,11 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-01",
 	"compatibility_flags": ["nodejs_compat"],
-	"workers_dev": true
+	"workers_dev": true,
+	"kv_namespaces": [
+		{
+			"binding": "AUDIT_REPORTS_KV",
+			"id": "PLACEHOLDER_REPLACE_IN_CLOUDFLARE_DASHBOARD"
+		}
+	]
 }
