@@ -13,26 +13,44 @@ import {
 	type SchemaValue,
 } from "@/lib/seo";
 
-// Title trimmed to 56 chars (under Google's ~60 char SERP cap) and
-// description to 152 chars (under the 160 char meta description cap)
+// Title trimmed to 58 chars (under Google's ~60 char SERP cap) and
+// description to 140 chars (under the 160 char meta description cap)
 // to fix the audit findings reported in the user-supplied PDF.
+//
+// `title.absolute` opts out of the root layout's `title.template`
+// ("%s | Designed by Anthony") since this string already includes
+// the brand suffix — without `absolute` the rendered title would be
+// duplicated to "...| Designed by Anthony | Designed by Anthony".
 const HOME_TITLE = "Mohawk Valley Web Design & Local SEO | Designed by Anthony";
 const HOME_DESCRIPTION =
 	"Custom websites & local SEO for Mohawk Valley and Central NY service businesses. Built to rank on Google and turn searches into booked work.";
+// Default site OG card. Re-declared here (instead of inheriting from
+// the root layout) because Next.js fully replaces parent `openGraph`
+// and `twitter` blocks rather than merging them — leaving these out
+// would drop the og:image / twitter:image meta tags on the homepage.
+const HOME_OG_IMAGE = {
+	url: "/images/og-site-premium.png",
+	width: 2400,
+	height: 1260,
+	alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+	type: "image/png",
+} as const;
 
 export const metadata: Metadata = {
-	title: HOME_TITLE,
+	title: { absolute: HOME_TITLE },
 	description: HOME_DESCRIPTION,
 	openGraph: {
 		title: HOME_TITLE,
 		description: HOME_DESCRIPTION,
 		url: "https://designedbyanthony.com",
 		type: "website",
+		images: [HOME_OG_IMAGE],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: HOME_TITLE,
 		description: HOME_DESCRIPTION,
+		images: [HOME_OG_IMAGE.url],
 	},
 	alternates: { canonical: "/" },
 };
