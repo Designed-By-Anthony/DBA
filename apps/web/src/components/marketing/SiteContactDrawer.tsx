@@ -38,7 +38,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 						id={`${formId}-first_name`}
 						maxLength={40}
 						name="first_name"
-						size={20}
 						type="text"
 						autoComplete="given-name"
 						required
@@ -51,7 +50,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 						id={`${formId}-email`}
 						maxLength={80}
 						name="email"
-						size={20}
 						type="email"
 						autoComplete="email"
 						required
@@ -64,7 +62,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 						id={`${formId}-phone`}
 						maxLength={40}
 						name="phone"
-						size={20}
 						type="tel"
 						autoComplete="tel"
 					/>

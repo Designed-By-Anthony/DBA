@@ -1699,6 +1699,13 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	margin-bottom: 1rem;
 }
 
+@media (max-width: 600px) {
+	.salesforce-form-grid {
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+}
+
 .salesforce-form-field {
 	display: flex;
 	flex-direction: column;
@@ -1720,6 +1727,8 @@ body:not(.has-progress-bar) #reading-progress-bar {
 .salesforce-form-field input,
 .salesforce-form-field textarea,
 .salesforce-form-field select {
+	width: 100%;
+	min-width: 0;
 	padding: 0.7rem 0.95rem;
 	border-radius: 0.65rem;
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.32);
@@ -1762,6 +1771,17 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	margin-top: 1rem;
 }
 
+@media (max-width: 600px) {
+	.salesforce-form-actions {
+		justify-content: stretch;
+	}
+
+	.salesforce-form-actions .btn {
+		width: 100%;
+		min-height: 2.75rem;
+	}
+}
+
 .salesforce-form-privacy {
 	margin-top: 0.75rem;
 	font-size: 0.75rem;
@@ -1771,6 +1791,13 @@ body:not(.has-progress-bar) #reading-progress-bar {
 /* Compact form (for contact drawer) */
 .salesforce-form-grid--compact {
 	gap: 0.75rem 1rem;
+}
+
+@media (max-width: 480px) {
+	.salesforce-form-grid--compact {
+		grid-template-columns: 1fr;
+		gap: 0.6rem;
+	}
 }
 
 .salesforce-form-grid--compact .salesforce-form-field input,
