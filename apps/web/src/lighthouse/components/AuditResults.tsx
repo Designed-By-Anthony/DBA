@@ -660,15 +660,17 @@ export function AuditResults({
 			</MotionDiv>
 
 			{/* ── CTA ── */}
+			{/* Phase-3 #5: standalone, high-contrast bronze CTA so the contact
+			    action no longer blends into the surrounding card text. */}
 			<MotionDiv
-				className="lh-report-cta print:hidden relative mt-10 mb-6 overflow-hidden rounded-[1.25rem] p-6 md:p-8"
+				className="lh-report-cta print:hidden relative mt-12 mb-8 overflow-hidden rounded-[1.25rem] p-6 md:p-8"
 				initial={prefersReduced ? false : { opacity: 0, y: 20 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true }}
 				transition={{ duration: 0.55 }}
 			>
 				<div
-					className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[rgb(var(--accent-bronze-rgb)/0.12)] blur-3xl"
+					className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[rgb(var(--accent-bronze-rgb)/0.18)] blur-3xl"
 					aria-hidden
 				/>
 				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-(--accent-bronze-muted)">
@@ -677,19 +679,27 @@ export function AuditResults({
 				<h3 className="relative mb-3 font-display text-xl font-bold tracking-tight text-white md:text-2xl">
 					Want help fixing the highest-impact items?
 				</h3>
-				<p className="relative mb-5 max-w-xl text-[14px] leading-relaxed text-white/66 md:text-[15px]">
+				<p className="relative mb-6 max-w-xl text-[14px] leading-relaxed text-white/72 md:text-[15px]">
 					Book a 15-minute call with Anthony — we'll walk through your report
 					together, prioritize what matters for revenue, and outline the fastest
 					path to results.
 				</p>
-				<a
-					href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
-					target="_blank"
-					rel="noopener"
-					className="lh-report-cta__button relative inline-block rounded-xl bg-white px-7 py-3.5 text-[14px] font-bold tracking-tight text-[#0f1218] shadow-[0_20px_50px_-18px_rgba(255,252,245,0.35)] ring-1 ring-white/40 transition-[transform,background-color,box-shadow] hover:-translate-y-px hover:bg-[var(--accent-bronze-light)] hover:shadow-[0_24px_56px_-16px_var(--accent-bronze-glow)]"
-				>
-					Book a 15-minute call →
-				</a>
+				<div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
+					<a
+						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
+						target="_blank"
+						rel="noopener"
+						className="lh-report-cta__button inline-flex items-center justify-center rounded-xl bg-(--accent-bronze-light) px-8 py-3.5 text-[15px] font-bold tracking-tight text-[#171008] shadow-[0_20px_50px_-18px_var(--accent-bronze-glow)] ring-1 ring-[rgb(var(--accent-bronze-rgb)/0.65)] transition-[transform,background-color,box-shadow] hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_28px_60px_-14px_var(--accent-bronze-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0d12]"
+					>
+						Book a 15-minute call →
+					</a>
+					<a
+						href="/contact"
+						className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 py-3.5 text-[14px] font-semibold text-white/85 transition-[background-color,border-color,color] hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0d12]"
+					>
+						Or send a message
+					</a>
+				</div>
 			</MotionDiv>
 
 			{/* ── Reset ── */}

@@ -65,6 +65,39 @@ export function middleware(request: NextRequest) {
 		return NextResponse.rewrite(url);
 	}
 
+	/* ── Phase-3 fix list #19, #20 ─────────────────────────────────────────
+	 * Backwards-compatible URL aliases for marketing routes whose published
+	 * slugs differ from the descriptive form people type/link to.
+	 *   /our-edge                       → /ouredge   (canonical: no hyphen)
+	 *   /services/hosting-infrastructure → /services/managed-hosting
+	 * These return 308 (Permanent Redirect) so search engines consolidate
+	 * link equity onto the canonical page instead of soft-404'ing.
+	 * ─────────────────────────────────────────────────────────────────── */
+	const redirectAliases: Record<string, string> = {
+		"/our-edge": "/ouredge",
+		"/our-edge/": "/ouredge",
+		"/services/hosting-infrastructure": "/services/managed-hosting",
+		"/services/hosting-infrastructure/": "/services/managed-hosting",
+	};
+	const aliased = redirectAliases[pathname];
+	if (aliased) {
+		const url = request.nextUrl.clone();
+		url.pathname = aliased;
+		return NextResponse.redirect(url, 308);
+	}
+
+	/* Magic-link reports were emailed under /report/{id}; the actual route
+	   lives under /lighthouse/report/{id}. Redirect 308 so existing links
+	   in customer inboxes resolve correctly (phase-3 #8). */
+	if (pathname.startsWith("/report/")) {
+		const id = pathname.slice("/report/".length).replace(/\/$/, "");
+		if (id && /^[A-Za-z0-9_-]+$/.test(id)) {
+			const url = request.nextUrl.clone();
+			url.pathname = `/lighthouse/report/${id}`;
+			return NextResponse.redirect(url, 308);
+		}
+	}
+
 	// Handle Markdown for Agents (text/markdown content negotiation)
 	// https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/
 	const acceptHeader = request.headers.get("accept") ?? "";

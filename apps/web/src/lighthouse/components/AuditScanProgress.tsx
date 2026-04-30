@@ -73,8 +73,11 @@ export function AuditScanProgress({
 		return () => window.clearInterval(t);
 	}, []);
 
+	/* Phase-3 #3: phase tiles render as a single horizontal carousel that
+	   gently auto-scrolls while the scan runs. Each tile keeps its
+	   completion / current / pending color so progress is still legible. */
 	const cardBase =
-		"lighthouse-phase-card rounded-xl border px-4 py-3 transition-colors";
+		"lighthouse-phase-card flex w-[16rem] shrink-0 flex-col rounded-xl border px-5 py-4 transition-colors";
 
 	return (
 		<div className="space-y-6">
@@ -172,82 +175,92 @@ export function AuditScanProgress({
 				</MotionDiv>
 			</MotionDiv>
 
-			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{PHASES.map((p, i) => {
-					const done = i < idx;
-					const current = i === idx;
-					const borderClass = current
-						? "border-sky-400/45 bg-sky-500/[0.12] shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
-						: done
-							? "border-emerald-500/25 bg-emerald-500/[0.08]"
-							: "border-white/[0.08] bg-[rgba(6,10,18,0.45)]";
+			<section className="lh-phase-carousel" aria-label="Scan phases">
+				<div
+					className={`lh-phase-track${prefersReduced ? " lh-phase-track--paused" : ""}`}
+				>
+					{PHASES.map((p, i) => {
+						const done = i < idx;
+						const current = i === idx;
+						const borderClass = current
+							? "border-sky-400/45 bg-sky-500/[0.12] shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
+							: done
+								? "border-emerald-500/25 bg-emerald-500/[0.08]"
+								: "border-white/[0.08] bg-[rgba(6,10,18,0.45)]";
 
-					return (
-						<MotionDiv
-							key={p.id}
-							className={`${cardBase} ${borderClass}`}
-							initial={prefersReduced ? false : { opacity: 0, y: 22 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{
-								delay: prefersReduced ? 0 : 0.06 * i,
-								duration: 0.45,
-								ease: [0.22, 1, 0.36, 1],
-							}}
-							whileHover={
-								prefersReduced
-									? undefined
-									: { y: -3, transition: { duration: 0.2 } }
-							}
-							layout
-						>
-							<div className="mb-3 flex items-center justify-between gap-2">
-								<span className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
-									Step {i + 1}
-								</span>
-								{done ? (
-									<MotionDiv
-										initial={prefersReduced ? false : { scale: 0, opacity: 0 }}
-										animate={{ scale: 1, opacity: 1 }}
-										transition={{ type: "spring", stiffness: 400, damping: 20 }}
-										className="text-emerald-400"
-										title="Complete"
-									>
-										<svg
-											width="16"
-											height="16"
-											viewBox="0 0 14 14"
-											fill="none"
-											aria-hidden="true"
+						return (
+							<MotionDiv
+								key={p.id}
+								className={`${cardBase} ${borderClass}`}
+								initial={prefersReduced ? false : { opacity: 0, y: 22 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{
+									delay: prefersReduced ? 0 : 0.06 * i,
+									duration: 0.45,
+									ease: [0.22, 1, 0.36, 1],
+								}}
+								whileHover={
+									prefersReduced
+										? undefined
+										: { y: -3, transition: { duration: 0.2 } }
+								}
+								layout
+							>
+								<div className="mb-3 flex items-center justify-between gap-2">
+									<span className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
+										Step {i + 1}
+									</span>
+									{done ? (
+										<MotionDiv
+											initial={
+												prefersReduced ? false : { scale: 0, opacity: 0 }
+											}
+											animate={{ scale: 1, opacity: 1 }}
+											transition={{
+												type: "spring",
+												stiffness: 400,
+												damping: 20,
+											}}
+											className="text-emerald-400"
+											title="Complete"
 										>
-											<title>Complete</title>
-											<path
-												d="M2.5 7L5.5 10L11.5 4"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											/>
-										</svg>
-									</MotionDiv>
-								) : current ? (
-									<span
-										className="inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
-										aria-hidden
-									/>
-								) : (
-									<span className="text-white/20 text-sm">○</span>
-								)}
-							</div>
-							<p className="font-display text-base font-semibold text-white mb-2">
-								{p.label}
-							</p>
-							<p className="text-xs leading-relaxed text-white/60">
-								{p.description}
-							</p>
-						</MotionDiv>
-					);
-				})}
-			</div>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 14 14"
+												fill="none"
+												aria-hidden="true"
+											>
+												<title>Complete</title>
+												<path
+													d="M2.5 7L5.5 10L11.5 4"
+													stroke="currentColor"
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
+											</svg>
+										</MotionDiv>
+									) : current ? (
+										<span
+											className="inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
+											aria-hidden
+										/>
+									) : (
+										<span className="text-white/20 text-sm">○</span>
+									)}
+								</div>
+								<p className="font-display text-base font-semibold text-white mb-2">
+									{p.label}
+								</p>
+								<p className="text-xs leading-relaxed text-white/60">
+									{p.description}
+								</p>
+							</MotionDiv>
+						);
+					})}
+				</div>
+			</section>
 		</div>
 	);
 }

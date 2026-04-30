@@ -74,11 +74,12 @@ export function HomePage() {
 							growth and lasting market presence.
 						</h1>
 						<p data-hero-sub>
-							Enterprise-grade websites for contractors, home-service professionals,
-							medical aesthetics, salons, and scaling businesses throughout Utica,
-							Rome, Syracuse, and Central New York. Performance-optimized architecture,
-							conversion-focused design, and SEO infrastructure that positions you
-							at the top of local search results.
+							Enterprise-grade websites for contractors, home-service
+							professionals, medical aesthetics, salons, and scaling businesses
+							throughout Utica, Rome, Syracuse, and Central New York.
+							Performance-optimized architecture, conversion-focused design, and
+							SEO infrastructure that positions you at the top of local search
+							results.
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
@@ -88,9 +89,10 @@ export function HomePage() {
 							(investment typically {STANDARD_WEBSITE_TYPICAL_RANGE}) — includes
 							enterprise hosting and strategic SEO for the first quarter, then
 							continue with the {FOUNDING_PARTNER_SEO_MONTHLY}/mo{" "}
-							{FOUNDING_PARTNER_SEO_LABEL}. Founding partner program: complimentary
-							build with SEO commitment — {FOUNDING_PARTNER_BUILD_SLOTS} exclusive
-							positions available. Single-service solutions from {STANDARD_WEBSITE_STARTING_PRICE}.
+							{FOUNDING_PARTNER_SEO_LABEL}. Founding partner program:
+							complimentary build with SEO commitment —{" "}
+							{FOUNDING_PARTNER_BUILD_SLOTS} exclusive positions available.
+							Single-service solutions from {STANDARD_WEBSITE_STARTING_PRICE}.
 						</p>
 						<div className="hero-actions">
 							<Link
