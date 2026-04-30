@@ -34,7 +34,7 @@ export function CookieConsentBanner() {
 
 	if (!panelOpen) {
 		return (
-			<div className="fixed bottom-3 left-3 z-100">
+			<div className="fixed bottom-3 left-3 z-100 print:hidden">
 				<button
 					type="button"
 					onClick={() => setSettingsOpen(true)}

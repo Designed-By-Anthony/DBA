@@ -214,14 +214,14 @@ export function AuditResults({
 
 			{/* ── Action toolbar ── */}
 			<MotionDiv
-				className="lighthouse-actions-toolbar print:hidden mx-auto mb-10 flex max-w-3xl flex-col gap-3 sm:flex-row sm:justify-center"
+				className="lighthouse-actions-toolbar print:hidden mx-auto mb-10 flex max-w-3xl flex-col gap-4 sm:flex-row sm:justify-center"
 				initial={prefersReduced ? false : { opacity: 0, y: 12 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.1, duration: 0.45 }}
 			>
 				<MotionDiv
 					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[132px]"
+					className="sm:flex-1 sm:min-w-[140px]"
 				>
 					<button
 						type="button"
@@ -233,7 +233,7 @@ export function AuditResults({
 				</MotionDiv>
 				<MotionDiv
 					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[132px]"
+					className="sm:flex-1 sm:min-w-[140px]"
 				>
 					<button
 						type="button"
@@ -246,7 +246,7 @@ export function AuditResults({
 				</MotionDiv>
 				<MotionDiv
 					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[132px]"
+					className="sm:flex-1 sm:min-w-[140px]"
 				>
 					<button
 						type="button"
