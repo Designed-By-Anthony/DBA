@@ -934,7 +934,7 @@ export default function LighthouseReportPrintPage() {
 			{/* Screen-only toolbar */}
 			<div className="print:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 border-b border-[rgb(var(--accent-bronze-rgb)/0.18)] bg-[rgba(6,10,18,0.94)] backdrop-blur-xl px-5 py-3.5 md:px-8">
 				<div>
-					<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent-bronze-muted)]">
+					<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--accent-bronze-muted)">
 						Designed by Anthony
 					</p>
 					<p className="text-sm font-semibold text-white/80">
@@ -944,7 +944,7 @@ export default function LighthouseReportPrintPage() {
 				<button
 					type="button"
 					onClick={() => window.print()}
-					className="rounded-xl border border-[rgb(var(--accent-bronze-rgb)/0.62)] bg-[var(--accent-bronze-light)] px-5 py-2.5 text-sm font-bold text-[#171008] shadow-[0_8px_24px_-8px_var(--accent-bronze-glow)] transition hover:-translate-y-px hover:bg-white"
+					className="rounded-xl border border-[rgb(var(--accent-bronze-rgb)/0.62)] bg-(--accent-bronze-light) px-5 py-2.5 text-sm font-bold text-[#171008] shadow-[0_8px_24px_-8px_var(--accent-bronze-glow)] transition hover:-translate-y-px hover:bg-white"
 				>
 					Print / Save as PDF
 				</button>

@@ -167,7 +167,7 @@ export function AuditResults({
 			{/* Degraded report warning */}
 			{data.psiDegradedReason ? (
 				<MotionDiv
-					className="mb-8 rounded-[1.1rem] border border-amber-400/28 bg-gradient-to-br from-amber-950/45 to-[rgba(20,14,8,0.4)] px-5 py-5 text-sm leading-relaxed text-amber-50/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+					className="mb-8 rounded-[1.1rem] border border-amber-400/28 bg-linear-to-br from-amber-950/45 to-[rgba(20,14,8,0.4)] px-5 py-5 text-sm leading-relaxed text-amber-50/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
 					role="status"
 					initial={prefersReduced ? false : { opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -342,7 +342,7 @@ export function AuditResults({
 						{actions.map((item, idx) => (
 							<li
 								key={`${item.priority}-${item.action}`}
-								className="flex flex-col gap-2 rounded-xl border border-white/[0.06] bg-white/[0.025] px-4 py-3.5 sm:flex-row sm:items-start sm:gap-4"
+								className="flex flex-col gap-2 rounded-xl border border-white/6 bg-white/2.5 px-4 py-3.5 sm:flex-row sm:items-start sm:gap-4"
 							>
 								<span className="shrink-0 font-display text-[13px] font-bold text-amber-300/60 sm:w-5 sm:text-right">
 									{idx + 1}
@@ -565,7 +565,7 @@ export function AuditResults({
 					<h3 className="lighthouse-result-heading text-lg">
 						Site crawl signals
 					</h3>
-					<ul className="space-y-0 lighthouse-result-body divide-y divide-white/[0.05]">
+					<ul className="space-y-0 lighthouse-result-body divide-y divide-white/5">
 						<li className="flex flex-wrap gap-x-2 py-2.5">
 							<span className="font-semibold text-sky-200/82">robots.txt</span>
 							<span className="lighthouse-result-muted">
@@ -616,7 +616,7 @@ export function AuditResults({
 						{data.competitors.slice(0, 4).map((c) => (
 							<li
 								key={`${c.name}-${c.reviewCount}`}
-								className="flex flex-col rounded-lg border border-white/[0.055] bg-white/[0.025] px-4 py-3 sm:flex-row sm:items-baseline sm:gap-2"
+								className="flex flex-col rounded-lg border border-white/5.5 bg-white/2.5 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-2"
 							>
 								<span className="font-semibold text-white/94">{c.name}</span>
 								<span className="lighthouse-result-muted">
@@ -673,7 +673,7 @@ export function AuditResults({
 					className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[rgb(var(--accent-bronze-rgb)/0.12)] blur-3xl"
 					aria-hidden
 				/>
-				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--accent-bronze-muted)]">
+				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-(--accent-bronze-muted)">
 					Next step
 				</p>
 				<h3 className="relative mb-3 font-display text-xl font-bold tracking-tight text-white md:text-2xl">
@@ -688,7 +688,7 @@ export function AuditResults({
 					href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 					target="_blank"
 					rel="noopener"
-					className="relative inline-block rounded-xl bg-[var(--accent-bronze-light)] px-7 py-3.5 text-[14px] font-bold tracking-tight text-[#171008] shadow-[0_20px_50px_-18px_var(--accent-bronze-glow)] transition-[transform,background-color] hover:-translate-y-px hover:bg-white"
+					className="relative inline-block rounded-xl bg-(--accent-bronze-light) px-7 py-3.5 text-[14px] font-bold tracking-tight text-[#171008] shadow-[0_20px_50px_-18px_var(--accent-bronze-glow)] transition-[transform,background-color] hover:-translate-y-px hover:bg-white"
 				>
 					Book a 15-minute call →
 				</a>
@@ -699,7 +699,7 @@ export function AuditResults({
 				<button
 					type="button"
 					onClick={onReset}
-					className="rounded-full border border-white/12 bg-white/[0.045] px-8 py-3 text-[13px] font-semibold text-white/80 transition-[background-color,border-color] hover:border-white/20 hover:bg-white/[0.08]"
+					className="rounded-full border border-white/12 bg-white/4.5 px-8 py-3 text-[13px] font-semibold text-white/80 transition-[background-color,border-color] hover:border-white/20 hover:bg-white/8"
 				>
 					Run another audit
 				</button>
