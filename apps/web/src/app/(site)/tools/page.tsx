@@ -25,7 +25,9 @@ export const metadata: Metadata = {
 export default function Tools() {
 	return (
 		<MarketingChrome>
-			<ToolsPage />
+			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+				<ToolsPage />
+			</div>
 		</MarketingChrome>
 	);
 }
