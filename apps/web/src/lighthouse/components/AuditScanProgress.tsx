@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 type Fact = {
@@ -88,6 +89,9 @@ export function AuditScanProgress({
 		const step = 100 / PHASES.length;
 		return Math.min(100, Math.round((idx + 0.65) * step));
 	}, [idx]);
+	const progressStyle: CSSProperties & { "--scan-progress": string } = {
+		"--scan-progress": `${progressPct}%`,
+	};
 
 	useEffect(() => {
 		const t = window.setInterval(() => {
@@ -110,7 +114,7 @@ export function AuditScanProgress({
 				</div>
 
 				<div className="lh-scan-progress__track">
-					<div className="lh-scan-progress__fill" />
+					<div className="lh-scan-progress__fill" style={progressStyle} />
 				</div>
 
 				<ol className="lh-scan-pips" aria-label="Audit phases">
