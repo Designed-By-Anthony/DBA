@@ -19,6 +19,7 @@ export type SendTransactionalEmailInput = {
 	html: string;
 	text?: string;
 	replyTo?: string;
+	headers?: Record<string, string>;
 };
 
 /**
@@ -35,14 +36,21 @@ export async function sendTransactionalEmail(
 	const to = Array.isArray(input.to) ? input.to : [input.to];
 	const from = getTransactionalFromEmail();
 
+	const replyTo = input.replyTo || "anthony@designedbyanthony.com";
 	const body: Record<string, unknown> = {
 		from,
 		to,
 		subject: input.subject,
 		html: input.html,
+		reply_to: replyTo,
+		headers: {
+			"List-Unsubscribe":
+				"<mailto:unsubscribe@designedbyanthony.com?subject=unsubscribe>",
+			"List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+			...(input.headers ?? {}),
+		},
 	};
 	if (input.text) body.text = input.text;
-	if (input.replyTo) body.reply_to = input.replyTo;
 
 	const res = await fetch(RESEND_API, {
 		method: "POST",

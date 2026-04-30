@@ -1,6 +1,11 @@
 /**
- * In-memory audit report store (process-local). Document-shaped API for compatibility with existing routes.
- * Not backed by any external database.
+ * Audit report store with Cloudflare KV persistence.
+ *
+ * When the `AUDIT_REPORTS_KV` binding is available (production Worker),
+ * reports are persisted to Cloudflare KV with a 90-day TTL. The
+ * in-memory Map acts as a hot cache for the lifetime of the Worker
+ * isolate. Without the KV binding (local dev), the store is purely
+ * in-memory and reports vanish on restart.
  */
 
 type TimestampLike = {
@@ -41,7 +46,53 @@ type StoredReport = Record<string, unknown> & {
 	emailLastSentAt?: TimestampLike | null;
 	emailSendLockUntil?: TimestampLike | null;
 };
+
 const REPORTS = new Map<string, StoredReport>();
+const REPORT_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
+
+/**
+ * Minimal KV interface — matches the subset of Cloudflare KVNamespace
+ * that we actually use, so the shared package doesn't need a direct
+ * dependency on `@cloudflare/workers-types`.
+ */
+interface KVLike {
+	get(key: string, options?: { type?: string }): Promise<string | null>;
+	put(
+		key: string,
+		value: string,
+		options?: { expirationTtl?: number },
+	): Promise<void>;
+}
+
+let _kv: KVLike | null = null;
+
+/** Call once at Worker startup to wire the KV binding. */
+export function setReportKV(kv: KVLike | undefined): void {
+	_kv = kv ?? null;
+}
+
+function serializeForKV(report: StoredReport): string {
+	return JSON.stringify(report, (_key, value) => {
+		if (
+			value &&
+			typeof value === "object" &&
+			"toDate" in value &&
+			typeof value.toDate === "function"
+		) {
+			return { __ts: (value as TimestampLike).toMillis() };
+		}
+		return value;
+	});
+}
+
+function deserializeFromKV(raw: string): StoredReport {
+	return JSON.parse(raw, (_key, value) => {
+		if (value && typeof value === "object" && "__ts" in value) {
+			return toTimestamp(value.__ts as number);
+		}
+		return value;
+	}) as StoredReport;
+}
 
 export const Timestamp = {
 	now(): TimestampLike {
@@ -94,20 +145,61 @@ function makeDocRef(id: string) {
 				throw err;
 			}
 			REPORTS.set(id, payload);
+			if (_kv) {
+				try {
+					await _kv.put(id, serializeForKV(payload), {
+						expirationTtl: REPORT_TTL_SECONDS,
+					});
+				} catch (e) {
+					console.error("[report-store] KV write failed:", e);
+				}
+			}
 		},
 		async get() {
-			const data = REPORTS.get(id);
+			let data = REPORTS.get(id);
+			if (!data && _kv) {
+				try {
+					const raw = await _kv.get(id, { type: "text" });
+					if (raw) {
+						data = deserializeFromKV(raw);
+						REPORTS.set(id, data);
+					}
+				} catch (e) {
+					console.error("[report-store] KV read failed:", e);
+				}
+			}
 			return {
 				exists: Boolean(data),
 				data: () => data,
 			};
 		},
 		async update(payload: Record<string, unknown>) {
-			const existing = REPORTS.get(id);
+			let existing = REPORTS.get(id);
+			if (!existing && _kv) {
+				try {
+					const raw = await _kv.get(id, { type: "text" });
+					if (raw) {
+						existing = deserializeFromKV(raw);
+						REPORTS.set(id, existing);
+					}
+				} catch (e) {
+					console.error("[report-store] KV read failed:", e);
+				}
+			}
 			if (!existing) {
 				throw new Error("not found");
 			}
-			REPORTS.set(id, applyPatch(existing, payload));
+			const updated = applyPatch(existing, payload);
+			REPORTS.set(id, updated);
+			if (_kv) {
+				try {
+					await _kv.put(id, serializeForKV(updated), {
+						expirationTtl: REPORT_TTL_SECONDS,
+					});
+				} catch (e) {
+					console.error("[report-store] KV write failed:", e);
+				}
+			}
 		},
 	};
 }

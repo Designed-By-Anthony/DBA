@@ -139,9 +139,7 @@ export default function LighthouseReportViewerPage() {
 					);
 				}
 				if (jsonParseFailed) {
-					throw new Error(
-						"Report data could not be read. Please try again.",
-					);
+					throw new Error("Report data could not be read. Please try again.");
 				}
 				if (!cancelled) setData(toAuditData(json));
 			} catch (e) {

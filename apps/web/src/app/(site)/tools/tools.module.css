@@ -79,7 +79,7 @@
 }
 
 .input::placeholder {
-	color: rgba(247, 244, 238, 0.3);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .input:focus {
@@ -117,7 +117,7 @@
 
 .formNote {
 	font-size: 0.72rem;
-	color: rgba(247, 244, 238, 0.35);
+	color: rgba(247, 244, 238, 0.58);
 	text-align: center;
 }
 
@@ -195,7 +195,7 @@
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.45);
+	color: rgba(247, 244, 238, 0.58);
 	width: fit-content;
 }
 
