@@ -172,7 +172,7 @@ export function AuditScanProgress({
 				</MotionDiv>
 			</MotionDiv>
 
-			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{PHASES.map((p, i) => {
 					const done = i < idx;
 					const current = i === idx;
@@ -200,8 +200,8 @@ export function AuditScanProgress({
 							}
 							layout
 						>
-							<div className="mb-2 flex items-center justify-between gap-2">
-								<span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+							<div className="mb-3 flex items-center justify-between gap-2">
+								<span className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
 									Step {i + 1}
 								</span>
 								{done ? (
@@ -213,8 +213,8 @@ export function AuditScanProgress({
 										title="Complete"
 									>
 										<svg
-											width="14"
-											height="14"
+											width="16"
+											height="16"
 											viewBox="0 0 14 14"
 											fill="none"
 											aria-hidden="true"
@@ -231,17 +231,17 @@ export function AuditScanProgress({
 									</MotionDiv>
 								) : current ? (
 									<span
-										className="inline-flex h-2 w-2 animate-pulse rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+										className="inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
 										aria-hidden
 									/>
 								) : (
-									<span className="text-white/20">○</span>
+									<span className="text-white/20 text-sm">○</span>
 								)}
 							</div>
-							<p className="font-display text-sm font-semibold text-white">
+							<p className="font-display text-base font-semibold text-white mb-2">
 								{p.label}
 							</p>
-							<p className="mt-1 text-[11px] leading-snug text-white/50">
+							<p className="text-xs leading-relaxed text-white/60">
 								{p.description}
 							</p>
 						</MotionDiv>

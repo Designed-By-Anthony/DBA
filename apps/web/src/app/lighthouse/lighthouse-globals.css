@@ -709,6 +709,17 @@
 
 .lighthouse-phase-card {
 	backdrop-filter: blur(12px);
+	padding: 1.25rem;
+	border-radius: 0.875rem;
+	min-height: 8rem;
+	display: flex;
+	flex-direction: column;
+}
+
+@media (max-width: 768px) {
+	.lighthouse-phase-card {
+		min-height: auto;
+	}
 }
 
 /* ─── Score grid section header ─── */
