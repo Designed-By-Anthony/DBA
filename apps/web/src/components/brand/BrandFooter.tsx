@@ -4,6 +4,7 @@ import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
 	SITE_LEGAL_LINKS,
+	SITE_SOCIAL_LINKS,
 } from "@/design-system/site-config";
 
 const BUILT_WITH = [
@@ -26,9 +27,8 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 
 	return (
 		<footer className="dba-footer">
-			<div className="dba-footer-rule" aria-hidden />
 			<div className="dba-footer-inner">
-				<div className="dba-footer-row">
+				<div className="dba-footer-primary">
 					<Link
 						href={SITE_BRAND.homeHref}
 						className="dba-footer-brand"
@@ -40,9 +40,11 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							width={22}
 							height={16}
 							className="dba-footer-mark"
-							style={{ width: "auto" }}
 						/>
-						<span className="dba-footer-brand-name">{SITE_BRAND.name}</span>
+						<span>
+							<span className="dba-footer-brand-name">{SITE_BRAND.name}</span>
+							<small>{SITE_BRAND.footerDescription}</small>
+						</span>
 					</Link>
 
 					<nav className="dba-footer-nav" aria-label="Footer navigation">
@@ -52,49 +54,12 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							</Link>
 						))}
 					</nav>
-
-					<div className="dba-footer-legal">
-						<p className="dba-footer-copy">
-							© {year} {SITE_BRAND.name}
-						</p>
-						{SITE_LEGAL_LINKS.map((link) => (
-							<span key={link.href} className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
-									·
-								</span>
-								<Link href={link.href}>{link.label}</Link>
-							</span>
-						))}
-						{buildTag ? (
-							<span className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
-									·
-								</span>
-								<span className="dba-footer-meta font-mono">{buildTag}</span>
-							</span>
-						) : null}
-					</div>
 				</div>
 
-				<div className="dba-footer-stack">
-					<span className="dba-footer-stack-label">Built with</span>
-					{BUILT_WITH.map(({ label, href }) => (
-						<a
-							key={label}
-							href={href}
-							className="dba-stack-badge"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{label}
-						</a>
-					))}
-				</div>
-
-				{poweredBy?.length ? (
+				<div className="dba-footer-meta-grid">
 					<div className="dba-footer-stack">
-						<span className="dba-footer-stack-label">Powered by</span>
-						{poweredBy.map(({ label, href }) => (
+						<span className="dba-footer-stack-label">Built with</span>
+						{BUILT_WITH.map(({ label, href }) => (
 							<a
 								key={label}
 								href={href}
@@ -106,7 +71,51 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							</a>
 						))}
 					</div>
-				) : null}
+
+					<div className="dba-footer-stack">
+						<span className="dba-footer-stack-label">Social</span>
+						{SITE_SOCIAL_LINKS.map(({ label, href }) => (
+							<a
+								key={label}
+								href={href}
+								className="dba-stack-badge"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{label}
+							</a>
+						))}
+					</div>
+
+					{poweredBy?.length ? (
+						<div className="dba-footer-stack">
+							<span className="dba-footer-stack-label">Powered by</span>
+							{poweredBy.map(({ label, href }) => (
+								<a
+									key={label}
+									href={href}
+									className="dba-stack-badge"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{label}
+								</a>
+							))}
+						</div>
+					) : null}
+				</div>
+
+				<div className="dba-footer-legal">
+					<p className="dba-footer-copy">
+						© {year} {SITE_BRAND.name}
+					</p>
+					{SITE_LEGAL_LINKS.map((link) => (
+						<Link key={link.href} href={link.href}>
+							{link.label}
+						</Link>
+					))}
+					{buildTag ? <span>{buildTag}</span> : null}
+				</div>
 			</div>
 		</footer>
 	);

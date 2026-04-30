@@ -19,10 +19,6 @@ const nextConfig: NextConfig = {
 	images: {
 		unoptimized: true,
 	},
-	experimental: {
-		/** Tree-shake `framer-motion` re-exports so only used motion primitives ship. */
-		optimizePackageImports: ["framer-motion"],
-	},
 	compiler: {
 		/** Drop stray `console.log` / `console.info` / `console.debug` in production client+server bundles. */
 		removeConsole:

@@ -1,6 +1,5 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface ScoreRingProps {
@@ -12,18 +11,13 @@ interface ScoreRingProps {
 export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
 	const [filled, setFilled] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
-	const prefersReducedMotion = useReducedMotion();
 
 	useEffect(() => {
-		if (prefersReducedMotion) {
-			setFilled(true);
-			return;
-		}
 		const raf = requestAnimationFrame(() =>
 			requestAnimationFrame(() => setFilled(true)),
 		);
 		return () => cancelAnimationFrame(raf);
-	}, [prefersReducedMotion]);
+	}, []);
 
 	const isLg = size === "lg";
 	const radius = isLg ? 46 : 36;
@@ -36,48 +30,42 @@ export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
 	const targetOffset = circumference - (pct / 100) * circumference;
 	const strokeDashoffset = filled ? targetOffset : circumference;
 
-	let colorVar = "rgba(248,113,113,0.9)";
+	let toneClass = "lighthouse-score-card--red";
+	let colorVar = "rgba(248, 113, 113, 0.9)";
 	let glowClass = "score-glow-red";
-	let textColor = "#f87171";
 	if (score == null) {
-		colorVar = "rgba(255,255,255,0.28)";
+		toneClass = "lighthouse-score-card--null";
+		colorVar = "rgba(255, 255, 255, 0.28)";
 		glowClass = "";
-		textColor = "rgba(255,255,255,0.28)";
 	} else if (score >= 90) {
-		colorVar = "rgba(74,222,128,0.95)";
+		toneClass = "lighthouse-score-card--green";
+		colorVar = "rgba(74, 222, 128, 0.95)";
 		glowClass = "score-glow-green";
-		textColor = "#4ade80";
 	} else if (score >= 50) {
-		colorVar = "rgba(251,191,36,0.95)";
+		toneClass = "lighthouse-score-card--amber";
+		colorVar = "rgba(251, 191, 36, 0.95)";
 		glowClass = "score-glow-amber";
-		textColor = "#fbbf24";
 	}
 
-	const wrapSize = isLg ? "h-[104px] w-[104px]" : "h-[80px] w-[80px]";
-	const scoreSize = isLg ? "text-[1.75rem]" : "text-[1.35rem]";
 	const titleText =
 		score == null ? `${label}: not available` : `${label}: ${score} out of 100`;
 
 	return (
 		<figure
-			className={`lighthouse-score-card ${glowClass} flex flex-col items-center gap-2.5`}
+			className={`lighthouse-score-card ${toneClass} ${glowClass}${isLg ? " lighthouse-score-card--lg" : ""}`}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 			aria-label={titleText}
-			style={{
-				transform: isHovered ? "translateY(-4px) scale(1.02)" : undefined,
-				transition: "transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-			}}
+			data-hovered={isHovered ? "true" : "false"}
 		>
-			<div className={`relative flex items-center justify-center ${wrapSize}`}>
+			<div className="lighthouse-score-ring">
 				<svg
-					className="h-full w-full -rotate-90 transform"
+					className="lighthouse-score-svg"
 					viewBox={`0 0 ${svgSize} ${svgSize}`}
 					aria-hidden="true"
 					role="img"
 				>
 					<title>{titleText}</title>
-					{/* Track */}
 					<circle
 						cx={cx}
 						cy={cx}
@@ -86,7 +74,6 @@ export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
 						strokeWidth={strokeWidth}
 						fill="transparent"
 					/>
-					{/* Progress */}
 					{score != null && (
 						<circle
 							cx={cx}
@@ -98,29 +85,15 @@ export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
 							strokeDasharray={circumference}
 							strokeDashoffset={strokeDashoffset}
 							strokeLinecap="round"
-							style={{
-								transition: filled
-									? "stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1)"
-									: "none",
-								filter: isHovered
-									? `drop-shadow(0 0 12px ${colorVar})`
-									: `drop-shadow(0 0 6px ${colorVar})`,
-							}}
+							data-filled={filled ? "true" : "false"}
 						/>
 					)}
 				</svg>
-				{/* Center number — aria-label is on the SVG title above */}
-				<span
-					className={`absolute font-display font-semibold leading-none ${scoreSize}`}
-					style={{ color: textColor }}
-					aria-hidden="true"
-				>
+				<span className="lighthouse-score-value" aria-hidden="true">
 					{score == null ? "—" : score}
 				</span>
 			</div>
-			<span className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50 px-1">
-				{label}
-			</span>
+			<span className="lighthouse-score-label">{label}</span>
 		</figure>
 	);
 }

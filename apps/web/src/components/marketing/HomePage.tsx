@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { homeFaqEntries, processSteps, whyStackCards } from "@/data/home";
 import { showcaseFeaturedItems } from "@/data/showcase";
 import {
@@ -11,56 +10,18 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
-import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
 import "@/app/home-page.css";
 
 const homeFeaturedWorkItems = showcaseFeaturedItems.slice(0, 3);
 
-/**
- * Hero A/B variants. Default copy always renders in SSR for SEO; the
- * afterInteractive script swaps only when `?v=<key>` is present (ad
- * campaign landing pages). Search engines always see the default.
- */
-const heroVariants = {
-	wellness: {
-		eyebrow:
-			"Mohawk Valley Web Design Studio · Medspa · Salon · Wellness · Boutique",
-		h1: "Mohawk Valley web design for wellness brands that want a site as polished as the client experience.",
-		sub: "Custom websites for medspas, salons, aesthetic clinics, and boutique wellness brands across Utica, Rome, Syracuse, and Central New York. Editorial layouts, luxurious typography, and a booking flow that respects your brand — so the site feels like an extension of the treatment room, not a template from 2014. Contact us for your free audit.",
-	},
-	"multi-location": {
-		eyebrow:
-			"Central NY Web Design Studio · Multi-Location · Franchise · HVAC · Home Services",
-		h1: "Web design and local SEO for multi-location service businesses across Central New York.",
-		sub: "Custom sites for HVAC, plumbing, electrical, and home-service operators running two, three, or more locations across Utica, Syracuse, Watertown, and greater Upstate NY. Distinct location pages, shared lead capture, CRM integration (ServiceTitan, Jobber, Housecall Pro), and local SEO tuned for each market. Contact us for your free audit.",
-	},
-} as const;
-
 export function HomePage() {
 	return (
 		<>
 			<section className="page-hero page-hero--home">
-				<div className="hero-drift" aria-hidden="true">
-					<span className="hero-drift__glow hero-drift__glow--a" />
-					<span className="hero-drift__glow hero-drift__glow--b" />
-				</div>
-				<div className="hero-rain" aria-hidden="true">
-					<span className="hero-rain__layer hero-rain__layer--back" />
-					<span className="hero-rain__layer hero-rain__layer--front" />
-				</div>
 				<div className="page-hero-inner">
 					<div className="hero-copy">
-						<p className="hero-place-marker">
-							<span className="sr-only">
-								Area codes three one five and five one eight
-							</span>
-							<span className="hero-place-marker__rule" aria-hidden="true" />
-							<span className="hero-place-marker__text" aria-hidden="true">
-								315 · 518
-							</span>
-						</p>
 						<p className="page-eyebrow page-eyebrow--rule" data-hero-eyebrow>
 							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY
 						</p>
@@ -133,9 +94,7 @@ export function HomePage() {
 				</div>
 			</section>
 
-			<section className="section-shell section-shell--premium-pitch">
-				<PremiumPitchStrip variant="home" />
-			</section>
+			<PremiumPitchStrip variant="home" />
 
 			<section
 				className="section-shell section-shell--proof command-shell"
@@ -377,7 +336,7 @@ export function HomePage() {
 						className="featured-work-grid featured-work-grid--stagger"
 						data-home-featured-work
 					>
-						{homeFeaturedWorkItems.map((item, i) => {
+						{homeFeaturedWorkItems.map((item) => {
 							const href = item.caseStudySlug
 								? `/portfolio/${item.caseStudySlug}`
 								: (item.href ?? "#");
@@ -397,18 +356,14 @@ export function HomePage() {
 										rel={isExternal ? "noopener noreferrer" : undefined}
 										className="featured-work-media"
 									>
-										<div className="featured-image-wrap">
-											<Image
-												src={imgSrc}
-												alt={item.imageAlt ?? item.name}
-												className="featured-image"
-												width={640}
-												height={480}
-												sizes="(max-width: 900px) min(100vw, 1160px), min(33vw, 480px)"
-												priority={i === 0}
-												{...(i === 0 ? { fetchPriority: "high" as const } : {})}
-											/>
-										</div>
+										<Image
+											src={imgSrc}
+											alt={item.imageAlt ?? item.name}
+											width={900}
+											height={600}
+											className="featured-image"
+											sizes="(max-width: 900px) 100vw, 33vw"
+										/>
 									</a>
 									<div className="featured-copy">
 										<div className="featured-meta">
@@ -441,67 +396,6 @@ export function HomePage() {
 					</div>
 				</div>
 			</section>
-
-			<Script id="hero-variants" strategy="afterInteractive">
-				{`(() => {
-  try {
-    var params = new URLSearchParams(window.location.search);
-    var variantKey = params.get('v');
-    var heroVariants = ${JSON.stringify(heroVariants)};
-    if (variantKey && heroVariants && heroVariants[variantKey]) {
-      var variant = heroVariants[variantKey];
-      var eyebrow = document.querySelector('[data-hero-eyebrow]');
-      var h1 = document.querySelector('[data-hero-h1]');
-      var sub = document.querySelector('[data-hero-sub]');
-      if (eyebrow && variant.eyebrow) eyebrow.textContent = variant.eyebrow;
-      if (h1 && variant.h1) h1.textContent = variant.h1;
-      if (sub && variant.sub) sub.textContent = variant.sub;
-      document.documentElement.setAttribute('data-hero-variant', variantKey);
-    }
-  } catch (e) {}
-})();`}
-			</Script>
-
-			<Script id="home-hero-motion" strategy="afterInteractive">
-				{`(() => {
-  var hero = document.querySelector('.page-hero--home');
-  if (!hero) return;
-  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-  if (!prefersReducedMotion && hasFinePointer) {
-    hero.addEventListener('pointermove', function (event) {
-      var rect = hero.getBoundingClientRect();
-      var x = ((event.clientX - rect.left) / rect.width) * 100;
-      var y = ((event.clientY - rect.top) / rect.height) * 100;
-      hero.style.setProperty('--hero-spot-x', x.toFixed(2) + '%');
-      hero.style.setProperty('--hero-spot-y', y.toFixed(2) + '%');
-    }, { passive: true });
-    hero.addEventListener('pointerleave', function () {
-      hero.style.setProperty('--hero-spot-x', '50%');
-      hero.style.setProperty('--hero-spot-y', '22%');
-    });
-  }
-  var actionButtons = hero.querySelectorAll('.hero-actions .btn');
-  if (prefersReducedMotion || !hasFinePointer || actionButtons.length === 0) return;
-  var MAX_SHIFT = 8;
-  actionButtons.forEach(function (button) {
-    button.addEventListener('pointermove', function (event) {
-      var rect = button.getBoundingClientRect();
-      var dx = event.clientX - (rect.left + rect.width / 2);
-      var dy = event.clientY - (rect.top + rect.height / 2);
-      var xShift = (dx / (rect.width / 2)) * MAX_SHIFT;
-      var yShift = (dy / (rect.height / 2)) * MAX_SHIFT;
-      button.style.setProperty('--btn-shift-x', xShift.toFixed(2) + 'px');
-      button.style.setProperty('--btn-shift-y', yShift.toFixed(2) + 'px');
-    }, { passive: true });
-    button.addEventListener('pointerleave', function () {
-      button.style.setProperty('--btn-shift-x', '0px');
-      button.style.setProperty('--btn-shift-y', '0px');
-    });
-  });
-})();`}
-			</Script>
-			<FirstVisitSplash />
 		</>
 	);
 }

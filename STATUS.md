@@ -2,6 +2,13 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Global UI rebuild foundation (2026-04-30)
+
+- Rebuilt the public marketing and Lighthouse UI around global CSS tokens in `apps/web/src/styles/theme.css`, with `apps/web/src/design-system/tokens.css` resynced from the same `:root` block.
+- Removed the old Framer Motion/GSAP UI layer and deleted unused motion/reveal helper components and scripts.
+- Consolidated page-specific CSS into the global theme surface, preserving brand assets at `/brand/logo.png` and `/brand/mark.webp`.
+- Verification: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
 - Removed Zustand badge from the "Our Edge" stack display — dependency was previously removed but badge remained.

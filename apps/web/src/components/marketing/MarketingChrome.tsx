@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
@@ -6,16 +5,12 @@ import { BrandFooter } from "@/components/brand/BrandFooter";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import {
 	SITE_AUDIT_CTA,
-	SITE_BRAND,
 	SITE_CONTACT_LINK,
 	SITE_HEADER_NAV_LINKS,
 } from "@/design-system/site-config";
-import { businessProfile } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
 import { SiteContactDrawer } from "./SiteContactDrawer";
-
-const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
 /** Build-time id (see `next.config.ts` env); avoids filesystem reads on Cloudflare Workers. */
 const siteScriptVersion =
@@ -102,7 +97,11 @@ window.__dbaRevokeAnalyticsConsent = function () {
 };`}
 			</Script>
 
-			<div id="reading-progress-bar" aria-hidden="true" />
+			<div
+				id="reading-progress-bar"
+				className="reading-progress-bar"
+				aria-hidden="true"
+			/>
 			<div className="site-chrome-sticky">
 				<BrandHeader />
 			</div>
@@ -163,93 +162,6 @@ window.__dbaRevokeAnalyticsConsent = function () {
 					<BrandFooter />
 				</div>
 			</div>
-
-			<div className="reach-out-sticky" id="reachOutSticky">
-				<button
-					type="button"
-					className="reach-out-sticky-btn"
-					id="reachOutOpenBtn"
-					aria-haspopup="dialog"
-					aria-controls="reachOutModal"
-					aria-expanded="false"
-				>
-					<span className="reach-out-sticky-label">Get in touch</span>
-				</button>
-			</div>
-
-			<dialog
-				id="reachOutModal"
-				className="reach-out-dialog"
-				aria-labelledby="reachOutModalTitle"
-				aria-modal="true"
-			>
-				<div className="reach-out-dialog-panel splash-shell splash-shell--reach-out">
-					<div className="reach-out-dialog-header">
-						<Image
-							src={SITE_BRAND.assets.mark}
-							alt={SITE_BRAND.name}
-							width={40}
-							height={30}
-							className="reach-out-dialog-logo"
-							style={{ height: "auto" }}
-						/>
-						<button
-							type="button"
-							className="reach-out-dialog-close splash-close"
-							data-reach-out-close
-							aria-label="Close"
-						>
-							×
-						</button>
-					</div>
-					<h2 id="reachOutModalTitle" className="reach-out-dialog-title">
-						Say hello
-					</h2>
-					<p className="reach-out-dialog-lede">
-						Start with a free site audit — or just call / email.
-					</p>
-					<Link
-						href="/lighthouse"
-						className="reach-out-dialog-primary"
-						data-reach-out-close
-					>
-						Audit My Site
-					</Link>
-					<section
-						className="reach-out-dialog-actions"
-						aria-label="Other ways to reach us"
-					>
-						<a
-							href={businessProfile.telephoneHref}
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Call</span>
-							<span className="reach-out-action-detail">
-								{businessProfile.telephone.replace("+1-", "")}
-							</span>
-						</a>
-						<a
-							href={mailtoContactHref}
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Email</span>
-							<span className="reach-out-action-detail">
-								{businessProfile.email}
-							</span>
-						</a>
-						<Link
-							href="/contact"
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Contact</span>
-							<span className="reach-out-action-detail">Form / message</span>
-						</Link>
-					</section>
-				</div>
-			</dialog>
 
 			<div
 				id="cookie-consent-root"

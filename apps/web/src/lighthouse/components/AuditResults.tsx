@@ -1,8 +1,6 @@
 "use client";
 
 import type { AuditData } from "@lh/auditReport";
-import { useReducedMotion } from "framer-motion";
-import { div as MotionDiv } from "framer-motion/client";
 import { useCallback, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { ScoreRing } from "./ScoreRing";
@@ -92,7 +90,6 @@ export function AuditResults({
 		"idle" | "sending" | "sent" | "error"
 	>("idle");
 	const [emailErr, setEmailErr] = useState("");
-	const prefersReduced = useReducedMotion();
 
 	const [pdfStatus, setPdfStatus] = useState<"idle" | "generating" | "error">(
 		"idle",
@@ -174,29 +171,14 @@ export function AuditResults({
 	}, [contactEmail, contactName, data, reportId]);
 
 	return (
-		<MotionDiv
-			className="lh-report-output w-full"
-			initial={prefersReduced ? false : { opacity: 0, y: 24 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-		>
+		<div className="lh-report-output">
 			{/* Degraded report warning */}
 			{data.psiDegradedReason ? (
-				<MotionDiv
-					className="mb-8 rounded-[1.1rem] border border-amber-400/28 bg-linear-to-br from-amber-950/45 to-[rgba(20,14,8,0.4)] px-5 py-5 text-sm leading-relaxed text-amber-50/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-					role="status"
-					initial={prefersReduced ? false : { opacity: 0, y: 10 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4 }}
-				>
-					<p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/85">
-						Heads up
-					</p>
-					<strong className="font-display text-base font-semibold text-amber-100">
-						Partial report
-					</strong>
-					<p className="mt-2 text-amber-50/88">{data.psiDegradedReason}</p>
-				</MotionDiv>
+				<div className="lh-alert lh-alert--amber" role="status">
+					<p className="lh-alert-kicker">Heads up</p>
+					<strong className="lh-alert-title">Partial report</strong>
+					<p className="lh-alert-body">{data.psiDegradedReason}</p>
+				</div>
 			) : null}
 
 			{/* ── Hero ── */}
@@ -221,7 +203,9 @@ export function AuditResults({
 					</a>
 					{reportId ? (
 						<>
-							<p className="lh-report-meta-label mt-4">Report reference</p>
+							<p className="lh-report-meta-label lh-report-meta-label--spaced">
+								Report reference
+							</p>
 							<p className="lh-report-id">{reportId}</p>
 						</>
 					) : null}
@@ -229,21 +213,13 @@ export function AuditResults({
 			</div>
 
 			{/* ── Action toolbar ── */}
-			<MotionDiv
-				className="lighthouse-actions-toolbar print:hidden mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row sm:justify-center"
-				initial={prefersReduced ? false : { opacity: 0, y: 12 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.1, duration: 0.45 }}
-			>
-				<MotionDiv
-					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[140px]"
-				>
+			<div className="lighthouse-actions-toolbar">
+				<div className="lighthouse-action-item">
 					<button
 						type="button"
 						onClick={handleDownloadPdf}
 						disabled={!reportId || pdfStatus === "generating"}
-						className="lighthouse-btn-primary w-full"
+						className="lighthouse-btn-primary"
 					>
 						{pdfStatus === "generating"
 							? "Generating…"
@@ -251,61 +227,44 @@ export function AuditResults({
 								? "Retry PDF"
 								: "Download PDF"}
 					</button>
-				</MotionDiv>
-				<MotionDiv
-					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[140px]"
-				>
+				</div>
+				<div className="lighthouse-action-item">
 					<button
 						type="button"
 						onClick={handlePrintView}
 						disabled={!reportId}
-						className="lighthouse-btn-secondary w-full disabled:cursor-not-allowed disabled:opacity-40"
+						className="lighthouse-btn-secondary"
 					>
 						Print / save as PDF
 					</button>
-				</MotionDiv>
-				<MotionDiv
-					whileTap={{ scale: 0.97 }}
-					className="sm:flex-1 sm:min-w-[140px]"
-				>
+				</div>
+				<div className="lighthouse-action-item">
 					<button
 						type="button"
 						onClick={handleEmailSummary}
 						disabled={emailStatus === "sending" || !contactEmail?.trim()}
-						className="lighthouse-btn-emerald w-full disabled:cursor-not-allowed disabled:opacity-40"
+						className="lighthouse-btn-emerald"
 					>
 						{emailStatus === "sending"
 							? "Sending…"
 							: emailStatus === "sent"
-								? "Emailed ✓"
+								? "Emailed"
 								: "Email summary"}
 					</button>
-				</MotionDiv>
-			</MotionDiv>
+				</div>
+			</div>
 
 			{emailStatus === "error" && emailErr ? (
-				<p
-					className="print:hidden rounded-lg border border-rose-500/28 bg-rose-950/38 px-4 py-3 text-center text-sm text-rose-100"
-					role="alert"
-				>
+				<p className="lh-error print:hidden" role="alert">
 					{emailErr}
 				</p>
 			) : null}
 
 			{/* ── Score grid — all 6 in a unified 3-column grid ── */}
-			<div className="mb-3">
-				<p className="lh-section-label text-center">How your site scored</p>
+			<div className="lh-section-label-wrap">
+				<p className="lh-section-label">How your site scored</p>
 			</div>
-			<MotionDiv
-				className="grid grid-cols-3 gap-[var(--space-block)] md:gap-[var(--space-block)]"
-				variants={{
-					hidden: {},
-					show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
-				}}
-				initial={prefersReduced ? false : "hidden"}
-				animate="show"
-			>
+			<div className="lh-score-grid">
 				{(
 					[
 						[data.trustScore, "Trust score"],
@@ -316,63 +275,36 @@ export function AuditResults({
 						[data.seo, "SEO"],
 					] as const
 				).map(([score, label]) => (
-					<MotionDiv
-						key={label}
-						variants={{
-							hidden: { opacity: 0, y: 18, scale: 0.93 },
-							show: {
-								opacity: 1,
-								y: 0,
-								scale: 1,
-								transition: { type: "spring", stiffness: 260, damping: 22 },
-							},
-						}}
-					>
+					<div key={label}>
 						<ScoreRing score={score} label={label} />
-					</MotionDiv>
+					</div>
 				))}
-			</MotionDiv>
+			</div>
 
 			{/* ── Executive summary ── */}
 			{data.aiInsight?.executiveSummary ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky"
-					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: "-60px" }}
-					transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-				>
+				<div className="lighthouse-result-panel lh-panel--sky">
 					<p className="lighthouse-result-eyebrow">Executive readout</p>
 					<h3 className="lighthouse-result-heading">Summary</h3>
 					<ExecutiveSummaryBody text={data.aiInsight.executiveSummary} />
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Priority actions ── */}
 			{actions.length > 0 ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--amber"
-					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: "-60px" }}
-					transition={{ duration: 0.5, delay: 0.05 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--amber">
 					<p className="lighthouse-result-eyebrow">What to fix first</p>
 					<h3 className="lighthouse-result-heading">Priority actions</h3>
-					<ol className="space-y-3">
+					<ol className="lh-action-list">
 						{actions.map((item, idx) => (
 							<li
 								key={`${item.priority}-${item.action}`}
-								className="flex flex-col gap-2 rounded-xl border border-white/6 bg-white/2.5 px-4 py-3.5 sm:flex-row sm:items-start sm:gap-4"
+								className="lh-action-item"
 							>
-								<span className="shrink-0 font-display text-[13px] font-bold text-amber-300/60 sm:w-5 sm:text-right">
-									{idx + 1}
-								</span>
-								<div className="flex-1 min-w-0">
-									<p className="text-[14px] font-semibold leading-snug text-white/94">
-										{item.action}
-									</p>
-									<div className="mt-1.5 flex flex-wrap gap-1.5">
+								<span className="lh-action-number">{idx + 1}</span>
+								<div className="lh-action-copy">
+									<p className="lh-action-title">{item.action}</p>
+									<div className="lh-chip-row">
 										<span className={impactChipClass(item.impact)}>
 											{item.impact} impact
 										</span>
@@ -384,31 +316,22 @@ export function AuditResults({
 							</li>
 						))}
 					</ol>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Strengths & weaknesses ── */}
 			{(data.aiInsight?.strengths?.length ?? 0) > 0 ||
 			(data.aiInsight?.weaknesses?.length ?? 0) > 0 ? (
-				<MotionDiv
-					className="grid gap-[var(--space-element)] sm:grid-cols-2"
-					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: "-40px" }}
-					transition={{ duration: 0.48 }}
-				>
+				<div className="lh-two-grid">
 					{(data.aiInsight?.strengths?.length ?? 0) > 0 ? (
 						<div className="lighthouse-result-panel lh-panel--emerald">
 							<p className="lighthouse-result-eyebrow">What&apos;s working</p>
-							<h3 className="lighthouse-result-heading text-lg">Strengths</h3>
-							<ul className="space-y-2">
+							<h3 className="lighthouse-result-heading">Strengths</h3>
+							<ul className="lh-bullet-list">
 								{data.aiInsight?.strengths?.map((s) => (
-									<li
-										key={s}
-										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"
-									>
+									<li key={s} className="lh-bullet-item">
 										<span
-											className="mt-0.5 shrink-0 text-emerald-400"
+											className="lh-bullet-icon lh-bullet-icon--green"
 											aria-hidden
 										>
 											✓
@@ -422,15 +345,12 @@ export function AuditResults({
 					{(data.aiInsight?.weaknesses?.length ?? 0) > 0 ? (
 						<div className="lighthouse-result-panel lh-panel--amber">
 							<p className="lighthouse-result-eyebrow">What needs work</p>
-							<h3 className="lighthouse-result-heading text-lg">Gaps found</h3>
-							<ul className="space-y-2">
+							<h3 className="lighthouse-result-heading">Gaps found</h3>
+							<ul className="lh-bullet-list">
 								{data.aiInsight?.weaknesses?.map((w) => (
-									<li
-										key={w}
-										className="flex items-start gap-2 text-[13.5px] leading-snug text-white/82"
-									>
+									<li key={w} className="lh-bullet-item">
 										<span
-											className="mt-0.5 shrink-0 text-amber-400/80"
+											className="lh-bullet-icon lh-bullet-icon--amber"
 											aria-hidden
 										>
 											→
@@ -441,73 +361,51 @@ export function AuditResults({
 							</ul>
 						</div>
 					) : null}
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Local listing ── */}
 			{places?.found &&
 			(places.rating != null || places.userRatingCount > 0) ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet"
-					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: "-40px" }}
-					transition={{ duration: 0.45 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--violet">
 					<p className="lighthouse-result-eyebrow">Maps &amp; reputation</p>
-					<h3 className="lighthouse-result-heading text-lg">
-						Local listing signal
-					</h3>
-					<p className="lighthouse-result-body text-white/80">
+					<h3 className="lighthouse-result-heading">Local listing signal</h3>
+					<p className="lighthouse-result-body">
 						{formatStars(places.rating)}
 						{places.userRatingCount > 0
 							? ` · ${places.userRatingCount} review${places.userRatingCount === 1 ? "" : "s"}`
 							: ""}
 						{places.primaryType ? ` · ${places.primaryType}` : ""}
 					</p>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Notable issue ── */}
 			{diag?.criticalIssue ? (
-				<MotionDiv
-					className="rounded-xl border border-amber-500/32 bg-amber-950/22 p-[var(--card-pad)] text-[13px] text-white/86"
-					initial={prefersReduced ? false : { opacity: 0, x: -8 }}
-					whileInView={{ opacity: 1, x: 0 }}
-					viewport={{ once: true }}
-					transition={{ duration: 0.4 }}
-				>
-					<span className="font-semibold text-amber-300/90">
-						Notable issue:{" "}
-					</span>
+				<div className="lh-alert lh-alert--amber">
+					<span className="lh-alert-title">Notable issue: </span>
 					{diag.criticalIssue}
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Authority & backlinks ── */}
 			{moz?.found ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky"
-					initial={prefersReduced ? false : { opacity: 0, y: 18 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: "-50px" }}
-					transition={{ duration: 0.5 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--sky">
 					<p className="lighthouse-result-eyebrow">Link profile</p>
 					<h3 className="lighthouse-result-heading">
 						Authority &amp; backlinks
 					</h3>
 					{moz.dataSource === "internal" ? (
-						<p className="mb-4 text-[12px] leading-relaxed text-amber-200/85">
+						<p className="lh-report-note lh-report-note--amber">
 							{moz.authorityLabel ??
 								"On-page estimate from your homepage crawl — not Moz Domain Authority or Ahrefs DR. Use for direction only."}
 						</p>
 					) : (
-						<p className="mb-4 text-[12px] lighthouse-result-muted">
+						<p className="lh-report-note lighthouse-result-muted">
 							Moz Link Explorer metrics for this domain.
 						</p>
 					)}
-					<div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+					<div className="lh-metric-grid">
 						{[
 							[
 								moz.dataSource === "internal"
@@ -522,71 +420,44 @@ export function AuditResults({
 							["Linking domains", moz.linkingRootDomains],
 							["Spam score", moz.spamScore],
 						].map(([metricLabel, metricVal]) => (
-							<div
-								key={String(metricLabel)}
-								className="lighthouse-metric-tile text-center"
-							>
-								<p className="mb-2 text-[10px] font-bold uppercase tracking-wider lighthouse-result-muted">
-									{metricLabel}
-								</p>
-								<p className="font-display text-xl font-semibold text-white">
-									{metricVal ?? "—"}
-								</p>
+							<div key={String(metricLabel)} className="lighthouse-metric-tile">
+								<p className="lighthouse-metric-label">{metricLabel}</p>
+								<p className="lighthouse-metric-value">{metricVal ?? "—"}</p>
 							</div>
 						))}
 					</div>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Index coverage ── */}
 			{index?.found && index.estimatedIndexedPages != null ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--emerald"
-					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true }}
-					transition={{ duration: 0.45 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--emerald">
 					<p className="lighthouse-result-eyebrow">Search footprint</p>
-					<h3 className="lighthouse-result-heading text-lg">Index coverage</h3>
+					<h3 className="lighthouse-result-heading">Index coverage</h3>
 					<p className="lighthouse-result-body">
 						~{index.estimatedIndexedPages.toLocaleString()} pages in Google's
 						index ({index.source})
 					</p>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Copywriting analysis ── */}
 			{data.aiInsight?.copywritingAnalysis ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet"
-					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true }}
-					transition={{ duration: 0.45 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--violet">
 					<p className="lighthouse-result-eyebrow">Messaging &amp; copy</p>
 					<h3 className="lighthouse-result-heading">Copywriting analysis</h3>
 					<ExecutiveSummaryBody text={data.aiInsight.copywritingAnalysis} />
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Site crawl signals ── */}
 			{sitewide ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky text-[13px]"
-					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true }}
-					transition={{ duration: 0.45 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--sky">
 					<p className="lighthouse-result-eyebrow">Technical crawl</p>
-					<h3 className="lighthouse-result-heading text-lg">
-						Site crawl signals
-					</h3>
-					<ul className="lighthouse-result-body divide-y divide-white/5 [&>li]:py-[var(--space-element)]">
-						<li className="flex flex-wrap gap-x-2 py-2.5">
-							<span className="font-semibold text-sky-200/82">robots.txt</span>
+					<h3 className="lighthouse-result-heading">Site crawl signals</h3>
+					<ul className="lighthouse-result-body lh-signal-list">
+						<li className="lh-signal-row">
+							<span className="lh-signal-label">robots.txt</span>
 							<span className="lighthouse-result-muted">
 								{sitewide.robotsTxt.exists
 									? sitewide.robotsTxt.allowsCrawlers
@@ -595,18 +466,16 @@ export function AuditResults({
 									: "not found"}
 							</span>
 						</li>
-						<li className="flex flex-wrap gap-x-2 py-2.5">
-							<span className="font-semibold text-sky-200/82">XML sitemap</span>
+						<li className="lh-signal-row">
+							<span className="lh-signal-label">XML sitemap</span>
 							<span className="lighthouse-result-muted">
 								{sitewide.sitemap.exists
 									? `${sitewide.sitemap.urlCount.toLocaleString()} URL${sitewide.sitemap.urlCount === 1 ? "" : "s"}`
 									: "not found"}
 							</span>
 						</li>
-						<li className="flex flex-wrap gap-x-2 py-2.5">
-							<span className="font-semibold text-sky-200/82">
-								HTTPS / redirects
-							</span>
+						<li className="lh-signal-row">
+							<span className="lh-signal-label">HTTPS / redirects</span>
 							<span className="lighthouse-result-muted">
 								{sitewide.redirectChain.httpToHttps
 									? "HTTP→HTTPS"
@@ -617,27 +486,21 @@ export function AuditResults({
 							</span>
 						</li>
 					</ul>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Competitive snapshot ── */}
 			{data.competitors && data.competitors.length > 0 ? (
-				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet"
-					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true }}
-					transition={{ duration: 0.5 }}
-				>
+				<div className="lighthouse-result-panel lh-panel--violet">
 					<p className="lighthouse-result-eyebrow">Market context</p>
 					<h3 className="lighthouse-result-heading">Competitive snapshot</h3>
-					<ul className="space-y-2 text-[13px]">
+					<ul className="lh-bullet-list">
 						{data.competitors.slice(0, 4).map((c) => (
 							<li
 								key={`${c.name}-${c.reviewCount}`}
-								className="flex flex-col rounded-lg border border-white/5.5 bg-white/2.5 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-2"
+								className="lh-competitor-row"
 							>
-								<span className="font-semibold text-white/94">{c.name}</span>
+								<span className="lh-competitor-name">{c.name}</span>
 								<span className="lighthouse-result-muted">
 									{c.rating != null ? `${c.rating.toFixed(1)}★` : ""}
 									{c.reviewCount > 0 ? ` · ${c.reviewCount} reviews` : ""}
@@ -645,94 +508,62 @@ export function AuditResults({
 							</li>
 						))}
 					</ul>
-				</MotionDiv>
+				</div>
 			) : null}
 
 			{/* ── Lab vitals ── */}
-			<MotionDiv
-				className="lighthouse-result-panel lh-panel--sky"
-				initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-				whileInView={{ opacity: 1, y: 0 }}
-				viewport={{ once: true }}
-				transition={{ duration: 0.5 }}
-			>
+			<div className="lighthouse-result-panel lh-panel--sky">
 				<p className="lighthouse-result-eyebrow">Lab vitals</p>
 				<h3 className="lighthouse-result-heading">Core Web Vitals</h3>
-				<div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+				<div className="lh-metric-grid">
 					{[
 						["First Contentful Paint", data.metrics.fcp],
 						["Largest Contentful Paint", data.metrics.lcp],
 						["Total Blocking Time", data.metrics.tbt],
 						["Cumulative Layout Shift", data.metrics.cls],
 					].map(([metricLabel, metricVal]) => (
-						<div
-							key={String(metricLabel)}
-							className="lighthouse-metric-tile text-center"
-						>
-							<p className="mb-2 text-[10px] font-bold uppercase tracking-wider lighthouse-result-muted leading-tight">
-								{metricLabel}
-							</p>
-							<p className="font-display text-lg font-semibold text-white">
-								{metricVal || "—"}
-							</p>
+						<div key={String(metricLabel)} className="lighthouse-metric-tile">
+							<p className="lighthouse-metric-label">{metricLabel}</p>
+							<p className="lighthouse-metric-value">{metricVal || "—"}</p>
 						</div>
 					))}
 				</div>
-			</MotionDiv>
+			</div>
 
 			{/* ── CTA ── */}
 			{/* Phase-3 #5: standalone, high-contrast bronze CTA so the contact
 			    action no longer blends into the surrounding card text. */}
-			<MotionDiv
-				className="lh-report-cta print:hidden relative overflow-hidden rounded-[var(--radius-card)] p-[var(--card-pad-lg)]"
-				initial={prefersReduced ? false : { opacity: 0, y: 20 }}
-				whileInView={{ opacity: 1, y: 0 }}
-				viewport={{ once: true }}
-				transition={{ duration: 0.55 }}
-			>
-				<div
-					className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[rgb(var(--accent-bronze-rgb)/0.18)] blur-3xl"
-					aria-hidden
-				/>
-				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[rgba(186,211,253,0.82)]">
-					Next step
-				</p>
-				<h3 className="relative mb-3 font-display text-xl font-bold tracking-tight text-white md:text-2xl">
+			<div className="lh-report-cta print:hidden">
+				<p className="lighthouse-result-eyebrow">Next step</p>
+				<h3 className="lighthouse-result-heading">
 					Want help fixing the highest-impact items?
 				</h3>
-				<p className="relative mb-6 max-w-xl text-[14px] leading-relaxed text-white/72 md:text-[15px]">
+				<p className="lighthouse-result-body">
 					Book a 15-minute call with Anthony — we'll walk through your report
 					together, prioritize what matters for revenue, and outline the fastest
 					path to results.
 				</p>
-				<div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
+				<div className="lh-cta-actions">
 					<a
 						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 						target="_blank"
 						rel="noopener"
-						className="btn btn-primary-book inline-flex items-center justify-center rounded-xl px-8 py-3.5 text-[15px] font-bold tracking-tight"
+						className="btn btn-primary-book"
 					>
 						Book a 15-minute call →
 					</a>
-					<a
-						href="/contact"
-						className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-7 py-3.5 text-[14px] font-semibold text-white/85 transition-[background-color,border-color,color] hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0d12]"
-					>
+					<a href="/contact" className="btn btn-secondary-proof">
 						Or send a message
 					</a>
 				</div>
-			</MotionDiv>
+			</div>
 
 			{/* ── Reset ── */}
-			<div className="mt-8 flex justify-center print:hidden">
-				<button
-					type="button"
-					onClick={onReset}
-					className="rounded-full border border-white/12 bg-white/4.5 px-8 py-3 text-[13px] font-semibold text-white/80 transition-[background-color,border-color] hover:border-white/20 hover:bg-white/8"
-				>
+			<div className="lh-reset-row print:hidden">
+				<button type="button" onClick={onReset} className="btn btn-outline">
 					Run another audit
 				</button>
 			</div>
-		</MotionDiv>
+		</div>
 	);
 }

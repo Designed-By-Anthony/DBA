@@ -8,10 +8,8 @@ import {
 	initFaqAccordion,
 	initGbpRoiCalculator,
 	initLayoutCalendlyEmbed,
-	initMagneticLinks,
 	initMobileNav,
 	initReachOutModal,
-	initRevealAnimations,
 	initTabbedProof,
 } from "./ui";
 import { initWebMCP } from "./webmcp";
@@ -26,7 +24,6 @@ function runPageScripts(): void {
 	const { signal } = pageLifecycleAbort;
 
 	initDeferredThirdPartyLoader();
-	initRevealAnimations();
 	initMobileNav();
 	initReachOutModal();
 	initLayoutCalendlyEmbed();
@@ -40,7 +37,6 @@ function runPageScripts(): void {
 	initFacebookOfferTracking();
 	initGbpRoiCalculator();
 	initCookieSettingsLinks();
-	initMagneticLinks();
 	initWebMCP();
 }
 

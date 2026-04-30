@@ -1,14 +1,6 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
-import { div as MotionDiv } from "framer-motion/client";
-import { useEffect, useMemo, useRef, useState } from "react";
-
-/**
- * Horizontal fact-tile carousel shown while an audit is running.
- * Phase-3 1C: converted from single fading hero card to a sliding
- * horizontal track of visible tiles with phase progress bar above.
- */
+import { useEffect, useMemo, useState } from "react";
 
 type Fact = {
 	tag: string;
@@ -90,31 +82,12 @@ export function AuditScanProgress({
 	activePhase: ScanPhase;
 	message: string;
 }) {
-	const prefersReduced = useReducedMotion();
 	const [factIndex, setFactIndex] = useState(0);
-	const [tileStride, setTileStride] = useState(0);
 	const idx = phaseIndex(activePhase);
-	const trackRef = useRef<HTMLDivElement>(null);
-	const firstTileRef = useRef<HTMLDivElement>(null);
 	const progressPct = useMemo(() => {
 		const step = 100 / PHASES.length;
 		return Math.min(100, Math.round((idx + 0.65) * step));
 	}, [idx]);
-
-	useEffect(() => {
-		const el = firstTileRef.current;
-		if (!el) return;
-		const measure = () => {
-			const gap = Number.parseFloat(
-				getComputedStyle(el.parentElement ?? el).gap || "16",
-			);
-			setTileStride(el.offsetWidth + gap);
-		};
-		measure();
-		const ro = new ResizeObserver(measure);
-		ro.observe(el);
-		return () => ro.disconnect();
-	}, []);
 
 	useEffect(() => {
 		const t = window.setInterval(() => {
@@ -125,31 +98,19 @@ export function AuditScanProgress({
 
 	return (
 		<div className="lh-scan-shell">
-			{/* Phase progress bar (sits above carousel) */}
 			<div className="lh-scan-phase-bar glass-card">
 				<div className="lh-scan-phase-bar__header">
 					<div className="lh-scan-phase-bar__left">
 						<p className="lh-scan-hero__eyebrow">Deep scan in progress</p>
-						<MotionDiv
-							key={message}
-							initial={prefersReduced ? false : { opacity: 0, x: -4 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{ duration: 0.3 }}
-							className="lh-scan-hero__message"
-						>
+						<div key={message} className="lh-scan-hero__message">
 							{message}
-						</MotionDiv>
+						</div>
 					</div>
 					<span className="lh-scan-phase-bar__pct">{progressPct}%</span>
 				</div>
 
 				<div className="lh-scan-progress__track">
-					<MotionDiv
-						className="lh-scan-progress__fill"
-						initial={false}
-						animate={{ width: `${progressPct}%` }}
-						transition={{ type: "spring", stiffness: 110, damping: 22 }}
-					/>
+					<div className="lh-scan-progress__fill" />
 				</div>
 
 				<ol className="lh-scan-pips" aria-label="Audit phases">
@@ -167,28 +128,11 @@ export function AuditScanProgress({
 				</ol>
 			</div>
 
-			{/* Horizontal fact tile carousel */}
 			<div className="lh-carousel-viewport" aria-live="polite">
-				<MotionDiv
-					ref={trackRef}
-					className="lh-carousel-track"
-					animate={
-						prefersReduced || tileStride === 0
-							? undefined
-							: {
-									x: -(factIndex * tileStride),
-								}
-					}
-					transition={
-						prefersReduced || tileStride === 0
-							? undefined
-							: { type: "spring", stiffness: 180, damping: 28 }
-					}
-				>
+				<div className="lh-carousel-track">
 					{FACTS.map((fact, i) => (
 						<div
 							key={fact.title}
-							ref={i === 0 ? firstTileRef : undefined}
 							className={`lh-carousel-tile glass-card${i === factIndex ? " lh-carousel-tile--active" : ""}`}
 						>
 							<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>
@@ -196,7 +140,7 @@ export function AuditScanProgress({
 							<p className="lh-fact-card__body">{fact.body}</p>
 						</div>
 					))}
-				</MotionDiv>
+				</div>
 			</div>
 
 			<div className="lh-fact-dots" role="tablist" aria-label="Fact carousel">

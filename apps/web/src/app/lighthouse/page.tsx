@@ -5,7 +5,7 @@ import { LighthouseValueStrip } from "@lh/components/LighthouseValueStrip";
 export default function LighthouseHome() {
 	return (
 		<main id="main-content" className="lighthouse-main">
-			<section className="lh-audit-stage mx-auto w-full max-w-7xl">
+			<section className="lh-audit-stage">
 				<div className="lh-stage-grid">
 					<LighthouseHero />
 					<aside

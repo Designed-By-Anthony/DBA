@@ -1,8 +1,5 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
-import { div as MotionDiv } from "framer-motion/client";
-
 const phases = [
 	{
 		num: "01",
@@ -32,14 +29,8 @@ const phases = [
 ];
 
 export function LighthouseValueStrip() {
-	const prefersReduced = useReducedMotion();
-	const animate = !prefersReduced;
-
 	return (
-		<section
-			className="lh-process relative"
-			aria-labelledby="lh-process-heading"
-		>
+		<section className="lh-process" aria-labelledby="lh-process-heading">
 			<div className="lh-process-heading">
 				<div>
 					<p className="lighthouse-result-eyebrow">What the scan covers</p>
@@ -54,29 +45,14 @@ export function LighthouseValueStrip() {
 			</div>
 
 			<ol className="lh-process-grid">
-				{phases.map((phase, index) => (
-					<MotionDiv
-						key={phase.num}
-						className="lh-process-step"
-						initial={animate ? { opacity: 0, y: 16 } : false}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: "-40px" }}
-						transition={{
-							duration: 0.5,
-							delay: index * 0.06,
-							ease: [0.22, 1, 0.36, 1],
-						}}
-					>
+				{phases.map((phase) => (
+					<li key={phase.num} className="lh-process-step">
 						<span className="lh-process-num">{phase.num}</span>
-						<span className="min-w-0">
-							<span className="block font-report text-[15px] font-semibold leading-tight text-white/96">
-								{phase.title}
-							</span>
-							<span className="mt-1.5 block text-[12px] leading-[1.55] text-white/56">
-								{phase.body}
-							</span>
+						<span className="lh-process-copy">
+							<strong>{phase.title}</strong>
+							<span>{phase.body}</span>
 						</span>
-					</MotionDiv>
+					</li>
 				))}
 			</ol>
 		</section>

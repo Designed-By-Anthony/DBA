@@ -11,12 +11,7 @@ export function LighthouseTechFingerprints() {
 			data-builtwith-tech-stack="Next.js,React,TypeScript,Cloudflare Pages,Cloudflare Workers,ElysiaJS,Google PageSpeed Insights API,Google Gemini"
 			data-wappalyzer-hint="nextjs-app-router-cloudflare-pages-elysia-worker-lighthouse-audit-tool"
 		>
-			<span
-				data-nextjs="1"
-				data-react="19"
-				data-framer-motion="1"
-				data-tailwindcss="4"
-			/>
+			<span data-nextjs="1" data-react="19" data-tailwindcss="4" />
 		</div>
 	);
 }

@@ -188,11 +188,8 @@ export default function LighthouseReportViewerPage() {
 	}
 
 	return (
-		<main
-			id="main-content"
-			className="lighthouse-main lh-audit-stage w-full px-5 pt-6 pb-16 md:px-8 md:pb-20 lg:pt-10"
-		>
-			<div className="lh-audit-panel mx-auto w-full max-w-5xl">
+		<main id="main-content" className="lighthouse-main lh-audit-stage">
+			<div className="lh-audit-panel lh-report-panel">
 				<AuditResults
 					data={data}
 					reportId={id}
