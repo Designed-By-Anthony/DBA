@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { btnOutline, btnPrimary } from "@/design-system/buttons";
 import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
@@ -101,10 +102,10 @@ export function FoundingPartnerSection() {
 				</div>
 
 				<div className={ACTIONS}>
-					<Link href="/lighthouse" className="btn btn-primary">
+					<Link href="/lighthouse" className={btnPrimary}>
 						Audit My Site
 					</Link>
-					<Link href="/contact" className="btn btn-outline">
+					<Link href="/contact" className={btnOutline}>
 						Contact us
 					</Link>
 				</div>

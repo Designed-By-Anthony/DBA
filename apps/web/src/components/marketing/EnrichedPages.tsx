@@ -11,6 +11,11 @@ import {
 } from "@/data/serviceAreaLocations";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
 import {
+	btnPrimaryAudit,
+	btnPrimaryBook,
+	btnSecondaryProof,
+} from "@/design-system/buttons";
+import {
 	ENTERPRISE_WEBSITE_STARTING_PRICE,
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
@@ -270,10 +275,10 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/lighthouse" className="btn btn-primary-book">
+					<Link href="/lighthouse" className={btnPrimaryBook}>
 						Audit My Site
 					</Link>
-					<Link href="/contact" className="btn btn-secondary-proof">
+					<Link href="/contact" className={btnSecondaryProof}>
 						Contact
 					</Link>
 				</MotionReveal>
@@ -418,10 +423,10 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<Link href="/lighthouse" className="btn btn-primary-book">
+						<Link href="/lighthouse" className={btnPrimaryBook}>
 							Audit My Site
 						</Link>
-						<Link href="/contact" className="btn btn-primary-audit">
+						<Link href="/contact" className={btnPrimaryAudit}>
 							Contact us
 						</Link>
 					</MotionReveal>
@@ -628,10 +633,10 @@ export function OurEdgePage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnPrimaryAudit}>
 						Contact us for your free audit
 					</Link>
-					<Link href="/services" className="btn btn-secondary-proof">
+					<Link href="/services" className={btnSecondaryProof}>
 						View services
 					</Link>
 				</MotionReveal>
@@ -696,10 +701,10 @@ export function FaqPage() {
 							marginTop: "clamp(2rem, 4vw, 3rem)",
 						}}
 					>
-						<Link href="/contact" className="btn btn-primary-book">
+						<Link href="/contact" className={btnPrimaryBook}>
 							Still have a question? Contact us
 						</Link>
-						<Link href="/contact" className="btn btn-primary-audit">
+						<Link href="/contact" className={btnPrimaryAudit}>
 							Contact us for your free audit
 						</Link>
 					</MotionReveal>
@@ -825,10 +830,10 @@ export function ServiceAreasPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-book">
+					<Link href="/contact" className={btnPrimaryBook}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnPrimaryAudit}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>
@@ -1034,10 +1039,10 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-book">
+					<Link href="/contact" className={btnPrimaryBook}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnPrimaryAudit}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>
