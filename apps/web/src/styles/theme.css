@@ -1664,26 +1664,42 @@ body:not(.has-progress-bar) #reading-progress-bar {
 }
 
 .salesforce-form-field input,
-.salesforce-form-field textarea {
-	padding: 0.65rem 0.9rem;
+.salesforce-form-field textarea,
+.salesforce-form-field select {
+	padding: 0.7rem 0.95rem;
 	border-radius: 0.65rem;
-	border: 1px solid rgba(255, 252, 245, 0.12);
-	background: rgba(8, 12, 18, 0.6);
-	color: var(--text-cream);
-	font-size: 0.92rem;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.32);
+	background: rgba(8, 12, 18, 0.78);
+	color: #ffffff;
+	-webkit-text-fill-color: #ffffff;
+	caret-color: rgb(var(--accent-bronze-rgb) / 0.95);
+	font-size: 0.95rem;
+	font-family: inherit;
+	transition:
+		border-color 0.2s ease,
+		box-shadow 0.2s ease,
+		background-color 0.2s ease;
 }
 
 .salesforce-form-field input:focus,
-.salesforce-form-field textarea:focus {
+.salesforce-form-field textarea:focus,
+.salesforce-form-field select:focus {
 	outline: none;
-	border-color: rgb(var(--accent-bronze-rgb) / 0.5);
-	box-shadow: 0 0 0 3px rgb(var(--accent-bronze-rgb) / 0.15);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.7);
+	background: rgba(10, 14, 22, 0.92);
+	box-shadow: 0 0 0 3px rgb(var(--accent-bronze-rgb) / 0.18);
 }
 
 .salesforce-form-field input::placeholder,
 .salesforce-form-field textarea::placeholder {
-	color: var(--text-muted);
+	color: rgba(255, 255, 255, 0.42);
+}
+
+.salesforce-form-field input:-webkit-autofill,
+.salesforce-form-field textarea:-webkit-autofill {
+	-webkit-text-fill-color: #ffffff;
+	-webkit-box-shadow: 0 0 0 1000px rgba(8, 12, 18, 0.92) inset;
+	caret-color: #ffffff;
 }
 
 .salesforce-form-actions {
@@ -1705,18 +1721,13 @@ body:not(.has-progress-bar) #reading-progress-bar {
 
 .salesforce-form-grid--compact .salesforce-form-field input,
 .salesforce-form-grid--compact .salesforce-form-field textarea {
-	padding: 0.5rem 0.75rem;
-	font-size: 0.88rem;
+	padding: 0.6rem 0.85rem;
+	font-size: 0.9rem;
+	color: #ffffff;
+	-webkit-text-fill-color: #ffffff;
 }
 
-/* reCAPTCHA container - ensure it renders above Crisp */
-.g-recaptcha {
-	margin: 1rem 0;
-	position: relative;
-	z-index: 99999;
-}
-
-/* Crisp chat should stay below forms and reCAPTCHA */
+/* Crisp chat should stay below site overlays/menus */
 .crisp-client {
 	z-index: 100 !important;
 }

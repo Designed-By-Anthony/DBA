@@ -20,10 +20,6 @@ import {
 	scanCompetitors,
 	scanPlaces,
 } from "@lh/lib/places";
-import {
-	getRecaptchaEnterpriseConfigStatus,
-	verifyRecaptchaEnterpriseToken,
-} from "@lh/lib/recaptchaEnterprise";
 import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
 import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
 import { type SitewideScanResult, scanSitewide } from "@lh/lib/sitewideScan";
@@ -98,28 +94,6 @@ export const auditRoute = new Elysia({ aot: false }).post(
 		} catch {
 			set.status = 400;
 			return { error: "Invalid request body." };
-		}
-
-		const recaptchaToken =
-			typeof body.recaptchaToken === "string" ? body.recaptchaToken : "";
-		const clientIp = getClientAddress(request);
-		const recaptchaStatus = getRecaptchaEnterpriseConfigStatus();
-		if (recaptchaStatus === "incomplete") {
-			set.status = 503;
-			return { error: "Audit bot protection is misconfigured." };
-		}
-		if (recaptchaStatus === "ready") {
-			const recaptcha = await verifyRecaptchaEnterpriseToken(
-				recaptchaToken,
-				clientIp,
-			);
-			if (!recaptcha.success) {
-				set.status = 403;
-				return {
-					error:
-						"Bot verification failed. Please refresh the page and try again.",
-				};
-			}
 		}
 
 		const url = normalizeHttpUrl(body.url);

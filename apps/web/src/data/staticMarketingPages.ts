@@ -81,7 +81,7 @@ export const staticMarketingPageCopy: Record<
 		title: "Cookie Policy",
 		description: "Cookies, analytics, and consent on designedbyanthony.com.",
 		paragraphs: [
-			"We use first-party and vendor cookies only where needed for security (for example reCAPTCHA or Turnstile), measurement (for example GA4 after consent), and chat when enabled. Use the cookie banner to accept or reject non-essential analytics.",
+			"We use first-party and vendor cookies only where needed for security, measurement (for example GA4 after consent), and chat when enabled. Use the cookie banner to accept or reject non-essential analytics.",
 		],
 	},
 	"image-license": {

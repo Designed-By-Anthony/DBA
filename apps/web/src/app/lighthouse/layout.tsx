@@ -1,10 +1,8 @@
 import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
 import { LighthouseJsonLd } from "@lh/components/LighthouseJsonLd";
 import { LighthouseTechFingerprints } from "@lh/components/LighthouseTechFingerprints";
-import { RECAPTCHA_ENTERPRISE_SITE_KEY } from "@lh/lib/recaptchaEnterpriseConfig";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter, Outfit } from "next/font/google";
-import Script from "next/script";
 import { BrandFooter } from "@/components/brand/BrandFooter";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import { SiteContactDrawer } from "@/components/marketing/SiteContactDrawer";
@@ -107,11 +105,6 @@ export default function LighthouseLayout({
 		>
 			<LighthouseJsonLd />
 			<LighthouseTechFingerprints />
-			<Script
-				id="recaptcha-enterprise"
-				src={`https://www.google.com/recaptcha/enterprise.js?render=${encodeURIComponent(RECAPTCHA_ENTERPRISE_SITE_KEY)}`}
-				strategy="afterInteractive"
-			/>
 
 			<BrandHeader currentSection="audit" includeHamburger={false} />
 

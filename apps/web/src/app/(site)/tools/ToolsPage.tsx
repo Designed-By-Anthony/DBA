@@ -20,7 +20,7 @@ const PREVIEW_TOOLS = [
 		icon: "🧩",
 		tag: "Coming Soon",
 		title: "Lead Form Builder",
-		desc: "Drag-and-drop smart forms with reCAPTCHA, Zapier hooks, and CRM-ready JSON output.",
+		desc: "Drag-and-drop smart forms with spam guards, Zapier hooks, and CRM-ready JSON output.",
 	},
 	{
 		icon: "🗺️",

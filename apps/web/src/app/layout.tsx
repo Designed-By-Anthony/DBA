@@ -2,7 +2,6 @@ import "@/design-system/dba-global.css";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import type { ReactNode } from "react";
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
@@ -71,18 +70,12 @@ const DEFAULT_LEAD_WEBHOOK =
 export default function RootLayout({ children }: { children: ReactNode }) {
 	const leadWebhookDefault =
 		process.env.NEXT_PUBLIC_LEAD_WEBHOOK_URL?.trim() || DEFAULT_LEAD_WEBHOOK;
-	const recaptchaSiteKey =
-		process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
-	const recaptchaAction =
-		process.env.NEXT_PUBLIC_RECAPTCHA_ACTION?.trim() || "contact_submit";
 	return (
 		<html
 			lang="en"
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
-			data-recaptcha-site-key={recaptchaSiteKey || undefined}
-			data-recaptcha-action={recaptchaSiteKey ? recaptchaAction : undefined}
 		>
 			<body>
 				{/* Google Tag Manager (noscript) */}
@@ -97,12 +90,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				</noscript>
 				{children}
 				<CrispBootstrap />
-				{/* Global reCAPTCHA v2 for all forms */}
-				<Script
-					src="https://www.google.com/recaptcha/api.js"
-					strategy="lazyOnload"
-					id="recaptcha-global"
-				/>
 			</body>
 		</html>
 	);
