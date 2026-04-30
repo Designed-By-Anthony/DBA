@@ -35,6 +35,7 @@ export const useToolsStore = create<ToolsStore>((set, get) => ({
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					email: waitlistEmail,
+					name: "Tools Waitlist Signup",
 					source: "tools-waitlist",
 					message: "Signed up for the Tools store waitlist.",
 				}),

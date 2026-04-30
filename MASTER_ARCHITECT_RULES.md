@@ -10,11 +10,10 @@
 - Cross-tenant data leakage is a critical failure.
 
 ## 3. Subdomain routing (this repo)
-- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to VertaFlow (see `src/proxy.ts`).
+- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to VertaFlow (see `apps/web/src/middleware.ts`).
 - `designedbyanthony.com` / `www` / `lighthouse.*` → this Next.js app.
 
 ## 4. The Purge
-- FIREBASE/FIRESTORE: Terminate on sight in new work. Prefer Drizzle/SQL where data lives.
 - CLEANUP: Delete unused legacy artifacts.
 
 ## 5. VERBATIM SYSTEM MAPPING

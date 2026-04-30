@@ -1,6 +1,8 @@
 /**
- * In-memory audit report store (process-local). Document-shaped API for compatibility with existing routes.
- * Not backed by any external database.
+ * Audit report store — KV-backed when a Cloudflare KV binding is
+ * available (`AUDIT_REPORTS_KV`), in-memory fallback otherwise.
+ *
+ * Document-shaped API kept for compatibility with existing routes.
  */
 
 type TimestampLike = {
@@ -41,7 +43,61 @@ type StoredReport = Record<string, unknown> & {
 	emailLastSentAt?: TimestampLike | null;
 	emailSendLockUntil?: TimestampLike | null;
 };
+
+/* ── In-memory fallback (local dev / no KV binding) ── */
 const REPORTS = new Map<string, StoredReport>();
+
+/* ── KV helpers ── */
+
+interface KvNamespace {
+	get(key: string, type: "text"): Promise<string | null>;
+	put(key: string, value: string): Promise<void>;
+}
+
+function getKvBinding(): KvNamespace | null {
+	try {
+		const g = globalThis as Record<string, unknown>;
+		if (g.AUDIT_REPORTS_KV && typeof g.AUDIT_REPORTS_KV === "object") {
+			return g.AUDIT_REPORTS_KV as KvNamespace;
+		}
+		if (
+			typeof process !== "undefined" &&
+			(process.env as Record<string, unknown>).AUDIT_REPORTS_KV &&
+			typeof (process.env as Record<string, unknown>).AUDIT_REPORTS_KV ===
+				"object"
+		) {
+			return (process.env as Record<string, unknown>)
+				.AUDIT_REPORTS_KV as KvNamespace;
+		}
+	} catch {
+		/* running outside Cloudflare — use in-memory */
+	}
+	return null;
+}
+
+function serializeReport(report: StoredReport): string {
+	return JSON.stringify(report, (_key, value) => {
+		if (
+			value &&
+			typeof value === "object" &&
+			typeof value.toDate === "function"
+		) {
+			return { __ts: value.toDate().toISOString() };
+		}
+		return value;
+	});
+}
+
+function deserializeReport(raw: string): StoredReport {
+	return JSON.parse(raw, (_key, value) => {
+		if (value && typeof value === "object" && typeof value.__ts === "string") {
+			return toTimestamp(new Date(value.__ts));
+		}
+		return value;
+	}) as StoredReport;
+}
+
+/* ── Public API (document-shaped, unchanged for callers) ── */
 
 export const Timestamp = {
 	now(): TimestampLike {
@@ -86,6 +142,19 @@ function makeDocRef(id: string) {
 	return {
 		id,
 		async create(payload: StoredReport) {
+			const kv = getKvBinding();
+			if (kv) {
+				const existing = await kv.get(id, "text");
+				if (existing) {
+					const err = new Error("already exists") as Error & {
+						code?: number | string;
+					};
+					err.code = "already-exists";
+					throw err;
+				}
+				await kv.put(id, serializeReport(payload));
+				return;
+			}
 			if (REPORTS.has(id)) {
 				const err = new Error("already exists") as Error & {
 					code?: number | string;
@@ -96,6 +165,18 @@ function makeDocRef(id: string) {
 			REPORTS.set(id, payload);
 		},
 		async get() {
+			const kv = getKvBinding();
+			if (kv) {
+				const raw = await kv.get(id, "text");
+				if (raw) {
+					const data = deserializeReport(raw);
+					return { exists: true as const, data: () => data };
+				}
+				return {
+					exists: false as const,
+					data: () => undefined as StoredReport | undefined,
+				};
+			}
 			const data = REPORTS.get(id);
 			return {
 				exists: Boolean(data),
@@ -103,6 +184,14 @@ function makeDocRef(id: string) {
 			};
 		},
 		async update(payload: Record<string, unknown>) {
+			const kv = getKvBinding();
+			if (kv) {
+				const raw = await kv.get(id, "text");
+				if (!raw) throw new Error("not found");
+				const existing = deserializeReport(raw);
+				await kv.put(id, serializeReport(applyPatch(existing, payload)));
+				return;
+			}
 			const existing = REPORTS.get(id);
 			if (!existing) {
 				throw new Error("not found");

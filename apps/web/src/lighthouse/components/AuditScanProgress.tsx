@@ -5,11 +5,10 @@ import { div as MotionDiv } from "framer-motion/client";
 import { useEffect, useMemo, useState } from "react";
 
 /**
- * Rotating fact carousel shown while an audit is running.
- * Replaces the previous five-up step grid (which forced the user to
- * scroll while the report was being built). The single hero card now
- * cycles SEO / web-design / internet trivia + the live phase the
- * scanner is on, all gold-led.
+ * Horizontal fact-tile carousel shown while an audit is running.
+ * Phase-3 rewrite: the single hero-card fade is replaced with a visible
+ * track of tiles that slides left as new facts rotate in. The five-phase
+ * progress bar sits *above* the carousel (slim strip).
  */
 
 type Fact = {
@@ -107,17 +106,15 @@ export function AuditScanProgress({
 		return () => window.clearInterval(t);
 	}, []);
 
-	const fact = FACTS[factIndex];
-
 	return (
 		<div className="lh-scan-shell">
+			{/* ── Hero status card ── */}
 			<MotionDiv
 				className="lh-scan-hero glass-card relative overflow-hidden"
 				initial={prefersReduced ? false : { opacity: 0, y: 16, scale: 0.985 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
 			>
-				{/* Gold ambient glow */}
 				<MotionDiv
 					className="lh-scan-hero__glow"
 					aria-hidden
@@ -206,20 +203,30 @@ export function AuditScanProgress({
 				</div>
 			</MotionDiv>
 
-			{/* Rotating fact tile */}
-			<div className="lh-fact-stage">
-				<MotionDiv
-					key={factIndex}
-					className="lh-fact-card glass-card"
-					initial={prefersReduced ? false : { opacity: 0, y: 14, scale: 0.985 }}
-					animate={{ opacity: 1, y: 0, scale: 1 }}
-					exit={prefersReduced ? undefined : { opacity: 0, y: -10 }}
-					transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-				>
-					<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>
-					<h4 className="lh-fact-card__title">{fact.title}</h4>
-					<p className="lh-fact-card__body">{fact.body}</p>
-				</MotionDiv>
+			{/* ── Horizontal fact carousel ── */}
+			<section
+				className="lh-fact-carousel"
+				aria-label="Did you know — web facts"
+			>
+				<div className="lh-fact-carousel__viewport">
+					<MotionDiv
+						className="lh-fact-carousel__track"
+						animate={prefersReduced ? undefined : { x: `${-factIndex * 100}%` }}
+						transition={
+							prefersReduced
+								? undefined
+								: { type: "spring", stiffness: 160, damping: 26 }
+						}
+					>
+						{FACTS.map((f) => (
+							<div key={f.title} className="lh-fact-carousel__tile glass-card">
+								<p className="lh-fact-card__tag">Did you know · {f.tag}</p>
+								<h4 className="lh-fact-card__title">{f.title}</h4>
+								<p className="lh-fact-card__body">{f.body}</p>
+							</div>
+						))}
+					</MotionDiv>
+				</div>
 				<div className="lh-fact-dots" role="tablist" aria-label="Fact carousel">
 					{FACTS.map((f, i) => (
 						<button
@@ -233,7 +240,7 @@ export function AuditScanProgress({
 						/>
 					))}
 				</div>
-			</div>
+			</section>
 		</div>
 	);
 }

@@ -5,9 +5,9 @@
 
 /* Tailwind v4 @theme directive - valid for v4 syntax */
 @theme {
-	--font-sans: var(--font-inter);
-	--font-display: var(--font-outfit);
-	--font-report: var(--font-fraunces, var(--font-display));
+	--font-sans: var(--font-main);
+	--font-display: var(--font-display);
+	--font-report: var(--font-report-display, var(--font-display));
 
 	--color-background: transparent;
 	--color-primary-foreground: #ffffff;
@@ -74,13 +74,13 @@
 	width: 100%;
 	color: var(--color-foreground);
 	position: relative;
-	background: /* Primary atmospheric glow - sky blue */
+	background: /* Primary atmospheric glow - sky blue (matches body in theme.css) */
 			radial-gradient(
 				ellipse 120% 50% at 50% -10%,
 				rgba(91, 156, 248, 0.12),
 				transparent 55%
 			),
-			/* Secondary warm accent - bronze */
+			/* Secondary warm accent - bronze (matches body in theme.css) */
 			radial-gradient(
 				ellipse 80% 40% at 85% 30%,
 				rgb(var(--accent-bronze-rgb) / 0.06),
@@ -92,13 +92,8 @@
 				rgba(59, 130, 246, 0.04),
 				transparent 45%
 			),
-			/* Base gradient */
-			linear-gradient(
-				180deg,
-				rgba(6, 10, 18, 0.98) 0%,
-				rgba(8, 11, 16, 1) 35%,
-				rgba(6, 8, 12, 1) 100%
-			);
+			/* Base: exact --bg-ink → --bg-dark from theme.css */
+			linear-gradient(180deg, var(--bg-ink) 0%, var(--bg-dark) 100%);
 	padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
 }
 
@@ -159,6 +154,20 @@
 	--lh-tile-padding: clamp(1.4rem, 3.5vw, 2.25rem);
 	--lh-tile-padding-tight: clamp(1.1rem, 2.6vw, 1.65rem);
 	--lh-tile-radius: 1.15rem;
+}
+
+/* ─── Global card/panel/tile padding (P1-D) ───
+ * Every "bubble" container must use at least --card-pad so text never
+ * clips corners on border-radius: var(--radius-card). */
+[class*="card"],
+[class*="panel"],
+[class*="tile"] {
+	padding: var(--card-pad);
+}
+
+/* Explicit padded variant for result panels */
+.lh-panel-padded {
+	padding: var(--card-pad-lg);
 }
 
 /* ─── Glass base card — premium finish, gold-led ─── */
@@ -332,7 +341,7 @@
 	border-radius: 0.875rem;
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	background: rgba(6, 10, 18, 0.5);
-	padding: 1rem 0.75rem;
+	padding: var(--card-pad);
 	transition: border-color 0.2s ease;
 }
 
@@ -920,18 +929,29 @@
 	}
 }
 
-/* ─── Fact carousel ─── */
-.lh-fact-stage {
+/* ─── Fact carousel (horizontal track) ─── */
+.lh-fact-carousel {
 	display: flex;
 	flex-direction: column;
 	gap: 0.9rem;
 	align-items: center;
 }
 
-.lh-fact-card {
+.lh-fact-carousel__viewport {
 	width: 100%;
-	max-width: 100%;
-	padding: var(--lh-tile-padding);
+	overflow: hidden;
+	border-radius: var(--lh-tile-radius);
+}
+
+.lh-fact-carousel__track {
+	display: flex;
+	gap: var(--space-element);
+}
+
+.lh-fact-carousel__tile {
+	min-width: 100%;
+	flex-shrink: 0;
+	padding: var(--card-pad);
 	border-radius: var(--lh-tile-radius);
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.2);
 	background: linear-gradient(
@@ -943,6 +963,15 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+}
+
+@media (min-width: 640px) {
+	.lh-fact-carousel__track {
+		gap: var(--space-element);
+	}
+	.lh-fact-carousel__tile {
+		min-width: clamp(200px, 28vw, 320px);
+	}
 }
 
 .lh-fact-card__tag {

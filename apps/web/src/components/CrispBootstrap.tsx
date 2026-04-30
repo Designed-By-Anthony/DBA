@@ -11,13 +11,15 @@ declare global {
 		CRISP_WEBSITE_ID?: string;
 		CRISP_RUNTIME_CONFIG?: { locale?: string };
 		__dbaCrispLoaded?: boolean;
+		__dbaAnalyticsEnabled?: boolean;
 	}
 }
 
 /**
- * Crisp chat — sole canonical chat widget. Defers script load until the first
- * user interaction (pointerdown/keydown) or a 6 s fallback timer so it never
- * costs LCP. Website ID is overridable via `NEXT_PUBLIC_CRISP_WEBSITE_ID`.
+ * Crisp chat — sole canonical chat widget. Gated behind
+ * `window.__dbaAnalyticsEnabled` (cookie consent). Once enabled,
+ * defers the actual script load until first interaction or 6 s
+ * fallback so it never costs LCP.
  */
 export function CrispBootstrap() {
 	useEffect(() => {
@@ -29,6 +31,7 @@ export function CrispBootstrap() {
 
 		const load = () => {
 			if (window.__dbaCrispLoaded) return;
+			if (!window.__dbaAnalyticsEnabled) return;
 			window.__dbaCrispLoaded = true;
 			window.$crisp = window.$crisp ?? [];
 			window.CRISP_RUNTIME_CONFIG = {

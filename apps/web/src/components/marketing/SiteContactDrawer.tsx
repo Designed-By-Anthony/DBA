@@ -5,8 +5,6 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
-const _mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
-
 const BODY_LOCK_CLASS = "site-contact-drawer-open";
 
 /**

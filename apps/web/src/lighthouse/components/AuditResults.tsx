@@ -160,6 +160,11 @@ export function AuditResults({
 	return (
 		<MotionDiv
 			className="lh-report-output w-full"
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				gap: "var(--space-section)",
+			}}
 			initial={prefersReduced ? false : { opacity: 0, y: 24 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -184,7 +189,7 @@ export function AuditResults({
 			) : null}
 
 			{/* ── Hero ── */}
-			<div className="lighthouse-results-hero lh-report-cover mb-10">
+			<div className="lighthouse-results-hero lh-report-cover">
 				<div className="lh-report-cover-copy">
 					<p className="lh-report-kicker">Report ready</p>
 					<h2 className="lh-report-title">Your site audit</h2>
@@ -214,7 +219,7 @@ export function AuditResults({
 
 			{/* ── Action toolbar ── */}
 			<MotionDiv
-				className="lighthouse-actions-toolbar print:hidden mx-auto mb-10 flex max-w-3xl flex-col gap-4 sm:flex-row sm:justify-center"
+				className="lighthouse-actions-toolbar print:hidden mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row sm:justify-center"
 				initial={prefersReduced ? false : { opacity: 0, y: 12 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.1, duration: 0.45 }}
@@ -273,11 +278,12 @@ export function AuditResults({
 			) : null}
 
 			{/* ── Score grid — all 6 in a unified 3-column grid ── */}
-			<div className="mb-3">
+			<div>
 				<p className="lh-section-label text-center">How your site scored</p>
 			</div>
 			<MotionDiv
-				className="mb-12 grid grid-cols-3 gap-3 md:gap-4"
+				className="grid grid-cols-3"
+				style={{ gap: "var(--space-block)" }}
 				variants={{
 					hidden: {},
 					show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
@@ -315,7 +321,7 @@ export function AuditResults({
 			{/* ── Executive summary ── */}
 			{data.aiInsight?.executiveSummary ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky mb-6 p-6 md:p-7"
+					className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-60px" }}
@@ -330,7 +336,7 @@ export function AuditResults({
 			{/* ── Priority actions ── */}
 			{actions.length > 0 ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--amber mb-6 p-6 md:p-7"
+					className="lighthouse-result-panel lh-panel--amber lh-panel-padded"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-60px" }}
@@ -466,7 +472,7 @@ export function AuditResults({
 			{/* ── Authority & backlinks ── */}
 			{moz?.found ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky mb-6 p-6 md:p-7"
+					className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
 					initial={prefersReduced ? false : { opacity: 0, y: 18 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-50px" }}
@@ -538,7 +544,7 @@ export function AuditResults({
 			{/* ── Copywriting analysis ── */}
 			{data.aiInsight?.copywritingAnalysis ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet mb-6 p-6 md:p-7"
+					className="lighthouse-result-panel lh-panel--violet lh-panel-padded"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -602,7 +608,7 @@ export function AuditResults({
 			{/* ── Competitive snapshot ── */}
 			{data.competitors && data.competitors.length > 0 ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet mb-6 p-6 md:p-7"
+					className="lighthouse-result-panel lh-panel--violet lh-panel-padded"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -629,7 +635,7 @@ export function AuditResults({
 
 			{/* ── Lab vitals ── */}
 			<MotionDiv
-				className="lighthouse-result-panel lh-panel--sky mb-6 p-6 md:p-7"
+				className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
 				initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true }}
@@ -663,7 +669,8 @@ export function AuditResults({
 			{/* Phase-3 #5: standalone, high-contrast bronze CTA so the contact
 			    action no longer blends into the surrounding card text. */}
 			<MotionDiv
-				className="lh-report-cta print:hidden relative mt-12 mb-8 overflow-hidden rounded-[1.25rem] p-6 md:p-8"
+				className="lh-report-cta print:hidden relative overflow-hidden rounded-[1.25rem]"
+				style={{ padding: "var(--card-pad-lg)" }}
 				initial={prefersReduced ? false : { opacity: 0, y: 20 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true }}
@@ -689,7 +696,7 @@ export function AuditResults({
 						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 						target="_blank"
 						rel="noopener"
-						className="lh-report-cta__button inline-flex items-center justify-center rounded-xl bg-(--accent-bronze-light) px-8 py-3.5 text-[15px] font-bold tracking-tight text-[#171008] shadow-[0_20px_50px_-18px_var(--accent-bronze-glow)] ring-1 ring-[rgb(var(--accent-bronze-rgb)/0.65)] transition-[transform,background-color,box-shadow] hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_28px_60px_-14px_var(--accent-bronze-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0d12]"
+						className="btn btn-primary-book hero-cta-glow"
 					>
 						Book a 15-minute call →
 					</a>

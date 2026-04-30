@@ -18,6 +18,11 @@ import "@/app/home-page.css";
 
 const homeFeaturedWorkItems = showcaseFeaturedItems.slice(0, 3);
 
+/**
+ * Client-side A/B hero copy — injected via `<Script>` reading `?v=`
+ * query param. Invisible to crawlers (intentional: default H1 is
+ * rendered server-side in initial HTML for SEO).
+ */
 const heroVariants = {
 	wellness: {
 		eyebrow:

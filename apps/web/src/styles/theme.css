@@ -33,7 +33,7 @@
 	--text-white: #f7f4ee;
 	--text-cream: #faf7f1;
 	--text-soft: rgba(247, 244, 238, 0.92);
-	--text-gray: #9ca3ae;
+	--text-gray: #a8b1bc;
 	--text-muted: rgba(247, 244, 238, 0.58);
 	--accent-blue: #5b9cf8;
 	--accent-blue-hover: #3b82f6;
@@ -1788,6 +1788,66 @@ body:not(.has-progress-bar) #reading-progress-bar {
 
 #crisp-chatbox {
 	z-index: 100 !important;
+}
+
+/* ─── InfoCarousel / HighlightStrip ─── */
+.info-carousel {
+	width: 100%;
+	overflow: hidden;
+	margin-block: var(--space-block);
+}
+
+.info-carousel__track {
+	display: flex;
+	gap: var(--space-element);
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	padding-inline: 1rem;
+}
+
+.info-carousel__track::-webkit-scrollbar {
+	display: none;
+}
+
+.info-carousel__card {
+	flex: 0 0 clamp(260px, 72vw, 320px);
+	scroll-snap-align: start;
+	padding: var(--card-pad);
+	border-radius: var(--radius-card, 1.15rem);
+	border: 1px solid var(--border-soft);
+	background: var(--surface-card, rgba(255, 255, 255, 0.03));
+}
+
+@media (min-width: 768px) {
+	.info-carousel__card {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+}
+
+.info-carousel__tag {
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--accent-bronze);
+	margin-bottom: 0.5rem;
+}
+
+.info-carousel__title {
+	font-family: var(--font-display);
+	font-size: 1.1rem;
+	font-weight: 650;
+	color: var(--text-primary);
+	margin-bottom: 0.5rem;
+}
+
+.info-carousel__body {
+	font-size: 0.875rem;
+	line-height: 1.65;
+	color: var(--text-muted);
 }
 
 /* Site quick rail drawer styling fixes */

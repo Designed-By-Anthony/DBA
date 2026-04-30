@@ -21,8 +21,11 @@ export type SendTransactionalEmailInput = {
 	replyTo?: string;
 };
 
+const DEFAULT_REPLY_TO = "hello@designedbyanthony.com";
+
 /**
  * Sends one email via Resend. Caller must handle errors (this throws on failure).
+ * Automatically adds Reply-To, List-Unsubscribe, and a plain-text fallback.
  */
 export async function sendTransactionalEmail(
 	input: SendTransactionalEmailInput,
@@ -34,15 +37,29 @@ export async function sendTransactionalEmail(
 
 	const to = Array.isArray(input.to) ? input.to : [input.to];
 	const from = getTransactionalFromEmail();
+	const replyTo = input.replyTo || DEFAULT_REPLY_TO;
 
 	const body: Record<string, unknown> = {
 		from,
 		to,
 		subject: input.subject,
 		html: input.html,
+		reply_to: replyTo,
+		headers: {
+			"List-Unsubscribe": `<mailto:${DEFAULT_REPLY_TO}?subject=Unsubscribe>`,
+			"List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+		},
 	};
-	if (input.text) body.text = input.text;
-	if (input.replyTo) body.reply_to = input.replyTo;
+	if (input.text) {
+		body.text = input.text;
+	} else {
+		body.text = input.html
+			.replace(/<br\s*\/?>/gi, "\n")
+			.replace(/<[^>]+>/g, "")
+			.replace(/&nbsp;/g, " ")
+			.replace(/&amp;/g, "&")
+			.trim();
+	}
 
 	const res = await fetch(RESEND_API, {
 		method: "POST",
