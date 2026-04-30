@@ -1,10 +1,8 @@
 /**
  * Micro-SaaS product catalog for the /tools store page.
  *
- * Stripe Payment Links are created separately in the Stripe dashboard
- * (by Viktor) and referenced here by URL. When Viktor delivers the
- * final payment-link table, drop each URL into the matching tier's
- * `monthlyLink` / `annualLink` field.
+ * Stripe Payment Links are live — each tier references its checkout URL
+ * from the STRIPE_LINKS map below.
  */
 
 export type ProductTier = {
@@ -27,7 +25,93 @@ export type Product = {
 	tiers: readonly ProductTier[];
 };
 
-const PLACEHOLDER_LINK = "#";
+/* ── Stripe Payment Links (live — created by Viktor, wired 2026-04-30) ── */
+const STRIPE_LINKS = {
+	sitescan: {
+		starter: {
+			monthly: "https://buy.stripe.com/14A4gz4lOg8y5bx0uP7ss00",
+			annual: "https://buy.stripe.com/9B600j8C4f4ucDZgtN7ss01",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/6oU6oH7y03lM0Vha5p7ss02",
+			annual: "https://buy.stripe.com/eVqdR9cSk1dE1Zla5p7ss03",
+		},
+		agency: {
+			monthly: "https://buy.stripe.com/14AeVd7y0f4u0Vh1yT7ss04",
+			annual: "https://buy.stripe.com/dRmfZh8C4g8yavR5P97ss05",
+		},
+	},
+	reviewpilot: {
+		starter: {
+			monthly: "https://buy.stripe.com/5kQaEXcSk09A33p3H17ss06",
+			annual: "https://buy.stripe.com/8x23cv7y0f4ueM7b9t7ss07",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/9B67sL8C4cWmfQb4L57ss08",
+			annual: "https://buy.stripe.com/6oU5kD8C44pQcDZelF7ss09",
+		},
+		business: {
+			monthly: "https://buy.stripe.com/4gM3cvf0s5tU6fB91l7ss0b",
+			annual: "https://buy.stripe.com/6oU7sL2dG09A47t6Td7ss0a",
+		},
+	},
+	clienthub: {
+		solo: {
+			monthly: "https://buy.stripe.com/00w4gz2dGbSi7jFa5p7ss0c",
+			annual: "https://buy.stripe.com/cNi4gz2dGg8yfQb7Xh7ss0d",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/bJe14n05y7C2bzV5P97ss0e",
+			annual: "https://buy.stripe.com/aFa9ATcSke0q7jF7Xh7ss0f",
+		},
+		business: {
+			monthly: "https://buy.stripe.com/3cI28r19C9Ka33p0uP7ss0g",
+			annual: "https://buy.stripe.com/00w3cvbOg1dEgUf7Xh7ss0h",
+		},
+	},
+	localrank: {
+		starter: {
+			monthly: "https://buy.stripe.com/aFa14ng4w8G61Zl7Xh7ss0i",
+			annual: "https://buy.stripe.com/7sY4gz5pS2hI9rNelF7ss0j",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/dRm28r3hK8G647ta5p7ss0k",
+			annual: "https://buy.stripe.com/3cI4gz7y009A6fB4L57ss0l",
+		},
+		business: {
+			monthly: "https://buy.stripe.com/14A14n8C44pQ1Zl1yT7ss0m",
+			annual: "https://buy.stripe.com/28EfZhaKc9KabzV6Td7ss0n",
+		},
+	},
+	testiflow: {
+		starter: {
+			monthly: "https://buy.stripe.com/9B614n19C5tU6fB0uP7ss0o",
+			annual: "https://buy.stripe.com/00w9AT2dG6xY33pb9t7ss0p",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/3cI5kD8C46xY7jF2CX7ss0r",
+			annual: "https://buy.stripe.com/14A9ATdWog8y0Vh5P97ss0q",
+		},
+		business: {
+			monthly: "https://buy.stripe.com/5kQ6oHg4wf4u33pelF7ss0s",
+			annual: "https://buy.stripe.com/7sYbJ1cSkf4u7jF1yT7ss0t",
+		},
+	},
+	contentmill: {
+		starter: {
+			monthly: "https://buy.stripe.com/14A5kD7y0aOe5bxfpJ7ss0u",
+			annual: "https://buy.stripe.com/00wbJ119CaOe33p5P97ss0v",
+		},
+		pro: {
+			monthly: "https://buy.stripe.com/eVq14ndWof4u0Vh5P97ss0w",
+			annual: "https://buy.stripe.com/4gM9AT6tW4pQbzV1yT7ss0x",
+		},
+		business: {
+			monthly: "https://buy.stripe.com/28E28r3hK2hI47t4L57ss0y",
+			annual: "https://buy.stripe.com/9B67sLg4w09A33pgtN7ss0z",
+		},
+	},
+} as const;
 
 export const TOOLS_PRODUCTS: readonly Product[] = [
 	{
@@ -49,8 +133,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Performance score tracking",
 					"Core Web Vitals history",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.sitescan.starter.monthly,
+				annualLink: STRIPE_LINKS.sitescan.starter.annual,
 			},
 			{
 				name: "Pro",
@@ -64,8 +148,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"SEO recommendations engine",
 					"Everything in Starter",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.sitescan.pro.monthly,
+				annualLink: STRIPE_LINKS.sitescan.pro.annual,
 			},
 			{
 				name: "Agency",
@@ -78,8 +162,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"API access",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.sitescan.agency.monthly,
+				annualLink: STRIPE_LINKS.sitescan.agency.annual,
 			},
 		],
 	},
@@ -102,8 +186,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Tone & brand voice tuning",
 					"One-click publish",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.reviewpilot.starter.monthly,
+				annualLink: STRIPE_LINKS.reviewpilot.starter.annual,
 			},
 			{
 				name: "Pro",
@@ -117,8 +201,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Weekly digest emails",
 					"Everything in Starter",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.reviewpilot.pro.monthly,
+				annualLink: STRIPE_LINKS.reviewpilot.pro.annual,
 			},
 			{
 				name: "Business",
@@ -131,8 +215,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"CRM integration",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.reviewpilot.business.monthly,
+				annualLink: STRIPE_LINKS.reviewpilot.business.annual,
 			},
 		],
 	},
@@ -155,8 +239,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Project status board",
 					"Up to 10 clients",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.clienthub.solo.monthly,
+				annualLink: STRIPE_LINKS.clienthub.solo.annual,
 			},
 			{
 				name: "Pro",
@@ -170,8 +254,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Custom branding",
 					"Everything in Solo",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.clienthub.pro.monthly,
+				annualLink: STRIPE_LINKS.clienthub.pro.annual,
 			},
 			{
 				name: "Business",
@@ -184,8 +268,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Priority support",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.clienthub.business.monthly,
+				annualLink: STRIPE_LINKS.clienthub.business.annual,
 			},
 		],
 	},
@@ -208,8 +292,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"GBP metrics dashboard",
 					"Monthly snapshot emails",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.localrank.starter.monthly,
+				annualLink: STRIPE_LINKS.localrank.starter.annual,
 			},
 			{
 				name: "Pro",
@@ -223,8 +307,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Citation monitoring",
 					"Everything in Starter",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.localrank.pro.monthly,
+				annualLink: STRIPE_LINKS.localrank.pro.annual,
 			},
 			{
 				name: "Business",
@@ -237,8 +321,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"API access",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.localrank.business.monthly,
+				annualLink: STRIPE_LINKS.localrank.business.annual,
 			},
 		],
 	},
@@ -261,8 +345,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Up to 25 testimonials",
 					"Email collection flow",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.testiflow.starter.monthly,
+				annualLink: STRIPE_LINKS.testiflow.starter.annual,
 			},
 			{
 				name: "Pro",
@@ -276,8 +360,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Custom branding",
 					"Everything in Starter",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.testiflow.pro.monthly,
+				annualLink: STRIPE_LINKS.testiflow.pro.annual,
 			},
 			{
 				name: "Business",
@@ -290,8 +374,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Priority support",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.testiflow.business.monthly,
+				annualLink: STRIPE_LINKS.testiflow.business.annual,
 			},
 		],
 	},
@@ -314,8 +398,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"3 social platforms",
 					"Content calendar view",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.contentmill.starter.monthly,
+				annualLink: STRIPE_LINKS.contentmill.starter.annual,
 			},
 			{
 				name: "Pro",
@@ -329,8 +413,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Smart scheduling",
 					"Everything in Starter",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.contentmill.pro.monthly,
+				annualLink: STRIPE_LINKS.contentmill.pro.annual,
 			},
 			{
 				name: "Business",
@@ -343,8 +427,8 @@ export const TOOLS_PRODUCTS: readonly Product[] = [
 					"Analytics dashboard",
 					"Everything in Pro",
 				],
-				monthlyLink: PLACEHOLDER_LINK,
-				annualLink: PLACEHOLDER_LINK,
+				monthlyLink: STRIPE_LINKS.contentmill.business.monthly,
+				annualLink: STRIPE_LINKS.contentmill.business.annual,
 			},
 		],
 	},
