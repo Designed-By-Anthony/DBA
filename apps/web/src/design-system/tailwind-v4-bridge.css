@@ -92,3 +92,88 @@
 		cursor: pointer;
 	}
 }
+
+/*
+ * Global keyframes referenced by inline Tailwind `animate-[...]` arbitrary
+ * values. These survive Phase 5 because they are not "layout rules" — they
+ * are reusable motion primitives that the design system depends on.
+ */
+@keyframes reach-out-dialog-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, calc(-50% + 20px)) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
+@keyframes reach-out-dialog-in-fade {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -50%);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%);
+	}
+}
+
+@keyframes layout-calendly-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes founding-ambient {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.72;
+	}
+}
+
+@keyframes founding-shimmer {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	50% {
+		transform: translateX(-50%);
+	}
+}
+
+@keyframes founding-stat-pop {
+	0%,
+	88%,
+	100% {
+		transform: scale(1);
+	}
+	90% {
+		transform: scale(1.04);
+	}
+	94% {
+		transform: scale(1);
+	}
+}
+
+@keyframes dba-bronze-glow-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.65),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+	50% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.88),
+			0 0 32px 6px rgba(212, 175, 55, 0.22),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+}
