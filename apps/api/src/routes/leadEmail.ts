@@ -1,3 +1,4 @@
+import { isGmailConfigured, sendViaGmail } from "@lh/lib/gmail";
 import { getClientAddress } from "@lh/lib/http";
 import {
 	getRecaptchaEnterpriseConfigStatus,
@@ -130,10 +131,11 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 
 		const leadWebhookUrl = process.env.LEAD_WEBHOOK_URL?.trim();
 		const resendApiKey = process.env.RESEND_API_KEY;
+		const gmailReady = isGmailConfigured();
 
-		if (!leadWebhookUrl && !resendApiKey) {
+		if (!leadWebhookUrl && !gmailReady && !resendApiKey) {
 			console.error(
-				"[lead-email] Neither LEAD_WEBHOOK_URL nor RESEND_API_KEY is configured; rejecting lead",
+				"[lead-email] No lead transport configured (LEAD_WEBHOOK_URL, GMAIL_SERVICE_ACCOUNT_KEY, RESEND_API_KEY all missing); rejecting lead",
 			);
 			set.status = 503;
 			return {
@@ -184,17 +186,61 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			}
 		}
 
-		if (!resendApiKey) {
+		if (!gmailReady && !resendApiKey) {
 			return { ok: true };
+		}
+
+		const toEmail =
+			process.env.LEAD_EMAIL_TO?.trim() || "anthony@designedbyanthony.com";
+
+		const { text, html } = renderEmail(lead);
+		const subject = `New lead · ${lead.name} · ${lead.leadSource || lead.offerType || "designedbyanthony.com"}`;
+
+		// Prefer Gmail (Workspace domain-wide delegation, no third-party
+		// rate limits, no extra MTA) and fall back to Resend only if Gmail
+		// is unavailable or fails. The webhook ingest above already saved
+		// the lead, so a notification failure here is non-fatal when
+		// `leadWebhookUrl` succeeded.
+		if (gmailReady) {
+			try {
+				await sendViaGmail(toEmail, subject, html, {
+					replyTo: lead.email,
+					// Notification already lands in Anthony's mailbox; a
+					// self-BCC would just duplicate it.
+					bcc: null,
+				});
+				return { ok: true };
+			} catch (err) {
+				console.error(
+					"[lead-email] Gmail API send failed",
+					err instanceof Error ? err.message : err,
+				);
+				if (!resendApiKey) {
+					if (leadWebhookUrl) {
+						return { ok: true, emailDelivered: false };
+					}
+					set.status = 502;
+					return {
+						errors: [
+							{
+								message:
+									"Could not send your request right now. Please try again later.",
+							},
+						],
+					};
+				}
+				// Fall through to Resend below.
+			}
+		}
+
+		if (!resendApiKey) {
+			// Either Gmail succeeded (already returned above) or there
+			// is no fallback to attempt; the webhook persisted the lead.
+			return { ok: true, emailDelivered: false };
 		}
 
 		const fromEmail =
 			process.env.RESEND_FROM_EMAIL?.trim() || "outreach@designedbyanthony.com";
-		const toEmail =
-			process.env.LEAD_EMAIL_TO || "anthony@designedbyanthony.com";
-
-		const { text, html } = renderEmail(lead);
-		const subject = `New lead · ${lead.name} · ${lead.leadSource || lead.offerType || "designedbyanthony.com"}`;
 
 		try {
 			const resendRes = await fetch("https://api.resend.com/emails", {
