@@ -673,7 +673,7 @@ export function AuditResults({
 					className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[rgb(var(--accent-bronze-rgb)/0.18)] blur-3xl"
 					aria-hidden
 				/>
-				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-(--accent-bronze-muted)">
+				<p className="relative mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[rgba(186,211,253,0.82)]">
 					Next step
 				</p>
 				<h3 className="relative mb-3 font-display text-xl font-bold tracking-tight text-white md:text-2xl">
