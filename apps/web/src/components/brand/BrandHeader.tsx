@@ -57,7 +57,7 @@ export function BrandHeader({
 					>
 						<Image
 							src={SITE_BRAND.assets.mark}
-							alt=""
+							alt="Designed by Anthony logo"
 							width={36}
 							height={27}
 							className="dba-brand-mark"

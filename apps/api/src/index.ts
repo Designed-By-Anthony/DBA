@@ -1,4 +1,5 @@
 import { cors } from "@elysiajs/cors";
+import { setReportKV } from "@lh/lib/report-store";
 import { Elysia } from "elysia";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
 import { isTrustedMarketingBrowserOrigin } from "@/lib/marketingBrowserOrigins";
@@ -10,6 +11,17 @@ import { reportEmailRoute } from "./routes/reportEmail";
 import { testEmailsRoute } from "./routes/testEmails";
 
 const app = new Elysia({ adapter: CloudflareAdapter })
+	.onRequest(({ request }) => {
+		const env = (
+			request as unknown as { cf?: { env?: Record<string, unknown> } }
+		).cf?.env;
+		const kvBinding =
+			(globalThis as unknown as Record<string, unknown>).AUDIT_REPORTS_KV ??
+			env?.AUDIT_REPORTS_KV;
+		if (kvBinding) {
+			setReportKV(kvBinding as Parameters<typeof setReportKV>[0]);
+		}
+	})
 	.use(
 		cors({
 			origin: (request) =>

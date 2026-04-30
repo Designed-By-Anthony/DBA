@@ -160,11 +160,6 @@ export function AuditResults({
 	return (
 		<MotionDiv
 			className="lh-report-output w-full"
-			style={{
-				display: "flex",
-				flexDirection: "column",
-				gap: "var(--space-section)",
-			}}
 			initial={prefersReduced ? false : { opacity: 0, y: 24 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -270,7 +265,7 @@ export function AuditResults({
 
 			{emailStatus === "error" && emailErr ? (
 				<p
-					className="print:hidden mb-6 rounded-lg border border-rose-500/28 bg-rose-950/38 px-4 py-3 text-center text-sm text-rose-100"
+					className="print:hidden rounded-lg border border-rose-500/28 bg-rose-950/38 px-4 py-3 text-center text-sm text-rose-100"
 					role="alert"
 				>
 					{emailErr}
@@ -278,12 +273,11 @@ export function AuditResults({
 			) : null}
 
 			{/* ── Score grid — all 6 in a unified 3-column grid ── */}
-			<div>
+			<div className="mb-3">
 				<p className="lh-section-label text-center">How your site scored</p>
 			</div>
 			<MotionDiv
-				className="grid grid-cols-3"
-				style={{ gap: "var(--space-block)" }}
+				className="grid grid-cols-3 gap-[var(--space-block)] md:gap-[var(--space-block)]"
 				variants={{
 					hidden: {},
 					show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
@@ -321,7 +315,7 @@ export function AuditResults({
 			{/* ── Executive summary ── */}
 			{data.aiInsight?.executiveSummary ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
+					className="lighthouse-result-panel lh-panel--sky"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-60px" }}
@@ -336,7 +330,7 @@ export function AuditResults({
 			{/* ── Priority actions ── */}
 			{actions.length > 0 ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--amber lh-panel-padded"
+					className="lighthouse-result-panel lh-panel--amber"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-60px" }}
@@ -376,14 +370,14 @@ export function AuditResults({
 			{(data.aiInsight?.strengths?.length ?? 0) > 0 ||
 			(data.aiInsight?.weaknesses?.length ?? 0) > 0 ? (
 				<MotionDiv
-					className="mb-6 grid gap-4 sm:grid-cols-2"
+					className="grid gap-[var(--space-element)] sm:grid-cols-2"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-40px" }}
 					transition={{ duration: 0.48 }}
 				>
 					{(data.aiInsight?.strengths?.length ?? 0) > 0 ? (
-						<div className="lighthouse-result-panel lh-panel--emerald p-5 md:p-6">
+						<div className="lighthouse-result-panel lh-panel--emerald">
 							<p className="lighthouse-result-eyebrow">What&apos;s working</p>
 							<h3 className="lighthouse-result-heading text-lg">Strengths</h3>
 							<ul className="space-y-2">
@@ -405,7 +399,7 @@ export function AuditResults({
 						</div>
 					) : null}
 					{(data.aiInsight?.weaknesses?.length ?? 0) > 0 ? (
-						<div className="lighthouse-result-panel lh-panel--amber p-5 md:p-6">
+						<div className="lighthouse-result-panel lh-panel--amber">
 							<p className="lighthouse-result-eyebrow">What needs work</p>
 							<h3 className="lighthouse-result-heading text-lg">Gaps found</h3>
 							<ul className="space-y-2">
@@ -433,7 +427,7 @@ export function AuditResults({
 			{places?.found &&
 			(places.rating != null || places.userRatingCount > 0) ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet mb-6 p-5 md:p-6"
+					className="lighthouse-result-panel lh-panel--violet"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-40px" }}
@@ -456,7 +450,7 @@ export function AuditResults({
 			{/* ── Notable issue ── */}
 			{diag?.criticalIssue ? (
 				<MotionDiv
-					className="mb-6 rounded-xl border border-amber-500/32 bg-amber-950/22 p-4 text-[13px] text-white/86"
+					className="rounded-xl border border-amber-500/32 bg-amber-950/22 p-[var(--card-pad)] text-[13px] text-white/86"
 					initial={prefersReduced ? false : { opacity: 0, x: -8 }}
 					whileInView={{ opacity: 1, x: 0 }}
 					viewport={{ once: true }}
@@ -472,7 +466,7 @@ export function AuditResults({
 			{/* ── Authority & backlinks ── */}
 			{moz?.found ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
+					className="lighthouse-result-panel lh-panel--sky"
 					initial={prefersReduced ? false : { opacity: 0, y: 18 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: "-50px" }}
@@ -526,7 +520,7 @@ export function AuditResults({
 			{/* ── Index coverage ── */}
 			{index?.found && index.estimatedIndexedPages != null ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--emerald mb-6 p-5 md:p-6"
+					className="lighthouse-result-panel lh-panel--emerald"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -544,7 +538,7 @@ export function AuditResults({
 			{/* ── Copywriting analysis ── */}
 			{data.aiInsight?.copywritingAnalysis ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet lh-panel-padded"
+					className="lighthouse-result-panel lh-panel--violet"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -559,7 +553,7 @@ export function AuditResults({
 			{/* ── Site crawl signals ── */}
 			{sitewide ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--sky mb-6 p-5 md:p-6 text-[13px]"
+					className="lighthouse-result-panel lh-panel--sky text-[13px]"
 					initial={prefersReduced ? false : { opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -569,7 +563,7 @@ export function AuditResults({
 					<h3 className="lighthouse-result-heading text-lg">
 						Site crawl signals
 					</h3>
-					<ul className="space-y-0 lighthouse-result-body divide-y divide-white/5">
+					<ul className="lighthouse-result-body divide-y divide-white/5 [&>li]:py-[var(--space-element)]">
 						<li className="flex flex-wrap gap-x-2 py-2.5">
 							<span className="font-semibold text-sky-200/82">robots.txt</span>
 							<span className="lighthouse-result-muted">
@@ -608,7 +602,7 @@ export function AuditResults({
 			{/* ── Competitive snapshot ── */}
 			{data.competitors && data.competitors.length > 0 ? (
 				<MotionDiv
-					className="lighthouse-result-panel lh-panel--violet lh-panel-padded"
+					className="lighthouse-result-panel lh-panel--violet"
 					initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
@@ -635,7 +629,7 @@ export function AuditResults({
 
 			{/* ── Lab vitals ── */}
 			<MotionDiv
-				className="lighthouse-result-panel lh-panel--sky lh-panel-padded"
+				className="lighthouse-result-panel lh-panel--sky"
 				initial={prefersReduced ? false : { opacity: 0, y: 16 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true }}
@@ -669,8 +663,7 @@ export function AuditResults({
 			{/* Phase-3 #5: standalone, high-contrast bronze CTA so the contact
 			    action no longer blends into the surrounding card text. */}
 			<MotionDiv
-				className="lh-report-cta print:hidden relative overflow-hidden rounded-[1.25rem]"
-				style={{ padding: "var(--card-pad-lg)" }}
+				className="lh-report-cta print:hidden relative overflow-hidden rounded-[var(--radius-card)] p-[var(--card-pad-lg)]"
 				initial={prefersReduced ? false : { opacity: 0, y: 20 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true }}
@@ -696,7 +689,7 @@ export function AuditResults({
 						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 						target="_blank"
 						rel="noopener"
-						className="btn btn-primary-book hero-cta-glow"
+						className="btn btn-primary-book inline-flex items-center justify-center rounded-xl px-8 py-3.5 text-[15px] font-bold tracking-tight"
 					>
 						Book a 15-minute call →
 					</a>

@@ -3,7 +3,7 @@
 @import "../../styles/theme.css";
 @import "tailwindcss";
 
-/* Tailwind v4 @theme directive - valid for v4 syntax */
+/* Tailwind v4 @theme directive — bridge canonical tokens from theme.css */
 @theme {
 	--font-sans: var(--font-main);
 	--font-display: var(--font-display);
@@ -92,7 +92,7 @@
 				rgba(59, 130, 246, 0.04),
 				transparent 45%
 			),
-			/* Base: exact --bg-ink → --bg-dark from theme.css */
+			/* Base: canonical --bg-ink → --bg-dark */
 			linear-gradient(180deg, var(--bg-ink) 0%, var(--bg-dark) 100%);
 	padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
 }
@@ -141,7 +141,18 @@
 .lighthouse-main-inner {
 	display: flex;
 	flex-direction: column;
-	gap: clamp(1.75rem, 4vw, 2.75rem);
+	gap: var(--space-section);
+}
+
+/* Audit results output — spacing between major result blocks */
+.lh-report-output {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-block);
+}
+
+.lh-report-output > * {
+	margin-bottom: 0;
 }
 
 /*
@@ -156,12 +167,10 @@
 	--lh-tile-radius: 1.15rem;
 }
 
-/* ─── Global card/panel/tile padding (P1-D) ───
- * Every "bubble" container must use at least --card-pad so text never
- * clips corners on border-radius: var(--radius-card). */
-[class*="card"],
-[class*="panel"],
-[class*="tile"] {
+/* Global card/panel/tile padding floor (P1D) — text must never clip corners */
+.lighthouse-segment [class*="card"],
+.lighthouse-segment [class*="panel"],
+.lighthouse-segment [class*="tile"] {
 	padding: var(--card-pad);
 }
 
@@ -353,7 +362,7 @@
 .lighthouse-result-panel {
 	position: relative;
 	overflow: hidden;
-	border-radius: 1.25rem;
+	border-radius: var(--radius-card);
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.12);
 	background: linear-gradient(
 		160deg,
@@ -368,7 +377,7 @@
 		transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
 		box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
 		border-color 0.3s ease;
-	padding-left: 1.75rem;
+	padding: var(--card-pad) var(--card-pad) var(--card-pad) var(--card-pad-lg);
 }
 
 .lighthouse-result-panel:hover {
@@ -683,7 +692,7 @@
 	font-weight: 800;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.38);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-report-url {
@@ -842,7 +851,7 @@
 	font-weight: 600;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.45);
+	color: rgba(247, 244, 238, 0.58);
 	margin-bottom: 0.45rem;
 }
 
@@ -881,7 +890,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45rem;
-	color: rgba(247, 244, 238, 0.4);
+	color: rgba(247, 244, 238, 0.58);
 	transition: color 0.25s ease;
 }
 
@@ -929,29 +938,47 @@
 	}
 }
 
-/* ─── Fact carousel (horizontal track) ─── */
-.lh-fact-carousel {
-	display: flex;
-	flex-direction: column;
-	gap: 0.9rem;
-	align-items: center;
+/* ─── Phase progress bar (sits above carousel) ─── */
+.lh-scan-phase-bar {
+	padding: var(--lh-tile-padding);
 }
 
-.lh-fact-carousel__viewport {
-	width: 100%;
+.lh-scan-phase-bar__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.lh-scan-phase-bar__left {
+	min-width: 0;
+}
+
+.lh-scan-phase-bar__pct {
+	flex-shrink: 0;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--accent-bronze-light);
+	letter-spacing: -0.02em;
+}
+
+/* ─── Horizontal fact carousel ─── */
+.lh-carousel-viewport {
 	overflow: hidden;
 	border-radius: var(--lh-tile-radius);
 }
 
-.lh-fact-carousel__track {
+.lh-carousel-track {
 	display: flex;
 	gap: var(--space-element);
 }
 
-.lh-fact-carousel__tile {
-	min-width: 100%;
+.lh-carousel-tile {
+	min-width: clamp(200px, 28vw, 320px);
 	flex-shrink: 0;
-	padding: var(--card-pad);
+	padding: var(--lh-tile-padding);
 	border-radius: var(--lh-tile-radius);
 	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.2);
 	background: linear-gradient(
@@ -959,18 +986,21 @@
 		rgba(22, 17, 12, 0.96) 0%,
 		rgba(12, 10, 8, 0.94) 100%
 	);
-	min-height: 10.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	opacity: 0.5;
+	transition: opacity 0.4s ease;
 }
 
-@media (min-width: 640px) {
-	.lh-fact-carousel__track {
-		gap: var(--space-element);
-	}
-	.lh-fact-carousel__tile {
-		min-width: clamp(200px, 28vw, 320px);
+.lh-carousel-tile--active {
+	opacity: 1;
+	border-color: rgb(var(--accent-bronze-rgb) / 0.38);
+}
+
+@media (max-width: 639px) {
+	.lh-carousel-tile {
+		min-width: 100%;
 	}
 }
 
@@ -1455,7 +1485,7 @@
 	gap: 0.75rem;
 	padding-top: 1.25rem;
 	font-size: 0.72rem;
-	color: rgba(247, 244, 238, 0.42);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-footer-bottom a {
@@ -1469,7 +1499,7 @@
 }
 
 .lh-footer-sep {
-	color: rgba(247, 244, 238, 0.25);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-footer-copy {
@@ -1701,7 +1731,7 @@
 	font-weight: 700;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: rgba(148, 163, 184, 0.55);
+	color: rgba(148, 163, 184, 0.65);
 	margin-bottom: 0.7rem;
 	padding-bottom: 0.5rem;
 	border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
@@ -2047,7 +2077,7 @@
 	font-weight: 800;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: rgba(247, 244, 238, 0.38);
+	color: rgba(247, 244, 238, 0.58);
 }
 
 .lh-diagnostic-title {
@@ -2265,7 +2295,7 @@
 }
 
 .lh-legend {
-	color: rgba(247, 244, 238, 0.46);
+	color: rgba(247, 244, 238, 0.58);
 	border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 

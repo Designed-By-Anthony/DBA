@@ -16,10 +16,9 @@ declare global {
 }
 
 /**
- * Crisp chat — sole canonical chat widget. Gated behind
- * `window.__dbaAnalyticsEnabled` (cookie consent). Once enabled,
- * defers the actual script load until first interaction or 6 s
- * fallback so it never costs LCP.
+ * Crisp chat — sole canonical chat widget. Gated behind cookie consent.
+ * Once enabled, defers the actual script load until first interaction
+ * or 6 s fallback so it never costs LCP.
  */
 export function CrispBootstrap() {
 	useEffect(() => {
@@ -29,9 +28,17 @@ export function CrispBootstrap() {
 		const websiteId =
 			process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID?.trim() || DEFAULT_WEBSITE_ID;
 
+		const hasCookieConsent = () => {
+			try {
+				return document.cookie.includes("dba_cookie_consent=accepted");
+			} catch {
+				return true;
+			}
+		};
+
 		const load = () => {
 			if (window.__dbaCrispLoaded) return;
-			if (!window.__dbaAnalyticsEnabled) return;
+			if (!hasCookieConsent()) return;
 			window.__dbaCrispLoaded = true;
 			window.$crisp = window.$crisp ?? [];
 			window.CRISP_RUNTIME_CONFIG = {
