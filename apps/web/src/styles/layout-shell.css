@@ -506,7 +506,7 @@
 		display: block;
 		visibility: hidden;
 		position: fixed;
-		left: 0.5rem;
+		left: 0;
 		top: 11rem;
 		right: auto;
 		bottom: auto;
