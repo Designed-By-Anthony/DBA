@@ -76,7 +76,7 @@ async function executeRecaptchaEnterprise(
  *   2. `NEXT_PUBLIC_LEAD_WEBHOOK_URL` when `action` is missing (build-time).
  *   3. Fallback: `https://admin.vertaflow.io/api/v1/ingest`.
  */
-const FALLBACK_FORM_ENDPOINT = "https://admin.vertaflow.io/api/v1/ingest";
+const FALLBACK_FORM_ENDPOINT = "https://tremendous-emu-522.convex.site/webhook/lead";
 
 function readDefaultLeadEndpoint(): string {
 	/** `site.js` is esbuild-bundled; read URL from `<html data-lead-webhook>` (set in `layout.tsx`). */
@@ -96,11 +96,12 @@ function readDefaultLeadEndpoint(): string {
 const LEGACY_CRM_HOST = "admin.designedbyanthony.com";
 const CURRENT_CRM_HOST = "admin.vertaflow.io";
 const DBA_API_HOST = "api.designedbyanthony.com";
+const CONVEX_WEBHOOK_HOST = "tremendous-emu-522.convex.site";
 
 function isTrustedConvexWebhook(url: URL): boolean {
 	return (
 		url.protocol === "https:" &&
-		url.hostname.endsWith(".convex.site") &&
+		(url.hostname.endsWith(".convex.site") || url.hostname === CONVEX_WEBHOOK_HOST) &&
 		url.pathname.startsWith("/webhook/")
 	);
 }
@@ -585,8 +586,24 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	await finalizeAuditFormSubmission(form, { type: "none" });
 }
 
+function determineLeadSource(pathname: string): string {
+	if (pathname.startsWith("/services/")) return "service_page";
+	if (pathname === "/services") return "services_index";
+	if (pathname === "/lighthouse" || pathname.startsWith("/lighthouse/"))
+		return "audit_page";
+	if (pathname === "/contact") return "contact_page";
+	if (pathname === "/") return "home_page";
+	if (pathname.startsWith("/blog/")) return "blog_page";
+	if (pathname.startsWith("/portfolio/")) return "portfolio_page";
+	return "other";
+}
+
 function setAuditTrackingFields(form: HTMLFormElement): void {
-	setAuditHiddenField(form, "source_page", window.location.pathname);
+	const pathname = window.location.pathname;
+	const leadSource = determineLeadSource(pathname);
+	
+	setAuditHiddenField(form, "source_page", pathname);
+	setAuditHiddenField(form, "lead_source", leadSource);
 	setAuditHiddenField(form, "page_url", window.location.href);
 	setAuditHiddenField(form, "referrer_url", document.referrer || "direct");
 	setAuditHiddenField(form, "page_title", document.title);

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { homeFaqEntries, processSteps, whyStackCards } from "@/data/home";
+import { FirstVisitSplash } from "./FirstVisitSplash";
 import { showcaseFeaturedItems } from "@/data/showcase";
 import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
@@ -495,6 +496,7 @@ export function HomePage() {
   });
 })();`}
 			</Script>
+			<FirstVisitSplash />
 		</>
 	);
 }
