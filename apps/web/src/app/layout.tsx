@@ -40,9 +40,19 @@ export const metadata: Metadata = {
 		siteName: "Designed by Anthony",
 		type: "website",
 		locale: "en_US",
+		images: [
+			{
+				url: "/images/og-site-premium.png",
+				width: 2400,
+				height: 1260,
+				alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+				type: "image/png",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
+		images: ["/images/og-site-premium.png"],
 	},
 	icons: {
 		icon: [

@@ -8,28 +8,31 @@ const MAX_W = PAGE_W - MARGIN * 2;
 const BODY_LINE = 6;
 const COL2 = MARGIN + MAX_W / 2 + 4;
 
-/* ── Palette ── */
-const C_BG = [247, 243, 234] as const;
-const C_PANEL = [255, 253, 248] as const;
-const C_SLATE_900 = [23, 16, 8] as const;
-const C_SLATE_700 = [61, 54, 45] as const;
-const C_SLATE_500 = [111, 102, 88] as const;
-const C_SLATE_200 = [232, 220, 198] as const;
-const C_BRONZE = [201, 168, 108] as const;
-const C_BRONZE_DARK = [139, 106, 56] as const;
-const C_BRONZE_LIGHT = [252, 240, 210] as const;
+/* ── Palette ──
+ *
+ * Printer-friendly: white page, near-black body type, and a single
+ * accent (C_BRONZE) used sparingly for hairlines and the cover band.
+ * No solid background fills, no high-saturation tints — earlier
+ * versions used a cream parchment background that drained ink on
+ * desktop and home printers. Score/Vital tiles are now outline-only
+ * (FD borders, no F fill) so the report prints clean on a B&W
+ * laser as well as colour. */
+const C_SLATE_900 = [17, 24, 39] as const;
+const C_SLATE_700 = [55, 65, 81] as const;
+const C_SLATE_500 = [107, 114, 128] as const;
+const C_SLATE_300 = [209, 213, 219] as const;
+const C_SLATE_200 = [229, 231, 235] as const;
+const C_BRONZE = [161, 124, 70] as const;
+const C_BRONZE_DARK = [120, 88, 36] as const;
 const C_AMBER_700 = [180, 83, 9] as const;
-const C_AMBER_50 = [255, 251, 235] as const;
 const C_GREEN_700 = [21, 128, 61] as const;
-const C_GREEN_100 = [220, 252, 231] as const;
 const C_RED_700 = [185, 28, 28] as const;
-const C_RED_100 = [254, 226, 226] as const;
 
 /* ── Utilities ── */
 function addPage(doc: jsPDF): number {
 	doc.addPage();
-	doc.setFillColor(...C_BG);
-	doc.rect(0, 0, PAGE_W, PAGE_H, "F");
+	// White paper. No fill needed (jsPDF defaults to white) — kept as a
+	// no-op so callers don't have to think about page state.
 	return MARGIN;
 }
 
@@ -86,18 +89,19 @@ function divider(doc: jsPDF, y: number): number {
 	return y + 4;
 }
 
-/* ── Score cell ── */
+/* ── Score cell ──
+ *
+ * Outline-only with a thin tinted border that hints at the score band
+ * (good/fair/poor). Numerals stay near-black so the score reads cleanly
+ * even when printed greyscale. */
 function scoreColor(score: number | null): {
-	bg: readonly [number, number, number];
-	fg: readonly [number, number, number];
 	ring: readonly [number, number, number];
+	numeral: readonly [number, number, number];
 } {
-	if (score == null) return { bg: C_BG, fg: C_SLATE_500, ring: C_SLATE_200 };
-	if (score >= 90)
-		return { bg: C_GREEN_100, fg: C_GREEN_700, ring: [134, 239, 172] };
-	if (score >= 50)
-		return { bg: C_AMBER_50, fg: C_AMBER_700, ring: [252, 211, 77] };
-	return { bg: C_RED_100, fg: C_RED_700, ring: [252, 165, 165] };
+	if (score == null) return { ring: C_SLATE_200, numeral: C_SLATE_500 };
+	if (score >= 90) return { ring: [134, 197, 152], numeral: C_GREEN_700 };
+	if (score >= 50) return { ring: [217, 175, 110], numeral: C_AMBER_700 };
+	return { ring: [219, 158, 158], numeral: C_RED_700 };
 }
 
 function scoreBox(
@@ -109,22 +113,21 @@ function scoreBox(
 	score: number | null,
 	label: string,
 ) {
-	const { bg, fg, ring } = scoreColor(score);
-	doc.setFillColor(...bg);
+	const { ring, numeral } = scoreColor(score);
 	doc.setDrawColor(...ring);
-	doc.setLineWidth(0.5);
-	doc.roundedRect(x, y, w, h, 2, 2, "FD");
+	doc.setLineWidth(0.4);
+	doc.roundedRect(x, y, w, h, 2, 2, "S");
 
 	doc.setFont("helvetica", "bold");
 	doc.setFontSize(16);
-	doc.setTextColor(...fg);
-	const scoreStr = score == null ? "—" : String(score);
+	doc.setTextColor(...numeral);
+	const scoreStr = score == null ? "-" : String(score);
 	const sw = doc.getTextWidth(scoreStr);
 	doc.text(scoreStr, x + w / 2 - sw / 2, y + h / 2 + 1);
 
 	doc.setFont("helvetica", "normal");
 	doc.setFontSize(6.5);
-	doc.setTextColor(...fg);
+	doc.setTextColor(...C_SLATE_500);
 	const lw = doc.getTextWidth(label.toUpperCase());
 	doc.text(label.toUpperCase(), x + w / 2 - lw / 2, y + h - 3.5);
 }
@@ -139,33 +142,33 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		keywords: "SEO audit, PageSpeed, Core Web Vitals, Designed by Anthony",
 	});
 
-	// Background
-	doc.setFillColor(...C_BG);
-	doc.rect(0, 0, PAGE_W, PAGE_H, "F");
+	// White paper, no global fill.
 
 	let y = MARGIN;
 
-	/* ── Cover header ── */
-	doc.setFillColor(...C_SLATE_900);
-	doc.roundedRect(MARGIN, y, MAX_W, 32, 2.5, 2.5, "F");
+	/* ── Cover header ──
+	 *
+	 * Inkless masthead: hairline frame, brand eyebrow in bronze, title
+	 * in near-black, single bronze rule underneath. No solid
+	 * dark-on-light slab (the previous deep-charcoal block burned
+	 * through ~6cm² of toner per copy on home printers). */
+	doc.setDrawColor(...C_SLATE_300);
+	doc.setLineWidth(0.4);
+	doc.roundedRect(MARGIN, y, MAX_W, 26, 2.5, 2.5, "S");
 
-	// Accent strip
-	doc.setFillColor(...C_BRONZE);
-	doc.rect(MARGIN, y + 30, MAX_W, 2, "F");
-
-	// Brand
-	doc.setTextColor(...C_BRONZE_LIGHT);
+	// Brand eyebrow
+	doc.setTextColor(...C_BRONZE);
 	doc.setFontSize(7.5);
 	doc.setFont("helvetica", "bold");
 	doc.text("DESIGNED BY ANTHONY  ·  EXECUTIVE AUDIT REPORT", MARGIN + 5, y + 7);
 
 	// Report title
-	doc.setTextColor(255, 255, 255);
+	doc.setTextColor(...C_SLATE_900);
 	doc.setFontSize(17);
 	doc.setFont("helvetica", "bold");
-	doc.text("Website Audit Report", MARGIN + 5, y + 18);
+	doc.text("Website Audit Report", MARGIN + 5, y + 17);
 
-	// Date (right-aligned)
+	// Date (right-aligned in eyebrow row)
 	const dateStr = new Date().toLocaleDateString("en-US", {
 		month: "short",
 		day: "numeric",
@@ -173,11 +176,16 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 	});
 	doc.setFontSize(8);
 	doc.setFont("helvetica", "normal");
-	doc.setTextColor(...C_BRONZE_LIGHT);
+	doc.setTextColor(...C_SLATE_500);
 	const dw = doc.getTextWidth(dateStr);
 	doc.text(dateStr, MARGIN + MAX_W - dw - 5, y + 7);
 
-	y += 36;
+	// Bronze rule under masthead
+	doc.setDrawColor(...C_BRONZE);
+	doc.setLineWidth(0.6);
+	doc.line(MARGIN, y + 26, MARGIN + MAX_W, y + 26);
+
+	y += 32;
 
 	/* URL & Report ID */
 	doc.setFontSize(9);
@@ -203,15 +211,18 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 	/* ── Degraded note ── */
 	if (data.psiDegradedReason) {
 		y = ensureSpace(doc, y, 22);
-		doc.setFillColor(...C_AMBER_50);
-		doc.setDrawColor(252, 211, 77);
-		doc.roundedRect(MARGIN, y, MAX_W, 18, 2, 2, "FD");
+		// Outline-only callout: amber border + amber heading. No fill
+		// so it stays printer-friendly.
+		doc.setDrawColor(...C_AMBER_700);
+		doc.setLineWidth(0.4);
+		doc.roundedRect(MARGIN, y, MAX_W, 18, 2, 2, "S");
 		doc.setFont("helvetica", "bold");
 		doc.setFontSize(8.5);
 		doc.setTextColor(...C_AMBER_700);
 		doc.text("Partial report.", MARGIN + 3.5, y + 6.5);
 		doc.setFont("helvetica", "normal");
 		doc.setFontSize(8);
+		doc.setTextColor(...C_SLATE_700);
 		y = wrapped(
 			doc,
 			data.psiDegradedReason,
@@ -269,14 +280,16 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		for (let i = 0; i < vitals.length; i++) {
 			const [abbr, val] = vitals[i];
 			const bx = MARGIN + i * (vw + 2);
-			doc.setFillColor(...C_PANEL);
-			doc.setDrawColor(...C_SLATE_200);
-			doc.roundedRect(bx, y, vw, 14, 1.5, 1.5, "FD");
+			// Outline-only vital tile.
+			doc.setDrawColor(...C_SLATE_300);
+			doc.setLineWidth(0.3);
+			doc.roundedRect(bx, y, vw, 14, 1.5, 1.5, "S");
 			doc.setFont("helvetica", "bold");
 			doc.setFontSize(9.5);
 			doc.setTextColor(...C_SLATE_900);
-			const vw2 = doc.getTextWidth(String(val || "—"));
-			doc.text(String(val || "—"), bx + vw / 2 - vw2 / 2, y + 7.5);
+			const valStr = String(val || "-");
+			const vw2 = doc.getTextWidth(valStr);
+			doc.text(valStr, bx + vw / 2 - vw2 / 2, y + 7.5);
 			doc.setFont("helvetica", "normal");
 			doc.setFontSize(6.5);
 			doc.setTextColor(...C_SLATE_500);
@@ -340,7 +353,13 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		y += 4;
 	}
 
-	/* ── Strengths & weaknesses ── */
+	/* ── Strengths & weaknesses ──
+	 *
+	 * jsPDF's built-in helvetica font is WinAnsi/CP1252 only, so the
+	 * older glyphs U+2714 (✔) and U+2192 (→) rendered as garbled
+	 * substitutes (`'` and `!'`) in the previous PDF. Keep bullet
+	 * markers strictly inside the WinAnsi range — `+` for strengths
+	 * and an em-dash for gaps. */
 	const strengths = data.aiInsight?.strengths ?? [];
 	const weaknesses = data.aiInsight?.weaknesses ?? [];
 	if (strengths.length > 0 || weaknesses.length > 0) {
@@ -350,14 +369,14 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 			doc.setFont("helvetica", "bold");
 			doc.setFontSize(8.5);
 			doc.setTextColor(...C_GREEN_700);
-			doc.text("What\u2019s working", MARGIN + 7, y);
+			doc.text("What's working", MARGIN + 7, y);
 			y += 5;
 			doc.setFont("helvetica", "normal");
 			doc.setFontSize(9);
 			doc.setTextColor(...C_SLATE_700);
 			for (const s of strengths) {
 				y = ensureSpace(doc, y, BODY_LINE + 1);
-				y = wrapped(doc, `\u2714  ${s}`, MARGIN + 10, y, MAX_W - 17, BODY_LINE);
+				y = wrapped(doc, `+   ${s}`, MARGIN + 10, y, MAX_W - 17, BODY_LINE);
 				y += 1;
 			}
 			y += 3;
@@ -373,10 +392,45 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 			doc.setTextColor(...C_SLATE_700);
 			for (const w of weaknesses) {
 				y = ensureSpace(doc, y, BODY_LINE + 1);
-				y = wrapped(doc, `\u2192  ${w}`, MARGIN + 10, y, MAX_W - 17, BODY_LINE);
+				y = wrapped(
+					doc,
+					`\u2014   ${w}`,
+					MARGIN + 10,
+					y,
+					MAX_W - 17,
+					BODY_LINE,
+				);
 				y += 1;
 			}
 			y += 4;
+		}
+	}
+
+	/* ── Copywriting analysis ──
+	 *
+	 * Previously omitted from the PDF entirely even though the
+	 * `aiInsight.copywritingAnalysis` field is part of the AuditData
+	 * schema. AI output sometimes wraps prose in <p>...</p>, so strip
+	 * tags + decode the same handful of entities we strip from the
+	 * executive summary. */
+	if (data.aiInsight?.copywritingAnalysis) {
+		const copyText = data.aiInsight.copywritingAnalysis
+			.replace(/<p>/gi, "")
+			.replace(/<\/p>/gi, "\n\n")
+			.replace(/<br\s*\/?>/gi, "\n")
+			.replace(/<[^>]+>/g, "")
+			.replace(/&amp;/gi, "&")
+			.replace(/&lt;/gi, "<")
+			.replace(/&gt;/gi, ">")
+			.replace(/&nbsp;/gi, " ")
+			.trim();
+		if (copyText.length > 0) {
+			y = sectionHeader(doc, y, "Voice & messaging", "Copywriting", C_BRONZE);
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(9.5);
+			doc.setTextColor(...C_SLATE_700);
+			y = wrapped(doc, copyText, MARGIN + 7, y, MAX_W - 7, BODY_LINE + 0.5);
+			y += 6;
 		}
 	}
 
@@ -425,13 +479,14 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		for (let i = 0; i < metrics.length; i++) {
 			const [ml, mv] = metrics[i];
 			const bx = MARGIN + i * (mw + 2);
-			doc.setFillColor(...C_BG);
-			doc.setDrawColor(...C_SLATE_200);
-			doc.roundedRect(bx, y, mw, 14, 1.5, 1.5, "FD");
+			// Outline-only authority tile.
+			doc.setDrawColor(...C_SLATE_300);
+			doc.setLineWidth(0.3);
+			doc.roundedRect(bx, y, mw, 14, 1.5, 1.5, "S");
 			doc.setFont("helvetica", "bold");
 			doc.setFontSize(10);
 			doc.setTextColor(...C_SLATE_900);
-			const vs = String(mv ?? "—");
+			const vs = String(mv ?? "-");
 			const vw3 = doc.getTextWidth(vs);
 			doc.text(vs, bx + mw / 2 - vw3 / 2, y + 7.5);
 			doc.setFont("helvetica", "normal");

@@ -13,25 +13,26 @@ import {
 	type SchemaValue,
 } from "@/lib/seo";
 
+// Title trimmed to 56 chars (under Google's ~60 char SERP cap) and
+// description to 152 chars (under the 160 char meta description cap)
+// to fix the audit findings reported in the user-supplied PDF.
+const HOME_TITLE = "Mohawk Valley Web Design & Local SEO | Designed by Anthony";
+const HOME_DESCRIPTION =
+	"Custom websites & local SEO for Mohawk Valley and Central NY service businesses. Built to rank on Google and turn searches into booked work.";
+
 export const metadata: Metadata = {
-	title:
-		"Mohawk Valley Web Design for Service Businesses — Utica, Rome, Syracuse | Designed by Anthony",
-	description:
-		"Custom web design for Mohawk Valley and Central NY service businesses. Fast, friendly websites built to rank on Google and turn visitors into booked work — so more of the people searching for your service actually call. Contact us for your free audit.",
+	title: HOME_TITLE,
+	description: HOME_DESCRIPTION,
 	openGraph: {
-		title:
-			"Mohawk Valley Web Design for Service Businesses — Utica, Rome, Syracuse | Designed by Anthony",
-		description:
-			"Custom web design for Mohawk Valley and Central NY service businesses. Fast, friendly websites built to rank on Google and turn visitors into booked work.",
+		title: HOME_TITLE,
+		description: HOME_DESCRIPTION,
 		url: "https://designedbyanthony.com",
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title:
-			"Mohawk Valley Web Design for Service Businesses — Utica, Rome, Syracuse | Designed by Anthony",
-		description:
-			"Custom web design for Mohawk Valley and Central NY service businesses. Fast, friendly websites built to rank on Google and turn visitors into booked work.",
+		title: HOME_TITLE,
+		description: HOME_DESCRIPTION,
 	},
 	alternates: { canonical: "/" },
 };

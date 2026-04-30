@@ -60,6 +60,27 @@ export function clearGmailTestOutbox(): void {
 }
 
 /**
+ * Optional fine-tuning for `sendViaGmail`. All fields are opt-in; defaults
+ * preserve the historical "audit receipt" behaviour (BCC the sender, no
+ * Reply-To override).
+ */
+export interface SendViaGmailOptions {
+	/**
+	 * RFC 5322 Reply-To header. Set this when the email is *to* Anthony but
+	 * he should be able to reply directly to a third party (e.g. lead form
+	 * notifications where the lead is the de-facto reply target).
+	 */
+	replyTo?: string;
+	/**
+	 * Override the BCC. Defaults to GMAIL_SENDER (Anthony's mailbox) so
+	 * outbound mail to clients leaves a paper trail in his inbox. Pass
+	 * `null` to suppress the BCC entirely (e.g. when the recipient already
+	 * is GMAIL_SENDER and a self-BCC would be redundant).
+	 */
+	bcc?: string | null;
+}
+
+/**
  * Sends an HTML email via the Gmail API using domain-wide delegation.
  *
  * Requires GMAIL_SERVICE_ACCOUNT_KEY env var containing the JSON of a service
@@ -71,11 +92,20 @@ export async function sendViaGmail(
 	to: string,
 	subject: string,
 	html: string,
+	options: SendViaGmailOptions = {},
 ): Promise<void> {
 	const recipient = normalizeEmail(to);
 	if (!recipient) {
 		throw new Error("Invalid recipient email address.");
 	}
+
+	const replyTo = options.replyTo ? normalizeEmail(options.replyTo) : null;
+	const bcc =
+		options.bcc === null
+			? null
+			: options.bcc
+				? normalizeEmail(options.bcc)
+				: GMAIL_SENDER;
 
 	if (isGmailTestMode()) {
 		const store = getGmailStore();
@@ -114,16 +144,23 @@ export async function sendViaGmail(
 	// RFC 2047 encode the subject for non-ASCII safety
 	const encodedSubject = `=?UTF-8?B?${Buffer.from(sanitizeHeaderValue(subject)).toString("base64")}?=`;
 
-	const messageParts = [
+	const messageParts: string[] = [
 		`From: Anthony <${GMAIL_SENDER}>`,
 		`To: ${recipient}`,
-		`Bcc: ${GMAIL_SENDER}`,
+	];
+	if (bcc) {
+		messageParts.push(`Bcc: ${bcc}`);
+	}
+	if (replyTo) {
+		messageParts.push(`Reply-To: ${replyTo}`);
+	}
+	messageParts.push(
 		`Subject: ${encodedSubject}`,
 		"MIME-Version: 1.0",
 		'Content-Type: text/html; charset="UTF-8"',
 		"",
 		html,
-	];
+	);
 	const raw = Buffer.from(messageParts.join("\r\n"))
 		.toString("base64")
 		.replace(/\+/g, "-")
