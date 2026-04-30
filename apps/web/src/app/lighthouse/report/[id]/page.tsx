@@ -19,7 +19,27 @@ import { AuditResults } from "@lh/components/AuditResults";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { buildPublicApiUrl } from "@/lib/publicApi";
+
+const LIGHTHOUSE_POWERED_BY = [
+	{ label: "Gemini 2.0", href: "https://deepmind.google/technologies/gemini/" },
+	{ label: "ElysiaJS", href: "https://elysiajs.com" },
+	{ label: "Next.js", href: "https://nextjs.org" },
+] as const;
+
+function LighthouseReportShell({ children }: { children: React.ReactNode }) {
+	return (
+		<MarketingChrome
+			headerCurrentSection="audit"
+			footerBuildTag="Lighthouse Scanner v2"
+			footerPoweredBy={LIGHTHOUSE_POWERED_BY}
+			hidePreFooterCta
+		>
+			{children}
+		</MarketingChrome>
+	);
+}
 
 function isObject(v: unknown): v is Record<string, unknown> {
 	return typeof v === "object" && v !== null && !Array.isArray(v);
@@ -155,50 +175,55 @@ export default function LighthouseReportViewerPage() {
 
 	if (!id) {
 		return (
-			<main className="lh-report-viewer-state">
-				<p>Invalid report link.</p>
-				<Link href="/lighthouse" className="lh-report-viewer-back">
-					Back to scanner
-				</Link>
-			</main>
+			<LighthouseReportShell>
+				<div className="lh-report-viewer-state">
+					<p>Invalid report link.</p>
+					<Link href="/lighthouse" className="lh-report-viewer-back">
+						Back to scanner
+					</Link>
+				</div>
+			</LighthouseReportShell>
 		);
 	}
 
 	if (error) {
 		return (
-			<main className="lh-report-viewer-state">
-				<p className="lh-report-viewer-error">{error}</p>
-				<p className="lh-report-viewer-help">
-					Reports expire after 90 days. If you saved this email link, please
-					request a fresh scan to view the latest version.
-				</p>
-				<Link href="/lighthouse" className="lh-report-viewer-back">
-					Run a new scan
-				</Link>
-			</main>
+			<LighthouseReportShell>
+				<div className="lh-report-viewer-state">
+					<p className="lh-report-viewer-error">{error}</p>
+					<p className="lh-report-viewer-help">
+						Reports expire after 90 days. If you saved this email link, please
+						request a fresh scan to view the latest version.
+					</p>
+					<Link href="/lighthouse" className="lh-report-viewer-back">
+						Run a new scan
+					</Link>
+				</div>
+			</LighthouseReportShell>
 		);
 	}
 
 	if (!data) {
 		return (
-			<main className="lh-report-viewer-state">
-				<p className="lh-report-viewer-loading">Loading your report…</p>
-			</main>
+			<LighthouseReportShell>
+				<div className="lh-report-viewer-state">
+					<p className="lh-report-viewer-loading">Loading your report…</p>
+				</div>
+			</LighthouseReportShell>
 		);
 	}
 
 	return (
-		<main
-			id="main-content"
-			className="lighthouse-main lh-audit-stage w-full px-5 pt-6 pb-16 md:px-8 md:pb-20 lg:pt-10"
-		>
-			<div className="lh-audit-panel mx-auto w-full max-w-5xl">
-				<AuditResults
-					data={data}
-					reportId={id}
-					onReset={() => router.push("/lighthouse")}
-				/>
+		<LighthouseReportShell>
+			<div className="lighthouse-main lh-audit-stage w-full px-5 pt-6 pb-16 md:px-8 md:pb-20 lg:pt-10">
+				<div className="lh-audit-panel mx-auto w-full max-w-5xl">
+					<AuditResults
+						data={data}
+						reportId={id}
+						onReset={() => router.push("/lighthouse")}
+					/>
+				</div>
 			</div>
-		</main>
+		</LighthouseReportShell>
 	);
 }

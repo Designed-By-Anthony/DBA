@@ -1,9 +1,10 @@
 import "@/design-system/dba-global.css";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
+import { FirstVisitSplash } from "@/components/marketing/FirstVisitSplash";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
 export const viewport: Viewport = {
@@ -94,6 +95,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					/>
 				</noscript>
 				{children}
+				{/* Global first-visit splash. Mounted in the root layout so
+				    it fires on the user's very first landing regardless of
+				    entry URL. The `useSearchParams` hook inside the splash
+				    forces the subtree onto the client, so it is wrapped in
+				    a Suspense boundary to keep the surrounding server tree
+				    statically renderable. */}
+				<Suspense fallback={null}>
+					<FirstVisitSplash />
+				</Suspense>
 				<CrispBootstrap />
 			</body>
 		</html>

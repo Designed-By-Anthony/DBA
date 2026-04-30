@@ -1,31 +1,101 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "dba_first_visit_shown_v1";
+/**
+ * Bumped from `_v1` to `_v2` when splash ownership moved from `HomePage`
+ * to the root layout (2026-04). Old v1 flags get ignored so existing
+ * visitors still see the splash once under the new global rules.
+ */
+const STORAGE_KEY = "dba_first_visit_shown_v2";
+
+const MICRO_SAAS_PATH_PREFIXES = ["/tools"] as const;
+const MICRO_SAAS_PARAM_KEYS = [
+	"ref",
+	"source",
+	"utm_source",
+	"utm_campaign",
+	"utm_medium",
+	"utm_content",
+] as const;
+const MICRO_SAAS_PARAM_PATTERN = /micro[-_ ]?saas|microsaas/i;
+
+function isMicroSaasEntry(
+	pathname: string | null,
+	searchParams: URLSearchParams | null,
+): boolean {
+	if (pathname) {
+		for (const prefix of MICRO_SAAS_PATH_PREFIXES) {
+			if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+				return true;
+			}
+		}
+	}
+	if (searchParams) {
+		for (const key of MICRO_SAAS_PARAM_KEYS) {
+			const value = searchParams.get(key);
+			if (value && MICRO_SAAS_PARAM_PATTERN.test(value)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+function safeGetStorage(key: string): string | null {
+	try {
+		return window.localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+}
+
+function safeSetStorage(key: string, value: string): void {
+	try {
+		window.localStorage.setItem(key, value);
+	} catch {
+		// swallow — private-mode / storage-full / disabled cookies
+	}
+}
 
 export function FirstVisitSplash() {
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const [isOpen, setIsOpen] = useState(false);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional — evaluates only the initial landing URL on mount; re-running on client nav would re-fire the splash.
 	useEffect(() => {
-		// Check if already shown
-		const hasShown = localStorage.getItem(STORAGE_KEY);
-		if (!hasShown) {
-			// Show after short delay for better UX
-			const timer = setTimeout(() => setIsOpen(true), 1500);
-			return () => clearTimeout(timer);
+		// Only evaluate once per session (on initial mount). After the first
+		// run we persist a flag so subsequent navigations never re-trigger.
+		if (safeGetStorage(STORAGE_KEY)) {
+			return;
 		}
+
+		// Micro-SaaS entry points (e.g. direct /tools landings, or any URL
+		// tagged with a micro-saas utm/ref param) must NEVER show the splash,
+		// since those visitors are already arriving for that exact offer.
+		if (isMicroSaasEntry(pathname, searchParams)) {
+			safeSetStorage(STORAGE_KEY, "skipped-microsaas");
+			return;
+		}
+
+		const timer = window.setTimeout(() => setIsOpen(true), 1500);
+		return () => window.clearTimeout(timer);
 	}, []);
 
+	const markShown = () => {
+		safeSetStorage(STORAGE_KEY, "shown");
+	};
+
 	const handleClose = () => {
-		localStorage.setItem(STORAGE_KEY, "true");
+		markShown();
 		setIsOpen(false);
 	};
 
 	const handleContactClick = () => {
-		localStorage.setItem(STORAGE_KEY, "true");
-		// Track the CTA
+		markShown();
 		if (typeof window !== "undefined") {
 			const w = window as unknown as { dataLayer?: unknown[] };
 			w.dataLayer?.push({

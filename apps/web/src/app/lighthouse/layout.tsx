@@ -1,11 +1,7 @@
-import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
 import { LighthouseJsonLd } from "@lh/components/LighthouseJsonLd";
 import { LighthouseTechFingerprints } from "@lh/components/LighthouseTechFingerprints";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter, Outfit } from "next/font/google";
-import { BrandFooter } from "@/components/brand/BrandFooter";
-import { BrandHeader } from "@/components/brand/BrandHeader";
-import { SiteContactDrawer } from "@/components/marketing/SiteContactDrawer";
 import { absoluteSiteUrl, SITE_BRAND } from "@/design-system/site-config";
 import "./lighthouse-globals.css";
 
@@ -96,6 +92,16 @@ export const metadata: Metadata = {
 	},
 };
 
+/**
+ * The lighthouse layout intentionally does NOT render BrandHeader / BrandFooter
+ * / SiteContactDrawer / CookieConsentBanner directly. Those chrome elements
+ * come from the global `MarketingChrome` wrapper applied at the page level
+ * (see `page.tsx` and `report/[id]/page.tsx`), which keeps header, footer,
+ * gold trim, and cookie consent 100 % consistent with the rest of the site.
+ *
+ * The `/lighthouse/report/[id]/print` sub-route deliberately opts out of
+ * the marketing chrome so the PDF output is clean.
+ */
 export default function LighthouseLayout({
 	children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -105,27 +111,7 @@ export default function LighthouseLayout({
 		>
 			<LighthouseJsonLd />
 			<LighthouseTechFingerprints />
-
-			<BrandHeader currentSection="audit" includeHamburger={false} />
-
 			{children}
-
-			<BrandFooter
-				buildTag="Lighthouse Scanner v2"
-				poweredBy={[
-					{
-						label: "Gemini 2.0",
-						href: "https://deepmind.google/technologies/gemini/",
-					},
-					{ label: "ElysiaJS", href: "https://elysiajs.com" },
-					{ label: "Next.js", href: "https://nextjs.org" },
-				]}
-			/>
-
-			<SiteContactDrawer />
-			<CookieConsentBanner />
-			{/* CrispBootstrap is mounted globally in the root layout; no need
-			    to duplicate it here. */}
 		</div>
 	);
 }

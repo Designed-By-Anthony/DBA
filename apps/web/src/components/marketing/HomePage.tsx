@@ -11,7 +11,6 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
-import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
 import "@/app/home-page.css";
@@ -501,7 +500,6 @@ export function HomePage() {
   });
 })();`}
 			</Script>
-			<FirstVisitSplash />
 		</>
 	);
 }

@@ -26,11 +26,23 @@ export function MarketingChrome({
 	footerCta,
 	hidePreFooterCta,
 	minimalChrome,
+	headerCurrentSection,
+	footerBuildTag,
+	footerPoweredBy,
+	segmentClassName,
 }: {
 	children: ReactNode;
 	footerCta?: FooterCtaProps;
 	hidePreFooterCta?: boolean;
 	minimalChrome?: boolean;
+	/** Marks the current section on the BrandHeader (e.g. "audit" on /lighthouse). */
+	headerCurrentSection?: "audit";
+	/** Optional mono build tag shown next to legal links in the BrandFooter. */
+	footerBuildTag?: string;
+	/** Optional "Powered by" stack shown in the BrandFooter. */
+	footerPoweredBy?: ReadonlyArray<{ label: string; href: string }>;
+	/** Optional class applied to the outer wrapper — used to scope segment-specific CSS (e.g. `lighthouse-segment`). */
+	segmentClassName?: string;
 }) {
 	if (minimalChrome) {
 		return <>{children}</>;
@@ -104,7 +116,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 
 			<div id="reading-progress-bar" aria-hidden="true" />
 			<div className="site-chrome-sticky">
-				<BrandHeader />
+				<BrandHeader currentSection={headerCurrentSection} />
 			</div>
 
 			<div
@@ -155,12 +167,14 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				</div>
 			</div>
 
-			<div className="site-body-canvas">
+			<div
+				className={`site-body-canvas${segmentClassName ? ` ${segmentClassName}` : ""}`}
+			>
 				<SiteContactDrawer />
 				<div className="site-main-wrap">
 					<main id="main-content">{children}</main>
 					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
-					<BrandFooter />
+					<BrandFooter buildTag={footerBuildTag} poweredBy={footerPoweredBy} />
 				</div>
 			</div>
 
