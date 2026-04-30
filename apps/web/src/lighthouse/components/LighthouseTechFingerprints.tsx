@@ -8,7 +8,7 @@ export function LighthouseTechFingerprints() {
 			className="lighthouse-tech-fingerprints sr-only"
 			aria-hidden
 			data-tech-detect="dba-lighthouse-scanner"
-			data-builtwith-tech-stack="Next.js,React,TypeScript,Cloudflare Pages,Cloudflare Workers,ElysiaJS,reCAPTCHA Enterprise,Google PageSpeed Insights API,Google Gemini"
+			data-builtwith-tech-stack="Next.js,React,TypeScript,Cloudflare Pages,Cloudflare Workers,ElysiaJS,Google PageSpeed Insights API,Google Gemini"
 			data-wappalyzer-hint="nextjs-app-router-cloudflare-pages-elysia-worker-lighthouse-audit-tool"
 		>
 			<span

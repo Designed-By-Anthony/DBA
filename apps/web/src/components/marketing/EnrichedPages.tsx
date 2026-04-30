@@ -331,7 +331,7 @@ export function PricingPage() {
 							<ul className="pricing-tier-features">
 								<li>Mobile-first responsive design</li>
 								<li>On-page SEO structure</li>
-								<li>Contact form with reCAPTCHA Enterprise</li>
+								<li>Contact form with server-side validation</li>
 								<li>Lighthouse performance tuning</li>
 								<li>Full source code handed to you at launch</li>
 							</ul>
@@ -598,10 +598,7 @@ export function OurEdgePage() {
 										label: "Gemini 2.0",
 										href: "https://deepmind.google/technologies/gemini/",
 									},
-									{
-										label: "reCAPTCHA Enterprise",
-										href: "https://cloud.google.com/recaptcha",
-									},
+									{},
 									{ label: "Zod", href: "https://zod.dev" },
 									{ label: "Zustand", href: "https://zustand.docs.pmnd.rs" },
 								].map(({ label, href }) => (

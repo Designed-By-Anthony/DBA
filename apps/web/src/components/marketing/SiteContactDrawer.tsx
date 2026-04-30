@@ -1,37 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
-const STORAGE_KEY = "dba_contact_drawer_open";
-
-function readStoredOpen(): boolean {
-	try {
-		const v = window.localStorage.getItem(STORAGE_KEY);
-		return v === "1";
-	} catch {
-		return false;
-	}
-}
-
-function writeStoredOpen(open: boolean): void {
-	try {
-		window.localStorage.setItem(STORAGE_KEY, open ? "1" : "0");
-	} catch {
-		/* private mode */
-	}
-}
-
-const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
+const _mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
 const BODY_LOCK_CLASS = "site-contact-drawer-open";
 
 /**
  * Inline Salesforce Web-to-Lead form for the contact drawer.
- * Note: reCAPTCHA script is loaded globally in layout.tsx
+ * No client-side captcha — submits directly to Salesforce.
  */
 function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 	const formId = useId();
@@ -46,11 +26,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 				setTimeout(() => onSuccess?.(), 100);
 			}}
 		>
-			<input
-				type="hidden"
-				name="captcha_settings"
-				value='{"keyname":"DBA","fallback":"true","orgId":"00Dao00001YO4nx","ts":""}'
-			/>
 			<input type="hidden" name="oid" value="00Dao00001YO4nx" />
 			<input
 				type="hidden"
@@ -109,12 +84,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 				</div>
 			</div>
 
-			<div
-				className="g-recaptcha"
-				data-sitekey="6LfnB9EsAAAAAPhbLN_enDV4s07F00YiLYANq3-Y"
-				data-size="compact"
-			/>
-
 			<div className="salesforce-form-actions">
 				<button type="submit" className="btn btn-primary-audit btn-sm">
 					Send Message
@@ -134,8 +103,10 @@ export function SiteContactDrawer() {
 	const [open, setOpen] = useState(false);
 	const [hydrated, setHydrated] = useState(false);
 
+	// Always default to tucked-in (closed). Persistence of "open" across
+	// navigations was leaving the drawer permanently open after the first
+	// click, which Anthony flagged as the wrong default behaviour.
 	useEffect(() => {
-		setOpen(readStoredOpen());
 		setHydrated(true);
 	}, []);
 
@@ -145,7 +116,6 @@ export function SiteContactDrawer() {
 			if (e.key === "Escape") {
 				e.preventDefault();
 				setOpen(false);
-				writeStoredOpen(false);
 				tabRef.current?.focus();
 			}
 		};
@@ -172,16 +142,11 @@ export function SiteContactDrawer() {
 	}, [open, hydrated]);
 
 	const toggle = useCallback(() => {
-		setOpen((prev) => {
-			const next = !prev;
-			writeStoredOpen(next);
-			return next;
-		});
+		setOpen((prev) => !prev);
 	}, []);
 
 	const close = useCallback(() => {
 		setOpen(false);
-		writeStoredOpen(false);
 		tabRef.current?.focus();
 	}, []);
 

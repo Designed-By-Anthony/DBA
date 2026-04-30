@@ -1,74 +1,6 @@
 import { buildPublicLeadPayloadFromFormData } from "@/lib/lead-form-contract";
 import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 
-type GrecaptchaEnterprise = {
-	ready: (cb: () => void) => void;
-	execute: (siteKey: string, opts: { action: string }) => Promise<string>;
-};
-
-type WindowWithGrecaptcha = Window & {
-	grecaptcha?: { enterprise?: GrecaptchaEnterprise };
-};
-
-function getGrecaptchaEnterprise(): GrecaptchaEnterprise | undefined {
-	return (window as WindowWithGrecaptcha).grecaptcha?.enterprise;
-}
-
-function loadRecaptchaEnterpriseScript(siteKey: string): Promise<void> {
-	return new Promise((resolve, reject) => {
-		if (getGrecaptchaEnterprise()) {
-			resolve();
-			return;
-		}
-		const id = "dba-recaptcha-enterprise-loader";
-		const existing = document.getElementById(id);
-		if (existing) {
-			const deadline = Date.now() + 15_000;
-			const poll = () => {
-				if (getGrecaptchaEnterprise()) resolve();
-				else if (Date.now() > deadline)
-					reject(new Error("reCAPTCHA script timeout"));
-				else window.setTimeout(poll, 50);
-			};
-			poll();
-			return;
-		}
-		const script = document.createElement("script");
-		script.id = id;
-		script.src = `https://www.google.com/recaptcha/enterprise.js?render=${encodeURIComponent(siteKey)}`;
-		script.async = true;
-		script.defer = true;
-		script.onload = () => {
-			const deadline = Date.now() + 15_000;
-			const poll = () => {
-				if (getGrecaptchaEnterprise()) resolve();
-				else if (Date.now() > deadline)
-					reject(new Error("reCAPTCHA init timeout"));
-				else window.setTimeout(poll, 50);
-			};
-			poll();
-		};
-		script.onerror = () => reject(new Error("reCAPTCHA script failed to load"));
-		document.head.appendChild(script);
-	});
-}
-
-async function executeRecaptchaEnterprise(
-	siteKey: string,
-	action: string,
-): Promise<string> {
-	await loadRecaptchaEnterpriseScript(siteKey);
-	const enterprise = getGrecaptchaEnterprise();
-	if (!enterprise) {
-		throw new Error("reCAPTCHA Enterprise API unavailable");
-	}
-	return new Promise((resolve, reject) => {
-		enterprise.ready(() => {
-			void enterprise.execute(siteKey, { action }).then(resolve).catch(reject);
-		});
-	});
-}
-
 /**
  * Lead endpoint resolution (marketing audit/contact-style forms):
  *   1. Form `action` URL when it is a trusted target (same-origin `/api/*`,
@@ -197,11 +129,6 @@ export function resetAuditFormState(
 	setAuditHiddenField(form, "page_title", document.title);
 
 	void syncGaClientId(form);
-
-	const recaptchaInput = form.querySelector<HTMLInputElement>(
-		'input[name="g-recaptcha-response"]',
-	);
-	if (recaptchaInput) recaptchaInput.value = "";
 }
 
 function clearAuditFormErrors(form: HTMLFormElement): void {
@@ -446,11 +373,8 @@ export function initFacebookOfferTracking(): void {
 	}
 }
 
-type CaptchaPayload = { type: "none" } | { type: "recaptcha"; token: string };
-
 async function finalizeAuditFormSubmission(
 	form: HTMLFormElement,
-	captcha: CaptchaPayload,
 ): Promise<void> {
 	const submitButton =
 		form.querySelector<HTMLButtonElement>("[data-form-submit]");
@@ -463,24 +387,11 @@ async function finalizeAuditFormSubmission(
 		submitButton.textContent = "Sending...";
 	}
 
-	const recaptchaInput = form.querySelector<HTMLInputElement>(
-		'input[name="g-recaptcha-response"]',
-	);
-
-	if (captcha.type === "recaptcha") {
-		if (recaptchaInput) recaptchaInput.value = captcha.token;
-	} else {
-		if (recaptchaInput) recaptchaInput.value = "";
-	}
-
 	const formData = new FormData(form);
 	formData.set("source_page", window.location.pathname);
 	formData.set("page_url", window.location.href);
 	formData.set("referrer_url", document.referrer || "direct");
 	formData.set("page_title", document.title);
-	if (captcha.type === "recaptcha") {
-		formData.set("g-recaptcha-response", captcha.token);
-	}
 
 	const payload = buildPublicLeadPayloadFromFormData(formData);
 
@@ -547,9 +458,9 @@ async function finalizeAuditFormSubmission(
 }
 
 /**
- * reCAPTCHA Enterprise: `grecaptcha.enterprise.execute` on submit.
- * When reCAPTCHA is not configured, submits without a token (server
- * allows when bot keys are unset).
+ * Submit handler for the legacy marketing audit/contact forms.
+ * No client-side captcha: the previous reCAPTCHA Enterprise step was
+ * removed in the round-2 hotfix pass.
  */
 async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	const submitButton =
@@ -559,33 +470,13 @@ async function submitAuditForm(form: HTMLFormElement): Promise<void> {
 	if (submitButton) {
 		submitButton.dataset.defaultLabel = defaultLabel;
 		submitButton.disabled = true;
-		submitButton.textContent = "Verifying...";
+		submitButton.textContent = "Sending...";
 	}
 
 	clearAuditFormErrors(form);
 	await syncGaClientId(form);
 
-	const siteKey = document.documentElement
-		.getAttribute("data-recaptcha-site-key")
-		?.trim();
-	if (siteKey) {
-		const action =
-			document.documentElement.getAttribute("data-recaptcha-action")?.trim() ||
-			"contact_submit";
-		try {
-			const token = await executeRecaptchaEnterprise(siteKey, action);
-			await finalizeAuditFormSubmission(form, { type: "recaptcha", token });
-		} catch {
-			showAuditFormError(
-				form,
-				"Security check could not complete. Please refresh the page and try again.",
-			);
-			restoreAuditSubmitButton(submitButton, defaultLabel);
-		}
-		return;
-	}
-
-	await finalizeAuditFormSubmission(form, { type: "none" });
+	await finalizeAuditFormSubmission(form);
 }
 
 function determineLeadSource(pathname: string): string {

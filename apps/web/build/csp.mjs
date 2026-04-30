@@ -3,7 +3,7 @@
  * Run `bun run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
- * Always-on site needs: reCAPTCHA Enterprise (forms), Lighthouse audit API, VertaFlow CRM lead ingest.
+ * Always-on site needs: Lighthouse audit API, VertaFlow CRM lead ingest, Crisp chat.
  */
 
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
@@ -21,7 +21,7 @@ const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
  */
 const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
-/** GA4 + reCAPTCHA loader; no data:/unsafe-eval (report-only probe). */
+/** GA4 + Google web fonts loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC = [
 	"'self'",
 	"'unsafe-inline'",

@@ -1,9 +1,4 @@
 import { isGmailConfigured, sendViaGmail } from "@lh/lib/gmail";
-import { getClientAddress } from "@lh/lib/http";
-import {
-	getRecaptchaEnterpriseConfigStatus,
-	verifyRecaptchaEnterpriseToken,
-} from "@lh/lib/recaptchaEnterprise";
 import { Elysia } from "elysia";
 import { z } from "zod";
 import {
@@ -103,30 +98,6 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			}
 			set.status = 400;
 			return { errors: [{ message: "Invalid request body." }] };
-		}
-
-		const recaptchaToken = lead.recaptchaToken ?? "";
-		const clientIp = getClientAddress(request);
-		const recaptchaStatus = getRecaptchaEnterpriseConfigStatus();
-		if (recaptchaStatus === "incomplete") {
-			set.status = 503;
-			return { errors: [{ message: "Bot protection is misconfigured." }] };
-		}
-		if (recaptchaStatus === "ready") {
-			const recaptcha = await verifyRecaptchaEnterpriseToken(
-				recaptchaToken,
-				clientIp,
-			);
-			if (!recaptcha.success) {
-				set.status = 403;
-				return {
-					errors: [
-						{
-							message: "Bot verification failed. Please refresh and try again.",
-						},
-					],
-				};
-			}
 		}
 
 		const leadWebhookUrl = process.env.LEAD_WEBHOOK_URL?.trim();
