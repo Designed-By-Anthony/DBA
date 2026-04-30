@@ -15,8 +15,8 @@ export default {
 		},
 		env: {
 			LEAD_WEBHOOK_SECRET: "dba-lead-hook-2026",
-			MARKETING_URL: "http://localhost:4321",
-			LIGHTHOUSE_URL: "http://localhost:4321",
+			MARKETING_URL: "http://localhost:3000",
+			LIGHTHOUSE_URL: "http://localhost:3000",
 		},
 	},
 	component: {

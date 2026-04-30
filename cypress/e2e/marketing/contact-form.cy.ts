@@ -1,4 +1,4 @@
-const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:4321";
+const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:3000";
 
 describe("Marketing — Contact Form", () => {
 	beforeEach(() => {

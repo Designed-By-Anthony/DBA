@@ -9,8 +9,6 @@ const APEX_SUBDOMAIN_PATTERN =
 	/^https:\/\/([a-z0-9-]+\.)*designedbyanthony\.com$/i;
 
 const LOCAL_ORIGINS = new Set<string>([
-	"http://localhost:4321",
-	"http://127.0.0.1:4321",
 	"http://localhost:3000", // pragma: allowlist secret
 	"http://127.0.0.1:3000", // pragma: allowlist secret
 	"http://localhost:3100", // pragma: allowlist secret

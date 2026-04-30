@@ -305,9 +305,14 @@
  * Neutral dark backgrounds matching the rest of the site. */
 
 /* Global card/panel/tile padding floor */
-.lighthouse-segment [class*="card"],
-.lighthouse-segment [class*="panel"],
-.lighthouse-segment [class*="tile"] {
+.lighthouse-segment .glass-card,
+.lighthouse-segment .lighthouse-score-card,
+.lighthouse-segment .lh-report-meta-card,
+.lighthouse-segment .cookie-consent-card,
+.lighthouse-segment .lh-audit-panel,
+.lighthouse-segment .lighthouse-result-panel,
+.lighthouse-segment .lh-carousel-tile,
+.lighthouse-segment .lighthouse-metric-tile {
 	padding: var(--card-pad);
 }
 

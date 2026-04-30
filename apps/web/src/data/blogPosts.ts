@@ -40,7 +40,7 @@ export const blogPosts: BlogPostMeta[] = [
 		title: "Upstate NY Local SEO 2026",
 		excerpt:
 			"How plumbers, HVAC, landscapers, and contractors across Albany, Syracuse, Rochester, Buffalo, and the Capital Region can win Google Maps and local search without NYC-sized budgets.",
-		image: "/images/upstate_local_seo_cover.png",
+		image: "/images/upstate_local_seo_cover.webp",
 		imageAlt:
 			"Upstate New York landscape suggesting local service businesses and regional search visibility",
 		imageWidth: 2752,

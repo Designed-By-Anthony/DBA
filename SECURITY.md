@@ -1,6 +1,6 @@
 # Security policy
 
-This document describes the security posture of the **Designed by Anthony** site: a **single Next.js 16** application at the repository root, deployed on **Firebase App Hosting** from **GitHub**.
+This document describes the security posture of the **Designed by Anthony** site: a **Turborepo monorepo** deployed on **Cloudflare Pages** (Next.js frontend) and a **Cloudflare Worker** (ElysiaJS API), built from **GitHub**.
 
 ## Reporting a vulnerability
 
@@ -16,43 +16,44 @@ Acknowledgement target: within 3 business days. Fix target: HIGH/CRITICAL within
 
 ## Supported versions
 
-Security fixes land on **`main`** and deploy through the normal Firebase App Hosting pipeline. There is no separate long-lived release branch.
+Security fixes land on **`main`** and deploy through the normal Cloudflare Pages + Workers CI pipeline. There is no separate long-lived release branch.
 
 ## Scope (this repository)
 
 | Surface | Role |
-|--------|------|
-| Marketing routes | Public content under `src/app/(site)/` |
-| Lighthouse segment | `src/app/lighthouse/`, `src/lighthouse/*` |
-| App Router API | `src/app/api/*` (contact, audit, lead-email, report, stream-chat-token, etc.) |
-| Request routing | `src/proxy.ts` (host-based redirects) |
+|---------|------|
+| Marketing routes | Public content under `apps/web/src/app/(site)/` |
+| Lighthouse segment | `apps/web/src/app/lighthouse/` |
+| API Worker | `apps/api/src/routes/` (audit, report, lead-email, audit-email-summary, report-email, test-emails) |
+| Request routing | `apps/web/src/middleware.ts` (host-based redirects) |
+| Shared logic | `packages/shared/src/` (origins, rate limiting, report-store) |
 
-**VertaFlow** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js proxy. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `src/`.
+**VertaFlow** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js middleware. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `apps/`.
 
 ## Trust boundaries (what this app enforces)
 
-- **Turnstile** on public POST surfaces when `TURNSTILE_SECRET_KEY` is set and the client sends a token (for example `/api/contact`, `/api/lead-email`). **`POST /api/audit`** verifies Turnstile only when **`LIGHTHOUSE_STRICT_TURNSTILE=1`**; otherwise the audit API relies on rate limiting and validation.
-- **CORS** on `/api/contact`: responses only allow the Designed by Anthony origin family (see `src/app/api/contact/route.ts`), not arbitrary `*`.
-- **Audit abuse:** sliding-window **per-IP** limiting for `POST /api/audit` in `src/lighthouse/lib/http.ts` (`checkLocalRateLimit` — process-local; not a substitute for edge or shared-store rate limiting at scale).
-- **Secrets:** production configuration lives in Firebase App Hosting / Google Cloud env and secrets. Schema and optional strictness are documented in `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, and `.env.example`.
+- **Turnstile** on public POST surfaces when `TURNSTILE_SECRET_KEY` is set and the client sends a token (e.g. lead-email). **Audit** verifies Turnstile only when **`LIGHTHOUSE_STRICT_TURNSTILE=1`**; otherwise the audit API relies on rate limiting and validation.
+- **CORS** on the API Worker: the global `@elysiajs/cors` plugin in `apps/api/src/index.ts` validates the `Origin` header against `isTrustedMarketingBrowserOrigin()` (apex, subdomains, `*.pages.dev` previews, and localhost dev ports).
+- **Audit abuse:** sliding-window **per-IP** limiting in `packages/shared/src/lighthouse/lib/http.ts` (`checkLocalRateLimit` — process-local; not a substitute for edge or shared-store rate limiting at scale).
+- **Secrets:** production configuration lives in the **Cloudflare dashboard** (Worker environment variables / secrets). Schema and optional strictness are documented in `apps/web/src/lib/env/` and `.env.example`.
 
 ## Operational hygiene
 
-- Run **`bun audit`** before releases; treat HIGH/CRITICAL advisories as release blockers unless explicitly risk-accepted (review production scope as needed).
+- Run **`bun audit`** before releases; treat HIGH/CRITICAL advisories as release blockers unless explicitly risk-accepted.
 - **Do not** commit real API keys, webhook secrets, or service-account JSON; rotate anything that has ever appeared in git history.
-- After CSP or connect-src changes, run **`bun run sync:static-headers`** so `static-headers.json` stays aligned with `build/csp.mjs`.
+- After CSP or connect-src changes, run **`bun run --cwd apps/web sync:static-headers`** so `static-headers.json` stays aligned with `build/csp.mjs`.
 
-## Where defenses live in code (this repo)
+## Where defenses live in code
 
 | Concern | Location |
-|--------|----------|
-| Host-based redirects (admin / accounts / lighthouse) | `src/proxy.ts` |
-| Contact form CORS + Turnstile | `src/app/api/contact/route.ts` |
-| Audit pipeline + rate limit + optional webhooks | `src/app/api/audit/route.ts`, `src/lighthouse/lib/http.ts` |
-| Resend lead-email bridge (Turnstile + honeypot) | `src/app/api/lead-email/route.ts` |
-| Stream Chat token issuance | `src/app/api/stream-chat-token/route.ts` |
-| CSP + security headers | `next.config.ts`, `build/csp.mjs` |
-| Env validation (Zod) | `src/lib/env/marketing.ts`, `src/lib/env/lighthouse.ts`, `src/lib/env/shared.ts` |
+|---------|----------|
+| Host-based redirects (admin / accounts) | `apps/web/src/middleware.ts` |
+| CORS (global, origin-validated) | `apps/api/src/index.ts` (Elysia `cors` plugin) |
+| Trusted origin allowlist | `packages/shared/src/lib/marketingBrowserOrigins.ts` |
+| Audit pipeline + rate limit | `apps/api/src/routes/audit.ts`, `packages/shared/src/lighthouse/lib/http.ts` |
+| Resend lead-email bridge (honeypot) | `apps/api/src/routes/leadEmail.ts` |
+| CSP + security headers | `apps/web/next.config.ts`, `apps/web/build/csp.mjs` |
+| Env validation (Zod) | `apps/web/src/lib/env/` |
 
 ## Audit log for this document
 
@@ -60,3 +61,4 @@ Security fixes land on **`main`** and deploy through the normal Firebase App Hos
 |------|--------|
 | 2026-04-16 | Initial SECURITY.md |
 | 2026-04-27 | Rewrote for single Next.js + Netlify; removed references to paths and products not in this repository |
+| 2026-04-30 | Rewrote for Cloudflare Pages + Workers monorepo architecture; updated all paths to reflect `apps/web`, `apps/api`, and `packages/shared` |

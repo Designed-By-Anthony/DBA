@@ -1,8 +1,8 @@
-import bakeryDemo from "../assets/portfolio/bakery_demo.png";
-import handymanDemo from "../assets/portfolio/handyman_demo.png";
-import landscapeDemo from "../assets/portfolio/landscape_demo.png";
-import plumberDemo from "../assets/portfolio/plumber_demo.png";
-import rooferDemo from "../assets/portfolio/roofer_demo.png";
+import bakeryDemo from "../assets/portfolio/bakery_demo.webp";
+import handymanDemo from "../assets/portfolio/handyman_demo.webp";
+import landscapeDemo from "../assets/portfolio/landscape_demo.webp";
+import plumberDemo from "../assets/portfolio/plumber_demo.webp";
+import rooferDemo from "../assets/portfolio/roofer_demo.webp";
 
 export type ShowcaseStatus = "example" | "in-progress";
 
@@ -44,7 +44,7 @@ export const showcaseItems: ShowcaseItem[] = [
 			"We designed and built a custom small business website on a headless CMS, giving the owner full control of every page from a visual dashboard. Contact forms route to his inbox, Google Analytics and Search Console track traffic and local search rankings, and an interactive service area map clarifies coverage in Long Beach and surrounding cities. The result is a fast-loading, mobile-responsive contractor website the owner runs day to day without ongoing developer dependency.",
 		href: "https://thelongbeachhandyman.com/",
 		caseStudySlug: "the-long-beach-handyman",
-		image: "/images/handyman_demo.png",
+		image: handymanDemo.src,
 		displayImage: handymanDemo,
 		imageAlt:
 			"Custom handyman website design for The Long Beach Handyman — a client build by Designed by Anthony featuring local SEO, lead capture, and mobile-friendly responsive design",
@@ -90,7 +90,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		solution:
 			"Professional presentation that communicates experience, clear positioning on services and coverage area, and a simple path for homeowners to request an estimate.",
 		href: "https://roofing-demo.web.app/",
-		image: "/images/roofer_demo.png",
+		image: rooferDemo.src,
 		displayImage: rooferDemo,
 		imageAlt: "Summit Roofing example website by Designed by Anthony",
 		featured: true,
@@ -107,7 +107,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		solution:
 			"Clear service breakdowns, a professional feel that matches the quality of the outdoor work, and a layout that moves visitors toward a quote request.",
 		href: "https://designed-by-anthony-c18bd.web.app/",
-		image: "/images/landscape_demo.png",
+		image: landscapeDemo.src,
 		displayImage: landscapeDemo,
 		imageAlt:
 			"Apex Landscaping and Snow Removal example website by Designed by Anthony",
@@ -124,7 +124,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		solution:
 			"A premium launch page with strong atmosphere, focused messaging, and a clear path for first-time visitors to become repeat customers.",
 		href: "https://food-service-demo-c7ecd.web.app/",
-		image: "/images/bakery_demo.png",
+		image: bakeryDemo.src,
 		displayImage: bakeryDemo,
 		imageAlt: "Marble & Bloom Bakery example website by Designed by Anthony",
 	},
@@ -140,7 +140,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		solution:
 			"Clear emergency messaging, strong local positioning, and a mobile experience designed so calling is the easiest action on the page.",
 		href: "https://plumber-demo-404e2.web.app/",
-		image: "/images/plumber_demo.png",
+		image: plumberDemo.src,
 		displayImage: plumberDemo,
 		imageAlt: "Copperline Plumbing example website by Designed by Anthony",
 		featured: true,

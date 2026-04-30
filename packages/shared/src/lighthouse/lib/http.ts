@@ -3,10 +3,7 @@ import { isTrustedHostedPreviewHostname } from "../../lib/marketingBrowserOrigin
 const LOCAL_ALLOWED_ORIGINS = new Set([
 	"https://designedbyanthony.com",
 	"https://www.designedbyanthony.com",
-	"http://localhost:4322",
-	"http://localhost:4321",
 	"http://localhost:3000",
-	"http://127.0.0.1:4321",
 	"http://127.0.0.1:3000",
 ]);
 
