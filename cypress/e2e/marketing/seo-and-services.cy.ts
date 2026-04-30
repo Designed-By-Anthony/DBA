@@ -1,4 +1,4 @@
-const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:4321";
+const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:3000";
 
 describe("Marketing — SEO Meta", () => {
 	it("contact page title clearly describes the page purpose", () => {

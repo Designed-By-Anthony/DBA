@@ -32,7 +32,7 @@ Do **not** claim: unlimited full-site crawl like Semrush/Ahrefs, JS-rendered cra
 
 Projects like [seo-audits-generator](https://github.com/vchaitanyachowdari/seo-audits-generator) lead with **stack badges**, **feature bullets** (SEO + CRO + AI), **install/env**, **usage**, and a **feature status table**. We should mirror that **shape** on the site and in docs:
 
-- Badges: optional later (Next.js, Firebase App Hosting, TypeScript).
+- Badges: optional later (Next.js, Cloudflare Pages, TypeScript).
 - Bullets: use the table above, tightened for the hero.
 - Status table: use “Live / Planned / Needs API key” for transparency (splash-worthy *because* it is honest).
 
