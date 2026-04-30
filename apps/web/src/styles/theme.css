@@ -1164,6 +1164,11 @@ li {
 	transform: translateY(-2px);
 }
 
+.lighthouse-score-svg circle[data-filled="false"],
+.lighthouse-score-svg circle[data-filled="true"] {
+	transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .lighthouse-score-label,
 .lighthouse-metric-label,
 .lh-section-label {
@@ -1420,6 +1425,30 @@ li {
 .reveal-scale {
 	opacity: 1;
 	transform: none;
+}
+
+.reading-progress-bar,
+#reading-progress-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+	width: 0%;
+	height: 3px;
+	border-radius: 0 999px 999px 0;
+	background: linear-gradient(
+		90deg,
+		var(--accent-blue),
+		var(--accent-bronze-light) 60%,
+		var(--accent-ink)
+	);
+	pointer-events: none;
+	transition: width 0.1s linear;
+}
+
+body:not(.has-progress-bar) .reading-progress-bar,
+body:not(.has-progress-bar) #reading-progress-bar {
+	display: none;
 }
 
 .section-flow-marker,
