@@ -49,7 +49,7 @@ export function FirstVisitSplash() {
 			/>
 
 			{/* Modal */}
-			<div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-linear-to-br from-[rgba(18,20,26,0.98)] to-[rgba(10,12,18,0.98)] p-8 shadow-2xl">
+			<div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-linear-to-br from-[rgba(18,20,26,0.98)] to-[rgba(10,12,18,0.98)] p-10 shadow-2xl">
 				{/* Accent line */}
 				<div className="absolute left-0 right-0 top-0 h-[2px] bg-linear-to-r from-transparent via-[rgb(var(--accent-bronze-rgb)/0.8)] to-transparent" />
 
