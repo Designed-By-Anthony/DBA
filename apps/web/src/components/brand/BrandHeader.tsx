@@ -114,7 +114,6 @@ export function BrandHeader({
 					{includeHamburger ? (
 						<button
 							type="button"
-							id="hamburger-btn"
 							data-mobile-nav-toggle
 							className="inline-flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
 							aria-label="Open navigation menu"

@@ -131,7 +131,9 @@ html {
 }
 
 body {
+	/* Base font + text color now come from app/layout.tsx to keep the root wrapper authoritative. */
 	min-width: 0;
+	background-color: var(--bg-dark);
 	background-image:
 		radial-gradient(
 			ellipse 120% 50% at 50% -10%,

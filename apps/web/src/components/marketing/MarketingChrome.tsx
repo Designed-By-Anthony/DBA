@@ -146,6 +146,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 								<Link
 									key={link.href}
 									href={link.href}
+									data-mobile-nav-link
 									className="text-3xl font-semibold tracking-[-0.03em] text-white/80 transition hover:text-white"
 								>
 									{link.label}
@@ -153,6 +154,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							))}
 							<Link
 								href={SITE_CONTACT_LINK.href}
+								data-mobile-nav-link
 								className="text-3xl font-semibold tracking-[-0.03em] text-white/80 transition hover:text-white"
 							>
 								{SITE_CONTACT_LINK.label}
@@ -160,12 +162,14 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							<div className="mt-6 flex flex-col gap-3 sm:max-w-sm">
 								<Link
 									href={SITE_AUDIT_CTA.href}
+									data-mobile-nav-link
 									className="inline-flex items-center justify-center rounded-full border border-sky-300/35 bg-sky-500/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white"
 								>
 									{SITE_AUDIT_CTA.label}
 								</Link>
 								<a
 									href={mailtoContactHref}
+									data-mobile-nav-link
 									className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white/85"
 								>
 									Email Anthony

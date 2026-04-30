@@ -150,9 +150,10 @@ export function SiteContactDrawer() {
 				Contact
 			</button>
 			{open ? (
-				<div
+				<button
+					type="button"
 					className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm"
-					aria-hidden="true"
+					aria-label="Close contact drawer"
 					onClick={close}
 				/>
 			) : null}

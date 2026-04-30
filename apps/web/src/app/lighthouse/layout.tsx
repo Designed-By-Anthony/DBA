@@ -91,7 +91,7 @@ export default function LighthouseLayout({
 	children,
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<div className="lighthouse-segment relative min-h-screen [font-family:var(--font-main)] antialiased">
+		<div className="lighthouse-segment relative min-h-screen">
 			<LighthouseJsonLd />
 			<LighthouseTechFingerprints />
 			<BrandHeader currentSection="audit" includeHamburger={false} />

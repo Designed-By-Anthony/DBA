@@ -33,7 +33,7 @@ export function initMobileNav(): void {
 	hamburger.dataset.mobileNavInit = "true";
 
 	const dismissEls = mobileNav.querySelectorAll<HTMLElement>(
-		"[data-mobile-nav-dismiss], [data-mobile-nav-close], a",
+		"[data-mobile-nav-dismiss], [data-mobile-nav-close], [data-mobile-nav-link]",
 	);
 
 	window.addEventListener("dba:page-ready", () => {
@@ -58,6 +58,7 @@ export function initMobileNav(): void {
 	for (const el of dismissEls) {
 		el.addEventListener("click", () => {
 			closeMobileNav();
+			hamburger.focus();
 		});
 	}
 

@@ -1,6 +1,6 @@
 import "@/design-system/dba-global.css";
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -82,7 +82,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			<head>
 				<JsonLd />
 			</head>
-			<body className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] [font-family:var(--font-main)] antialiased">
+			<body
+				className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] [font-family:var(--font-main)] antialiased"
+				style={
+					{
+						"--font-inter": "var(--font-main)",
+						"--font-outfit": "var(--font-display)",
+						"--font-fraunces": "var(--font-report-display)",
+					} as CSSProperties
+				}
+			>
 				<noscript>
 					<iframe
 						src="https://www.googletagmanager.com/ns.html?id=GTM-W2JBTH5L"
