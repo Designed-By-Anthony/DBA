@@ -1327,6 +1327,35 @@ a.marketing-service-card:hover {
 	transform: translateY(-2px);
 }
 
+/* Smooth FAQ content reveal animation */
+.home-faq-item::details-content {
+	block-size: 0;
+	overflow: hidden;
+	transition: block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-faq-item[open]::details-content {
+	block-size: auto;
+}
+
+/* Fallback for browsers without ::details-content support */
+@supports not selector(::details-content) {
+	.home-faq-answer {
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+		transition:
+			max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+			opacity 0.25s ease,
+			padding 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.home-faq-item[open] .home-faq-answer {
+		max-height: 500px;
+		opacity: 1;
+	}
+}
+
 /* ── About / Values Grid ── */
 .values-grid {
 	display: grid;

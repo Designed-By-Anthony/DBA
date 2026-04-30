@@ -7,6 +7,8 @@ import { Fraunces, Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import { BrandFooter } from "@/components/brand/BrandFooter";
 import { BrandHeader } from "@/components/brand/BrandHeader";
+import { CrispBootstrap } from "@/components/CrispBootstrap";
+import { SiteContactDrawer } from "@/components/marketing/SiteContactDrawer";
 import { absoluteSiteUrl, SITE_BRAND } from "@/design-system/site-config";
 import "./lighthouse-globals.css";
 
@@ -128,7 +130,9 @@ export default function LighthouseLayout({
 				]}
 			/>
 
+			<SiteContactDrawer />
 			<CookieConsentBanner />
+			<CrispBootstrap />
 		</div>
 	);
 }
