@@ -13,7 +13,6 @@
  *                                (and picks up the @theme block above).
  *   3. theme.css               — :root CSS custom properties, html/body base
  *                                styles, page-level component classes.
- *   4. brand-chrome.css        — .dba-header, .dba-footer, .dba-nav-* etc.
  *
  * ⚠️  Do NOT move @import "tailwindcss" below theme.css.
  *     Tailwind must run before unlayered :root / body rules so that the
@@ -22,7 +21,7 @@
  *
  * Canonical tokens : src/styles/theme.css
  * Tailwind bridge  : src/design-system/tailwind-v4-bridge.css
- * Brand chrome     : src/design-system/brand-chrome.css
+ * Brand chrome     : BrandHeader.tsx + BrandFooter.tsx (inline Tailwind — Phase 3)
  */
 
 /* 1. Map DBA CSS custom properties → Tailwind @theme token names */
@@ -33,6 +32,3 @@
 
 /* 3. CSS custom properties (:root), html/body base styles, page components */
 @import url("../styles/theme.css");
-
-/* 4. Shared brand chrome: .dba-header, .dba-footer, .dba-nav-* etc. */
-@import url("./brand-chrome.css");

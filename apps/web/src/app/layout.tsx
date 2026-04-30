@@ -21,10 +21,10 @@ const outfit = Outfit({
 
 /**
  * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
- * <html>. brand-chrome.css uses var(--font-fraunces, "Fraunces Variable", ...)
- * for the brand wordmark in the header and footer. Without this, the variable
- * is unset on marketing pages and the browser falls back to the @font-face
- * "Fraunces Variable" name — which works but skips preloading optimisations.
+ * <html>. BrandHeader and BrandFooter reference var(--font-fraunces) for the
+ * brand wordmark. Without this, the variable is unset on marketing pages and
+ * the browser falls back to the @font-face "Fraunces Variable" name — which
+ * works but skips preloading optimisations.
  */
 const fraunces = Fraunces({
 	variable: "--font-fraunces",
