@@ -6,7 +6,7 @@
 	"type": "module",
 	"engines": {
 		"bun": ">=1.1.0",
-		"node": ">=22.12.0"
+		"node": ">=24.11.0"
 	},
 	"browserslist": {
 		"production": [
@@ -32,18 +32,18 @@
 	"scripts": {
 		"generate:gbp-playbook-cover": "bun build/generate-gbp-playbook-cover.mjs",
 		"generate:gbp-playbook-hero": "bun build/generate-gbp-playbook-hero.mjs",
-		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js",
+		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js && bun build/trim-generated-whitespace.mjs public/scripts/site.js",
 		"sync:static-headers": "bun build/sync-static-headers.mjs",
 		"prepare:next": "bun run build:site-script && bun run sync:static-headers",
 		"dev": "bun run build:site-script && next dev",
-		"build": "bun run build:pages",
-		"build:next": "bun run prepare:next && next build",
-		"build:worker": "opennextjs-cloudflare build -c wrangler.worker.jsonc",
+		"build": "bun build/ensure-workspace-install.mjs && bun run build:pages",
+		"build:next": "bun run prepare:next && next build --webpack",
+		"build:worker": "opennextjs-cloudflare build -c wrangler.worker.json",
 		"build:pages": "bun run build:worker && bun build/prepare-pages-bundle.mjs",
-		"preview:worker": "bun run build:worker && opennextjs-cloudflare preview -c wrangler.worker.jsonc",
-		"deploy:worker": "bun run build:worker && opennextjs-cloudflare deploy -c wrangler.worker.jsonc",
+		"preview:worker": "bun run build:worker && opennextjs-cloudflare preview -c wrangler.worker.json",
+		"deploy:worker": "bun run build:worker && opennextjs-cloudflare deploy -c wrangler.worker.json",
 		"deploy": "bun run deploy:pages",
-		"deploy:pages": "bun run build:pages && wrangler pages deploy .vercel/output/static --project-name ${CLOUDFLARE_PAGES_PROJECT_NAME:-designed-by-anthony}",
+		"deploy:pages": "bun run build:pages && wrangler pages deploy .vercel/output/static -c wrangler.json --project-name ${CLOUDFLARE_PAGES_PROJECT_NAME:-designed-by-anthony}",
 		"start": "next start",
 		"typecheck": "tsc --noEmit"
 	},
@@ -54,27 +54,27 @@
 		"@fontsource-variable/outfit": "^5.2.8",
 		"@fontsource/abril-fatface": "^5.2.7",
 		"@google/genai": "^1.48.0",
-		"cheerio": "^1.0.0",
+		"cheerio": "^1.2.0",
 		"framer-motion": "^12.38.0",
-		"googleapis": "^148.0.0",
+		"googleapis": "^171.4.0",
 		"gsap": "^3.15.0",
 		"jspdf": "^4.2.1",
-		"next": "16.2.3",
-		"react": "19.2.4",
-		"react-dom": "19.2.4",
+		"next": "16.2.4",
+		"react": "19.2.5",
+		"react-dom": "19.2.5",
 		"sharp": "^0.34.5",
-		"zod": "^3.25.76",
+		"zod": "^4.4.0",
 		"zustand": "^5.0.12"
 	},
 	"devDependencies": {
 		"@opennextjs/cloudflare": "^1.19.4",
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^22.10.2",
-		"@types/react": "^19.2.0",
-		"@types/react-dom": "^19.2.0",
+		"@tailwindcss/postcss": "^4.2.4",
+		"@types/node": "^24",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
 		"esbuild": "^0.28.0",
-		"tailwindcss": "^4",
-		"typescript": "^5.9.3",
+		"tailwindcss": "^4.2.4",
+		"typescript": "^6.0.3",
 		"wrangler": "^4.86.0"
 	}
 }

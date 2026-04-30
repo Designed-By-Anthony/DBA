@@ -65,6 +65,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 		<html
 			lang="en"
 			prefix="og: https://ogp.me/ns#"
+			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
 			data-recaptcha-site-key={recaptchaSiteKey || undefined}
 			data-recaptcha-action={recaptchaSiteKey ? recaptchaAction : undefined}

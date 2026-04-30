@@ -61,6 +61,7 @@ export function BrandHeader({
 							width={36}
 							height={27}
 							className="dba-brand-mark"
+							style={{ width: "auto" }}
 							priority
 						/>
 						<span className="dba-brand-wordmark">

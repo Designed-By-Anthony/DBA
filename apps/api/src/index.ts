@@ -18,6 +18,22 @@ const app = new Elysia({ adapter: CloudflareAdapter })
 			methods: ["GET", "POST", "DELETE", "OPTIONS"],
 		}),
 	)
+	.get("/", ({ set }) => {
+		set.headers["Cache-Control"] = "no-store";
+		return { ok: true, service: "dba-api" };
+	})
+	.get("/health", ({ set }) => {
+		set.headers["Cache-Control"] = "no-store";
+		return { ok: true, service: "dba-api" };
+	})
+	.get(
+		"/favicon.ico",
+		() =>
+			new Response(null, {
+				status: 204,
+				headers: { "Cache-Control": "public, max-age=86400" },
+			}),
+	)
 	.use(auditRoute)
 	.use(auditEmailSummaryRoute)
 	.use(leadEmailRoute)

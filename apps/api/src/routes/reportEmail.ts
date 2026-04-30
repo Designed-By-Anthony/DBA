@@ -101,7 +101,7 @@ async function reserveEmailSend(ref: DocRef) {
 	});
 }
 
-export const reportEmailRoute = new Elysia().post(
+export const reportEmailRoute = new Elysia({ aot: false }).post(
 	"/api/report/:id/email",
 	async ({ params, set }) => {
 		set.headers["Cache-Control"] = "no-store";

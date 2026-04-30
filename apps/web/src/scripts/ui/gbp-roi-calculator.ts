@@ -57,16 +57,16 @@ export function initGbpRoiCalculator(): void {
 				);
 
 				resultEl.removeAttribute("hidden");
-				resultEl.innerHTML = `
-        <p>
-          At these inputs, modeled ROI is <strong>${roi}%</strong> on the monthly investment,
-          with about <strong>${formatUsd(additionalRevenue)}</strong> in additional monthly revenue before costs.
-        </p>
-        <p style="margin-top:0.75rem;color:var(--text-gray);font-size:0.88rem;">
-          Additional customers per day (modeled): ${customersDayDisplay} ·
-          Monthly revenue (modeled): ${customersDayDisplay} × ${formatUsd(value)} × 30 days ≈ ${formatUsd(additionalRevenue)}
-        </p>
-      `;
+				resultEl.innerHTML = [
+					"<p>",
+					`At these inputs, modeled ROI is <strong>${roi}%</strong> on the monthly investment, `,
+					`with about <strong>${formatUsd(additionalRevenue)}</strong> in additional monthly revenue before costs.`,
+					"</p>",
+					'<p style="margin-top:0.75rem;color:var(--text-gray);font-size:0.88rem;">',
+					`Additional customers per day (modeled): ${customersDayDisplay} · `,
+					`Monthly revenue (modeled): ${customersDayDisplay} × ${formatUsd(value)} × 30 days ≈ ${formatUsd(additionalRevenue)}`,
+					"</p>",
+				].join("");
 			});
 		});
 }

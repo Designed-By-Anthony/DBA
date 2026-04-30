@@ -191,6 +191,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 							width={40}
 							height={30}
 							className="reach-out-dialog-logo"
+							style={{ height: "auto" }}
 						/>
 						<button
 							type="button"
