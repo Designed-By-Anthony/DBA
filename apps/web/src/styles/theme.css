@@ -12,15 +12,6 @@
 }
 
 @font-face {
-	font-family: "Outfit Variable";
-	font-style: normal;
-	font-weight: 100 900;
-	src: url("~@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2")
-		format("woff2-variations");
-	font-display: swap;
-}
-
-@font-face {
 	font-family: "Fraunces Variable";
 	font-style: normal;
 	font-weight: 200 900;
@@ -64,8 +55,8 @@
 	--font-main:
 		"Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--font-display:
-		"Outfit Variable", "Inter Variable", -apple-system, BlinkMacSystemFont,
-		sans-serif;
+		var(--font-outfit, "Outfit Variable"), "Inter Variable", -apple-system,
+		BlinkMacSystemFont, sans-serif;
 	/* Display serif — home hero only; editorial “luxury print” (Google Fonts / OFL). */
 	--font-hero: "Abril Fatface", Georgia, "Times New Roman", serif;
 	/* Editorial serif — audit reports & premium headings only (pair with Inter body). */
