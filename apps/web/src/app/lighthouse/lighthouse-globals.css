@@ -3,6 +3,7 @@
 @import "../../styles/theme.css";
 @import "tailwindcss";
 
+/* Tailwind v4 @theme directive - valid for v4 syntax */
 @theme {
 	--font-sans: var(--font-inter);
 	--font-display: var(--font-outfit);

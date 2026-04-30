@@ -85,7 +85,7 @@ export function AuditScanProgress({
 				transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
 			>
 				<MotionDiv
-					className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-sky-400/20 to-blue-500/10 blur-3xl"
+					className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-linear-to-br from-sky-400/20 to-blue-500/10 blur-3xl"
 					aria-hidden
 					animate={
 						prefersReduced
@@ -124,7 +124,7 @@ export function AuditScanProgress({
 						</MotionDiv>
 					</div>
 					<MotionDiv
-						className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-sky-400/20 bg-gradient-to-br from-sky-500/12 to-blue-500/8"
+						className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-sky-400/20 bg-linear-to-br from-sky-500/12 to-blue-500/8"
 						aria-hidden
 						animate={
 							prefersReduced
@@ -152,9 +152,9 @@ export function AuditScanProgress({
 						<span>Overall progress</span>
 						<span>{progressPct}%</span>
 					</div>
-					<div className="h-2 overflow-hidden rounded-full bg-white/[0.06] shadow-inner">
+					<div className="h-2 overflow-hidden rounded-full bg-white/6 shadow-inner">
 						<MotionDiv
-							className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 shadow-[0_0_12px_rgba(56,189,248,0.35)]"
+							className="h-full rounded-full bg-linear-to-r from-sky-400 via-blue-500 to-indigo-500 shadow-[0_0_12px_rgba(56,189,248,0.35)]"
 							initial={false}
 							animate={{ width: `${progressPct}%` }}
 							transition={{ type: "spring", stiffness: 100, damping: 20 }}
