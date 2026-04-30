@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { homeFaqEntries, homeFooterCta } from "@/data/home";
+import { homeFaqEntries } from "@/data/home";
 import {
 	getServiceAreaDetailLongformSections,
 	getServiceAreaLongformSections,
@@ -30,7 +30,6 @@ import {
 	buildPricingOfferCatalogSchema,
 } from "@/lib/seo";
 import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
-import { MarketingChrome } from "./MarketingChrome";
 import {
 	MotionReveal,
 	MotionStagger,
@@ -137,7 +136,7 @@ function PageHero({
 export function AboutPage() {
 	const copy = staticMarketingPageCopy.about;
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname="/about"
 				schemaName={copy.title}
@@ -275,7 +274,7 @@ export function AboutPage() {
 					</Link>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -283,7 +282,7 @@ export function PricingPage() {
 	const copy = staticMarketingPageCopy.pricing;
 	const pricingCatalog = buildPricingOfferCatalogSchema();
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname="/pricing"
 				schemaName={copy.title}
@@ -424,14 +423,14 @@ export function PricingPage() {
 					</MotionReveal>
 				</div>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
 export function OurEdgePage() {
 	const copy = staticMarketingPageCopy.ouredge;
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname="/ouredge"
 				schemaName={copy.title}
@@ -633,7 +632,7 @@ export function OurEdgePage() {
 					</Link>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -644,7 +643,7 @@ export function FaqPage() {
 		{ path: "/faq" },
 	);
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname="/faq"
 				schemaName={copy.title}
@@ -702,7 +701,7 @@ export function FaqPage() {
 					</MotionReveal>
 				</div>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -718,7 +717,7 @@ export function ServiceAreasPage() {
 	).length;
 
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname="/service-areas"
 				schemaName={copy.title}
@@ -830,7 +829,7 @@ export function ServiceAreasPage() {
 					</Link>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -871,7 +870,7 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 	const longform = getServiceAreaDetailLongformSections(loc.name);
 
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<MarketingPageJsonLd
 				pathname={pathname}
 				schemaName={`Web design ${loc.name}`}
@@ -1039,6 +1038,6 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					</Link>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }

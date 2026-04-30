@@ -132,42 +132,32 @@ html {
 
 body {
 	min-width: 0;
-	background-color: var(--bg-dark);
-	background-image: /* Primary atmospheric glow - enhanced sky blue (matching Lighthouse) */
-			radial-gradient(
-				ellipse 120% 50% at 50% -10%,
-				rgba(91, 156, 248, 0.12),
-				transparent 55%
-			),
-			/* Secondary warm accent - bronze glow (matching Lighthouse depth) */
-			radial-gradient(
-				ellipse 80% 40% at 85% 20%,
-				rgb(var(--accent-bronze-rgb) / 0.06),
-				transparent 50%
-			),
-			/* Tertiary depth layer - subtle blue */
-			radial-gradient(
-				ellipse 60% 30% at 15% 70%,
-				rgba(59, 130, 246, 0.05),
-				transparent 45%
-			),
-			/* Base ink gradient */
-			linear-gradient(
-				180deg,
-				var(--bg-ink) 0%,
-				var(--bg-dark) 35%,
-				var(--bg-deeper) 100%
-			);
-	color: var(--text-white);
-	font-family: var(--font-main);
+	background-image:
+		radial-gradient(
+			ellipse 120% 50% at 50% -10%,
+			rgba(91, 156, 248, 0.12),
+			transparent 55%
+		),
+		radial-gradient(
+			ellipse 80% 40% at 85% 20%,
+			rgb(var(--accent-bronze-rgb) / 0.06),
+			transparent 50%
+		),
+		radial-gradient(
+			ellipse 60% 30% at 15% 70%,
+			rgba(59, 130, 246, 0.05),
+			transparent 45%
+		),
+		linear-gradient(
+			180deg,
+			var(--bg-ink) 0%,
+			var(--bg-dark) 35%,
+			var(--bg-deeper) 100%
+		);
 	line-height: 1.7;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
-	display: flex;
-	flex-direction: column;
-	min-height: 100dvh;
-	position: relative;
 	overflow-x: clip;
 }
 
@@ -232,9 +222,7 @@ summary:focus-visible,
 }
 
 main {
-	flex-grow: 1;
-	position: relative;
-	z-index: 2;
+	min-width: 0;
 }
 
 .section-shell {
@@ -1500,91 +1488,6 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	display: none;
 }
 
-/* ── In-house cookie consent (GTM / GA after Accept) ── */
-.cookie-consent {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 10050;
-	padding: 1rem 1.25rem max(1rem, env(safe-area-inset-bottom));
-	pointer-events: none;
-}
-
-.cookie-consent__inner {
-	pointer-events: auto;
-	max-width: 44rem;
-	margin: 0 auto;
-	padding: 1.25rem 1.5rem;
-	border-radius: var(--radius-card-lg);
-	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.25);
-	background: linear-gradient(
-		165deg,
-		rgba(19, 26, 36, 0.98) 0%,
-		rgba(8, 11, 18, 0.99) 100%
-	);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	box-shadow:
-		0 -20px 60px -20px rgba(0, 0, 0, 0.6),
-		0 0 0 1px rgba(255, 252, 245, 0.06),
-		inset 0 1px 0 rgba(255, 252, 245, 0.08);
-}
-
-.cookie-consent__title {
-	margin: 0 0 0.5rem;
-	font-size: 1rem;
-	font-weight: 700;
-	color: var(--text-cream);
-	letter-spacing: -0.01em;
-}
-
-.cookie-consent__text {
-	margin: 0 0 1rem;
-	font-size: 0.875rem;
-	line-height: 1.6;
-	color: var(--text-gray);
-}
-
-.cookie-consent__text a {
-	color: var(--accent-bronze);
-	text-decoration: none;
-	border-bottom: 1px solid rgb(var(--accent-bronze-rgb) / 0.4);
-	transition: border-color 0.2s ease;
-}
-
-.cookie-consent__text a:hover {
-	border-color: var(--accent-bronze);
-}
-
-.cookie-consent__actions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-	align-items: center;
-}
-
-/* Primary button in cookie banner uses bronze accent */
-.cookie-consent__actions .btn-primary {
-	background: linear-gradient(
-		180deg,
-		rgb(var(--accent-bronze-light)) 0%,
-		rgb(var(--accent-bronze-rgb)) 100%
-	);
-	color: #171008;
-	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.6);
-	font-weight: 600;
-}
-
-.cookie-consent__actions .btn-outline {
-	border-color: rgba(255, 252, 245, 0.2);
-	color: var(--text-cream);
-}
-
-.cookie-consent__actions .btn-outline:hover {
-	background: rgba(255, 252, 245, 0.08);
-}
-
 /* ── Hero trust strip (home + facebook-offer; shared, not page-scoped) ── */
 .hero-trust-strip {
 	display: flex;
@@ -1806,25 +1709,4 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	font-size: 0.9rem;
 	color: #ffffff;
 	-webkit-text-fill-color: #ffffff;
-}
-
-/* Crisp chat should stay below site overlays/menus */
-.crisp-client {
-	z-index: 100 !important;
-}
-
-#crisp-chatbox {
-	z-index: 100 !important;
-}
-
-/* Site quick rail drawer styling fixes */
-.site-quick-rail__divider {
-	height: 1px;
-	background: linear-gradient(
-		90deg,
-		transparent,
-		rgba(255, 252, 245, 0.1),
-		transparent
-	);
-	margin: 1.25rem 0;
 }

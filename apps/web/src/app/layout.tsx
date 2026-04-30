@@ -1,9 +1,8 @@
 import "@/design-system/dba-global.css";
-import { CrispBootstrap } from "@/components/CrispBootstrap";
-import { JsonLd } from "@/components/JsonLd";
-import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { CrispBootstrap } from "@/components/CrispBootstrap";
+import { JsonLd } from "@/components/JsonLd";
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
 export const viewport: Viewport = {
@@ -76,14 +75,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 		<html
 			lang="en"
 			prefix="og: https://ogp.me/ns#"
+			className="bg-[var(--bg-ink)] text-[var(--text-white)]"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
 		>
 			<head>
 				<JsonLd />
 			</head>
-			<body>
-				{/* Google Tag Manager (noscript) */}
+			<body className="min-h-screen bg-[var(--bg-dark)] text-[var(--text-white)] [font-family:var(--font-main)] antialiased">
 				<noscript>
 					<iframe
 						src="https://www.googletagmanager.com/ns.html?id=GTM-W2JBTH5L"

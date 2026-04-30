@@ -5,12 +5,6 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
 
-const BODY_LOCK_CLASS = "site-contact-drawer-open";
-
-/**
- * Inline Salesforce Web-to-Lead form for the contact drawer.
- * No client-side captcha — submits directly to Salesforce.
- */
 function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 	const formId = useId();
 
@@ -18,9 +12,8 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 		<form
 			action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dao00001YO4nx"
 			method="POST"
-			className="salesforce-contact-form salesforce-contact-form--compact"
+			className="space-y-4"
 			onSubmit={() => {
-				// Close drawer after short delay to let form submit
 				setTimeout(() => onSuccess?.(), 100);
 			}}
 		>
@@ -31,9 +24,14 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 				value="https://designedbyanthony.com/thank-you"
 			/>
 
-			<div className="salesforce-form-grid salesforce-form-grid--compact">
-				<div className="salesforce-form-field">
-					<label htmlFor={`${formId}-first_name`}>First Name</label>
+			<div className="grid gap-3 sm:grid-cols-2">
+				<div className="space-y-2">
+					<label
+						htmlFor={`${formId}-first_name`}
+						className="block text-xs font-semibold uppercase tracking-[0.14em] text-white/70"
+					>
+						First Name
+					</label>
 					<input
 						id={`${formId}-first_name`}
 						maxLength={40}
@@ -41,11 +39,16 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 						type="text"
 						autoComplete="given-name"
 						required
+						className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-300/50 focus:bg-black/40"
 					/>
 				</div>
-
-				<div className="salesforce-form-field">
-					<label htmlFor={`${formId}-email`}>Email</label>
+				<div className="space-y-2">
+					<label
+						htmlFor={`${formId}-email`}
+						className="block text-xs font-semibold uppercase tracking-[0.14em] text-white/70"
+					>
+						Email
+					</label>
 					<input
 						id={`${formId}-email`}
 						maxLength={80}
@@ -53,63 +56,72 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 						type="email"
 						autoComplete="email"
 						required
+						className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-300/50 focus:bg-black/40"
 					/>
 				</div>
-
-				<div className="salesforce-form-field">
-					<label htmlFor={`${formId}-phone`}>Phone</label>
+				<div className="space-y-2 sm:col-span-2">
+					<label
+						htmlFor={`${formId}-phone`}
+						className="block text-xs font-semibold uppercase tracking-[0.14em] text-white/70"
+					>
+						Phone
+					</label>
 					<input
 						id={`${formId}-phone`}
 						maxLength={40}
 						name="phone"
 						type="tel"
 						autoComplete="tel"
+						className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-300/50 focus:bg-black/40"
 					/>
 				</div>
-
-				<div className="salesforce-form-field salesforce-form-field-full">
-					<label htmlFor={`${formId}-description`}>Message</label>
+				<div className="space-y-2 sm:col-span-2">
+					<label
+						htmlFor={`${formId}-description`}
+						className="block text-xs font-semibold uppercase tracking-[0.14em] text-white/70"
+					>
+						Message
+					</label>
 					<textarea
 						id={`${formId}-description`}
 						name="description"
-						rows={3}
+						rows={4}
 						placeholder="How can we help?"
 						required
+						className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-300/50 focus:bg-black/40"
 					/>
 				</div>
 			</div>
-
-			<div className="salesforce-form-actions">
-				<button type="submit" className="btn btn-primary-audit btn-sm">
-					Send Message
-				</button>
-			</div>
+			<button
+				type="submit"
+				className="inline-flex w-full items-center justify-center rounded-full border border-sky-300/40 bg-sky-500/20 px-5 py-3 text-sm font-semibold text-white transition hover:border-sky-200/60 hover:bg-sky-500/30"
+			>
+				Send Message
+			</button>
 		</form>
 	);
 }
 
-/**
- * Contact drawer: desktop slides in from the left (transform-origin 0% 100%);
- * narrow viewports use a bottom sheet. High-contrast panel; CSS transitions only.
- */
 export function SiteContactDrawer() {
 	const panelId = "site-contact-drawer-panel";
 	const tabRef = useRef<HTMLButtonElement>(null);
 	const [open, setOpen] = useState(false);
-	const [hydrated, setHydrated] = useState(false);
 
-	// Always default to tucked-in (closed). Persistence of "open" across
-	// navigations was leaving the drawer permanently open after the first
-	// click, which Anthony flagged as the wrong default behaviour.
 	useEffect(() => {
-		setHydrated(true);
-	}, []);
+		if (typeof document === "undefined") return;
+		document.documentElement.classList.toggle("overflow-hidden", open);
+		document.body.classList.toggle("overflow-hidden", open);
+		return () => {
+			document.documentElement.classList.remove("overflow-hidden");
+			document.body.classList.remove("overflow-hidden");
+		};
+	}, [open]);
 
 	useEffect(() => {
 		if (!open || typeof document === "undefined") return;
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				e.preventDefault();
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				event.preventDefault();
 				setOpen(false);
 				tabRef.current?.focus();
 			}
@@ -118,103 +130,80 @@ export function SiteContactDrawer() {
 		return () => document.removeEventListener("keydown", onKeyDown);
 	}, [open]);
 
-	useEffect(() => {
-		if (typeof document === "undefined" || !hydrated) return;
-		const mq = window.matchMedia("(max-width: 1199px)");
-		const sync = () => {
-			if (mq.matches && open) {
-				document.body.classList.add(BODY_LOCK_CLASS);
-			} else {
-				document.body.classList.remove(BODY_LOCK_CLASS);
-			}
-		};
-		sync();
-		mq.addEventListener("change", sync);
-		return () => {
-			mq.removeEventListener("change", sync);
-			document.body.classList.remove(BODY_LOCK_CLASS);
-		};
-	}, [open, hydrated]);
-
-	const toggle = useCallback(() => {
-		setOpen((prev) => !prev);
-	}, []);
-
+	const toggle = useCallback(() => setOpen((value) => !value), []);
 	const close = useCallback(() => {
 		setOpen(false);
 		tabRef.current?.focus();
 	}, []);
 
 	return (
-		<div
-			className={`site-quick-rail-host${open ? " site-quick-rail-host--open" : ""}${hydrated ? " site-quick-rail-host--hydrated" : ""}`}
-		>
-			<button
-				type="button"
-				className="site-quick-rail-backdrop"
-				aria-label="Close contact drawer"
-				tabIndex={-1}
-				aria-hidden={!open}
-				onClick={close}
-			/>
+		<>
 			<button
 				ref={tabRef}
 				type="button"
-				className="site-quick-rail-tab"
+				onClick={toggle}
 				aria-expanded={open}
 				aria-controls={panelId}
-				onClick={toggle}
+				className="fixed bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[rgba(8,12,20,0.92)] px-4 py-3 text-sm font-semibold text-white shadow-[0_20px_50px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl transition hover:bg-[rgba(8,12,20,0.98)]"
 			>
-				<span className="site-quick-rail-tab__chevron" aria-hidden="true">
-					{open ? "⟨" : "⟩"}
-				</span>
-				<span className="site-quick-rail-tab__label">Contact</span>
+				<span className="inline-flex size-2 rounded-full bg-[rgb(var(--accent-bronze-rgb))]" />
+				Contact
 			</button>
+			{open ? (
+				<div
+					className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm"
+					aria-hidden="true"
+					onClick={close}
+				/>
+			) : null}
 			<aside
 				id={panelId}
-				className="site-quick-rail site-quick-rail--drawer"
-				aria-label="Contact form"
 				aria-hidden={!open}
-				data-nav-rail
+				className={`fixed inset-x-0 bottom-0 z-[95] max-h-[85vh] rounded-t-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,23,35,0.98),rgba(6,10,18,0.99))] shadow-[0_-24px_60px_-28px_rgba(0,0,0,0.8)] transition duration-300 md:bottom-6 md:left-auto md:right-6 md:inset-x-auto md:w-[420px] md:max-w-[calc(100vw-3rem)] md:rounded-[28px] ${open ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0 md:translate-y-8"}`}
 			>
-				<div className="site-quick-rail__head">
-					<Image
-						src={BRAND_MARK_IMAGE}
-						alt=""
-						width={BRAND_MARK_IMAGE.width}
-						height={BRAND_MARK_IMAGE.height}
-						className="site-quick-rail__mark"
-						aria-hidden
-					/>
+				<div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+					<div className="flex items-center gap-3">
+						<Image
+							src={BRAND_MARK_IMAGE}
+							alt=""
+							width={BRAND_MARK_IMAGE.width}
+							height={BRAND_MARK_IMAGE.height}
+							aria-hidden
+						/>
+						<div>
+							<p className="text-sm font-semibold text-white">
+								Start the conversation
+							</p>
+							<p className="text-xs uppercase tracking-[0.14em] text-white/45">
+								Replies within one business day
+							</p>
+						</div>
+					</div>
 					<button
 						type="button"
-						className="site-quick-rail__close"
 						onClick={close}
+						className="inline-flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
 						aria-label="Close contact drawer"
 					>
 						×
 					</button>
 				</div>
-				<div className="site-quick-rail__inner">
-					<p className="site-quick-rail__lead">
-						Send a quick message — we reply within one business day.
-					</p>
+				<div className="space-y-5 overflow-y-auto px-5 py-5">
 					<ContactDrawerForm onSuccess={close} />
-					<div className="site-quick-rail__divider" />
-					<a
-						href={businessProfile.telephoneHref}
-						className="nav-rail-link nav-rail-link--phone"
-						onClick={close}
-					>
-						<span className="nav-rail-text">
-							<strong>Or call now</strong>
-							<span className="nav-rail-sub">
-								{businessProfile.telephone.replace("+1-", "")}
-							</span>
-						</span>
-					</a>
+					<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+						<p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+							Prefer a call?
+						</p>
+						<a
+							href={businessProfile.telephoneHref}
+							onClick={close}
+							className="mt-2 block text-lg font-semibold text-white transition hover:text-sky-200"
+						>
+							{businessProfile.telephone.replace("+1-", "")}
+						</a>
+					</div>
 				</div>
 			</aside>
-		</div>
+		</>
 	);
 }

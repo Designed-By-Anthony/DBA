@@ -6,6 +6,5 @@ export { initFaqAccordion } from "./ui/faq-accordion";
 export { initGbpRoiCalculator } from "./ui/gbp-roi-calculator";
 export { initMagneticLinks } from "./ui/magnetic-links";
 export { initMobileNav } from "./ui/mobile-nav";
-export { initReachOutModal } from "./ui/reach-out-modal";
 export { initRevealAnimations } from "./ui/reveal";
 export { initTabbedProof } from "./ui/tabbed-proof";

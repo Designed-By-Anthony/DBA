@@ -15,9 +15,7 @@ const BUILT_WITH = [
 ] as const;
 
 export type BrandFooterProps = {
-	/** Optional small mono build tag (e.g. "Lighthouse Scanner v2") shown next to legal links. */
 	buildTag?: string;
-	/** Optional contextual "Powered by" chips shown below the standard Built-with row. */
 	poweredBy?: ReadonlyArray<{ label: string; href: string }>;
 };
 
@@ -25,88 +23,96 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 	const year = new Date().getFullYear();
 
 	return (
-		<footer className="dba-footer">
-			<div className="dba-footer-rule" aria-hidden />
-			<div className="dba-footer-inner">
-				<div className="dba-footer-row">
-					<Link
-						href={SITE_BRAND.homeHref}
-						className="dba-footer-brand"
-						aria-label={`${SITE_BRAND.name} — home`}
-					>
-						<Image
-							src={SITE_BRAND.assets.mark}
-							alt="Designed by Anthony logo"
-							width={22}
-							height={16}
-							className="dba-footer-mark"
-							style={{ width: "auto" }}
-						/>
-						<span className="dba-footer-brand-name">{SITE_BRAND.name}</span>
-					</Link>
-
-					<nav className="dba-footer-nav" aria-label="Footer navigation">
-						{SITE_FOOTER_LINKS.map((link) => (
-							<Link key={link.href} href={link.href}>
-								{link.label}
-							</Link>
-						))}
-					</nav>
-
-					<div className="dba-footer-legal">
-						<p className="dba-footer-copy">
-							© {year} {SITE_BRAND.name}
-						</p>
-						{SITE_LEGAL_LINKS.map((link) => (
-							<span key={link.href} className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
-									·
-								</span>
-								<Link href={link.href}>{link.label}</Link>
-							</span>
-						))}
-						{buildTag ? (
-							<span className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
-									·
-								</span>
-								<span className="dba-footer-meta font-mono">{buildTag}</span>
-							</span>
-						) : null}
-					</div>
-				</div>
-
-				<div className="dba-footer-stack">
-					<span className="dba-footer-stack-label">Built with</span>
-					{BUILT_WITH.map(({ label, href }) => (
-						<a
-							key={label}
-							href={href}
-							className="dba-stack-badge"
-							target="_blank"
-							rel="noopener noreferrer"
+		<footer className="border-t border-white/10 bg-[rgba(6,10,18,0.75)]">
+			<div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+				<div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+					<div className="space-y-4">
+						<Link
+							href={SITE_BRAND.homeHref}
+							className="inline-flex items-center gap-3"
+							aria-label={`${SITE_BRAND.name} — home`}
 						>
-							{label}
-						</a>
-					))}
-				</div>
-
-				{poweredBy?.length ? (
-					<div className="dba-footer-stack">
-						<span className="dba-footer-stack-label">Powered by</span>
-						{poweredBy.map(({ label, href }) => (
-							<a
-								key={label}
-								href={href}
-								className="dba-stack-badge"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{label}
-							</a>
-						))}
+							<Image
+								src={SITE_BRAND.assets.mark}
+								alt="Designed by Anthony logo"
+								width={26}
+								height={20}
+								style={{ width: "auto" }}
+							/>
+							<span className="font-[var(--font-report-display)] text-lg font-semibold text-white">
+								{SITE_BRAND.name}
+							</span>
+						</Link>
+						<nav className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-white/65">
+							{SITE_FOOTER_LINKS.map((link) => (
+								<Link
+									key={link.href}
+									href={link.href}
+									className="transition hover:text-white"
+								>
+									{link.label}
+								</Link>
+							))}
+						</nav>
 					</div>
-				) : null}
+					<div className="space-y-4 lg:max-w-xl lg:text-right">
+						<div className="flex flex-wrap gap-x-3 gap-y-2 text-sm text-white/55 lg:justify-end">
+							<span>
+								© {year} {SITE_BRAND.name}
+							</span>
+							{SITE_LEGAL_LINKS.map((link) => (
+								<Link
+									key={link.href}
+									href={link.href}
+									className="transition hover:text-white"
+								>
+									{link.label}
+								</Link>
+							))}
+							{buildTag ? (
+								<span className="font-mono text-xs uppercase tracking-[0.16em] text-[rgb(var(--accent-bronze-rgb)/0.7)]">
+									{buildTag}
+								</span>
+							) : null}
+						</div>
+						<div className="space-y-3">
+							<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+								<span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+									Built with
+								</span>
+								{BUILT_WITH.map(({ label, href }) => (
+									<a
+										key={label}
+										href={href}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 transition hover:border-white/20 hover:text-white"
+									>
+										{label}
+									</a>
+								))}
+							</div>
+							{poweredBy?.length ? (
+								<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+									<span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
+										Powered by
+									</span>
+									{poweredBy.map(({ label, href }) => (
+										<a
+											key={label}
+											href={href}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 transition hover:border-white/20 hover:text-white"
+										>
+											{label}
+										</a>
+									))}
+								</div>
+							) : null}
+						</div>
+					</div>
+				</div>
 			</div>
 		</footer>
 	);

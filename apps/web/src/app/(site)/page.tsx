@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { HomePage } from "@/components/marketing/HomePage";
-import { MarketingChrome } from "@/components/marketing/MarketingChrome";
-import { homeFaqEntries, homeFooterCta } from "@/data/home";
+import { homeFaqEntries } from "@/data/home";
 import {
 	buildBaseOrganizationSchema,
 	buildBaseWebsiteSchema,
@@ -140,9 +139,7 @@ export default function Home() {
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
 				/>
 			))}
-			<MarketingChrome footerCta={homeFooterCta}>
-				<HomePage />
-			</MarketingChrome>
+			<HomePage />
 		</>
 	);
 }

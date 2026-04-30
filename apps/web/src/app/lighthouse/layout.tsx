@@ -2,20 +2,11 @@ import { CookieConsentBanner } from "@lh/components/CookieConsentBanner";
 import { LighthouseJsonLd } from "@lh/components/LighthouseJsonLd";
 import { LighthouseTechFingerprints } from "@lh/components/LighthouseTechFingerprints";
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, Outfit } from "next/font/google";
 import { BrandFooter } from "@/components/brand/BrandFooter";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import { SiteContactDrawer } from "@/components/marketing/SiteContactDrawer";
 import { absoluteSiteUrl, SITE_BRAND } from "@/design-system/site-config";
 import "./lighthouse-globals.css";
-
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
-const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"] });
-const fraunces = Fraunces({
-	variable: "--font-fraunces",
-	subsets: ["latin"],
-	axes: ["opsz", "SOFT", "WONK"],
-});
 
 const LIGHTHOUSE_PATH = "/lighthouse";
 const LIGHTHOUSE_URL = absoluteSiteUrl(LIGHTHOUSE_PATH);
@@ -100,16 +91,11 @@ export default function LighthouseLayout({
 	children,
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<div
-			className={`lighthouse-segment relative ${inter.variable} ${outfit.variable} ${fraunces.variable} font-sans antialiased`}
-		>
+		<div className="lighthouse-segment relative min-h-screen [font-family:var(--font-main)] antialiased">
 			<LighthouseJsonLd />
 			<LighthouseTechFingerprints />
-
 			<BrandHeader currentSection="audit" includeHamburger={false} />
-
 			{children}
-
 			<BrandFooter
 				buildTag="Lighthouse Scanner v2"
 				poweredBy={[
@@ -121,11 +107,8 @@ export default function LighthouseLayout({
 					{ label: "Next.js", href: "https://nextjs.org" },
 				]}
 			/>
-
 			<SiteContactDrawer />
 			<CookieConsentBanner />
-			{/* CrispBootstrap is mounted globally in the root layout; no need
-			    to duplicate it here. */}
 		</div>
 	);
 }

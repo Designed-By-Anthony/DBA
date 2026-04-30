@@ -275,8 +275,6 @@
 
 .hero-cta-glow {
 	position: relative;
-	z-index: 0;
-	isolation: isolate;
 	overflow: visible;
 }
 
@@ -289,7 +287,6 @@
 .hero-cta-glow-halo {
 	position: absolute;
 	inset: -4px;
-	z-index: -1;
 	border-radius: inherit;
 	pointer-events: none;
 	box-shadow:
@@ -817,17 +814,10 @@
 
 /* Hero trust strip: global styles in theme.css (.hero-trust-strip, .hero-trust-badge, .hero-trust-sep) */
 
-/* ── Home hero: subtle rain (atmospheric, not competing with copy) ── */
-.page-hero--home::before,
-.page-hero--home::after {
-	z-index: 0;
-}
-
 /* Slow drifting light fields — GPU-friendly opacity + transform only */
 .hero-drift {
 	position: absolute;
 	inset: 0;
-	z-index: 1;
 	pointer-events: none;
 	overflow: hidden;
 }
@@ -896,7 +886,6 @@
 .hero-rain {
 	position: absolute;
 	inset: 0;
-	z-index: 2;
 	pointer-events: none;
 	overflow: hidden;
 }
@@ -947,7 +936,6 @@
 
 .page-hero--home .page-hero-inner {
 	position: relative;
-	z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1077,7 +1065,6 @@
 		rgba(91, 156, 248, 0.25) 85%,
 		transparent
 	);
-	z-index: 0;
 	pointer-events: none;
 	animation: process-line-glow 4s ease-in-out infinite;
 }
@@ -1094,7 +1081,6 @@
 
 .process-card {
 	position: relative;
-	z-index: 1;
 }
 
 .process-number {

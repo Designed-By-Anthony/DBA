@@ -1,7 +1,9 @@
 import "@/app/home-page.css";
 import "@/app/marketing-site-pages.css";
 import type { Metadata } from "next";
+import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { StaticMarketingPage } from "@/components/marketing/MarketingSitePages";
+import { homeFooterCta } from "@/data/home";
 
 export const metadata: Metadata = {
 	title: "Page not found",
@@ -27,5 +29,9 @@ export const metadata: Metadata = {
 
 /** Served when middleware rewrites `/404` → `/page-not-found` (Next reserves `404` on catch-all). */
 export default function PageNotFoundMarketing() {
-	return <StaticMarketingPage slug="404" />;
+	return (
+		<MarketingChrome footerCta={homeFooterCta}>
+			<StaticMarketingPage slug="404" />
+		</MarketingChrome>
+	);
 }

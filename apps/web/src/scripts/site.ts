@@ -10,7 +10,6 @@ import {
 	initLayoutCalendlyEmbed,
 	initMagneticLinks,
 	initMobileNav,
-	initReachOutModal,
 	initRevealAnimations,
 	initTabbedProof,
 } from "./ui";
@@ -28,7 +27,6 @@ function runPageScripts(): void {
 	initDeferredThirdPartyLoader();
 	initRevealAnimations();
 	initMobileNav();
-	initReachOutModal();
 	initLayoutCalendlyEmbed();
 	initFaqAccordion();
 	initExclusiveDetails();

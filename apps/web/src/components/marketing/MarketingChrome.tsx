@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
@@ -6,7 +5,6 @@ import { BrandFooter } from "@/components/brand/BrandFooter";
 import { BrandHeader } from "@/components/brand/BrandHeader";
 import {
 	SITE_AUDIT_CTA,
-	SITE_BRAND,
 	SITE_CONTACT_LINK,
 	SITE_HEADER_NAV_LINKS,
 } from "@/design-system/site-config";
@@ -17,7 +15,6 @@ import { SiteContactDrawer } from "./SiteContactDrawer";
 
 const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
 
-/** Build-time id (see `next.config.ts` env); avoids filesystem reads on Cloudflare Workers. */
 const siteScriptVersion =
 	process.env.NEXT_PUBLIC_SITE_SCRIPT_BUILD_ID ?? "local";
 
@@ -69,7 +66,6 @@ window.__dbaCookieConsentKey = 'dba_cookie_consent';
 function configureGtm() {
   if (gtmConfigured) return;
   gtmConfigured = true;
-  // GTM already handles its own initialization once the script is loaded
 }
 window.__dbaLoadAnalytics = function () {
   if (gtmLoaded) return;
@@ -102,185 +98,140 @@ window.__dbaRevokeAnalyticsConsent = function () {
 };`}
 			</Script>
 
-			<div id="reading-progress-bar" aria-hidden="true" />
-			<div className="site-chrome-sticky">
-				<BrandHeader />
-			</div>
-
 			<div
-				className="mobile-nav-overlay"
-				id="mobile-nav"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="mobile-nav-title"
+				id="reading-progress-bar"
 				aria-hidden="true"
-			>
+				className="fixed left-0 top-0 z-[110] h-1 w-0 rounded-r bg-gradient-to-r from-sky-500 via-sky-400 to-sky-200 transition-[width] duration-100"
+			/>
+
+			<div className="relative min-h-screen">
+				<a
+					href="#main-content"
+					className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:rounded-md focus:bg-sky-500 focus:px-4 focus:py-3 focus:text-white"
+				>
+					Skip to content
+				</a>
+				<BrandHeader />
+
 				<div
-					className="mobile-nav-backdrop"
-					data-mobile-nav-dismiss
+					id="mobile-nav"
+					className="fixed inset-0 z-[100] hidden bg-black/95 text-white md:hidden"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="mobile-nav-title"
 					aria-hidden="true"
-				/>
-				<div className="mobile-nav-scroll-wrap">
-					<div className="mobile-nav-panel">
-						<div className="mobile-nav-panel__top">
-							<h2 id="mobile-nav-title" className="sr-only">
-								Main menu
+				>
+					<div className="flex min-h-full flex-col overflow-y-auto">
+						<div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-6 sm:px-6">
+							<h2
+								id="mobile-nav-title"
+								className="text-sm font-semibold uppercase tracking-[0.2em] text-white/55"
+							>
+								Navigation
 							</h2>
 							<button
 								type="button"
-								className="mobile-nav-close"
 								data-mobile-nav-close
+								className="inline-flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
 								aria-label="Close navigation menu"
 							>
-								<span aria-hidden="true">×</span>
+								×
 							</button>
 						</div>
-						<nav className="mobile-nav-links" aria-label="Mobile">
+						<nav
+							className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-5 px-4 pb-12 sm:px-6"
+							aria-label="Mobile"
+						>
 							{SITE_HEADER_NAV_LINKS.map((link) => (
-								<Link key={link.href} href={link.href}>
+								<Link
+									key={link.href}
+									href={link.href}
+									className="text-3xl font-semibold tracking-[-0.03em] text-white/80 transition hover:text-white"
+								>
 									{link.label}
 								</Link>
 							))}
 							<Link
 								href={SITE_CONTACT_LINK.href}
-								className="mobile-nav-cta mobile-nav-cta--secondary"
+								className="text-3xl font-semibold tracking-[-0.03em] text-white/80 transition hover:text-white"
 							>
 								{SITE_CONTACT_LINK.label}
 							</Link>
-							<Link href={SITE_AUDIT_CTA.href} className="mobile-nav-cta">
-								{SITE_AUDIT_CTA.label}
-							</Link>
+							<div className="mt-6 flex flex-col gap-3 sm:max-w-sm">
+								<Link
+									href={SITE_AUDIT_CTA.href}
+									className="inline-flex items-center justify-center rounded-full border border-sky-300/35 bg-sky-500/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white"
+								>
+									{SITE_AUDIT_CTA.label}
+								</Link>
+								<a
+									href={mailtoContactHref}
+									className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white/85"
+								>
+									Email Anthony
+								</a>
+							</div>
 						</nav>
 					</div>
 				</div>
-			</div>
 
-			<div className="site-body-canvas">
 				<SiteContactDrawer />
-				<div className="site-main-wrap">
-					<main id="main-content">{children}</main>
-					{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
-					<BrandFooter />
-				</div>
+				<main id="main-content" className="relative min-h-[60vh]">
+					{children}
+				</main>
+				{!hidePreFooterCta && footerCta ? <FooterCta {...footerCta} /> : null}
+				<BrandFooter />
 			</div>
-
-			<div className="reach-out-sticky" id="reachOutSticky">
-				<button
-					type="button"
-					className="reach-out-sticky-btn"
-					id="reachOutOpenBtn"
-					aria-haspopup="dialog"
-					aria-controls="reachOutModal"
-					aria-expanded="false"
-				>
-					<span className="reach-out-sticky-label">Get in touch</span>
-				</button>
-			</div>
-
-			<dialog
-				id="reachOutModal"
-				className="reach-out-dialog"
-				aria-labelledby="reachOutModalTitle"
-				aria-modal="true"
-			>
-				<div className="reach-out-dialog-panel splash-shell splash-shell--reach-out">
-					<div className="reach-out-dialog-header">
-						<Image
-							src={SITE_BRAND.assets.mark}
-							alt={SITE_BRAND.name}
-							width={40}
-							height={30}
-							className="reach-out-dialog-logo"
-							style={{ height: "auto" }}
-						/>
-						<button
-							type="button"
-							className="reach-out-dialog-close splash-close"
-							data-reach-out-close
-							aria-label="Close"
-						>
-							×
-						</button>
-					</div>
-					<h2 id="reachOutModalTitle" className="reach-out-dialog-title">
-						Say hello
-					</h2>
-					<p className="reach-out-dialog-lede">
-						Start with a free site audit — or just call / email.
-					</p>
-					<Link
-						href="/lighthouse"
-						className="reach-out-dialog-primary"
-						data-reach-out-close
-					>
-						Audit My Site
-					</Link>
-					<section
-						className="reach-out-dialog-actions"
-						aria-label="Other ways to reach us"
-					>
-						<a
-							href={businessProfile.telephoneHref}
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Call</span>
-							<span className="reach-out-action-detail">
-								{businessProfile.telephone.replace("+1-", "")}
-							</span>
-						</a>
-						<a
-							href={mailtoContactHref}
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Email</span>
-							<span className="reach-out-action-detail">
-								{businessProfile.email}
-							</span>
-						</a>
-						<Link
-							href="/contact"
-							className="reach-out-action"
-							data-reach-out-close
-						>
-							<span className="reach-out-action-label">Contact</span>
-							<span className="reach-out-action-detail">Form / message</span>
-						</Link>
-					</section>
-				</div>
-			</dialog>
 
 			<div
 				id="cookie-consent-root"
-				className="cookie-consent"
 				hidden
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="cookie-consent-title"
 				aria-describedby="cookie-consent-desc"
+				className="fixed inset-x-0 bottom-0 z-[105] px-4 pb-4 sm:px-6"
 			>
-				<div className="cookie-consent__inner">
-					<p id="cookie-consent-title" className="cookie-consent__title">
+				<div className="mx-auto max-w-3xl rounded-[28px] border border-[rgb(var(--accent-bronze-rgb)/0.24)] bg-[linear-gradient(165deg,rgba(19,26,36,0.98),rgba(8,11,18,0.99))] p-6 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+					<p
+						id="cookie-consent-title"
+						className="text-base font-semibold text-[var(--text-cream)]"
+					>
 						Cookies and analytics
 					</p>
-					<p id="cookie-consent-desc" className="cookie-consent__text">
+					<p
+						id="cookie-consent-desc"
+						className="mt-2 text-sm leading-6 text-white/65"
+					>
 						We use essential tools to keep forms secure and the site running. If
 						you are OK with it, we also load Google Analytics 4 to see how
-						traffic moves. Read the <Link href="/cookie">Cookie Policy</Link>{" "}
-						and <Link href="/privacy">Privacy Policy</Link>.
+						traffic moves. Read the{" "}
+						<Link
+							href="/cookie"
+							className="text-[rgb(var(--accent-bronze-rgb))] underline underline-offset-4"
+						>
+							Cookie Policy
+						</Link>{" "}
+						and{" "}
+						<Link
+							href="/privacy"
+							className="text-[rgb(var(--accent-bronze-rgb))] underline underline-offset-4"
+						>
+							Privacy Policy
+						</Link>
+						.
 					</p>
-					<div className="cookie-consent__actions">
+					<div className="mt-5 flex flex-wrap gap-3">
 						<button
 							type="button"
-							className="btn btn-primary btn-sm"
+							className="inline-flex items-center rounded-full border border-[rgb(var(--accent-bronze-rgb)/0.5)] bg-[rgb(var(--accent-bronze-rgb)/0.9)] px-5 py-3 text-sm font-semibold text-[#171008]"
 							id="cookie-consent-accept"
 						>
 							Accept
 						</button>
 						<button
 							type="button"
-							className="btn btn-outline btn-sm"
+							className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85"
 							id="cookie-consent-reject"
 						>
 							Decline

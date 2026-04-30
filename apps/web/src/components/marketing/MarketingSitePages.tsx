@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getArticleBlocksForSlug } from "@/data/blogArticleBlocks";
 import { blogPosts } from "@/data/blogPosts";
-import { homeFooterCta } from "@/data/home";
 import {
 	getBlogLongformSections,
 	getServiceDetailLongformSections,
@@ -25,7 +24,6 @@ import {
 	ServiceAreasPage,
 } from "./EnrichedPages";
 import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
-import { MarketingChrome } from "./MarketingChrome";
 import {
 	MotionReveal,
 	MotionStagger,
@@ -79,7 +77,7 @@ function ProseBlock({ paragraphs }: { paragraphs: string[] }) {
 function ServicesIndex() {
 	const longform = getServiceLongformSections("Services");
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero
 				kind="services"
 				title="Services"
@@ -127,7 +125,7 @@ function ServicesIndex() {
 					</MotionReveal>
 				</section>
 			))}
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -141,7 +139,7 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 	   "Strategy before design" block doesn't duplicate across every service. */
 	const longform = getServiceDetailLongformSections(service.name);
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero
 				kind="services"
 				title={service.name}
@@ -214,13 +212,13 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					</Link>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
 function BlogIndex() {
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero
 				kind="blog"
 				title="Blog"
@@ -279,7 +277,7 @@ function BlogIndex() {
 					))}
 				</MotionStagger>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -289,7 +287,7 @@ function BlogPostPage({ slug }: { slug: string }) {
 	const articleBlocks = getArticleBlocksForSlug(slug);
 	const longform = getBlogLongformSections(post.title);
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<BlogArticleEnhancements />
 			<article className="blog-article-root">
 				<section
@@ -365,13 +363,13 @@ function BlogPostPage({ slug }: { slug: string }) {
 					</div>
 				</section>
 			</article>
-		</MarketingChrome>
+		</>
 	);
 }
 
 function PortfolioIndex() {
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero kind="portfolio" {...staticMarketingPageCopy.portfolio} />
 			<section className="section-shell">
 				<MotionStagger
@@ -424,7 +422,7 @@ function PortfolioIndex() {
 					})}
 				</MotionStagger>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -432,7 +430,7 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 	const item = showcaseItems.find((i) => i.caseStudySlug === slug);
 	if (!item) notFound();
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero
 				kind="portfolio"
 				title={item.name}
@@ -484,7 +482,7 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 					</p>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 
@@ -494,7 +492,7 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 	const showContactForm = slug === "contact";
 	const showFacebookCta = slug === "facebook-offer";
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero kind={slug} title={copy.title} subtitle={copy.description} />
 			<ProseBlock paragraphs={copy.paragraphs} />
 			{showFacebookCta ? (
@@ -528,14 +526,14 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 					</div>
 				</section>
 			) : null}
-		</MarketingChrome>
+		</>
 	);
 }
 
 function ThankYouPage() {
 	const base = staticMarketingPageCopy["thank-you"];
 	return (
-		<MarketingChrome footerCta={homeFooterCta}>
+		<>
 			<PageHero
 				kind="thank-you"
 				title={base.title}
@@ -559,7 +557,7 @@ function ThankYouPage() {
 					</p>
 				</MotionReveal>
 			</section>
-		</MarketingChrome>
+		</>
 	);
 }
 

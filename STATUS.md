@@ -2,6 +2,17 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Agent singularity + marketing chrome rebuild (2026-04-30)
+
+- Consolidated repository AI guidance into `/home/runner/work/DBA/DBA/AGENTS.md` and removed redundant instruction/config paths (`.codex/`, `.cursor/`, `MASTER_ARCHITECT_RULES.md`, `ANTHONYS_INSTRUCTIONS.txt`, `.vscode/mcp.json`).
+- Moved Tailwind v4 global loading to `/home/runner/work/DBA/DBA/apps/web/src/design-system/dba-global.css` with workspace-wide `@source` coverage so utilities resolve outside `/lighthouse`.
+- Deleted legacy chrome CSS files (`apps/web/src/styles/layout-shell.css`, `apps/web/src/design-system/brand-chrome.css`) and rebuilt the marketing shell in Tailwind inside `BrandHeader`, `BrandFooter`, `MarketingChrome`, and `SiteContactDrawer`.
+- Root layout now owns base background/text/font application; `(site)` layout is the single shared marketing wrapper for `/`, `/tools`, and catch-all marketing routes.
+- Replaced the old mobile nav fixed-body scroll lock with class-based document overflow locking in `apps/web/src/scripts/ui/mobile-nav.ts`.
+- Removed `next/font/google` usage from `/home/runner/work/DBA/DBA/apps/web/src/app/lighthouse/layout.tsx`, eliminating blocked Google Fonts fetches during the production build.
+- Trimmed theme/page CSS to reduce chrome-layer conflicts by removing legacy z-index/isolation rules from the home and marketing page styles and removing obsolete cookie/chrome blocks from `theme.css`.
+- Verification: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root. `bun run test:playwright:render` still fails because the existing Playwright webServer command invokes `bun run --cwd apps/web dev`, which Bun rejects as invalid CLI usage.
+
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
 - Removed Zustand badge from the "Our Edge" stack display — dependency was previously removed but badge remained.

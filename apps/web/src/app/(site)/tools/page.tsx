@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { ToolsPage } from "./ToolsPage";
 
 export const metadata: Metadata = {
@@ -23,9 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default function Tools() {
-	return (
-		<MarketingChrome>
-			<ToolsPage />
-		</MarketingChrome>
-	);
+	return <ToolsPage />;
 }
