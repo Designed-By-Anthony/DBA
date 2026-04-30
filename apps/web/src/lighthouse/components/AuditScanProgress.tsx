@@ -92,12 +92,29 @@ export function AuditScanProgress({
 }) {
 	const prefersReduced = useReducedMotion();
 	const [factIndex, setFactIndex] = useState(0);
+	const [tileStride, setTileStride] = useState(0);
 	const idx = phaseIndex(activePhase);
 	const trackRef = useRef<HTMLDivElement>(null);
+	const firstTileRef = useRef<HTMLDivElement>(null);
 	const progressPct = useMemo(() => {
 		const step = 100 / PHASES.length;
 		return Math.min(100, Math.round((idx + 0.65) * step));
 	}, [idx]);
+
+	useEffect(() => {
+		const el = firstTileRef.current;
+		if (!el) return;
+		const measure = () => {
+			const gap = Number.parseFloat(
+				getComputedStyle(el.parentElement ?? el).gap || "16",
+			);
+			setTileStride(el.offsetWidth + gap);
+		};
+		measure();
+		const ro = new ResizeObserver(measure);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, []);
 
 	useEffect(() => {
 		const t = window.setInterval(() => {
@@ -156,14 +173,14 @@ export function AuditScanProgress({
 					ref={trackRef}
 					className="lh-carousel-track"
 					animate={
-						prefersReduced
+						prefersReduced || tileStride === 0
 							? undefined
 							: {
-									x: `calc(-${factIndex} * (min(28vw, 320px) + var(--space-element)))`,
+									x: -(factIndex * tileStride),
 								}
 					}
 					transition={
-						prefersReduced
+						prefersReduced || tileStride === 0
 							? undefined
 							: { type: "spring", stiffness: 180, damping: 28 }
 					}
@@ -171,6 +188,7 @@ export function AuditScanProgress({
 					{FACTS.map((fact, i) => (
 						<div
 							key={fact.title}
+							ref={i === 0 ? firstTileRef : undefined}
 							className={`lh-carousel-tile glass-card${i === factIndex ? " lh-carousel-tile--active" : ""}`}
 						>
 							<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>
