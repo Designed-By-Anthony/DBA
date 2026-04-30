@@ -1773,7 +1773,7 @@ body:not(.has-progress-bar) #reading-progress-bar {
 
 @media (max-width: 600px) {
 	.salesforce-form-actions {
-		justify-content: stretch;
+		justify-content: center;
 	}
 
 	.salesforce-form-actions .btn {
