@@ -577,8 +577,8 @@ main {
 	gap: 0.5rem;
 	padding: 0.46rem 0.78rem;
 	border-radius: 999px;
-	border: 1px solid rgba(96, 165, 250, 0.22);
-	background: rgba(14, 23, 39, 0.72);
+	border: 1px solid rgba(212, 175, 55, 0.2);
+	background: rgba(14, 20, 30, 0.72);
 	color: rgba(255, 255, 255, 0.84);
 	font-size: 0.84rem;
 	font-weight: 600;
@@ -701,10 +701,10 @@ main {
 		rgba(9, 14, 24, 0.95) 0%,
 		rgba(11, 17, 29, 0.95) 100%
 	);
-	border-color: rgba(147, 197, 253, 0.3);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.22);
 	box-shadow:
 		0 28px 70px -38px rgba(2, 6, 23, 0.96),
-		inset 0 0 0 1px rgba(148, 163, 184, 0.12);
+		inset 0 0 0 1px rgba(148, 163, 184, 0.08);
 }
 
 .surface-card--proof {
@@ -722,7 +722,7 @@ main {
 	border-color: rgba(34, 197, 94, 0.22);
 }
 
-/* Cursor glow pseudo-element */
+/* Cursor glow pseudo-element — Bronze warmth instead of blue */
 .surface-card::after {
 	content: "";
 	position: absolute;
@@ -730,7 +730,7 @@ main {
 	border-radius: inherit;
 	background: radial-gradient(
 		300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-		rgba(59, 130, 246, 0.06),
+		rgba(212, 175, 55, 0.05),
 		transparent 60%
 	);
 	opacity: 0;
@@ -746,9 +746,9 @@ main {
 .surface-card:hover {
 	transform: translateY(-4px) rotateX(1.5deg) rotateY(-1.5deg);
 	box-shadow:
-		0 32px 64px -32px rgba(2, 6, 23, 0.8),
-		0 0 0 1px rgba(96, 165, 250, 0.12);
-	border-color: rgba(96, 165, 250, 0.2);
+		0 32px 64px -32px rgba(2, 6, 23, 0.85),
+		0 0 0 1px rgba(212, 175, 55, 0.1);
+	border-color: rgba(255, 255, 255, 0.14);
 }
 
 @media (prefers-reduced-motion: reduce), (pointer: coarse) {
@@ -828,9 +828,9 @@ main {
 	align-items: center;
 	padding: 0.36rem 0.7rem;
 	border-radius: 999px;
-	background: rgba(59, 130, 246, 0.12);
-	border: 1px solid rgba(59, 130, 246, 0.24);
-	color: #bfdbfe;
+	background: rgb(var(--accent-bronze-rgb) / 0.1);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.24);
+	color: var(--accent-bronze-light, #fcf0d2);
 	font-size: 0.72rem;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -843,9 +843,9 @@ main {
 
 a .card-tag:hover,
 button:hover .card-tag {
-	background: rgba(59, 130, 246, 0.2);
-	border-color: rgba(96, 165, 250, 0.38);
-	color: #eff6ff;
+	background: rgb(var(--accent-bronze-rgb) / 0.18);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.4);
+	color: var(--accent-bronze-light, #fcf0d2);
 }
 
 /* ── Button System ── */
@@ -864,11 +864,15 @@ button:hover .card-tag {
 	text-decoration: none;
 	color: var(--text-white);
 	background:
-		linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(37, 99, 235, 0.95)),
+		linear-gradient(
+			135deg,
+			rgba(212, 175, 55, 0.18),
+			rgba(181, 138, 20, 0.85)
+		),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-	border: 1px solid rgba(147, 197, 253, 0.62);
+	border: 1px solid rgba(212, 175, 55, 0.55);
 	box-shadow:
-		0 18px 34px -20px rgba(37, 99, 235, 0.95),
+		0 18px 34px -20px rgba(181, 138, 20, 0.75),
 		inset 0 1px 0 rgba(255, 255, 255, 0.18);
 	transition:
 		transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -906,37 +910,45 @@ button:hover .card-tag {
 
 .btn:hover {
 	transform: translateY(-1px);
-	border-color: rgba(191, 219, 254, 0.82);
+	border-color: rgba(212, 175, 55, 0.78);
 	box-shadow:
-		0 20px 36px -22px rgba(37, 99, 235, 0.88),
+		0 20px 36px -22px rgba(181, 138, 20, 0.85),
 		inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .btn:focus-visible {
-	outline: 3px solid rgba(147, 197, 253, 0.35);
+	outline: 3px solid rgba(212, 175, 55, 0.5);
 	outline-offset: 3px;
 }
 
 .btn:active {
 	transform: scale(0.97) translateY(0);
 	box-shadow:
-		0 8px 16px -8px rgba(37, 99, 235, 0.8),
+		0 8px 16px -8px rgba(181, 138, 20, 0.7),
 		inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
 	background:
-		linear-gradient(135deg, rgba(96, 165, 250, 0.34), rgba(37, 99, 235, 1)),
+		linear-gradient(
+			135deg,
+			rgba(212, 175, 55, 0.34),
+			rgba(181, 138, 20, 1)
+		),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-	border-color: rgba(147, 197, 253, 0.72);
+	border-color: rgba(212, 175, 55, 0.72);
 	box-shadow:
-		0 22px 40px -22px rgba(37, 99, 235, 1),
+		0 22px 40px -22px rgba(181, 138, 20, 0.9),
 		inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .btn-primary:hover {
 	background:
-		linear-gradient(135deg, rgba(147, 197, 253, 0.38), rgba(29, 78, 216, 1)),
+		linear-gradient(
+			135deg,
+			rgba(232, 204, 105, 0.38),
+			rgba(155, 110, 15, 1)
+		),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
 }
 
@@ -962,9 +974,27 @@ button:hover .card-tag {
 
 .btn-primary-audit {
 	background:
-		linear-gradient(135deg, rgba(96, 165, 250, 0.34), rgba(30, 64, 175, 0.96)),
-		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-	border-color: rgba(125, 211, 252, 0.72);
+		linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.08),
+			rgba(20, 25, 36, 0.95)
+		),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+	border-color: rgba(255, 255, 255, 0.18);
+	box-shadow:
+		0 18px 34px -20px rgba(0, 0, 0, 0.6),
+		inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.btn-primary-audit:hover {
+	background:
+		linear-gradient(
+			135deg,
+			rgba(212, 175, 55, 0.12),
+			rgba(20, 25, 36, 0.95)
+		),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+	border-color: rgba(212, 175, 55, 0.35);
 }
 
 @media (hover: hover) and (pointer: fine) and (
@@ -995,10 +1025,11 @@ button:hover .card-tag {
 	background:
 		linear-gradient(
 			135deg,
-			rgb(var(--accent-bronze-rgb) / 0.16),
-			rgba(91, 156, 248, 0.2)
+			rgb(var(--accent-bronze-rgb) / 0.14),
+			rgba(20, 23, 32, 0.85)
 		),
 		rgba(9, 15, 28, 0.74);
+	border-color: rgb(var(--accent-bronze-rgb) / 0.52);
 }
 
 /* ── CTA glow pulse ── */
@@ -1605,8 +1636,8 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	margin-top: clamp(1.85rem, 3vw, 2.25rem);
 	padding: 1rem 1.2rem;
 	border-radius: 1rem;
-	background: rgba(8, 15, 28, 0.6);
-	border: 1px solid rgba(96, 165, 250, 0.14);
+	background: rgba(8, 12, 20, 0.6);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	animation: hero-trust-fade-up 0.8s ease-out backwards;

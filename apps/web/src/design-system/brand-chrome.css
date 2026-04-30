@@ -101,11 +101,12 @@
 	z-index: 3;
 	background: linear-gradient(
 		180deg,
-		rgba(6, 10, 18, 0.9) 0%,
-		rgba(6, 10, 18, 0.78) 100%
+		rgba(10, 12, 16, 0.88) 0%,
+		rgba(10, 12, 16, 0.78) 100%
 	);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
 	padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
 }
@@ -243,26 +244,26 @@
 	animation: dba-pulse-dot 2s ease-in-out infinite;
 }
 
-/* Audit CTA button (marketing pages) */
+/* Audit CTA button (marketing pages) — Brushed Bronze */
 .dba-nav-cta {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
 	padding: 0.55rem 1.1rem;
 	border-radius: 0.6rem;
-	border: 1px solid rgba(96, 165, 250, 0.38);
+	border: 1px solid rgba(212, 175, 55, 0.45);
 	background: linear-gradient(
 		170deg,
-		rgba(56, 189, 248, 0.22) 0%,
-		rgba(37, 99, 235, 0.32) 100%
+		rgba(212, 175, 55, 0.22) 0%,
+		rgba(181, 138, 20, 0.32) 100%
 	);
 	font-size: 0.78rem;
 	font-weight: 700;
 	letter-spacing: 0.01em;
-	color: rgba(247, 250, 255, 0.96);
+	color: rgba(252, 240, 210, 0.96);
 	text-decoration: none;
 	box-shadow:
-		0 8px 22px -10px rgba(56, 189, 248, 0.4),
+		0 8px 22px -10px rgba(212, 175, 55, 0.35),
 		inset 0 1px 0 rgba(255, 255, 255, 0.08);
 	transition:
 		transform 180ms ease,
@@ -273,9 +274,9 @@
 
 .dba-nav-cta:hover {
 	transform: translateY(-1px);
-	border-color: rgba(125, 211, 252, 0.55);
+	border-color: rgba(212, 175, 55, 0.65);
 	box-shadow:
-		0 12px 28px -10px rgba(56, 189, 248, 0.5),
+		0 12px 28px -10px rgba(212, 175, 55, 0.45),
 		inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 

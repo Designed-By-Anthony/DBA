@@ -43,6 +43,7 @@
 .heading {
 	font-size: clamp(2rem, 5vw, 3.25rem);
 	font-weight: 700;
+	font-family: var(--font-display, "Outfit Variable", system-ui, sans-serif);
 	letter-spacing: -0.03em;
 	line-height: 1.12;
 	color: var(--text-white, rgba(247, 244, 238, 0.97));
@@ -206,8 +207,8 @@
 }
 
 .toggleBtnActive {
-	background: rgba(91, 156, 248, 0.14);
-	color: var(--accent-blue, #5b9cf8);
+	background: rgba(212, 175, 55, 0.14);
+	color: var(--accent-bronze, #d4af37);
 }
 
 .toggleSave {
@@ -237,23 +238,24 @@
 	border: 1px solid var(--border-soft, rgba(255, 252, 245, 0.07));
 	background: rgba(255, 255, 255, 0.02);
 	backdrop-filter: blur(8px);
-	transition:
-		border-color 220ms ease,
-		transform 220ms ease;
+	transition: all 300ms ease-out;
 }
 
 .tierCard:hover {
-	border-color: rgba(255, 255, 255, 0.11);
-	transform: translateY(-2px);
+	border-color: rgba(255, 255, 255, 0.2);
+	transform: translateY(-4px);
+	box-shadow:
+		0 25px 50px -12px rgba(0, 0, 0, 0.5),
+		0 0 0 1px rgba(212, 175, 55, 0.08);
 }
 
 .tierCardHighlight {
-	border-color: rgba(91, 156, 248, 0.25);
-	background: rgba(91, 156, 248, 0.04);
+	border-color: rgba(212, 175, 55, 0.28);
+	background: rgba(212, 175, 55, 0.04);
 }
 
 .tierCardHighlight:hover {
-	border-color: rgba(91, 156, 248, 0.4);
+	border-color: rgba(212, 175, 55, 0.45);
 }
 
 .tierPopular {
@@ -262,12 +264,16 @@
 	right: 1rem;
 	padding: 0.18rem 0.6rem;
 	border-radius: 999px;
-	background: var(--accent-blue, #5b9cf8);
+	background: linear-gradient(
+		135deg,
+		rgba(212, 175, 55, 0.9) 0%,
+		rgba(181, 138, 20, 0.95) 100%
+	);
 	font-size: 0.6rem;
 	font-weight: 800;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: #fff;
+	color: #1a1200;
 }
 
 .tierName {
@@ -339,25 +345,27 @@
 	text-align: center;
 	padding: 0.65rem 1.25rem;
 	border-radius: 0.55rem;
-	border: 1px solid rgba(96, 165, 250, 0.38);
+	border: 1px solid rgba(212, 175, 55, 0.45);
 	background: linear-gradient(
 		170deg,
-		rgba(56, 189, 248, 0.22) 0%,
-		rgba(37, 99, 235, 0.32) 100%
+		rgba(212, 175, 55, 0.22) 0%,
+		rgba(181, 138, 20, 0.32) 100%
 	);
-	color: rgba(247, 250, 255, 0.96);
+	color: rgba(252, 240, 210, 0.96);
 	font-size: 0.85rem;
 	font-weight: 700;
 	text-decoration: none;
 	cursor: pointer;
 	transition:
-		transform 180ms ease,
-		box-shadow 220ms ease;
+		transform 300ms ease-out,
+		box-shadow 300ms ease-out,
+		border-color 300ms ease-out;
 }
 
 .tierCta:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 10px 24px -8px rgba(56, 189, 248, 0.42);
+	border-color: rgba(212, 175, 55, 0.65);
+	box-shadow: 0 10px 24px -8px rgba(212, 175, 55, 0.35);
 }
 
 .tierCtaPreorder {

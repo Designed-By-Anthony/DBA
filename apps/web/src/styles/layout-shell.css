@@ -945,26 +945,31 @@ body.site-contact-drawer-open {
 
 .mobile-nav-cta {
 	margin-top: 1rem;
-	background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-	color: var(--text-white);
+	background: linear-gradient(
+		135deg,
+		rgba(212, 175, 55, 0.28) 0%,
+		rgba(181, 138, 20, 0.42) 100%
+	);
+	border: 1px solid rgba(212, 175, 55, 0.5);
+	color: rgba(252, 240, 210, 0.96);
 	padding: 1rem 2.5rem;
 	border-radius: 999px;
 	font-size: 1rem;
 	letter-spacing: 0.06em;
-	box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45);
+	box-shadow: 0 8px 24px -4px rgba(212, 175, 55, 0.3);
 }
 
 .mobile-nav-cta--secondary {
 	margin-top: 0.5rem;
 	background: transparent;
-	border: 2px solid rgba(96, 165, 250, 0.55);
-	color: rgba(255, 255, 255, 0.92);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	color: rgba(255, 255, 255, 0.82);
 	box-shadow: none;
 }
 
 .mobile-nav-cta--secondary:hover {
-	border-color: rgba(147, 197, 253, 0.85);
-	color: var(--text-white);
+	border-color: rgba(212, 175, 55, 0.4);
+	color: rgba(252, 240, 210, 0.96);
 }
 
 @media (max-width: 768px) {
