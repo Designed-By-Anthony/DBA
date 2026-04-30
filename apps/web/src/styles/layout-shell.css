@@ -506,7 +506,7 @@
 		display: block;
 		visibility: hidden;
 		position: fixed;
-		left: 0;
+		left: 0.5rem;
 		top: 11rem;
 		right: auto;
 		bottom: auto;
@@ -514,7 +514,7 @@
 		pointer-events: none;
 		-webkit-transform-origin: 0% 100%;
 		transform-origin: 0% 100%;
-		transform: translate3d(calc(-100% + 1.7rem), 0, 0);
+		transform: translate3d(calc(-100% + 2.25rem), 0, 0);
 		transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
