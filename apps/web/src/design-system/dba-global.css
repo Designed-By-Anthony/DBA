@@ -1,7 +1,38 @@
 /**
  * Designed by Anthony — global theme entry.
- * Canonical tokens: src/styles/theme.css
- * Shared brand chrome (header, footer, banner): ./brand-chrome.css
+ *
+ * This is the CSS root for every marketing page (loaded by app/layout.tsx).
+ * The Lighthouse segment has its own entry (lighthouse-globals.css) that
+ * extends this foundation with audit-specific tokens and component styles.
+ *
+ * Load order is critical for Tailwind v4 correctness:
+ *   1. tailwind-v4-bridge.css  — @theme block registers DBA tokens as
+ *                                Tailwind design-token names BEFORE Tailwind
+ *                                processes the file.
+ *   2. @import "tailwindcss"   — generates preflight + all utility classes
+ *                                (and picks up the @theme block above).
+ *   3. theme.css               — :root CSS custom properties, html/body base
+ *                                styles, page-level component classes.
+ *   4. brand-chrome.css        — .dba-header, .dba-footer, .dba-nav-* etc.
+ *
+ * ⚠️  Do NOT move @import "tailwindcss" below theme.css.
+ *     Tailwind must run before unlayered :root / body rules so that the
+ *     @layer base cursor fix in tailwind-v4-bridge.css has the correct
+ *     cascade priority.
+ *
+ * Canonical tokens : src/styles/theme.css
+ * Tailwind bridge  : src/design-system/tailwind-v4-bridge.css
+ * Brand chrome     : src/design-system/brand-chrome.css
  */
+
+/* 1. Map DBA CSS custom properties → Tailwind @theme token names */
+@import url("./tailwind-v4-bridge.css");
+
+/* 2. Generate Tailwind CSS: preflight reset + all utility classes */
+@import "tailwindcss";
+
+/* 3. CSS custom properties (:root), html/body base styles, page components */
 @import url("../styles/theme.css");
+
+/* 4. Shared brand chrome: .dba-header, .dba-footer, .dba-nav-* etc. */
 @import url("./brand-chrome.css");

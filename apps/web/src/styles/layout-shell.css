@@ -49,8 +49,8 @@
 .announcement-bar {
 	background: linear-gradient(
 		135deg,
-		rgba(18, 37, 72, 0.98) 0%,
-		rgba(29, 78, 216, 0.98) 100%
+		rgba(8, 12, 22, 0.98) 0%,
+		rgba(14, 20, 36, 0.98) 100%
 	);
 	color: white;
 	padding: 0.7rem 1rem;
@@ -64,10 +64,10 @@
 .announcement-bar--launch {
 	background: linear-gradient(
 		135deg,
-		rgba(6, 78, 59, 0.96) 0%,
-		rgba(16, 185, 129, 0.92) 50%,
-		rgba(5, 150, 105, 0.96) 100%
+		rgba(8, 12, 22, 0.98) 0%,
+		rgba(20, 26, 40, 0.98) 100%
 	);
+	border-bottom: 1px solid rgb(var(--accent-bronze-rgb) / 0.22);
 }
 
 .announcement-container {
@@ -200,18 +200,6 @@
 	.nav a:not(.nav-book-btn):hover {
 		transform: none;
 	}
-}
-
-.header {
-	position: relative;
-	background: linear-gradient(
-		180deg,
-		rgba(6, 10, 18, 0.9) 0%,
-		rgba(6, 10, 18, 0.76) 100%
-	);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border-bottom: 1px solid rgb(var(--accent-bronze-rgb) / 0.26);
 }
 
 /* ── Body canvas: main column + tucked quick rail drawer (desktop) ── */

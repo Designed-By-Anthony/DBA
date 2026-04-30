@@ -3,7 +3,35 @@ import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Outfit } from "next/font/google";
 import type { ReactNode } from "react";
+
+/**
+ * Load Outfit Variable via Next.js Font API so the --font-outfit CSS variable
+ * is available globally. theme.css sets --font-display to "Outfit Variable",
+ * but without the Next.js font loader the Google Font only loads on the
+ * Lighthouse segment (which has its own Outfit import). Loading it here
+ * ensures headings use Outfit everywhere on the marketing site.
+ */
+const outfit = Outfit({
+	variable: "--font-outfit",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+/**
+ * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
+ * <html>. brand-chrome.css uses var(--font-fraunces, "Fraunces Variable", ...)
+ * for the brand wordmark in the header and footer. Without this, the variable
+ * is unset on marketing pages and the browser falls back to the @font-face
+ * "Fraunces Variable" name — which works but skips preloading optimisations.
+ */
+const fraunces = Fraunces({
+	variable: "--font-fraunces",
+	subsets: ["latin"],
+	axes: ["opsz", "SOFT", "WONK"],
+	display: "swap",
+});
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
 export const viewport: Viewport = {
@@ -78,6 +106,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
+			className={`${outfit.variable} ${fraunces.variable}`}
 		>
 			<head>
 				<JsonLd />

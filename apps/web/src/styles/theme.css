@@ -12,6 +12,15 @@
 }
 
 @font-face {
+	font-family: "Outfit Variable";
+	font-style: normal;
+	font-weight: 100 900;
+	src: url("~@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2")
+		format("woff2-variations");
+	font-display: swap;
+}
+
+@font-face {
 	font-family: "Fraunces Variable";
 	font-style: normal;
 	font-weight: 200 900;
@@ -124,10 +133,12 @@ html {
 	}
 }
 
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+@layer base {
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
 }
 
 body {
