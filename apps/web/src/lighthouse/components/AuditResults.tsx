@@ -159,7 +159,7 @@ export function AuditResults({
 
 	return (
 		<MotionDiv
-			className="lh-report-output w-full max-w-5xl md:mx-auto"
+			className="lh-report-output w-full"
 			initial={prefersReduced ? false : { opacity: 0, y: 24 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -546,9 +546,7 @@ export function AuditResults({
 				>
 					<p className="lighthouse-result-eyebrow">Messaging &amp; copy</p>
 					<h3 className="lighthouse-result-heading">Copywriting analysis</h3>
-					<p className="lighthouse-result-body lighthouse-result-muted leading-relaxed">
-						{data.aiInsight.copywritingAnalysis}
-					</p>
+					<ExecutiveSummaryBody text={data.aiInsight.copywritingAnalysis} />
 				</MotionDiv>
 			) : null}
 
@@ -688,7 +686,7 @@ export function AuditResults({
 					href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 					target="_blank"
 					rel="noopener"
-					className="relative inline-block rounded-xl bg-(--accent-bronze-light) px-7 py-3.5 text-[14px] font-bold tracking-tight text-[#171008] shadow-[0_20px_50px_-18px_var(--accent-bronze-glow)] transition-[transform,background-color] hover:-translate-y-px hover:bg-white"
+					className="lh-report-cta__button relative inline-block rounded-xl bg-white px-7 py-3.5 text-[14px] font-bold tracking-tight text-[#0f1218] shadow-[0_20px_50px_-18px_rgba(255,252,245,0.35)] ring-1 ring-white/40 transition-[transform,background-color,box-shadow] hover:-translate-y-px hover:bg-[var(--accent-bronze-light)] hover:shadow-[0_24px_56px_-16px_var(--accent-bronze-glow)]"
 				>
 					Book a 15-minute call →
 				</a>

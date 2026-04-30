@@ -234,8 +234,11 @@ export function AuditForm() {
 							value={url}
 							onChange={(e) => setUrl(e.target.value)}
 							placeholder="yoursite.com"
-							autoComplete="url"
-							className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.42)] bg-[rgba(10,14,22,0.88)] py-4 pl-[5.4rem] pr-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.15),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:text-white/45 placeholder:font-normal transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.72)] focus:bg-[rgba(12,16,25,0.96)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.22)]"
+							autoComplete="off"
+							autoCorrect="off"
+							autoCapitalize="off"
+							spellCheck={false}
+							className="lh-field lh-url-input w-full rounded-lg border border-[rgb(var(--accent-bronze-rgb)/0.42)] bg-[rgba(10,14,22,0.88)] py-4 pl-[5.4rem] pr-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(201,168,108,0.15),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:text-white/22 placeholder:font-normal transition-[border-color,box-shadow,background-color] focus:border-[rgb(var(--accent-bronze-rgb)/0.72)] focus:bg-[rgba(12,16,25,0.96)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-bronze-rgb)/0.22)] focus:placeholder:text-transparent"
 						/>
 					</div>
 				</div>

@@ -10,7 +10,17 @@ import {
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
 import { postLeadIngest } from "@/lib/leadWebhook";
-import { buildMarketingLeadApiCorsHeaders } from "@/lib/marketingBrowserOrigins";
+
+/*
+ * CORS for `/api/lead-email` is handled exclusively by the global
+ * `@elysiajs/cors` plugin mounted in `apps/api/src/index.ts`. Setting
+ * `Access-Control-Allow-Origin` here as well caused duplicate values in
+ * the response header (e.g. "https://designedbyanthony.com,
+ * https://designedbyanthony.com"), which browsers reject with:
+ *   "The 'Access-Control-Allow-Origin' header contains multiple values
+ *    'https://designedbyanthony.com, https://designedbyanthony.com',
+ *    but only one is allowed."
+ */
 
 function escapeHtml(value: string): string {
 	return value
@@ -68,17 +78,9 @@ function renderEmail(lead: PublicLeadIngestBody): {
 	return { text: textLines.join("\n"), html };
 }
 
-export const leadEmailRoute = new Elysia({ aot: false })
-	.post("/api/lead-email", async ({ request, set }) => {
-		const origin = request.headers.get("origin");
-		const corsHeaders: Record<string, string> = {
-			...buildMarketingLeadApiCorsHeaders(origin),
-			"Access-Control-Allow-Methods": "POST, OPTIONS",
-		};
-		for (const [key, value] of Object.entries(corsHeaders)) {
-			set.headers[key] = value;
-		}
-
+export const leadEmailRoute = new Elysia({ aot: false }).post(
+	"/api/lead-email",
+	async ({ request, set }) => {
 		const rawBody: unknown = await request.json().catch(() => null);
 		if (rawBody == null || typeof rawBody !== "object") {
 			set.status = 400;
@@ -254,14 +256,5 @@ export const leadEmailRoute = new Elysia({ aot: false })
 		}
 
 		return { ok: true };
-	})
-	.options("/api/lead-email", ({ request }) => {
-		const origin = request.headers.get("origin");
-		return new Response(null, {
-			status: 204,
-			headers: {
-				...buildMarketingLeadApiCorsHeaders(origin),
-				"Access-Control-Allow-Methods": "POST, OPTIONS",
-			},
-		});
-	});
+	},
+);

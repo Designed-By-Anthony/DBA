@@ -514,7 +514,10 @@
 		pointer-events: none;
 		-webkit-transform-origin: 0% 100%;
 		transform-origin: 0% 100%;
-		transform: translate3d(calc(-100% + 2.25rem), 0, 0);
+		/* Closed state: panel is fully translated off-screen so the tab
+		   (which sits at right: -1.75rem of the panel) sits flush against
+		   the viewport's left edge with no visible gap. */
+		transform: translate3d(-100%, 0, 0);
 		transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
