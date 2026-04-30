@@ -2,6 +2,7 @@ import "@/design-system/dba-global.css";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import type { ReactNode } from "react";
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
@@ -86,6 +87,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				</noscript>
 				{children}
 				<CrispBootstrap />
+				{/* Global reCAPTCHA v2 for all forms */}
+				<Script
+					src="https://www.google.com/recaptcha/api.js"
+					strategy="lazyOnload"
+					id="recaptcha-global"
+				/>
 			</body>
 		</html>
 	);

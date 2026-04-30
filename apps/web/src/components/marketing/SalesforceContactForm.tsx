@@ -1,22 +1,17 @@
 "use client";
 
-import Script from "next/script";
 import { useId } from "react";
 
 /**
  * Salesforce Web-to-Lead contact form
  * Submits directly to Salesforce with reCAPTCHA v2
+ * Note: reCAPTCHA script is loaded globally in layout.tsx
  */
 export function SalesforceContactForm() {
 	const formId = useId();
 
 	return (
-		<>
-			<Script
-				src="https://www.google.com/recaptcha/api.js"
-				strategy="afterInteractive"
-			/>
-			<form
+		<form
 				action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dao00001YO4nx"
 				method="POST"
 				className="salesforce-contact-form"
@@ -113,6 +108,5 @@ export function SalesforceContactForm() {
 					Protected by reCAPTCHA. We reply within one business day.
 				</p>
 			</form>
-		</>
-	);
+		);
 }
