@@ -41,6 +41,7 @@
         "cheerio": "^1.2.0",
         "framer-motion": "^12.38.0",
         "gsap": "^3.15.0",
+        "jspdf": "^4.2.1",
         "next": "16.2.4",
         "react": "19.2.5",
         "react-dom": "19.2.5",
@@ -1486,7 +1487,9 @@
 
     "@cypress/xvfb/debug": ["debug@3.2.7", "", { "dependencies": { "ms": "^2.1.1" } }, "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ=="],
 
-    "@dba/api/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "zod": "^4.4.0" } }],
+    "@dba/api/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "googleapis": "^171.4.0", "jspdf": "^4.2.1", "zod": "^4.4.0" } }],
+
+    "@dba/web/@dba/shared": ["@dba/shared@file:packages/shared", { "dependencies": { "googleapis": "^171.4.0", "jspdf": "^4.2.1", "zod": "^4.4.0" } }],
 
     "@dotenvx/dotenvx/commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 
