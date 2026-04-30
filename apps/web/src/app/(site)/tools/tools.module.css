@@ -360,17 +360,120 @@
 	box-shadow: 0 10px 24px -8px rgba(56, 189, 248, 0.42);
 }
 
-.tierCtaDisabled {
+.tierCtaPreorder {
 	display: block;
+	width: 100%;
 	text-align: center;
 	padding: 0.65rem 1.25rem;
 	border-radius: 0.55rem;
-	border: 1px solid rgba(255, 255, 255, 0.06);
-	background: rgba(255, 255, 255, 0.03);
-	color: var(--text-muted, rgba(247, 244, 238, 0.58));
+	border: 1px solid rgba(201, 168, 108, 0.35);
+	background: linear-gradient(
+		170deg,
+		rgba(201, 168, 108, 0.14) 0%,
+		rgba(201, 168, 108, 0.08) 100%
+	);
+	color: var(--accent-bronze-light, #fcf0d2);
 	font-size: 0.85rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition:
+		transform 180ms ease,
+		box-shadow 220ms ease;
+}
+
+.tierCtaPreorder:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 10px 24px -8px rgba(201, 168, 108, 0.35);
+}
+
+/* ─── Pre-order inline form ─── */
+.preorderForm {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.preorderInput {
+	width: 100%;
+	padding: 0.55rem 0.75rem;
+	border-radius: 0.45rem;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--text-white, rgba(247, 244, 238, 0.95));
+	font-size: 0.82rem;
+	outline: none;
+	transition: border-color 180ms ease;
+}
+
+.preorderInput::placeholder {
+	color: var(--text-muted, rgba(247, 244, 238, 0.58));
+}
+
+.preorderInput:focus {
+	border-color: rgba(201, 168, 108, 0.45);
+}
+
+.preorderActions {
+	display: flex;
+	gap: 0.4rem;
+}
+
+.preorderSubmit {
+	flex: 1;
+	padding: 0.55rem 0.75rem;
+	border-radius: 0.45rem;
+	border: 1px solid rgba(201, 168, 108, 0.35);
+	background: rgba(201, 168, 108, 0.15);
+	color: var(--accent-bronze-light, #fcf0d2);
+	font-size: 0.8rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition:
+		background 180ms ease,
+		transform 180ms ease;
+}
+
+.preorderSubmit:hover:not(:disabled) {
+	background: rgba(201, 168, 108, 0.22);
+	transform: translateY(-1px);
+}
+
+.preorderSubmit:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.preorderCancel {
+	padding: 0.55rem 0.75rem;
+	border-radius: 0.45rem;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: transparent;
+	color: var(--text-muted, rgba(247, 244, 238, 0.58));
+	font-size: 0.8rem;
 	font-weight: 600;
-	cursor: default;
+	cursor: pointer;
+	transition: color 180ms ease;
+}
+
+.preorderCancel:hover {
+	color: var(--text-soft, rgba(247, 244, 238, 0.92));
+}
+
+.preorderDone {
+	text-align: center;
+}
+
+.preorderSuccessMsg {
+	font-size: 0.82rem;
+	color: var(--success-green, #22c55e);
+	line-height: 1.45;
+	margin: 0;
+}
+
+.preorderError {
+	font-size: 0.75rem;
+	color: rgba(248, 113, 113, 0.85);
+	margin: 0;
 }
 
 /* ─── Bottom CTA ─── */

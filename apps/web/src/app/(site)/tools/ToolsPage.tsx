@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import {
 	PROMO_BOGO,
 	PROMO_FOUNDING,
@@ -8,6 +8,7 @@ import {
 	type ProductTier,
 	TOOLS_PRODUCTS,
 } from "@/data/tools-products";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 import styles from "./tools.module.css";
 
 const ICON_MAP: Record<string, string> = {
@@ -27,11 +28,99 @@ function ProductIcon({ icon }: { icon: string }) {
 	);
 }
 
-function TierCard({ tier, annual }: { tier: ProductTier; annual: boolean }) {
+type PreorderStatus = "idle" | "form" | "submitting" | "success" | "error";
+
+function PreorderForm({
+	productName,
+	tierName,
+	onClose,
+}: {
+	productName: string;
+	tierName: string;
+	onClose: () => void;
+}) {
+	const [email, setEmail] = useState("");
+	const [status, setStatus] = useState<PreorderStatus>("form");
+
+	async function handleSubmit(e: FormEvent) {
+		e.preventDefault();
+		if (!email.includes("@")) return;
+		setStatus("submitting");
+		try {
+			await fetch(buildPublicApiUrl("/api/lead-email"), {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email,
+					source: "tools-preorder",
+					message: `Pre-order interest: ${productName} — ${tierName} tier`,
+				}),
+			});
+			setStatus("success");
+		} catch {
+			setStatus("error");
+		}
+	}
+
+	if (status === "success") {
+		return (
+			<div className={styles.preorderDone}>
+				<p className={styles.preorderSuccessMsg}>
+					Reserved! We will email you when {productName} launches.
+				</p>
+			</div>
+		);
+	}
+
+	return (
+		<form className={styles.preorderForm} onSubmit={handleSubmit}>
+			<input
+				type="email"
+				className={styles.preorderInput}
+				placeholder="your@email.com"
+				value={email}
+				onChange={(e) => setEmail(e.target.value)}
+				required
+				aria-label={`Email for ${productName} ${tierName} pre-order`}
+				disabled={status === "submitting"}
+			/>
+			<div className={styles.preorderActions}>
+				<button
+					type="submit"
+					className={styles.preorderSubmit}
+					disabled={status === "submitting"}
+				>
+					{status === "submitting" ? "Reserving\u2026" : "Reserve Spot"}
+				</button>
+				<button
+					type="button"
+					className={styles.preorderCancel}
+					onClick={onClose}
+				>
+					Cancel
+				</button>
+			</div>
+			{status === "error" ? (
+				<p className={styles.preorderError}>Something went wrong. Try again.</p>
+			) : null}
+		</form>
+	);
+}
+
+function TierCard({
+	tier,
+	annual,
+	productName,
+}: {
+	tier: ProductTier;
+	annual: boolean;
+	productName: string;
+}) {
 	const price = annual ? tier.annualPrice : tier.monthlyPrice;
 	const period = annual ? "/yr" : "/mo";
 	const link = annual ? tier.annualLink : tier.monthlyLink;
 	const isPlaceholder = link === "#";
+	const [showPreorder, setShowPreorder] = useState(false);
 
 	return (
 		<div
@@ -54,7 +143,21 @@ function TierCard({ tier, annual }: { tier: ProductTier; annual: boolean }) {
 				))}
 			</ul>
 			{isPlaceholder ? (
-				<span className={styles.tierCtaDisabled}>Coming Soon</span>
+				showPreorder ? (
+					<PreorderForm
+						productName={productName}
+						tierName={tier.name}
+						onClose={() => setShowPreorder(false)}
+					/>
+				) : (
+					<button
+						type="button"
+						className={styles.tierCtaPreorder}
+						onClick={() => setShowPreorder(true)}
+					>
+						Pre-order
+					</button>
+				)
 			) : (
 				<a
 					href={link}
@@ -113,7 +216,12 @@ function ProductSection({ product }: { product: Product }) {
 
 			<div className={styles.tierGrid}>
 				{product.tiers.map((tier) => (
-					<TierCard key={tier.name} tier={tier} annual={annual} />
+					<TierCard
+						key={tier.name}
+						tier={tier}
+						annual={annual}
+						productName={product.name}
+					/>
 				))}
 			</div>
 		</section>
@@ -127,7 +235,7 @@ export function ToolsPage() {
 			<section className={styles.hero}>
 				<p className={styles.badge}>
 					<span className={styles.badgeDot} aria-hidden />
-					Micro SaaS Store
+					Micro SaaS Store &middot; Pre-orders Open
 				</p>
 				<h1 className={styles.heading}>
 					Purpose-built tools for local service businesses.
@@ -135,7 +243,8 @@ export function ToolsPage() {
 				<p className={styles.subheading}>
 					Six focused products — SEO monitoring, AI review responses, client
 					portals, testimonial collection, and more — priced for freelancers and
-					small agencies. No bloat. No enterprise lock-in.
+					small agencies. No bloat. No enterprise lock-in. Pre-order now to lock
+					in founding member pricing.
 				</p>
 			</section>
 
