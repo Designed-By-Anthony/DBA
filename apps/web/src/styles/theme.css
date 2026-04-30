@@ -1709,9 +1709,20 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	font-size: 0.88rem;
 }
 
-/* reCAPTCHA container */
+/* reCAPTCHA container - ensure it renders above Crisp */
 .g-recaptcha {
 	margin: 1rem 0;
+	position: relative;
+	z-index: 99999;
+}
+
+/* Crisp chat should stay below forms and reCAPTCHA */
+.crisp-client {
+	z-index: 100 !important;
+}
+
+#crisp-chatbox {
+	z-index: 100 !important;
 }
 
 /* Site quick rail drawer styling fixes */
