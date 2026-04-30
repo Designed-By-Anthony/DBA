@@ -25,6 +25,7 @@
 
 	/* ── Bronze accent (Midnight & Bronze palette) ───────────────── */
 	--color-accent-bronze: var(--accent-bronze);
+	--color-accent-bronze-dark: var(--accent-bronze-dark);
 	--color-accent-bronze-light: var(--accent-bronze-light);
 	--color-accent-bronze-muted: var(--accent-bronze-muted);
 	--color-accent-bronze-soft: var(--accent-bronze-soft);
@@ -38,7 +39,7 @@
 
 	/* ── Brand tokens — bronze-first ────────────────────────────── */
 	--color-brand: var(--accent-bronze);
-	--color-brand-hover: #b58a14;
+	--color-brand-hover: var(--accent-bronze-dark);
 	--color-brand-subtle: rgb(201 168 108 / 0.14);
 	--color-brand-glow: rgb(201 168 108 / 0.22);
 	--color-brand-ring: rgb(201 168 108 / 0.5);

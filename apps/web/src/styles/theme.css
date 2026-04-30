@@ -41,6 +41,7 @@
 	/* Canonical warm metal accent — bronze carries DBA's premium detail language. */
 	--accent-bronze-rgb: 201 168 108;
 	--accent-bronze: #c9a86c;
+	--accent-bronze-dark: #b58a14; /* darkened hover / pressed state */
 	--accent-bronze-light: #fcf0d2;
 	--accent-bronze-muted: #e8d5a8;
 	--accent-bronze-soft: rgb(var(--accent-bronze-rgb) / 0.35);
@@ -855,11 +856,7 @@ button:hover .card-tag {
 	text-decoration: none;
 	color: var(--text-white);
 	background:
-		linear-gradient(
-			135deg,
-			rgba(212, 175, 55, 0.18),
-			rgba(181, 138, 20, 0.85)
-		),
+		linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(181, 138, 20, 0.85)),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
 	border: 1px solid rgba(212, 175, 55, 0.55);
 	box-shadow:
@@ -921,11 +918,7 @@ button:hover .card-tag {
 
 .btn-primary {
 	background:
-		linear-gradient(
-			135deg,
-			rgba(212, 175, 55, 0.34),
-			rgba(181, 138, 20, 1)
-		),
+		linear-gradient(135deg, rgba(212, 175, 55, 0.34), rgba(181, 138, 20, 1)),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
 	border-color: rgba(212, 175, 55, 0.72);
 	box-shadow:
@@ -935,11 +928,7 @@ button:hover .card-tag {
 
 .btn-primary:hover {
 	background:
-		linear-gradient(
-			135deg,
-			rgba(232, 204, 105, 0.38),
-			rgba(155, 110, 15, 1)
-		),
+		linear-gradient(135deg, rgba(232, 204, 105, 0.38), rgba(155, 110, 15, 1)),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
 }
 
@@ -965,11 +954,7 @@ button:hover .card-tag {
 
 .btn-primary-audit {
 	background:
-		linear-gradient(
-			135deg,
-			rgba(255, 255, 255, 0.08),
-			rgba(20, 25, 36, 0.95)
-		),
+		linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(20, 25, 36, 0.95)),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
 	border-color: rgba(255, 255, 255, 0.18);
 	box-shadow:
@@ -979,11 +964,7 @@ button:hover .card-tag {
 
 .btn-primary-audit:hover {
 	background:
-		linear-gradient(
-			135deg,
-			rgba(212, 175, 55, 0.12),
-			rgba(20, 25, 36, 0.95)
-		),
+		linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(20, 25, 36, 0.95)),
 		linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
 	border-color: rgba(212, 175, 55, 0.35);
 }

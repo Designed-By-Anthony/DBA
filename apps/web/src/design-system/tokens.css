@@ -21,6 +21,7 @@
 	--accent-blue-soft: rgba(91, 156, 248, 0.12);
 	--accent-bronze-rgb: 201 168 108;
 	--accent-bronze: #c9a86c;
+	--accent-bronze-dark: #b58a14;
 	--accent-bronze-light: #fcf0d2;
 	--accent-bronze-muted: #e8d5a8;
 	--accent-bronze-soft: rgb(var(--accent-bronze-rgb) / 0.35);
