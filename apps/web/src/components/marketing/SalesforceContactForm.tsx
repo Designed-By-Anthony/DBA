@@ -14,7 +14,7 @@ export function SalesforceContactForm() {
 		<>
 			<Script
 				src="https://www.google.com/recaptcha/api.js"
-				strategy="lazyOnload"
+				strategy="afterInteractive"
 			/>
 			<form
 				action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dao00001YO4nx"
