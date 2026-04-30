@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { businessProfile } from "@/lib/seo";
@@ -32,17 +31,13 @@ const BODY_LOCK_CLASS = "site-contact-drawer-open";
 
 /**
  * Inline Salesforce Web-to-Lead form for the contact drawer.
+ * Note: reCAPTCHA script is loaded globally in layout.tsx
  */
 function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 	const formId = useId();
 
 	return (
-		<>
-			<Script
-				src="https://www.google.com/recaptcha/api.js"
-				strategy="afterInteractive"
-			/>
-			<form
+		<form
 				action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dao00001YO4nx"
 				method="POST"
 				className="salesforce-contact-form salesforce-contact-form--compact"
@@ -126,7 +121,6 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 					</button>
 				</div>
 			</form>
-		</>
 	);
 }
 
