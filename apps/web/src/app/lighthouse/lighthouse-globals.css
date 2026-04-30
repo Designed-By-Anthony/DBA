@@ -149,20 +149,32 @@
 	gap: clamp(1.75rem, 4vw, 2.75rem);
 }
 
-/* ─── Glass base card — premium finish ─── */
+/*
+ * ─── Global tile padding token ───
+ * One source of truth for the inner padding inside every "blob"
+ * (glass card, scan hero, audit results tile, fact card). Edit
+ * --lh-tile-padding here to nudge every box at once.
+ */
+.lighthouse-segment {
+	--lh-tile-padding: clamp(1.4rem, 3.5vw, 2.25rem);
+	--lh-tile-padding-tight: clamp(1.1rem, 2.6vw, 1.65rem);
+	--lh-tile-radius: 1.15rem;
+}
+
+/* ─── Glass base card — premium finish, gold-led ─── */
 .glass-card {
 	background: linear-gradient(
 		165deg,
-		rgba(14, 19, 32, 0.97) 0%,
-		rgba(9, 13, 22, 0.94) 50%,
-		rgba(12, 18, 30, 0.96) 100%
+		rgba(20, 17, 12, 0.97) 0%,
+		rgba(14, 12, 9, 0.94) 50%,
+		rgba(18, 15, 11, 0.96) 100%
 	);
-	border: 1px solid rgba(96, 165, 250, 0.14);
-	border-radius: 1.15rem;
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.18);
+	border-radius: var(--lh-tile-radius);
 	box-shadow:
 		0 32px 80px -40px rgba(2, 6, 23, 0.95),
 		0 0 0 1px rgba(255, 252, 245, 0.04) inset,
-		0 0 40px -20px rgba(91, 156, 248, 0.05);
+		0 0 40px -20px rgb(var(--accent-bronze-rgb) / 0.12);
 	backdrop-filter: blur(24px);
 	transition:
 		transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -170,9 +182,10 @@
 		border-color 0.35s ease;
 	position: relative;
 	overflow: hidden;
+	padding: var(--lh-tile-padding);
 }
 
-/* Cursor glow effect for glass cards */
+/* Cursor glow — bronze instead of cool blue */
 .glass-card::after {
 	content: "";
 	position: absolute;
@@ -180,7 +193,7 @@
 	border-radius: inherit;
 	background: radial-gradient(
 		300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-		rgba(91, 156, 248, 0.06),
+		rgb(var(--accent-bronze-rgb) / 0.08),
 		transparent 60%
 	);
 	opacity: 0;
@@ -194,7 +207,7 @@
 }
 
 .text-glow {
-	text-shadow: 0 0 24px rgba(91, 156, 248, 0.48);
+	text-shadow: 0 0 24px rgb(var(--accent-bronze-rgb) / 0.5);
 }
 
 /* Premium bronze text glow variant */
@@ -694,33 +707,298 @@
 	box-shadow: 0 24px 60px -34px var(--accent-bronze-glow);
 }
 
-/* ─── Scan progress ─── */
-.lighthouse-scan-hero {
-	border-radius: 1.25rem;
-	border: 1px solid rgba(56, 189, 248, 0.2);
-	background: linear-gradient(
-		155deg,
-		rgba(11, 19, 34, 0.97) 0%,
-		rgba(8, 13, 24, 0.91) 100%
-	);
-	box-shadow:
-		0 24px 64px -36px rgba(2, 6, 23, 0.9),
-		inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.lighthouse-phase-card {
-	backdrop-filter: blur(12px);
-	padding: 1.25rem;
-	border-radius: 0.875rem;
-	min-height: 8rem;
+/* ─── Scan progress (gold-led carousel hero) ─── */
+.lh-scan-shell {
 	display: flex;
 	flex-direction: column;
+	gap: 1.5rem;
+	padding-bottom: 0.5rem;
 }
 
-@media (max-width: 768px) {
-	.lighthouse-phase-card {
-		min-height: auto;
+.lh-scan-hero {
+	border-radius: var(--lh-tile-radius);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.32);
+	background: linear-gradient(
+		155deg,
+		rgba(28, 20, 12, 0.97) 0%,
+		rgba(14, 11, 8, 0.94) 100%
+	);
+	box-shadow:
+		0 24px 64px -32px rgba(0, 0, 0, 0.85),
+		inset 0 1px 0 rgba(255, 255, 255, 0.05),
+		0 0 60px -28px rgb(var(--accent-bronze-rgb) / 0.45);
+	padding: var(--lh-tile-padding);
+}
+
+.lh-scan-hero__glow {
+	position: absolute;
+	inset: -20%;
+	background: radial-gradient(
+		60% 50% at 75% 18%,
+		rgb(var(--accent-bronze-rgb) / 0.32) 0%,
+		rgb(var(--accent-bronze-rgb) / 0.08) 38%,
+		transparent 70%
+	);
+	pointer-events: none;
+	z-index: 0;
+}
+
+.lh-scan-hero__row {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	margin-bottom: 1.5rem;
+}
+
+@media (min-width: 760px) {
+	.lh-scan-hero__row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
 	}
+}
+
+.lh-scan-hero__heading {
+	min-width: 0;
+}
+
+.lh-scan-hero__eyebrow {
+	margin-bottom: 0.55rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+	color: var(--accent-bronze-light);
+}
+
+.lh-scan-hero__title {
+	font-family: var(--font-fraunces, "Fraunces"), serif;
+	font-size: clamp(1.45rem, 2.4vw, 1.85rem);
+	font-weight: 600;
+	letter-spacing: -0.005em;
+	color: #ffffff;
+	margin: 0;
+}
+
+.lh-scan-hero__message {
+	margin-top: 0.5rem;
+	max-width: 36rem;
+	font-size: 0.92rem;
+	line-height: 1.65;
+	color: rgba(247, 244, 238, 0.7);
+}
+
+.lh-scan-hero__spinner {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	height: 3.5rem;
+	width: 3.5rem;
+	border-radius: 0.95rem;
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.32);
+	background: linear-gradient(
+		135deg,
+		rgb(var(--accent-bronze-rgb) / 0.18) 0%,
+		rgb(var(--accent-bronze-rgb) / 0.04) 100%
+	);
+}
+
+.lh-scan-hero__spinner-ring {
+	height: 1.85rem;
+	width: 1.85rem;
+	border-radius: 9999px;
+	border: 1.6px solid rgb(var(--accent-bronze-rgb) / 0.22);
+	border-top-color: var(--accent-bronze-light);
+	animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.lh-scan-progress {
+	position: relative;
+	z-index: 1;
+}
+
+.lh-scan-progress__row {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: rgba(247, 244, 238, 0.45);
+	margin-bottom: 0.45rem;
+}
+
+.lh-scan-progress__track {
+	height: 0.45rem;
+	border-radius: 999px;
+	background: rgba(255, 252, 245, 0.06);
+	overflow: hidden;
+	box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.lh-scan-progress__fill {
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(
+		90deg,
+		var(--accent-bronze) 0%,
+		var(--accent-bronze-light) 60%,
+		#f3d68a 100%
+	);
+	box-shadow: 0 0 14px rgb(var(--accent-bronze-rgb) / 0.5);
+}
+
+.lh-scan-pips {
+	margin-top: 1rem;
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem 1.1rem;
+	font-size: 0.7rem;
+	letter-spacing: 0.04em;
+}
+
+.lh-scan-pip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	color: rgba(247, 244, 238, 0.4);
+	transition: color 0.25s ease;
+}
+
+.lh-scan-pip__dot {
+	height: 0.55rem;
+	width: 0.55rem;
+	border-radius: 999px;
+	background: rgba(255, 252, 245, 0.18);
+	box-shadow: 0 0 0 2px rgba(255, 252, 245, 0.05);
+	transition:
+		background-color 0.25s ease,
+		box-shadow 0.25s ease,
+		transform 0.25s ease;
+}
+
+.lh-scan-pip--done {
+	color: rgba(247, 244, 238, 0.78);
+}
+
+.lh-scan-pip--done .lh-scan-pip__dot {
+	background: var(--accent-bronze-muted, var(--accent-bronze));
+	box-shadow: 0 0 0 2px rgb(var(--accent-bronze-rgb) / 0.18);
+}
+
+.lh-scan-pip--active {
+	color: var(--accent-bronze-light);
+}
+
+.lh-scan-pip--active .lh-scan-pip__dot {
+	background: var(--accent-bronze-light);
+	box-shadow:
+		0 0 0 4px rgb(var(--accent-bronze-rgb) / 0.25),
+		0 0 14px rgb(var(--accent-bronze-rgb) / 0.7);
+	transform: scale(1.1);
+	animation: lh-pip-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes lh-pip-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.55;
+	}
+}
+
+/* ─── Fact carousel ─── */
+.lh-fact-stage {
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
+	align-items: center;
+}
+
+.lh-fact-card {
+	width: 100%;
+	max-width: 100%;
+	padding: var(--lh-tile-padding);
+	border-radius: var(--lh-tile-radius);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.2);
+	background: linear-gradient(
+		160deg,
+		rgba(22, 17, 12, 0.96) 0%,
+		rgba(12, 10, 8, 0.94) 100%
+	);
+	min-height: 10.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.lh-fact-card__tag {
+	margin: 0 0 0.55rem 0;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--accent-bronze-light);
+}
+
+.lh-fact-card__title {
+	margin: 0 0 0.65rem 0;
+	font-family: var(--font-fraunces, "Fraunces"), serif;
+	font-size: clamp(1.2rem, 2vw, 1.55rem);
+	font-weight: 600;
+	color: #ffffff;
+	letter-spacing: -0.005em;
+}
+
+.lh-fact-card__body {
+	margin: 0;
+	font-size: 0.95rem;
+	line-height: 1.7;
+	color: rgba(247, 244, 238, 0.78);
+}
+
+.lh-fact-dots {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	justify-content: center;
+}
+
+.lh-fact-dot {
+	height: 0.45rem;
+	width: 0.45rem;
+	padding: 0;
+	border: none;
+	border-radius: 999px;
+	background: rgba(255, 252, 245, 0.18);
+	cursor: pointer;
+	transition:
+		background-color 0.25s ease,
+		transform 0.25s ease,
+		width 0.25s ease;
+}
+
+.lh-fact-dot:hover {
+	background: rgb(var(--accent-bronze-rgb) / 0.5);
+}
+
+.lh-fact-dot--active {
+	background: var(--accent-bronze-light);
+	width: 1.4rem;
+	box-shadow: 0 0 8px rgb(var(--accent-bronze-rgb) / 0.55);
 }
 
 /* ─── Score grid section header ─── */
@@ -2031,30 +2309,7 @@
 		inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.lh-recaptcha-note {
-	margin-top: 0.35rem;
-	max-width: 18rem;
-	font-size: 0.63rem;
-	line-height: 1.45;
-	color: rgba(247, 244, 238, 0.36);
-}
-
-.lh-recaptcha-note a {
-	color: color-mix(in srgb, var(--accent-bronze-muted) 82%, transparent);
-	text-decoration: none;
-}
-
-.lh-recaptcha-note a:hover {
-	color: var(--accent-bronze-light);
-}
-
-body:has(.lighthouse-segment) #crisp-chatbox {
-	display: none !important;
-}
-
-body:has(.lighthouse-segment) .grecaptcha-badge {
-	visibility: hidden;
-}
+/* Crisp chat is loaded globally and intentionally visible on /lighthouse. */
 
 /* ──────────────────────────────────────────────────
  * Print-optimized styles
