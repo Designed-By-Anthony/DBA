@@ -229,7 +229,7 @@ export function AuditForm() {
 					<input
 						id="url"
 						name="url"
-						type="url"
+						type="text"
 						inputMode="url"
 						required
 						value={url}
