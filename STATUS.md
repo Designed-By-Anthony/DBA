@@ -2,14 +2,23 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
+
+- Removed Zustand badge from the "Our Edge" stack display — dependency was previously removed but badge remained.
+- Removed stray `console.warn` in the competitor-scan catch block of `apps/api/src/routes/audit.ts`.
+- Cleaned up outdated Firebase/Firestore references in `lighthouse2.md` (now reflects Cloudflare Pages/Workers + KV/D1).
+- Added `manifest.webmanifest` to `apps/web/public/` with PWA metadata — triggers PWA detection on Wappalyzer/BuiltWith.
+- Added JSON-LD structured data (`Organization`, `LocalBusiness`, `WebSite`) in root layout — zero render cost, boosts SEO.
+- Verification: `bun run lint`, `bun run build` pass from the repo root.
+
 ## Lockfile fix + backend PDF offload (2026-04-30)
+
 
 - **Lockfile fix (P0):** Removed conflicting workspace-level `overrides` from `apps/web/package.json` (stale `postcss ^8.4.38` vs root `^8.5.12`, duplicate `uuid`, unrecorded `yaml@<2.8.3`). Moved `yaml@<2.8.3` override to root `package.json`. Regenerated `bun.lock` — `bun install --frozen-lockfile` now passes in CI.
 - **Dependency hygiene:** Relocated heavy backend-only packages (`@google/genai`, `googleapis`, `cheerio`, `jspdf`) from `apps/web` to `packages/shared` where they are actually imported. Frontend bundle no longer ships these libraries.
 - **PDF offload to API Worker:** Created `GET /api/report/:id/pdf` on the ElysiaJS Worker (`apps/api/src/routes/reportPdf.ts`). The route fetches the persisted report from the KV store, calls `buildAuditPdf` server-side, and streams the PDF back with `Content-Disposition: attachment`. `AuditResults.tsx` now fetches from this endpoint instead of importing `jspdf` client-side — removes ~250 KB from the browser bundle and eliminates client-side PDF generation latency.
 - Added `./lighthouse/*` export to `packages/shared` so `AuditData` types are accessible from any workspace.
 - Verification: `bun install --frozen-lockfile`, `bun run build`, `bun run typecheck`, and `bun run lint` pass from the repo root.
-
 ## Micro SaaS store /tools page build-out (2026-04-30)
 
 - Replaced the "Coming Soon" waitlist on `/tools` with a full product catalog showcasing 6 Stripe-backed micro-SaaS products: SiteScan, ReviewPilot, ClientHub, LocalRank, TestiFlow, and ContentMill.
