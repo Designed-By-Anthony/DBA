@@ -54,7 +54,8 @@ export const metadata: Metadata = {
 	},
 };
 
-const DEFAULT_LEAD_WEBHOOK = "https://tremendous-emu-522.convex.site/webhook/lead";
+const DEFAULT_LEAD_WEBHOOK =
+	"https://tremendous-emu-522.convex.site/webhook/lead";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 	const leadWebhookDefault =

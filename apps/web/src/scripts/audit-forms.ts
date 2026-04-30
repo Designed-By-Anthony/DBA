@@ -76,7 +76,8 @@ async function executeRecaptchaEnterprise(
  *   2. `NEXT_PUBLIC_LEAD_WEBHOOK_URL` when `action` is missing (build-time).
  *   3. Fallback: `https://admin.vertaflow.io/api/v1/ingest`.
  */
-const FALLBACK_FORM_ENDPOINT = "https://tremendous-emu-522.convex.site/webhook/lead";
+const FALLBACK_FORM_ENDPOINT =
+	"https://tremendous-emu-522.convex.site/webhook/lead";
 
 function readDefaultLeadEndpoint(): string {
 	/** `site.js` is esbuild-bundled; read URL from `<html data-lead-webhook>` (set in `layout.tsx`). */
@@ -101,7 +102,8 @@ const CONVEX_WEBHOOK_HOST = "tremendous-emu-522.convex.site";
 function isTrustedConvexWebhook(url: URL): boolean {
 	return (
 		url.protocol === "https:" &&
-		(url.hostname.endsWith(".convex.site") || url.hostname === CONVEX_WEBHOOK_HOST) &&
+		(url.hostname.endsWith(".convex.site") ||
+			url.hostname === CONVEX_WEBHOOK_HOST) &&
 		url.pathname.startsWith("/webhook/")
 	);
 }
@@ -601,7 +603,7 @@ function determineLeadSource(pathname: string): string {
 function setAuditTrackingFields(form: HTMLFormElement): void {
 	const pathname = window.location.pathname;
 	const leadSource = determineLeadSource(pathname);
-	
+
 	setAuditHiddenField(form, "source_page", pathname);
 	setAuditHiddenField(form, "lead_source", leadSource);
 	setAuditHiddenField(form, "page_url", window.location.href);

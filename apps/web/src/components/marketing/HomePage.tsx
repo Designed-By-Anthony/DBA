@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { homeFaqEntries, processSteps, whyStackCards } from "@/data/home";
-import { FirstVisitSplash } from "./FirstVisitSplash";
 import { showcaseFeaturedItems } from "@/data/showcase";
 import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
@@ -12,6 +11,7 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
+import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
 import "@/app/home-page.css";

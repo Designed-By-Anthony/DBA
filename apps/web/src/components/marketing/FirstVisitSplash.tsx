@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "dba_first_visit_shown_v1";
 
@@ -87,8 +87,8 @@ export function FirstVisitSplash() {
 							>
 								{tag}
 							</span>
-							),
-						)}
+						),
+					)}
 				</div>
 
 				<div className="flex flex-col gap-3 sm:flex-row">
