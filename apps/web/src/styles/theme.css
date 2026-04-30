@@ -1440,7 +1440,7 @@ li {
 		90deg,
 		var(--accent-blue),
 		var(--accent-bronze-light) 60%,
-		var(--accent-ink)
+		var(--bg-ink)
 	);
 	pointer-events: none;
 	transition: width 0.1s linear;
