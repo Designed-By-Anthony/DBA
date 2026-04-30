@@ -8,6 +8,8 @@
 		"./lighthouse/lib/*": "./src/lighthouse/lib/*.ts"
 	},
 	"dependencies": {
+		"googleapis": "^171.4.0",
+		"jspdf": "^4.2.1",
 		"zod": "^4.4.0"
 	}
 }

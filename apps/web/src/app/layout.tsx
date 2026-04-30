@@ -1,5 +1,6 @@
 import "@/design-system/dba-global.css";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
+import { JsonLd } from "@/components/JsonLd";
 import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
 	},
 	description:
 		"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
+	manifest: "/manifest.webmanifest",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
@@ -77,6 +79,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
 		>
+			<head>
+				<JsonLd />
+			</head>
 			<body>
 				{/* Google Tag Manager (noscript) */}
 				<noscript>

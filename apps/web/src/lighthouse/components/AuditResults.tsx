@@ -1,7 +1,6 @@
 "use client";
 
 import type { AuditData } from "@lh/auditReport";
-import { buildAuditPdf } from "@lh/lib/auditReportPdf";
 import { useReducedMotion } from "framer-motion";
 import { div as MotionDiv } from "framer-motion/client";
 import { useCallback, useState } from "react";
@@ -96,6 +95,7 @@ export function AuditResults({
 	const prefersReduced = useReducedMotion();
 
 	const handleDownloadPdf = useCallback(async () => {
+		const { buildAuditPdf } = await import("@lh/lib/auditReportPdf");
 		const blob = buildAuditPdf(data, reportId ?? null);
 		const a = document.createElement("a");
 		a.href = URL.createObjectURL(blob);

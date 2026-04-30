@@ -2,6 +2,17 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
+
+- Removed Zustand badge from the "Our Edge" stack display — dependency was previously removed but badge remained.
+- Removed stray `console.warn` in the competitor-scan catch block of `apps/api/src/routes/audit.ts`.
+- Cleaned up outdated Firebase/Firestore references in `lighthouse2.md` (now reflects Cloudflare Pages/Workers + KV/D1).
+- Added `manifest.webmanifest` to `apps/web/public/` with PWA metadata — triggers PWA detection on Wappalyzer/BuiltWith.
+- Added JSON-LD structured data (`Organization`, `LocalBusiness`, `WebSite`) in root layout — zero render cost, boosts SEO.
+- Dynamic-imported `jspdf` (via `buildAuditPdf`) in `AuditResults.tsx` so the heavy PDF library is only loaded when the user clicks "Download PDF", not on initial page load.
+- Moved `googleapis` and `jspdf` dependencies from `apps/web` to `packages/shared` where they are actually consumed, preventing accidental client-bundle inclusion.
+- Verification: `bun run lint`, `bun run build` pass from the repo root.
+
 ## Micro SaaS store /tools page build-out (2026-04-30)
 
 - Replaced the "Coming Soon" waitlist on `/tools` with a full product catalog showcasing 6 Stripe-backed micro-SaaS products: SiteScan, ReviewPilot, ClientHub, LocalRank, TestiFlow, and ContentMill.
