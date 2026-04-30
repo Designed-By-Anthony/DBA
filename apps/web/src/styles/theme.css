@@ -35,9 +35,10 @@
 	--text-soft: rgba(247, 244, 238, 0.92);
 	--text-gray: #9ca3ae;
 	--text-muted: rgba(247, 244, 238, 0.58);
-	--accent-blue: #5b9cf8;
-	--accent-blue-hover: #3b82f6;
-	--accent-blue-soft: rgba(91, 156, 248, 0.12);
+	/* Legacy blue tokens retargeted to Bronze — Midnight & Bronze aesthetic. */
+	--accent-blue: var(--accent-bronze);
+	--accent-blue-hover: var(--accent-bronze-dark);
+	--accent-blue-soft: rgb(var(--accent-bronze-rgb) / 0.12);
 	/* Canonical warm metal accent — bronze carries DBA's premium detail language. */
 	--accent-bronze-rgb: 201 168 108;
 	--accent-bronze: #c9a86c;
@@ -51,7 +52,7 @@
 	--accent-brass: var(--accent-bronze);
 	--accent-brass-soft: var(--accent-bronze-soft);
 	--border-soft: rgba(255, 252, 245, 0.07);
-	--border-strong: rgba(147, 197, 253, 0.22);
+	--border-strong: rgb(var(--accent-bronze-rgb) / 0.22);
 	--success-green: #22c55e;
 	--font-main:
 		"Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -139,7 +140,7 @@ body {
 	background-image: /* Primary atmospheric glow - enhanced sky blue (matching Lighthouse) */
 			radial-gradient(
 				ellipse 120% 50% at 50% -10%,
-				rgba(91, 156, 248, 0.12),
+				rgb(var(--accent-bronze-rgb) / 0.12),
 				transparent 55%
 			),
 			/* Secondary warm accent - bronze glow (matching Lighthouse depth) */
@@ -151,7 +152,7 @@ body {
 			/* Tertiary depth layer - subtle blue */
 			radial-gradient(
 				ellipse 60% 30% at 15% 70%,
-				rgba(59, 130, 246, 0.05),
+				rgb(var(--accent-bronze-rgb) / 0.05),
 				transparent 45%
 			),
 			/* Base ink gradient */
@@ -230,7 +231,7 @@ textarea:focus-visible,
 select:focus-visible,
 summary:focus-visible,
 [role="button"]:focus-visible {
-	outline: 2px solid rgba(147, 197, 253, 0.5);
+	outline: 2px solid rgb(var(--accent-bronze-rgb) / 0.5);
 	outline-offset: 2px;
 }
 
@@ -283,7 +284,7 @@ main {
 .section-shell--proof {
 	position: relative;
 	background:
-		radial-gradient(circle at 0% 0%, rgba(91, 156, 248, 0.08), transparent 34%),
+		radial-gradient(circle at 0% 0%, rgb(var(--accent-bronze-rgb) / 0.08), transparent 34%),
 		radial-gradient(
 			circle at 100% 100%,
 			rgb(var(--accent-bronze-rgb) / 0.08),
@@ -475,7 +476,7 @@ main {
 	background: linear-gradient(
 		90deg,
 		var(--accent-brass),
-		rgba(91, 156, 248, 0.5),
+		rgb(var(--accent-bronze-rgb) / 0.5),
 		transparent
 	);
 }
@@ -495,7 +496,7 @@ main {
 	background:
 		radial-gradient(
 			circle at 18% 22%,
-			rgba(91, 156, 248, 0.12),
+			rgb(var(--accent-bronze-rgb) / 0.12),
 			transparent 32%
 		),
 		radial-gradient(
@@ -516,7 +517,7 @@ main {
 	width: 420px;
 	height: 420px;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(91, 156, 248, 0.1), transparent 70%);
+	background: radial-gradient(circle, rgb(var(--accent-bronze-rgb) / 0.1), transparent 70%);
 	top: -120px;
 	right: -80px;
 	filter: blur(64px);
@@ -598,7 +599,7 @@ main {
 	padding: 0.9rem 1rem;
 	border-radius: 1rem;
 	background: rgba(9, 15, 28, 0.76);
-	border: 1px solid rgba(147, 197, 253, 0.2);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.2);
 	color: rgba(255, 255, 255, 0.82);
 	font-size: 0.92rem;
 	font-weight: 600;
@@ -618,7 +619,7 @@ main {
 	background:
 		radial-gradient(
 			circle at top left,
-			rgba(91, 156, 248, 0.1),
+			rgb(var(--accent-bronze-rgb) / 0.1),
 			transparent 36%
 		),
 		radial-gradient(
@@ -863,7 +864,7 @@ button:hover .card-tag {
 			transparent 28%
 		),
 		linear-gradient(135deg, #0b1220 0%, #111c31 48%, #16243d 100%);
-	border: 1px solid rgba(147, 197, 253, 0.4);
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.4);
 	box-shadow: var(--shadow-card);
 }
 
@@ -982,12 +983,12 @@ html:not(.reveal-ready) .reveal-scale {
 		90deg,
 		transparent,
 		rgb(var(--accent-bronze-rgb) / 0.8),
-		rgba(91, 156, 248, 0.8),
+		rgb(var(--accent-bronze-rgb) / 0.8),
 		transparent
 	);
 	background-size: 200% 100%;
 	animation: divider-shimmer 4s ease-in-out infinite;
-	box-shadow: 0 0 18px rgba(91, 156, 248, 0.26);
+	box-shadow: 0 0 18px rgb(var(--accent-bronze-rgb) / 0.26);
 }
 
 @keyframes divider-shimmer {
@@ -1139,7 +1140,7 @@ main#main-content {
 	left: 0;
 	width: 0%;
 	height: 3px;
-	background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 60%, #93c5fd 100%);
+	background: linear-gradient(90deg, rgb(var(--accent-bronze-rgb)) 0%, var(--accent-bronze-light) 60%, var(--accent-bronze-muted) 100%);
 	z-index: 9999;
 	transition: width 0.1s linear;
 	pointer-events: none;
