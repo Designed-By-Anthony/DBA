@@ -598,7 +598,6 @@ export function OurEdgePage() {
 										label: "Gemini 2.0",
 										href: "https://deepmind.google/technologies/gemini/",
 									},
-									{},
 									{ label: "Zod", href: "https://zod.dev" },
 									{ label: "Zustand", href: "https://zustand.docs.pmnd.rs" },
 								].map(({ label, href }) => (
