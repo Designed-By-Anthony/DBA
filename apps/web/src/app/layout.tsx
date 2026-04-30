@@ -1,10 +1,9 @@
 import "@/design-system/dba-global.css";
-import { CrispBootstrap } from "@/components/CrispBootstrap";
-import { JsonLd } from "@/components/JsonLd";
-import "@/styles/layout-shell.css";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import type { ReactNode } from "react";
+import { CrispBootstrap } from "@/components/CrispBootstrap";
+import { JsonLd } from "@/components/JsonLd";
 
 /**
  * Load Outfit Variable via Next.js Font API so the --font-outfit CSS variable

@@ -44,15 +44,18 @@ function MarketingBreadcrumbs({ items }: { items: BreadcrumbItem[] }) {
 
 	return (
 		<nav
-			className="breadcrumb-nav marketing-breadcrumb-nav"
+			className="bg-white/[0.02] border-b border-white/[0.05] py-3"
 			aria-label="Breadcrumb"
 		>
-			<div className="breadcrumb-container">
-				<ol className="breadcrumbs">
+			<div className="max-w-[var(--content-max)] mx-auto px-[var(--container-gutter)]">
+				<ol className="list-none flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.85rem] text-[var(--text-gray)] overflow-hidden m-0 p-0">
 					{items.map((item, i) => {
 						const isLast = i === items.length - 1;
 						return (
-							<li key={item.path} className="breadcrumb-item">
+							<li
+								key={item.path}
+								className="flex items-center whitespace-nowrap min-w-0 last:overflow-hidden last:[text-overflow:ellipsis] last:flex-shrink before:[content:'/'] before:opacity-30 before:mr-2 before:flex-shrink-0 first:before:hidden last:[&>span]:overflow-hidden last:[&>span]:[text-overflow:ellipsis] last:[&>span]:whitespace-nowrap last:[&>span]:block"
+							>
 								{isLast ? (
 									<span aria-current="page">{item.name}</span>
 								) : (

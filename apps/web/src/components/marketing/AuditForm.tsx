@@ -46,8 +46,9 @@ const META =
 const PRIVACY =
 	"text-white/[0.46] text-[0.8rem] leading-[1.55] m-0 [&_a]:text-[rgba(232,213,168,0.95)]";
 const STATUS = "min-h-[1.2rem] text-[0.84rem] text-[#fca5a5] m-0 mt-[-0.15rem]";
+/* JS-set hook (audit-forms.ts adds .audit-submit-success on success) */
 const SUBMIT_BTN =
-	"btn btn-primary-audit disabled:opacity-72 disabled:cursor-wait";
+	"btn btn-primary-audit disabled:opacity-72 disabled:cursor-wait [&.audit-submit-success]:!bg-[#16a34a] [&.audit-submit-success]:!opacity-100 [&.audit-submit-success]:!cursor-default";
 
 /**
  * Native marketing lead form — wired by `src/scripts/audit-forms.ts`

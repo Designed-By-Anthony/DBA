@@ -246,7 +246,7 @@ export function SiteContactDrawer() {
 					<div className="site-quick-rail__divider" />
 					<a
 						href={businessProfile.telephoneHref}
-						className={RAIL_LINK}
+						className={`nav-rail-link nav-rail-link--phone ${RAIL_LINK}`}
 						onClick={close}
 					>
 						<span className={RAIL_TEXT}>

@@ -43,7 +43,7 @@ export function BrandHeader({
 			>
 				<Link
 					href={isAudit ? SITE_BRAND.homeHref : SITE_BANNER.href}
-					className="flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-medium tracking-[0.04em] text-[rgba(232,213,168,0.92)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
+					className="site-banner-link flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-medium tracking-[0.04em] text-[rgba(232,213,168,0.92)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
 				>
 					<span
 						className="inline-block w-[0.4rem] h-[0.4rem] rounded-full bg-[rgba(201,168,108,0.95)] shadow-[0_0_8px_1px_rgba(201,168,108,0.4)] shrink-0"
@@ -110,7 +110,7 @@ export function BrandHeader({
 						))}
 						<Link
 							href={SITE_CONTACT_LINK.href}
-							className="text-[0.82rem] font-medium text-[rgba(247,244,238,0.7)] no-underline transition-colors duration-[180ms] ease-in tracking-[-0.005em] whitespace-nowrap hover:text-[rgba(247,244,238,0.98)]"
+							className="nav-contact-link text-[0.82rem] font-medium text-[rgba(247,244,238,0.7)] no-underline transition-colors duration-[180ms] ease-in tracking-[-0.005em] whitespace-nowrap hover:text-[rgba(247,244,238,0.98)]"
 						>
 							{SITE_CONTACT_LINK.label}
 						</Link>
@@ -153,16 +153,16 @@ export function BrandHeader({
 						)}
 						{includeHamburger ? (
 							<button
-								className="hamburger inline-flex flex-col justify-center gap-[0.28rem] w-[2.4rem] h-[2.4rem] px-[0.55rem] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-[0.5rem] cursor-pointer transition-[background,border-color] duration-[180ms] ease-in hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] aria-expanded:bg-[rgba(255,255,255,0.08)] aria-expanded:border-[rgba(255,255,255,0.18)]"
+								className="hamburger inline-flex flex-col justify-center gap-[0.28rem] w-[2.4rem] h-[2.4rem] px-[0.55rem] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-[0.5rem] cursor-pointer transition-[background,border-color] duration-[180ms] ease-in hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] aria-expanded:bg-[rgba(255,255,255,0.08)] aria-expanded:border-[rgba(255,255,255,0.18)] [&.active>span:nth-child(1)]:[transform:translate(0,0.4rem)_rotate(45deg)] [&.active>span:nth-child(2)]:opacity-0 [&.active>span:nth-child(3)]:[transform:translate(0,-0.4rem)_rotate(-45deg)]"
 								id="hamburger-btn"
 								type="button"
 								aria-label="Open navigation menu"
 								aria-controls="mobile-nav"
 								aria-expanded="false"
 							>
-								<span className="hamburger-line block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
-								<span className="hamburger-line block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
-								<span className="hamburger-line block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-[opacity,transform] duration-[200ms] ease-in" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
 							</button>
 						) : null}
 					</div>
