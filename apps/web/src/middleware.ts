@@ -10,6 +10,25 @@ const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 const VF_ADMIN_HOST = `admin.${VERTAFLOW_DOMAIN}`;
 const VF_ACCOUNTS_HOST = `accounts.${VERTAFLOW_DOMAIN}`;
 
+/**
+ * RFC 8288 Link headers for agent discovery
+ * https://www.rfc-editor.org/rfc/rfc8288
+ */
+const LINK_HEADERS = [
+	// API Catalog (RFC 9727)
+	'</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
+	// Agent Skills Discovery
+	'</.well-known/agent-skills/index.json>; rel="agent-skills"; type="application/json"',
+	// MCP Server Card
+	'</.well-known/mcp/server-card.json>; rel="mcp-server"; type="application/json"',
+	// Service documentation
+	'</lighthouse>; rel="service-doc"; title="Lighthouse Scanner"',
+	// API documentation
+	'<https://api.designedbyanthony.com>; rel="service-desc"; title="API Endpoint"',
+	// Health/Status endpoint
+	'<https://api.designedbyanthony.com/health>; rel="status"; title="API Health"',
+].join(", ");
+
 function redirectToVertaflow(
 	request: NextRequest,
 	targetHost: string,
@@ -46,7 +65,67 @@ export function middleware(request: NextRequest) {
 		return NextResponse.rewrite(url);
 	}
 
-	return NextResponse.next();
+	// Handle Markdown for Agents (text/markdown content negotiation)
+	// https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/
+	const acceptHeader = request.headers.get("accept") ?? "";
+	const wantsMarkdown = acceptHeader.includes("text/markdown");
+
+	if (wantsMarkdown && pathname === "/") {
+		// For now, return a simple markdown version of the homepage
+		const markdownContent = generateHomepageMarkdown();
+		return new NextResponse(markdownContent, {
+			status: 200,
+			headers: {
+				"Content-Type": "text/markdown; charset=utf-8",
+				"X-Markdown-Tokens": "256",
+				Link: LINK_HEADERS,
+			},
+		});
+	}
+
+	// Add Link headers to all responses for agent discovery (RFC 8288)
+	const response = NextResponse.next();
+	response.headers.set("Link", LINK_HEADERS);
+	return response;
+}
+
+/**
+ * Generate markdown version of homepage for agents
+ */
+function generateHomepageMarkdown(): string {
+	return `# Designed by Anthony
+
+**Mohawk Valley Web Design Studio** · Utica · Rome · Syracuse · CNY
+
+Custom websites for contractors, home-service pros, medspas, salons, boutiques, and every other small business across Central New York. Fast on a phone, friendly to read, and built so people searching for what you do actually land, trust you, and call.
+
+## Services
+
+- Web Design & Development
+- Local SEO
+- Performance Optimization
+- Website Audits
+
+## Free Tool
+
+**[Lighthouse Scanner](/lighthouse)** — Free SEO & Performance Audit
+
+## Contact
+
+- Website: https://designedbyanthony.com
+- Phone: 315-638-2320
+- Email: anthony@designedbyanthony.com
+- Address: 8370 Elizabethtown Rd, Herkimer, NY 13350
+
+## API
+
+- API Endpoint: https://api.designedbyanthony.com
+- API Documentation: https://api.designedbyanthony.com/docs
+
+---
+
+*Built with Next.js, React, TypeScript, Tailwind CSS, and Cloudflare.*
+`;
 }
 
 export const config = {

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/2024-11-05/server-card.json",
+  "serverInfo": {
+    "name": "designedbyanthony",
+    "version": "2.0.0",
+    "description": "MCP server for Designed by Anthony - Mohawk Valley Web Design Studio website operations and lead management",
+    "vendor": "Designed by Anthony",
+    "contact": "anthony@designedbyanthony.com"
+  },
+  "transport": {
+    "type": "http",
+    "endpoint": "https://api.designedbyanthony.com/mcp",
+    "supportedProtocols": ["mcp-v2024-11-05"]
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": true,
+      "supported": [
+        "website_audit",
+        "lead_form_submission",
+        "contact_form_access",
+        "service_inquiry"
+      ]
+    },
+    "resources": {
+      "listChanged": true,
+      "subscribe": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": false
+  },
+  "authentication": {
+    "type": "none",
+    "required": false
+  },
+  "documentation": {
+    "homepage": "https://designedbyanthony.com",
+    "apiDocs": "https://api.designedbyanthony.com/docs",
+    "contact": "https://designedbyanthony.com/contact"
+  }
+}
