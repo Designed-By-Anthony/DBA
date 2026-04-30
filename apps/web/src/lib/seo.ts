@@ -212,43 +212,43 @@ export const MARKETING_SERVICES = [
 		name: "Custom Web Design",
 		path: "/services/custom-web-design",
 		description:
-			"Custom websites built for trust, speed, clarity, and lead generation.",
+			"Strategic website design combining brand aesthetics with conversion-focused architecture. Engineered for performance, built for results.",
 	},
 	{
-		name: "Website Rescues and Mobile Optimization",
+		name: "Website Recovery & Performance",
 		path: "/services/website-rescue",
 		description:
-			"Website rescue work that improves mobile usability, speed, and conversion flow.",
+			"Comprehensive site remediation addressing technical debt, mobile experience, and conversion optimization. Restore performance, reclaim rankings.",
 	},
 	{
-		name: "Managed Hosting and VIP Support",
+		name: "Enterprise Hosting & Support",
 		path: "/services/managed-hosting",
 		description:
-			"Managed hosting and direct support that keep the site fast, secure, and easy to maintain.",
+			"Premium managed infrastructure on Cloudflare's edge network with dedicated technical support. Enterprise-grade security, global performance, zero maintenance overhead.",
 	},
 	{
-		name: "Local SEO and Search Visibility",
+		name: "Local SEO & Search Strategy",
 		path: "/services/local-seo",
 		description:
-			"Local SEO and Google Business Profile work — Merchynt agency partner — aligning service pages, areas, and entity signals.",
+			"Data-driven local search optimization and Google Business Profile management. Strategic entity alignment for service-area businesses seeking market dominance.",
 	},
 	{
-		name: "Google Business Profile & Local Marketing",
+		name: "Local Marketing Intelligence",
 		path: "/services/google-business-profile",
 		description:
-			"Complete local marketing program around Google Business Profile, reviews, citations, AI visibility, and reporting — Merchynt agency partner.",
+			"Comprehensive local presence management integrating reputation systems, citation networks, and AI-powered visibility optimization. Full-funnel reporting included.",
 	},
 	{
-		name: "Google Workspace Setup",
+		name: "Business Systems Integration",
 		path: "/services/workspace-setup",
 		description:
-			"Professional business email and workspace administration setup.",
+			"Enterprise workspace architecture and business system integration. Seamless email, collaboration, and workflow automation deployment.",
 	},
 	{
-		name: "Custom Google AI Chatbots & Forms",
-		path: "/services/ai-automation",
+		name: "Micro SaaS Development",
+		path: "/services/micro-saas",
 		description:
-			"Automated chatbots and smart forms for hands-free lead capture.",
+			"Bespoke web applications and marketing automation systems for scaling businesses. From custom CRMs to lead generation platforms — engineered for growth.",
 	},
 ] as const;
 

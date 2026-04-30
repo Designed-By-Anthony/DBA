@@ -1,5 +1,6 @@
 @import "../../design-system/tokens.css";
 @import "../../design-system/tailwind-v4-bridge.css";
+@import "../../styles/theme.css";
 @import "tailwindcss";
 
 @theme {
