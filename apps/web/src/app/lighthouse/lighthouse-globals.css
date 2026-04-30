@@ -1575,6 +1575,26 @@
 	}
 }
 
+/*
+ * When the audit completes and `AuditResults` is mounted inside the audit
+ * panel, collapse the 2-column stage grid back to a single full-width
+ * column. Otherwise the report stays trapped in the right-hand column at
+ * desktop, leaving a giant empty rail on the left.
+ */
+.lh-audit-stage:has(.lh-report-output) .lh-stage-grid {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.lh-audit-stage:has(.lh-report-output) .lighthouse-hero,
+.lh-audit-stage:has(.lh-report-output) .lh-stage-lower {
+	display: none;
+}
+
+.lh-audit-stage:has(.lh-report-output) .lh-audit-panel {
+	position: static;
+	padding: clamp(1.5rem, 3.6vw, 3rem);
+}
+
 .lh-stage-lower {
 	margin-top: clamp(1.5rem, 4vw, 3rem);
 }
