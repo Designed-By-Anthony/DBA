@@ -1000,6 +1000,11 @@ li {
 	padding-bottom: 0.5rem;
 }
 
+.lh-process {
+	padding: var(--space-block) 0 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
 .lh-scan-phase-bar__header,
 .lh-diagnostic-topline,
 .lh-process-heading,
@@ -1012,6 +1017,23 @@ li {
 
 .lh-scan-phase-bar__header {
 	margin-bottom: var(--space-element);
+}
+
+.lh-process-title {
+	max-width: 46rem;
+	color: rgba(247, 244, 238, 0.96);
+	font-family: var(--font-fraunces, var(--font-display));
+	font-size: clamp(1.55rem, 2.8vw, 2.35rem);
+	font-weight: 650;
+	line-height: 1.08;
+	letter-spacing: 0;
+}
+
+.lh-process-note {
+	max-width: 24rem;
+	color: rgba(247, 244, 238, 0.52);
+	font-size: 0.86rem;
+	line-height: 1.62;
 }
 
 .lh-scan-phase-bar__left {
