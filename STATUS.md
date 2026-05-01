@@ -14,6 +14,8 @@
 - Verification after review fixes: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 - Review cleanup: removed the unused `Outfit` Next font loader and stale `--font-outfit` references now that `--font-display` uses Fraunces.
 - Verification after font cleanup: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+- Review fix: restored the Lighthouse scan fact carousel offset logic with CSS transform variables so auto-advance and dot clicks reveal each active fact tile.
+- Verification after carousel fix: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 

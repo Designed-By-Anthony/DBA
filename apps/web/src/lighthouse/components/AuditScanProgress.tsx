@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Fact = {
 	tag: string;
@@ -84,13 +84,27 @@ export function AuditScanProgress({
 	message: string;
 }) {
 	const [factIndex, setFactIndex] = useState(0);
+	const [carouselMetrics, setCarouselMetrics] = useState({
+		tileStride: 0,
+		maxOffset: 0,
+	});
+	const viewportRef = useRef<HTMLDivElement>(null);
+	const trackRef = useRef<HTMLDivElement>(null);
+	const firstTileRef = useRef<HTMLDivElement>(null);
 	const idx = phaseIndex(activePhase);
 	const progressPct = useMemo(() => {
 		const step = 100 / PHASES.length;
 		return Math.min(100, Math.round((idx + 0.65) * step));
 	}, [idx]);
+	const carouselOffset = Math.min(
+		factIndex * carouselMetrics.tileStride,
+		carouselMetrics.maxOffset,
+	);
 	const progressStyle: CSSProperties & { "--scan-progress": string } = {
 		"--scan-progress": `${progressPct}%`,
+	};
+	const carouselStyle: CSSProperties & { "--carousel-offset": string } = {
+		"--carousel-offset": `${-carouselOffset}px`,
 	};
 
 	useEffect(() => {
@@ -98,6 +112,49 @@ export function AuditScanProgress({
 			setFactIndex((i) => (i + 1) % FACTS.length);
 		}, 5500);
 		return () => window.clearInterval(t);
+	}, []);
+
+	useEffect(() => {
+		const updateCarouselMetrics = () => {
+			const viewport = viewportRef.current;
+			const track = trackRef.current;
+			const firstTile = firstTileRef.current;
+
+			if (!viewport || !track || !firstTile) {
+				return;
+			}
+
+			const trackStyles = window.getComputedStyle(track);
+			const gap =
+				Number.parseFloat(trackStyles.columnGap || trackStyles.gap || "0") || 0;
+			const tileStride = firstTile.getBoundingClientRect().width + gap;
+			const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+			setCarouselMetrics((current) =>
+				current.tileStride === tileStride && current.maxOffset === maxOffset
+					? current
+					: { tileStride, maxOffset },
+			);
+		};
+
+		updateCarouselMetrics();
+		window.addEventListener("resize", updateCarouselMetrics);
+
+		const resizeObserver =
+			typeof ResizeObserver === "undefined"
+				? null
+				: new ResizeObserver(updateCarouselMetrics);
+
+		if (resizeObserver) {
+			if (viewportRef.current) resizeObserver.observe(viewportRef.current);
+			if (trackRef.current) resizeObserver.observe(trackRef.current);
+			if (firstTileRef.current) resizeObserver.observe(firstTileRef.current);
+		}
+
+		return () => {
+			window.removeEventListener("resize", updateCarouselMetrics);
+			resizeObserver?.disconnect();
+		};
 	}, []);
 
 	return (
@@ -132,11 +189,16 @@ export function AuditScanProgress({
 				</ol>
 			</div>
 
-			<div className="lh-carousel-viewport" aria-live="polite">
-				<div className="lh-carousel-track">
+			<div
+				ref={viewportRef}
+				className="lh-carousel-viewport"
+				aria-live="polite"
+			>
+				<div ref={trackRef} className="lh-carousel-track" style={carouselStyle}>
 					{FACTS.map((fact, i) => (
 						<div
 							key={fact.title}
+							ref={i === 0 ? firstTileRef : undefined}
 							className={`lh-carousel-tile glass-card${i === factIndex ? " lh-carousel-tile--active" : ""}`}
 						>
 							<p className="lh-fact-card__tag">Did you know · {fact.tag}</p>

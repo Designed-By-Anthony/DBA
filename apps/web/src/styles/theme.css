@@ -976,6 +976,9 @@ li {
 .lh-carousel-track {
 	display: flex;
 	gap: var(--space-element);
+	transform: translateX(var(--carousel-offset, 0));
+	transition: transform var(--motion-duration-slow) var(--ease-out);
+	will-change: transform;
 }
 
 .lh-carousel-tile {
