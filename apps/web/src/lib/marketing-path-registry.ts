@@ -1,6 +1,8 @@
 import { blogPosts } from "@/data/blogPosts";
+import { COMPARE_COMPETITORS } from "@/data/compare-competitors";
 import { getAllServiceAreaSlugs } from "@/data/serviceAreaLocations";
 import { showcaseItems } from "@/data/showcase";
+import { listAllInfrastructurePaths } from "@/lib/programmaticSeo";
 import { MARKETING_SERVICES } from "@/lib/seo";
 
 /** Single-page marketing slugs handled by `(site)/[...path]`. */
@@ -47,6 +49,17 @@ export function getMarketingSitemapPathnames(): string[] {
 
 	for (const slug of STATIC_MARKETING_SLUGS) {
 		paths.add(`/${slug}`);
+	}
+
+	paths.add("/tools");
+	paths.add("/calculator");
+
+	for (const { slug } of COMPARE_COMPETITORS) {
+		paths.add(`/compare/${slug}`);
+	}
+
+	for (const { city, industry } of listAllInfrastructurePaths()) {
+		paths.add(`/infrastructure/${city}/${industry}`);
 	}
 
 	for (const slug of getAllServiceAreaSlugs()) {

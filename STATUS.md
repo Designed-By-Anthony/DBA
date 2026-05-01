@@ -18,6 +18,17 @@
 - **FAQ:** `FaqSection.tsx` + `.text-bubble.is-bordered` accordion rows; thin bronze +/- toggle; inner pages use same pattern via `FaqAccordionSummaryAndAnswer`.
 - **`tailwind.config.ts`:** documents `#D4AF37` / aligns IDE with `@theme` tokens from `tokens.css`.
 
+## Edge SEO + programmatic scale (2026-05-01)
+
+- **Programmatic routes:** `/infrastructure/[city]/[industry]` (SSG + `revalidate`), `/compare/[competitor]`, `/calculator` (lead hook via existing `/api/lead-email`).
+- **Shared scale engine:** `packages/shared/src/lib/programmaticSeo.ts`; web re-export `apps/web/src/lib/programmaticSeo.ts`.
+- **Elysia:** `GET /api/seo/infrastructure/:city/:industry` + `/api/seo/infrastructure-index` on **`dba-api`** (relative import for Wrangler bundle).
+- **Sitemap:** `getMarketingSitemapPathnames()` includes infrastructure, compare, calculator, tools.
+- **Middleware:** crawler UA detection (`x-seo-bot`), sticky hero A/B cookie `dba_hero_ab` + response headers (homepage stays static — no `headers()` on `/`).
+- **Schema:** pricing gains FAQPage + duplicate Vault `SoftwareApplication`; `/tools` gains ItemList of micro-SaaS apps.
+- **LCP:** hero uses prioritized `next/image` on `/images/og-site-premium.png` (decorative layer).
+- **Optional outer Worker:** `workers/edge-seo-proxy` — canonical Link injection in front of Pages (configure `ORIGIN_URL`).
+
 ## Playwright ironclad + security audit specs (2026-05-01)
 
 - Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, primary vs outline CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).

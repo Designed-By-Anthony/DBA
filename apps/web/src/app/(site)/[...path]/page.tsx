@@ -11,6 +11,8 @@ import { resolveMarketingMetadata } from "@/lib/marketing-metadata";
 import { STATIC_MARKETING_SLUGS } from "@/lib/marketing-path-registry";
 import { MARKETING_SERVICES } from "@/lib/seo";
 
+export const revalidate = 86400;
+
 type PageProps = {
 	params: Promise<{ path: string[] }>;
 };

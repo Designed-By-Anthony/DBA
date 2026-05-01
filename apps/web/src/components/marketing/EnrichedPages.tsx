@@ -5,6 +5,7 @@ import {
 	getServiceAreaDetailLongformSections,
 	getServiceAreaLongformSections,
 } from "@/data/longformContent";
+import { pricingFaqEntries } from "@/data/pricing-faq";
 import {
 	getServiceAreaLocation,
 	serviceAreaLocations,
@@ -35,6 +36,7 @@ import {
 	buildFaqPageSchema,
 	buildMarketingWebPageSchema,
 	buildPricingOfferCatalogSchema,
+	buildVaultCrmSoftwareApplicationSchema,
 } from "@/lib/seo";
 import { FaqAccordionSummaryAndAnswer } from "./FaqSection";
 import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
@@ -293,6 +295,10 @@ export function AboutPage() {
 export function PricingPage() {
 	const copy = staticMarketingPageCopy.pricing;
 	const pricingCatalog = buildPricingOfferCatalogSchema();
+	const vaultSoftware = buildVaultCrmSoftwareApplicationSchema();
+	const pricingFaqSchema = buildFaqPageSchema([...pricingFaqEntries], {
+		path: "/pricing",
+	});
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<MarketingPageJsonLd
@@ -305,6 +311,16 @@ export function PricingPage() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingCatalog) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(vaultSoftware) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingFaqSchema) }}
 			/>
 			<PageHero
 				kind="pricing"

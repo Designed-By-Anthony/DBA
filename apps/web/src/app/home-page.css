@@ -1,6 +1,29 @@
 .page-hero--home {
 	--hero-spot-x: 50%;
 	--hero-spot-y: 22%;
+	position: relative;
+	overflow: clip;
+}
+
+/* Preload OG artwork as hero LCP candidate (decorative; boosts discoverable image fetch). */
+.page-hero--home .hero-lcp-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.page-hero--home .hero-lcp-layer__img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0.12;
+	filter: saturate(1.05);
+}
+
+.page-hero--home .page-hero-inner {
+	position: relative;
+	z-index: 1;
 }
 
 /* Editorial typography dial: mixed Fraunces + Inter headline (`.home-hero-title`). */

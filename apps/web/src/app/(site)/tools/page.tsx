@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
+import { buildToolsStoreJsonLd } from "@/lib/tools-jsonld";
 import { ToolsPage } from "./ToolsPage";
+
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
 	title: "Tools — Micro SaaS for Local Service Businesses",
@@ -23,8 +26,14 @@ export const metadata: Metadata = {
 };
 
 export default function Tools() {
+	const toolsGraph = buildToolsStoreJsonLd();
 	return (
 		<MarketingChrome>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD data
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(toolsGraph) }}
+			/>
 			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
 				<ToolsPage />
 			</div>
