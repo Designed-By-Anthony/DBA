@@ -6,7 +6,7 @@ import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 export default function LighthouseHome() {
 	return (
 		<MarketingChrome>
-			<main id="main-content" className="lighthouse-main">
+			<div className="lighthouse-main">
 				<section className="lh-audit-stage">
 					<div className="lh-stage-grid">
 						<LighthouseHero />
@@ -22,7 +22,7 @@ export default function LighthouseHome() {
 						<LighthouseValueStrip />
 					</div>
 				</section>
-			</main>
+			</div>
 		</MarketingChrome>
 	);
 }

@@ -27,6 +27,7 @@
 - Review fix: removed `.dba-footer` from the card/glass selector group so full-width footer chrome no longer inherits card radius, shadow, border, or backdrop blur.
 - Review fix: restored `dba-bronze-glow-pulse` keyframes and split `.lh-score-grid` into a fixed 3-column desktop grid with mobile collapse.
 - Review fix: restored Lighthouse value strip `.lh-process`, `.lh-process-title`, and `.lh-process-note` styles.
+- Review fix: changed the Lighthouse home page content wrapper from nested `<main id="main-content">` to a div inside `MarketingChrome`'s existing main landmark.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
