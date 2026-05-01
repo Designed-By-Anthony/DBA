@@ -1,5 +1,7 @@
 import { env } from "cloudflare:workers";
 import { cors } from "@elysiajs/cors";
+import { createD1Client } from "@dba/shared/db/client";
+import { setLeadsDb } from "@/lib/d1Leads";
 import { setReportKV } from "@lh/lib/report-store";
 import { Elysia } from "elysia";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
@@ -15,6 +17,13 @@ import { testEmailsRoute } from "./routes/testEmails";
 const kvBinding = (env as Record<string, unknown>).AUDIT_REPORTS_KV;
 if (kvBinding) {
 	setReportKV(kvBinding as Parameters<typeof setReportKV>[0]);
+}
+
+// Wire the D1 binding so route handlers can insert leads without carrying
+// the binding through every function signature.
+const d1Binding = (env as Record<string, unknown>).DBA_LEADS_DB;
+if (d1Binding) {
+	setLeadsDb(createD1Client(d1Binding));
 }
 
 const app = new Elysia({ adapter: CloudflareAdapter })

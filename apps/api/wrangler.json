@@ -10,5 +10,12 @@
 			"binding": "AUDIT_REPORTS_KV",
 			"id": "PLACEHOLDER_REPLACE_IN_CLOUDFLARE_DASHBOARD"
 		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DBA_LEADS_DB",
+			"database_name": "dba-leads",
+			"database_id": "PLACEHOLDER_REPLACE_IN_CLOUDFLARE_DASHBOARD"
+		}
 	]
 }
