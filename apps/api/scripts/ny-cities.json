@@ -1,0 +1,32 @@
+[
+  {
+    "city": "Rome",
+    "areaCode": "315",
+    "slug": "rome"
+  },
+  {
+    "city": "Utica",
+    "areaCode": "315",
+    "slug": "utica"
+  },
+  {
+    "city": "Syracuse",
+    "areaCode": "315",
+    "slug": "syracuse"
+  },
+  {
+    "city": "Albany",
+    "areaCode": "518",
+    "slug": "albany"
+  },
+  {
+    "city": "Schenectady",
+    "areaCode": "518",
+    "slug": "schenectady"
+  },
+  {
+    "city": "Troy",
+    "areaCode": "518",
+    "slug": "troy"
+  }
+]

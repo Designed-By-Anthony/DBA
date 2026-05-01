@@ -2,7 +2,7 @@ import {
 	clearGmailTestOutbox,
 	getGmailTestOutbox,
 	isGmailTestMode,
-} from "@lh/lib/gmail";
+} from "@dba/shared/lighthouse/lib/gmail";
 import { Elysia } from "elysia";
 
 export const testEmailsRoute = new Elysia({ aot: false })

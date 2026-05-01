@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dba-admin",
+  "pages_build_output_dir": ".vercel/output/static",
+  "compatibility_date": "2025-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dba-ledger",
+      "database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
+    }
+  ]
+}

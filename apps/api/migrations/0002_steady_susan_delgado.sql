@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` ADD `lead_id` text REFERENCES leads(id);

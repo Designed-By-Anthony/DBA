@@ -3,8 +3,8 @@ import {
 	FieldValue,
 	REPORTS_COLLECTION,
 	Timestamp,
-} from "@lh/lib/report-store";
-import { isValidReportId } from "@lh/lib/reportId";
+} from "@dba/shared/lighthouse/lib/report-store";
+import { isValidReportId } from "@dba/shared/lighthouse/lib/reportId";
 import { Elysia } from "elysia";
 
 export const reportRoute = new Elysia({ aot: false }).get(

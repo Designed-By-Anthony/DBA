@@ -1,44 +1,44 @@
-import { buildFallbackInsight, generateAiInsight } from "@lh/lib/ai";
-import { fireAuditLoggingWebhook } from "@lh/lib/auditLoggingWebhook";
-import { resolvePageSpeedLighthouse } from "@lh/lib/auditPsi";
-import { buildInternalAuthorityMetrics } from "@lh/lib/authorityEstimate";
+import { buildFallbackInsight, generateAiInsight } from "@dba/shared/lighthouse/lib/ai";
+import { fireAuditLoggingWebhook } from "@dba/shared/lighthouse/lib/auditLoggingWebhook";
+import { resolvePageSpeedLighthouse } from "@dba/shared/lighthouse/lib/auditPsi";
+import { buildInternalAuthorityMetrics } from "@dba/shared/lighthouse/lib/authorityEstimate";
 import {
 	buildReceiptEmail,
 	isGmailConfigured,
 	sendViaGmail,
-} from "@lh/lib/gmail";
-import { type HtmlScanResult, scanHtml } from "@lh/lib/htmlScanner";
-import { checkLocalRateLimit, getClientAddress } from "@lh/lib/http";
+} from "@dba/shared/lighthouse/lib/gmail";
+import { type HtmlScanResult, scanHtml } from "@dba/shared/lighthouse/lib/htmlScanner";
+import { checkLocalRateLimit, getClientAddress } from "@dba/shared/lighthouse/lib/http";
 import {
 	estimateIndexCoverage,
 	type IndexCheckResult,
-} from "@lh/lib/indexCheck";
-import { type MozMetrics, scanMoz } from "@lh/lib/mozAnalysis";
+} from "@dba/shared/lighthouse/lib/indexCheck";
+import { type MozMetrics, scanMoz } from "@dba/shared/lighthouse/lib/mozAnalysis";
 import {
 	type Competitor,
 	type PlacesResult,
 	scanCompetitors,
 	scanPlaces,
-} from "@lh/lib/places";
-import { db, REPORTS_COLLECTION, Timestamp } from "@lh/lib/report-store";
-import { buildPrefix, buildReportId, randomSuffix } from "@lh/lib/reportId";
-import { type SitewideScanResult, scanSitewide } from "@lh/lib/sitewideScan";
+} from "@dba/shared/lighthouse/lib/places";
+import { db, REPORTS_COLLECTION, Timestamp } from "@dba/shared/lighthouse/lib/report-store";
+import { buildPrefix, buildReportId, randomSuffix } from "@dba/shared/lighthouse/lib/reportId";
+import { type SitewideScanResult, scanSitewide } from "@dba/shared/lighthouse/lib/sitewideScan";
 import {
 	isResendConfigured,
 	sendTransactionalEmail,
-} from "@lh/lib/transactionalResend";
+} from "@dba/shared/lighthouse/lib/transactionalResend";
 import {
 	normalizeEmail,
 	normalizeHttpUrl,
 	normalizeText,
-} from "@lh/lib/validation";
+} from "@dba/shared/lighthouse/lib/validation";
 import { Elysia } from "elysia";
-import { tryInsertLead } from "@/lib/d1Leads";
-import { postLeadIngest } from "@/lib/leadWebhook";
+import { tryInsertLead } from "@dba/shared/lib/d1Leads";
+import { postLeadIngest } from "@dba/shared/lib/leadWebhook";
 import {
 	resolveEffectiveSecretKey,
 	verifyTurnstileToken,
-} from "@/lib/turnstile";
+} from "@dba/shared/lib/turnstile";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;

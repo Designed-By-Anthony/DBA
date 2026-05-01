@@ -1,30 +1,38 @@
 {
-	"name": "@dba/admin",
-	"version": "0.0.1",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "next dev --port 3010",
-		"build": "next build",
-		"start": "next start --port 3010",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"@dba/shared": "file:../../packages/shared",
-		"@opennextjs/cloudflare": "^1.19.4",
-		"drizzle-orm": "^0.45.2",
-		"next": "16.2.4",
-		"react": "19.2.5",
-		"react-dom": "19.2.5"
-	},
-	"devDependencies": {
-		"@tailwindcss/postcss": "^4.2.4",
-		"@cloudflare/workers-types": "^4.20260429.1",
-		"@types/node": "^24",
-		"@types/react": "^19.2.14",
-		"@types/react-dom": "^19.2.3",
-		"tailwindcss": "^4.2.4",
-		"typescript": "^6.0.3",
-		"wrangler": "^4.86.0"
-	}
+  "name": "@dba/admin",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.11.0",
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "dev": "next dev --port 3010",
+    "build": "opennextjs-cloudflare build",
+    "build:pages": "opennextjs-cloudflare build && cp -RL .open-next/assets .open-next/assets_flat && rm -rf .open-next/assets && mv .open-next/assets_flat .open-next/assets",
+    "start": "next start --port 3010",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dba/api": "workspace:*",
+    "@dba/shared": "file:../../packages/shared",
+    "@elysiajs/eden": "^1.4.9",
+    "@opennextjs/cloudflare": "^1.19.4",
+    "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.14.0",
+    "next": "16.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@cloudflare/workers-types": "^4.20260429.1",
+    "@types/node": "^24",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.86.0"
+  }
 }

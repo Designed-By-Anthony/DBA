@@ -2,15 +2,15 @@ import {
 	buildReceiptEmail,
 	isGmailConfigured,
 	sendViaGmail,
-} from "@lh/lib/gmail";
+} from "@dba/shared/lighthouse/lib/gmail";
 import {
 	db,
 	FieldValue,
 	REPORTS_COLLECTION,
 	Timestamp,
-} from "@lh/lib/report-store";
-import { isValidReportId } from "@lh/lib/reportId";
-import { normalizeEmail } from "@lh/lib/validation";
+} from "@dba/shared/lighthouse/lib/report-store";
+import { isValidReportId } from "@dba/shared/lighthouse/lib/reportId";
+import { normalizeEmail } from "@dba/shared/lighthouse/lib/validation";
 import { Elysia } from "elysia";
 
 const MAX_SENDS_PER_REPORT = 3;
