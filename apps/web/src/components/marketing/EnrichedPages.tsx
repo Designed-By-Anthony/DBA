@@ -10,6 +10,7 @@ import {
 	serviceAreaLocations,
 } from "@/data/serviceAreaLocations";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
+import { stackBadge } from "@/design-system/buttons";
 import {
 	ENTERPRISE_WEBSITE_STARTING_PRICE,
 	FOUNDING_PARTNER_BUILD_SLOTS,
@@ -470,7 +471,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -497,7 +498,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -528,7 +529,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>

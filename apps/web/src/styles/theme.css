@@ -205,6 +205,56 @@ main,
 	margin-inline: auto;
 }
 
+.lh-report-viewer-state {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: var(--space-section);
+	text-align: center;
+	color: rgba(247, 244, 238, 0.78);
+}
+
+.lh-report-viewer-loading {
+	font-size: 0.95rem;
+	color: rgba(247, 244, 238, 0.5);
+}
+
+.lh-report-viewer-error {
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgba(248, 220, 188, 0.92);
+}
+
+.lh-report-viewer-help {
+	max-width: 32rem;
+	font-size: 0.86rem;
+	line-height: 1.6;
+	color: rgba(247, 244, 238, 0.55);
+}
+
+.lh-report-viewer-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-top: 0.5rem;
+	padding: 0.7rem 1.2rem;
+	border: 1px solid rgb(var(--accent-bronze-rgb) / 0.6);
+	border-radius: 0.85rem;
+	background: var(--accent-bronze-light);
+	color: #171008;
+	font-size: 0.9rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: transform var(--motion-duration) var(--ease-out);
+}
+
+.lh-report-viewer-back:hover {
+	transform: translateY(-1px);
+}
+
 .lh-audit-stage {
 	width: min(80rem, 100%);
 	max-width: 100%;

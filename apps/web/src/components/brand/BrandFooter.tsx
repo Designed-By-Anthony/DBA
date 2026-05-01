@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { stackBadge } from "@/design-system/buttons";
 import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
@@ -63,7 +64,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							<a
 								key={label}
 								href={href}
-								className="dba-stack-badge"
+								className={stackBadge}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -78,7 +79,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							<a
 								key={label}
 								href={href}
-								className="dba-stack-badge"
+								className={stackBadge}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -94,7 +95,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 								<a
 									key={label}
 									href={href}
-									className="dba-stack-badge"
+									className={stackBadge}
 									target="_blank"
 									rel="noopener noreferrer"
 								>

@@ -16,6 +16,8 @@
 - Verification after font cleanup: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 - Review fix: restored the Lighthouse scan fact carousel offset logic with CSS transform variables so auto-advance and dot clicks reveal each active fact tile.
 - Verification after carousel fix: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+- Merge update: merged latest `main` again, kept the global `theme.css` architecture, retained the new `stackBadge` helper, and resolved Tailwind bridge conflicts without reintroducing duplicate global CSS.
+- Review fix: restored Lighthouse report viewer loading/error/invalid-link state styles in `theme.css`.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
