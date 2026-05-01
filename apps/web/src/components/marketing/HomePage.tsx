@@ -17,6 +17,7 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
+import { FaqSection } from "./FaqSection";
 import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
@@ -72,12 +73,17 @@ export function HomePage() {
 						</p>
 						<div className="hero-launch-pill" role="status">
 							<span className="hero-launch-dot" aria-hidden="true" />
-							<span>
+							<span className="hero-launch-pill__text">
+								The 315 Pilot:{" "}
 								<strong>
-									{FOUNDING_PARTNER_BUILD_SLOTS} launch pilot spots
-								</strong>{" "}
-								· complimentary build + {FOUNDING_PARTNER_SEO_MONTHLY}/mo growth
-								plan
+									{FOUNDING_PARTNER_BUILD_SLOTS} Founding Infrastructure
+									Placements Remaining
+								</strong>
+								<span className="hero-launch-pill__sep"> · </span>
+								<span className="hero-launch-pill__sub">
+									complimentary build + {FOUNDING_PARTNER_SEO_MONTHLY}/mo growth
+									plan
+								</span>
 							</span>
 						</div>
 						<h1
@@ -317,22 +323,11 @@ export function HomePage() {
 							language, before you spend a dollar.
 						</p>
 					</div>
-					<div className="home-faq-list" data-exclusive-details>
-						{homeFaqEntries.map((entry) => (
-							<details
-								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
-							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
-							</details>
-						))}
-					</div>
+					<FaqSection
+						className="home-faq-list"
+						itemClassName="reveal-up"
+						entries={homeFaqEntries}
+					/>
 					<p className="home-faq-cta-note">
 						More on process, hosting, and revisions on the{" "}
 						<Link href="/faq" className="inline-link">

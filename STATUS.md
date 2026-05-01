@@ -10,6 +10,12 @@
 
 - Marketing hero + primary CTAs (`btnPrimary` Inter uppercase), Spanish `/es` headline, checkout provisioning copy, JSON-LD “The Vault by ANTHONY.” (replaces prior CRM product naming in structured data). Admin ledger UI retitled **The Vault** with **315 Pipeline** / **Revenue Ledger** on absolute black. CSP variable rename only (`CRM_CONSOLE_ORIGIN`); lead-ingest host unchanged.
 
+## Deep rebrand — chrome + FAQ (2026-05-01)
+
+- **BrandHeader / BrandFooter:** Fraunces **ANTHONY.** wordmark (bronze period), text-only header (no mark image); site banner **315 Pilot** copy + bronze pulse dot; nav audit CTA **Inter** uppercase `tracking-widest` (“Audit My Site”). Footer line **ANTHONY. | Built in the 315**.
+- **FAQ:** `FaqSection.tsx` + `.text-bubble.is-bordered` accordion rows; thin bronze +/- toggle; inner pages use same pattern via `FaqAccordionSummaryAndAnswer`.
+- **`tailwind.config.ts`:** documents `#D4AF37` / aligns IDE with `@theme` tokens from `tokens.css`.
+
 ## Playwright ironclad + security audit specs (2026-05-01)
 
 - Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, primary vs outline CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).

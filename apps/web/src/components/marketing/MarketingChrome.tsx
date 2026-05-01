@@ -15,7 +15,7 @@ import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
 import { SiteContactDrawer } from "./SiteContactDrawer";
 
-const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
+const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — ANTHONY.")}`;
 
 /** Build-time id (see `next.config.ts` env); avoids filesystem reads on Cloudflare Workers. */
 const siteScriptVersion =

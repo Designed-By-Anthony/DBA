@@ -472,6 +472,21 @@ main {
 	}
 }
 
+/** Bronze pilot-banner dot — global (banner lives outside home-page.css). */
+@keyframes atelier-bronze-dot-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+		box-shadow: 0 0 10px 2px rgb(var(--accent-bronze-rgb) / 0.45);
+	}
+	50% {
+		opacity: 0.88;
+		transform: scale(1.15);
+		box-shadow: 0 0 14px 4px rgb(var(--accent-bronze-rgb) / 0.35);
+	}
+}
+
 /* ── Display Font: Outfit Variable for all headlines ── */
 .section-header h1,
 .section-header h2,

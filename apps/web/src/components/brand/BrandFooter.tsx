@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { stackBadge } from "@/design-system/buttons";
 import {
@@ -16,9 +15,7 @@ const BUILT_WITH = [
 ] as const;
 
 export type BrandFooterProps = {
-	/** Optional small mono build tag (e.g. "Lighthouse Scanner v2") shown next to legal links. */
 	buildTag?: string;
-	/** Optional contextual "Powered by" chips shown below the standard Built-with row. */
 	poweredBy?: ReadonlyArray<{ label: string; href: string }>;
 };
 
@@ -27,35 +24,24 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 
 	return (
 		<footer className="relative z-[1] mt-[clamp(2.5rem,5vw,4rem)] pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] bg-[linear-gradient(180deg,transparent_0%,rgba(6,8,14,0.65)_40%,rgba(6,8,14,0.92)_100%)]">
-			{/* Bronze accent rule */}
 			<div
 				className="h-px bg-[linear-gradient(90deg,rgba(212,175,55,0)_0%,rgba(212,175,55,0.4)_50%,rgba(212,175,55,0)_100%)]"
 				aria-hidden
 			/>
 
 			<div className="max-w-[80rem] mx-auto py-5 pb-[1.1rem]">
-				{/* Single compact row */}
 				<div className="flex items-center flex-wrap gap-x-6 gap-y-3">
-					{/* Brand lockup */}
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="inline-flex items-center gap-2 no-underline shrink-0"
-						aria-label={`${SITE_BRAND.name} — home`}
+						className="inline-flex items-center gap-0 no-underline shrink-0"
+						aria-label="ANTHONY. — home"
 					>
-						<Image
-							src={SITE_BRAND.assets.mark}
-							alt="Designed by Anthony logo"
-							width={22}
-							height={16}
-							className="shrink-0"
-							style={{ width: "auto" }}
-						/>
-						<span className="font-[family-name:var(--font-fraunces)] text-[0.88rem] font-semibold tracking-[-0.015em] text-[rgba(247,244,238,0.88)] leading-none">
-							{SITE_BRAND.name}
+						<span className="font-[family-name:var(--font-fraunces)] text-[0.92rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.9)] leading-none">
+							ANTHONY
+							<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
 						</span>
 					</Link>
 
-					{/* Footer nav */}
 					<nav
 						className="flex flex-row flex-wrap gap-x-4 gap-y-1"
 						aria-label="Footer navigation"
@@ -71,33 +57,40 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 						))}
 					</nav>
 
-					{/* Language switcher */}
-				<div className="flex items-center gap-[0.3rem] shrink-0">
-					<a
-						href="/"
-						hrefLang="en"
-						aria-label="View site in English"
-						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.85)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] hover:border-[rgba(212,175,55,0.4)] hover:text-[rgba(212,175,55,0.9)] transition-colors duration-[180ms] ease-in"
-					>
-						EN
-					</a>
-					<span className="text-[rgba(255,255,255,0.22)] text-[0.6rem]" aria-hidden>
-						|
-					</span>
-					<a
-						href="/es"
-						hrefLang="es"
-						aria-label="Ver el sitio en español"
-						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.48)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-transparent hover:border-[rgba(212,175,55,0.3)] hover:text-[rgba(212,175,55,0.8)] transition-colors duration-[180ms] ease-in"
-					>
-						ES
-					</a>
-				</div>
+					<div className="flex items-center gap-[0.3rem] shrink-0">
+						<a
+							href="/"
+							hrefLang="en"
+							aria-label="View site in English"
+							className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.85)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] hover:border-[rgba(212,175,55,0.4)] hover:text-[rgba(212,175,55,0.9)] transition-colors duration-[180ms] ease-in"
+						>
+							EN
+						</a>
+						<span
+							className="text-[rgba(255,255,255,0.22)] text-[0.6rem]"
+							aria-hidden
+						>
+							|
+						</span>
+						<a
+							href="/es"
+							hrefLang="es"
+							aria-label="Ver el sitio en español"
+							className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.48)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-transparent hover:border-[rgba(212,175,55,0.3)] hover:text-[rgba(212,175,55,0.8)] transition-colors duration-[180ms] ease-in"
+						>
+							ES
+						</a>
+					</div>
 
-				{/* Legal + copyright */}
 					<div className="flex items-center flex-wrap gap-x-[0.55rem] gap-y-[0.35rem] ml-auto text-[0.7rem] text-[rgba(247,244,238,0.38)] max-sm:ml-0">
 						<p className="m-0 whitespace-nowrap">
-							© {year} {SITE_BRAND.name}
+							© {year}{" "}
+							<span className="text-[rgba(247,244,238,0.55)]">
+								ANTHONY
+								<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
+								{" | "}
+								{SITE_BRAND.footerCopyrightSuffix}
+							</span>
 						</p>
 						{SITE_LEGAL_LINKS.map((link) => (
 							<span
@@ -128,7 +121,6 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					</div>
 				</div>
 
-				{/* Built-with chips */}
 				<div className="flex flex-wrap items-center gap-x-2 gap-y-[0.35rem] pt-[0.7rem] border-t border-[rgba(255,255,255,0.06)] mt-[0.65rem]">
 					<span className="text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[rgba(247,244,238,0.28)] mr-[0.15rem] shrink-0">
 						Built with
@@ -146,7 +138,6 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					))}
 				</div>
 
-				{/* Optional powered-by chips */}
 				{poweredBy?.length ? (
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-[0.35rem] pt-[0.7rem] border-t border-[rgba(255,255,255,0.06)] mt-[0.65rem]">
 						<span className="text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[rgba(247,244,238,0.28)] mr-[0.15rem] shrink-0">

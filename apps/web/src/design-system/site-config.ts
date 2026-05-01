@@ -15,12 +15,14 @@ export const SITE_BRAND = {
 	homeHref: "/",
 	tagline: "Mohawk Valley · Central NY",
 	footerDescription: "Custom websites for Central NY service businesses.",
+	/** Footer copyright suffix — after © year. */
+	footerCopyrightSuffix: "Built in the 315",
 	assets: BRAND_ASSETS,
 } as const;
 
 export const SITE_BANNER = {
 	href: "/lighthouse",
-	label: "Launch pilot · 10 founding spots",
+	label: "The 315 Pilot: 10 Founding Infrastructure Placements Remaining",
 	cta: "start with a free SEO + performance audit",
 	currentCta: "You're already on the free audit ↓",
 } as const;
@@ -45,7 +47,7 @@ export const SITE_CONTACT_LINK = {
 export const SITE_AUDIT_CTA = {
 	href: "/lighthouse",
 	label: "Audit My Site",
-	shortLabel: "Audit",
+	shortLabel: "Audit My Site",
 } as const;
 
 export const SITE_FOOTER_LINKS = [

@@ -1312,54 +1312,40 @@ a.marketing-service-card:hover {
 	flex-shrink: 0;
 }
 
-.home-faq-item {
+.home-faq-item.text-bubble.is-bordered {
 	transition:
 		border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
 		box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
 		transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-faq-item > summary {
+.home-faq-item.text-bubble.is-bordered > summary {
 	position: relative;
 }
 
-.home-faq-item > summary::before {
-	content: "";
-	width: 0.55rem;
-	height: 0.55rem;
-	border-radius: 999px;
-	background: radial-gradient(
-		circle at 35% 30%,
-		rgba(255, 252, 245, 0.9),
-		rgb(var(--accent-bronze-rgb) / 0.78) 42%,
-		rgba(91, 156, 248, 0.64)
-	);
-	box-shadow: 0 0 18px rgba(91, 156, 248, 0.28);
-	flex: 0 0 auto;
-}
-
-.home-faq-item[open] {
-	border-color: rgb(var(--accent-bronze-rgb) / 0.32);
+.home-faq-item.text-bubble.is-bordered[open] {
+	border-color: rgb(var(--accent-bronze-rgb) / 0.28);
 	box-shadow:
 		0 28px 58px -34px rgba(2, 6, 23, 0.92),
-		0 0 0 1px rgb(var(--accent-bronze-rgb) / 0.12);
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 0 1px rgb(var(--accent-bronze-rgb) / 0.1);
 	transform: translateY(-2px);
 }
 
 /* Smooth FAQ content reveal animation */
-.home-faq-item::details-content {
+.home-faq-item.text-bubble.is-bordered::details-content {
 	block-size: 0;
 	overflow: hidden;
 	transition: block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-faq-item[open]::details-content {
+.home-faq-item.text-bubble.is-bordered[open]::details-content {
 	block-size: auto;
 }
 
 /* Fallback for browsers without ::details-content support */
 @supports not selector(::details-content) {
-	.home-faq-answer {
+	.home-faq-item.text-bubble.is-bordered .home-faq-answer {
 		max-height: 0;
 		overflow: hidden;
 		opacity: 0;
@@ -1369,7 +1355,7 @@ a.marketing-service-card:hover {
 			padding 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.home-faq-item[open] .home-faq-answer {
+	.home-faq-item.text-bubble.is-bordered[open] .home-faq-answer {
 		max-height: 500px;
 		opacity: 1;
 	}

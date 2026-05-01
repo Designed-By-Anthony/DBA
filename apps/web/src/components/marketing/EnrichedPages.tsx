@@ -36,6 +36,7 @@ import {
 	buildMarketingWebPageSchema,
 	buildPricingOfferCatalogSchema,
 } from "@/lib/seo";
+import { FaqAccordionSummaryAndAnswer } from "./FaqSection";
 import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
 import { MarketingChrome } from "./MarketingChrome";
 import {
@@ -685,15 +686,9 @@ export function FaqPage() {
 							<MotionStaggerChild
 								as="details"
 								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
+								className="text-bubble is-bordered home-faq-item reveal-up"
 							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
+								<FaqAccordionSummaryAndAnswer {...entry} />
 							</MotionStaggerChild>
 						))}
 					</MotionStagger>
@@ -794,8 +789,11 @@ export function ServiceAreasPage() {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
-										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
+									<span
+										className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}
+									>
+										{r.cardBadge ??
+											(r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
@@ -986,15 +984,9 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 							<MotionStaggerChild
 								as="details"
 								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
+								className="text-bubble is-bordered home-faq-item reveal-up"
 							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
+								<FaqAccordionSummaryAndAnswer {...entry} />
 							</MotionStaggerChild>
 						))}
 					</MotionStagger>
@@ -1023,8 +1015,11 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
-										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
+									<span
+										className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}
+									>
+										{r.cardBadge ??
+											(r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
