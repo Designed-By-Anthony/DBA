@@ -9,6 +9,7 @@ import { isTrustedMarketingBrowserOrigin } from "@/lib/marketingBrowserOrigins";
 import { auditRoute } from "./routes/audit";
 import { auditEmailSummaryRoute } from "./routes/auditEmailSummary";
 import { leadEmailRoute } from "./routes/leadEmail";
+import { programmaticSeoRoute } from "./routes/programmaticSeo";
 import { reportRoute } from "./routes/report";
 import { reportEmailRoute } from "./routes/reportEmail";
 import { reportPdfRoute } from "./routes/reportPdf";
@@ -58,6 +59,7 @@ const app = new Elysia({ adapter: CloudflareAdapter })
 	.use(reportEmailRoute)
 	.use(reportPdfRoute)
 	.use(testEmailsRoute)
+	.use(programmaticSeoRoute)
 	// This is required to make Elysia work on Cloudflare Worker
 	.compile();
 

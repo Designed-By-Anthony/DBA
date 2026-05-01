@@ -46,9 +46,23 @@ const heroVariants = {
 } as const;
 
 export function HomePage() {
+	const heroSub =
+		"High-performance digital architecture for businesses that have outgrown their 'web guy.' Engineered in the 315.";
 	return (
 		<>
 			<section className="page-hero page-hero--home">
+				<div className="hero-lcp-layer" aria-hidden="true">
+					<Image
+						src="/images/og-site-premium.png"
+						alt=""
+						width={2400}
+						height={1260}
+						className="hero-lcp-layer__img"
+						priority
+						fetchPriority="high"
+						sizes="100vw"
+					/>
+				</div>
 				<div className="hero-drift" aria-hidden="true">
 					<span className="hero-drift__glow hero-drift__glow--a" />
 					<span className="hero-drift__glow hero-drift__glow--b" />
@@ -111,8 +125,7 @@ export function HomePage() {
 							data-hero-sub
 							className="font-[family-name:var(--font-inter)] font-normal"
 						>
-							High-performance digital architecture for businesses that have
-							outgrown their &apos;web guy.&apos; Engineered in the 315.
+							{heroSub}
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
