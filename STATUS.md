@@ -4,6 +4,11 @@
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
+- Tightened the shared marketing chrome for responsive navigation across tablet/desktop/mobile by updating `apps/web/src/components/brand/BrandHeader.tsx` and `apps/web/src/components/marketing/MarketingChrome.tsx`.
+- Desktop navigation now switches on at `md`, the mobile trigger stays isolated below `md`, and the mobile menu now renders as a true full-viewport opaque overlay with a dedicated header bar and centered link stack.
+- Verified route blast radius: marketing routes under `apps/web/src/app/(site)` continue to inherit `MarketingChrome`, and `/tools` now adds an explicit `max-w-7xl` wrapper in `apps/web/src/app/(site)/tools/page.tsx` so it no longer bypasses the tightened container structure.
+- Validation: `bun run typecheck` passes. Root `bun run lint` is still blocked by a pre-existing Biome formatting issue in `apps/web/src/components/JsonLd.tsx`, and `bun run build` is blocked in this sandbox by external font fetch failures to `fonts.googleapis.com`.
+
 - Removed Zustand badge from the "Our Edge" stack display — dependency was previously removed but badge remained.
 - Removed stray `console.warn` in the competitor-scan catch block of `apps/api/src/routes/audit.ts`.
 - Cleaned up outdated Firebase/Firestore references in `lighthouse2.md` (now reflects Cloudflare Pages/Workers + KV/D1).
