@@ -14,6 +14,7 @@ import {
 	btnOutline,
 	btnPrimary,
 	btnSecondaryProof,
+	stackBadge,
 } from "@/design-system/buttons";
 import {
 	ENTERPRISE_WEBSITE_STARTING_PRICE,
@@ -556,7 +557,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -583,7 +584,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -614,7 +615,7 @@ export function OurEdgePage() {
 									<a
 										key={label}
 										href={href}
-										className="dba-stack-badge"
+										className={stackBadge}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
