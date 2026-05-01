@@ -15,14 +15,21 @@ import { reportEmailRoute } from "./routes/reportEmail";
 import { reportPdfRoute } from "./routes/reportPdf";
 import { testEmailsRoute } from "./routes/testEmails";
 
-const kvBinding = (env as Record<string, unknown>).AUDIT_REPORTS_KV;
+type WorkerBindings = {
+	AUDIT_REPORTS_KV?: Parameters<typeof setReportKV>[0];
+	DB?: Parameters<typeof createD1Client>[0];
+};
+
+const workerBindings = env as unknown as WorkerBindings;
+
+const kvBinding = workerBindings.AUDIT_REPORTS_KV;
 if (kvBinding) {
-	setReportKV(kvBinding as Parameters<typeof setReportKV>[0]);
+	setReportKV(kvBinding);
 }
 
 // Wire the D1 binding so route handlers can insert leads without carrying
 // the binding through every function signature.
-const d1Binding = (env as Record<string, unknown>).DB;
+const d1Binding = workerBindings.DB;
 if (d1Binding) {
 	setLedgerDb(createD1Client(d1Binding));
 }

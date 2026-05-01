@@ -8,14 +8,9 @@ import {
 } from "@/lib/edge-seo";
 
 const APEX_DOMAIN = "designedbyanthony.com";
-/** Legacy redirect host for managed admin + accounts consoles (infrastructure host). */
-const EXTERNAL_CONSOLE_DOMAIN = "vertaflow.io";
 
 const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
-
-const EXTERNAL_ADMIN_HOST = `admin.${EXTERNAL_CONSOLE_DOMAIN}`;
-const EXTERNAL_ACCOUNTS_HOST = `accounts.${EXTERNAL_CONSOLE_DOMAIN}`;
 
 /**
  * RFC 8288 Link headers for agent discovery
@@ -36,33 +31,17 @@ const LINK_HEADERS = [
 	'<https://api.designedbyanthony.com/health>; rel="status"; title="API Health"',
 ].join(", ");
 
-function redirectToExternalConsole(
-	request: NextRequest,
-	targetHost: string,
-): NextResponse {
-	const target = request.nextUrl.clone();
-	target.hostname = targetHost;
-	target.protocol = "https:";
-	target.port = "";
-	return NextResponse.redirect(target, 308);
-}
-
 /**
  * Edge middleware for the Cloudflare Pages deployment.
- * `admin.*` and `accounts.*` redirect to the managed console host; everything else is the
- * single Next.js marketing app (including `/lighthouse`).
+ * `admin.*` and `accounts.*` remain first-party hosts so auth callback URLs
+ * resolve on the ANTHONY. domain family; everything else is the single Next.js
+ * marketing app (including `/lighthouse`).
  */
 export function middleware(request: NextRequest) {
 	const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
 	const { pathname } = request.nextUrl;
 
-	if (host === ADMIN_HOST) {
-		return redirectToExternalConsole(request, EXTERNAL_ADMIN_HOST);
-	}
-
-	if (host === ACCOUNTS_HOST) {
-		return redirectToExternalConsole(request, EXTERNAL_ACCOUNTS_HOST);
-	}
+	const isFirstPartyConsoleHost = host === ADMIN_HOST || host === ACCOUNTS_HOST;
 
 	/* `/404` cannot be a stable `(site)/[...path]` segment — Next treats `404` specially.
 	   Rewrite to a real route so the branded not-found page always renders. */
@@ -132,6 +111,9 @@ export function middleware(request: NextRequest) {
 		const variant = pickHeroAbVariant(request);
 		const response = NextResponse.next();
 		response.headers.set("Link", LINK_HEADERS);
+		if (isFirstPartyConsoleHost) {
+			response.headers.set("x-dba-console-host", host);
+		}
 		setHeroAbCookie(response, variant);
 		response.headers.set("x-hero-ab", variant);
 		if (isSearchEngineBot(request)) {
@@ -142,6 +124,9 @@ export function middleware(request: NextRequest) {
 
 	const response = NextResponse.next();
 	response.headers.set("Link", LINK_HEADERS);
+	if (isFirstPartyConsoleHost) {
+		response.headers.set("x-dba-console-host", host);
+	}
 	return response;
 }
 

@@ -16,8 +16,8 @@ Public frontend is deployed via **Cloudflare Pages** (advanced mode with `_worke
 [`apps/web/src/middleware.ts`](./apps/web/src/middleware.ts) runs as Edge middleware for Cloudflare Pages. It reads `Host` and 308-redirects `admin.*` / `accounts.*` to the managed console hosts — the audit lives on the apex at `/lighthouse`.
 
 ```
-admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*
-accounts.designedbyanthony.com/*    →  308 → https://accounts.vertaflow.io/*
+admin.designedbyanthony.com/*       →  first-party admin host
+accounts.designedbyanthony.com/*    →  first-party accounts host
 * (everything else, including /lighthouse) → this Next app (fallthrough)
 ```
 
@@ -74,6 +74,8 @@ bun run deploy:api     # Cloudflare Worker API
 **Wrangler config path:** root [`wrangler.json`](./wrangler.json). This is what prevents Pages from missing `nodejs_compat` and serving a 500 from an otherwise valid OpenNext bundle.
 
 **API Worker (`apps/api`)** — separate from Pages: deploy with **`bun run deploy:api`** or **`wrangler deploy`** from **`apps/api`** (Worker name in **`apps/api/wrangler.json`**: **`dba-api`**). Custom domains (e.g. **`api.designedbyanthony.com`**) are attached in the dashboard to that Worker script.
+
+**D1 Ledger:** Wrangler binding is **`DB`**; the Cloudflare D1 database name is **`dba-ledger`**. Drizzle uses root [`drizzle.config.ts`](./drizzle.config.ts), reads [`packages/shared/src/db/schema.ts`](./packages/shared/src/db/schema.ts), and writes migrations to **`apps/api/migrations`**.
 
 Security headers and CSP are set in `next.config.ts` from `build/csp.mjs`.
 

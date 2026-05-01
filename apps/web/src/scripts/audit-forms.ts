@@ -4,9 +4,9 @@ import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 /**
  * Lead endpoint resolution (marketing audit/contact-style forms):
  *   1. Form `action` URL when it is a trusted target (same-origin `/api/*`,
- *      managed CRM `/api/*`, or Convex `*.convex.site/webhook/*`).
+ *      first-party API `/api/*`, or Convex `*.convex.site/webhook/*`).
  *   2. `NEXT_PUBLIC_LEAD_WEBHOOK_URL` when `action` is missing (build-time).
- *   3. Fallback: `https://admin.vertaflow.io/api/v1/ingest`.
+ *   3. Fallback: managed Convex lead webhook.
  */
 const FALLBACK_FORM_ENDPOINT =
 	"https://tremendous-emu-522.convex.site/webhook/lead";
@@ -26,8 +26,6 @@ function readDefaultLeadEndpoint(): string {
 	return fromEnv || FALLBACK_FORM_ENDPOINT;
 }
 
-const LEGACY_CRM_HOST = "admin.designedbyanthony.com";
-const CURRENT_CRM_HOST = "admin.vertaflow.io";
 const DBA_API_HOST = "api.designedbyanthony.com";
 const CONVEX_WEBHOOK_HOST = "tremendous-emu-522.convex.site";
 
@@ -59,21 +57,9 @@ function resolveFormEndpoint(rawEndpoint: string | null | undefined): string {
 		const isSameOriginApi =
 			url.origin === window.location.origin && url.pathname.startsWith("/api/");
 
-		if (url.hostname === LEGACY_CRM_HOST) {
-			url.hostname = CURRENT_CRM_HOST;
-			url.protocol = "https:";
-			url.port = "";
-		}
-		const isTrustedRemote =
-			url.hostname === CURRENT_CRM_HOST && url.pathname.startsWith("/api/");
 		const isDbaApi =
 			url.hostname === DBA_API_HOST && url.pathname.startsWith("/api/");
-		if (
-			isSameOriginApi ||
-			isTrustedRemote ||
-			isDbaApi ||
-			isTrustedConvexWebhook(url)
-		) {
+		if (isSameOriginApi || isDbaApi || isTrustedConvexWebhook(url)) {
 			return url.toString();
 		}
 		return defaultEndpoint;

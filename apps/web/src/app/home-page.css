@@ -23,7 +23,51 @@
 
 .page-hero--home .page-hero-inner {
 	position: relative;
+	z-index: 2;
+}
+
+.hero-ghost-layer {
+	position: absolute;
+	inset: 0;
 	z-index: 1;
+	overflow: hidden;
+	pointer-events: none;
+	user-select: none;
+}
+
+.hero-ghost-line {
+	position: absolute;
+	left: max(-1rem, -1vw);
+	display: block;
+	white-space: nowrap;
+	font-family: var(--font-inter);
+	font-size: clamp(4.5rem, 12vw, 11rem);
+	font-weight: 900;
+	line-height: 0.86;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.03);
+	opacity: 1;
+	transform: rotate(-3deg);
+}
+
+.hero-ghost-line--1 {
+	top: 12%;
+}
+
+.hero-ghost-line--2 {
+	top: 31%;
+	left: 12%;
+}
+
+.hero-ghost-line--3 {
+	top: 51%;
+	left: 4%;
+}
+
+.hero-ghost-line--4 {
+	top: 71%;
+	left: 18%;
 }
 
 /* Editorial typography dial: mixed Fraunces + Inter headline (`.home-hero-title`). */
@@ -234,18 +278,16 @@
 	flex-wrap: wrap;
 	max-width: 42rem;
 	margin-bottom: 1.15rem;
-	padding: 0.55rem 1rem 0.55rem 0.65rem;
+	padding: 0.5rem 2rem;
 	border-radius: 999px;
 	font-size: 0.8rem;
 	font-weight: 400;
 	font-family: var(--font-main);
 	letter-spacing: 0.02em;
 	color: rgba(255, 252, 245, 0.88);
-	background: linear-gradient(
-		135deg,
-		rgb(var(--accent-bronze-rgb) / 0.12),
-		rgb(var(--accent-bronze-rgb) / 0.06)
-	);
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 	border: 1px solid rgba(255, 252, 245, 0.1);
 	box-shadow: 0 12px 40px -28px rgb(var(--accent-bronze-rgb) / 0.35);
 	animation: hero-pill-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;

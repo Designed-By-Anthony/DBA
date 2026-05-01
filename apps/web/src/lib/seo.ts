@@ -379,10 +379,7 @@ export function toAbsoluteUrl(path: string): string {
 }
 
 export function stripSiteSuffix(title: string): string {
-	return title
-		.replace(/\s*\|\s*ANTHONY\.\s*$/i, "")
-		.replace(/\s*\|\s*Designed by Anthony\s*$/i, "")
-		.trim();
+	return title.replace(/\s*\|\s*ANTHONY\.\s*$/i, "").trim();
 }
 
 function startCase(value: string): string {
@@ -826,7 +823,10 @@ export function buildVaultCrmSoftwareApplicationSchema(): SchemaValue {
 		"@type": ["SoftwareApplication", "WebApplication"],
 		"@id": VAULT_CRM_SOFTWARE_ID,
 		name: "The Vault by ANTHONY.",
-		alternateName: ["ANTHONY. Vault — Client Workspace", "VertaFlow CRM"],
+		alternateName: [
+			"ANTHONY. Vault — Client Workspace",
+			"ANTHONY_INFRASTRUCTURE",
+		],
 		description:
 			"CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Console access via the managed admin host; client-facing tools via accounts.designedbyanthony.com.",
 		applicationCategory: "BusinessApplication",

@@ -39,6 +39,10 @@
 		"cross-env": "^10.1.0",
 		"cypress": "^15.14.2",
 		"drizzle-kit": "^0.31.10",
+		"drizzle-orm": "^0.45.2",
 		"turbo": "^2.9.6"
+	},
+	"dependencies": {
+		"@marsidev/react-turnstile": "^1.5.1"
 	}
 }

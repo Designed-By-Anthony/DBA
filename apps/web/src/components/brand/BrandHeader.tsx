@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
 	SITE_AUDIT_CTA,
@@ -59,20 +58,17 @@ export function BrandHeader({
 			</aside>
 
 			<header className="relative z-[3] bg-[#0a0c10]/80 backdrop-blur-md border-b border-white/10 pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
-				<div className="flex items-center justify-between gap-6 max-w-[80rem] mx-auto py-[0.95rem] md:py-[1.1rem]">
+				<div className="flex items-center justify-between gap-6 max-w-[80rem] mx-auto pt-8 pb-4">
 					<Link
 						href={SITE_BRAND.homeHref}
 						className="inline-flex items-center min-w-0 shrink max-w-[min(72vw,14rem)] md:max-w-none group"
 						aria-label={SITE_WORDMARK_ALT}
 					>
-						<Image
-							src={SITE_BRAND.assets.masterWordmark}
-							alt={SITE_WORDMARK_ALT}
-							width={720}
-							height={140}
-							className="h-8 w-auto max-h-8 object-contain object-left opacity-[0.96] transition-opacity duration-200 group-hover:opacity-100"
-							priority
-							sizes="(max-width: 960px) 55vw, 240px"
+						{/* biome-ignore lint/performance/noImgElement: Direct SVG wordmark keeps the bronze period locked to the master asset. */}
+						<img
+							src="/logos/anthony_master_wordmark.svg"
+							alt="ANTHONY."
+							className="block h-8 w-auto opacity-[0.96] transition-opacity duration-200 group-hover:opacity-100"
 						/>
 					</Link>
 

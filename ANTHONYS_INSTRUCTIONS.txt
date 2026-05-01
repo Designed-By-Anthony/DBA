@@ -9,7 +9,7 @@ Layout
 • apps/web  — Next.js 16 app (marketing + /lighthouse), deployed on Cloudflare Pages: src/, public/, next.config.ts, wrangler.json
 • apps/api  — ElysiaJS Cloudflare Worker (api.designedbyanthony.com): src/routes/, wrangler.json
 • packages/shared (@dba/shared) — shared business logic: lighthouse/lib/, lib/
-• Supporting folders at root (not separate deploys): customer-site-embeds/, vertaflow-crm/
+• Supporting folders at root (not separate deploys): customer-site-embeds/
 
 Global theme (single source of truth)
 -------------------------------------
@@ -39,6 +39,7 @@ Cloudflare Pages + Workers
 • Next.js Pages:    bun run deploy:web   (OpenNext build + Pages bundle + wrangler pages deploy from apps/web)
 • Next.js Worker fallback: bun run --cwd apps/web deploy:worker
 • API Worker:       bun run deploy:api   (wrangler deploy from apps/api)
+• D1 Ledger:        Wrangler binding `DB`; Cloudflare D1 database name `dba-ledger`; Drizzle schema `packages/shared/src/db/schema.ts`; migrations output `apps/api/migrations`.
 • Secrets/vars (web): Cloudflare Pages project settings
 • Secrets (api):    wrangler secret put <KEY> --cwd apps/api
 
@@ -60,9 +61,9 @@ Cloudflare / GCP
 -----------------
 Follow your platform blueprint; env vars are scoped per backend.
 
-VertaFlow CRM (separate product)
---------------------------------
-• Admin and accounts subdomains redirect to **vertaflow.io** from `apps/web/src/middleware.ts`. This marketing app does not ship the CRM codebase.
+ANTHONY. Vault (identity + portal)
+----------------------------------
+• Admin and accounts subdomains stay on **designedbyanthony.com** first-party hosts. Auth callbacks use `/api/auth/callback` on the apex/admin domains.
 
 Public leads
 ------------
