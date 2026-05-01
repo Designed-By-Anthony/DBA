@@ -1525,6 +1525,10 @@ li {
 	background: var(--accent-bronze);
 }
 
+.lh-row-status--green {
+	background: #4ade80;
+}
+
 .lh-bullet-icon--green {
 	background: #4ade80;
 }
