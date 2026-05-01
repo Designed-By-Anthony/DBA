@@ -89,7 +89,11 @@ export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
 						/>
 					)}
 				</svg>
-				<span className="lighthouse-score-value" aria-hidden="true">
+				<span
+					className="lighthouse-score-value"
+					style={{ color: colorVar }}
+					aria-hidden="true"
+				>
 					{score == null ? "—" : score}
 				</span>
 			</div>
