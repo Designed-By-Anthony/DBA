@@ -24,6 +24,7 @@
 - Review fix: restored top alignment for the Lighthouse audit form grid and removed the duplicate footer margin shorthand that conflicted with `brand-chrome.css`.
 - Review fix: restored the four-column Lighthouse mini score grid in the hero diagnostic preview.
 - Review fix: restored semantic sticky header chrome styles for `site-chrome-sticky`.
+- Review fix: removed `.dba-footer` from the card/glass selector group so full-width footer chrome no longer inherits card radius, shadow, border, or backdrop blur.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 

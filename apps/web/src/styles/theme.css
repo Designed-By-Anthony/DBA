@@ -363,7 +363,6 @@ li {
 .lighthouse-metric-tile,
 .home-email-cta__card,
 .premium-pitch,
-.dba-footer,
 .cookie-consent__inner,
 .cookie-consent-card {
 	border: 1px solid var(--border-soft);
@@ -713,6 +712,10 @@ li {
 	grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
 	gap: var(--space-block);
 	align-items: start;
+}
+
+.lh-stage-lower {
+	margin-top: var(--space-block);
 }
 
 .page-hero--home,
