@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getAllMarketingPathnames } from "../src/lib/marketing-routes";
+import { getAllMarketingPathnames } from "./lib/marketing-paths";
 
 /* `/404` rewrites to `/page-not-found` but stays HTTP 404; we already test the not-found page there. */
 const paths = getAllMarketingPathnames().filter((p) => p !== "/404");
