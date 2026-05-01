@@ -6,7 +6,7 @@ import {
 	BTN_OUTLINE_MARKERS,
 	BTN_PRIMARY_MARKERS,
 	BTN_SECONDARY_MARKERS,
-	SLATE_FORBIDDEN,
+	SLATE_FORBIDDEN_MARKERS,
 } from "./helpers/audit-constants";
 import { getAllMarketingPathnames } from "./lib/marketing-paths";
 
@@ -104,7 +104,7 @@ test.describe("Ironclad Playwright audit (report-only)", () => {
 			return s;
 		});
 		expect(
-			stack.includes(SLATE_FORBIDDEN),
+			matchesAny(stack, SLATE_FORBIDDEN_MARKERS),
 			`[VISUAL] FoundingPartnerSection computed background stack references forbidden Slate at apps/web/src/components/marketing/FoundingPartnerSection.tsx — stack sample: ${stack.slice(0, 280)}`,
 		).toBe(false);
 	});

@@ -21,7 +21,12 @@ export const BTN_SECONDARY_MARKERS = [
 	"transparent",
 ] as const;
 
-export const SLATE_FORBIDDEN = "rgba(11, 17, 30)";
+export const SLATE_FORBIDDEN_MARKERS = [
+	"rgba(11, 17, 30)",
+	"rgba(11,17,30)",
+	"rgb(11, 17, 30)",
+	"rgb(11,17,30)",
+] as const;
 
 export const XSS_INJECTION_PAYLOADS = [
 	`<script>alert(1)</script>`,
