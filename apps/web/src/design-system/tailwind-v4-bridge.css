@@ -40,9 +40,9 @@
 	/* ── Brand tokens — bronze-first ────────────────────────────── */
 	--color-brand: var(--accent-bronze);
 	--color-brand-hover: var(--accent-bronze-dark);
-	--color-brand-subtle: rgb(201 168 108 / 0.14);
-	--color-brand-glow: rgb(201 168 108 / 0.22);
-	--color-brand-ring: rgb(201 168 108 / 0.5);
+	--color-brand-subtle: rgb(212 175 55 / 0.14);
+	--color-brand-glow: rgb(212 175 55 / 0.22);
+	--color-brand-ring: rgb(212 175 55 / 0.5);
 
 	/* ── Borders ─────────────────────────────────────────────────── */
 	--color-border-soft: var(--border-soft);
@@ -185,24 +185,6 @@
  * these rules survive as the legacy bridge until each consumer is
  * progressively migrated.
  * ─────────────────────────────────────────────────────────────────────── */
-
-@font-face {
-	font-family: "Inter Variable";
-	font-style: normal;
-	font-weight: 100 900;
-	src: url("~@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
-		format("woff2-variations");
-	font-display: swap;
-}
-
-@font-face {
-	font-family: "Fraunces Variable";
-	font-style: normal;
-	font-weight: 200 900;
-	src: url("~@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2")
-		format("woff2-variations");
-	font-display: swap;
-}
 
 /**
  * Canonical global theme for Designed by Anthony (sync with src/design-system/tokens.css).
@@ -885,8 +867,8 @@ main {
  *
  * - `.text-bubble` is the explicit utility class (use on prose blocks).
  * - The default rule below also patches every card class that already
- *   exists in the design system, so legacy markup is fixed without a
- *   site-wide refactor.
+ * exists in the design system, so legacy markup is fixed without a
+ * site-wide refactor.
  *
  * The minimum used here (`max(1.25rem, var(--radius-card-lg))`) is
  * 1.4rem (22.4px) — equal to the largest rounded corner used on cards.
@@ -912,9 +894,17 @@ main {
  * the non-clipping variant when the container DOESN'T have overflow:hidden
  * (so we still want the visual gutter to feel right). */
 .text-bubble.is-bordered {
-	border: 1px solid var(--border-soft);
-	border-radius: var(--radius-card-lg);
-	background: rgba(14, 18, 28, 0.55);
+	/* Remove the flat dark background, replace with a subtle glass gradient */
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+	/* Crisper, lighter border */
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 1rem;
+	/* The secret sauce: a 1px white inner highlight at the very top */
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+	padding: 1.5rem;
+	/* Make the text feel more editorial */
+	color: rgba(255, 255, 255, 0.75);
+	line-height: 1.8;
 }
 
 .feature-grid {
@@ -1391,4 +1381,69 @@ body:not(.has-progress-bar) #reading-progress-bar {
 		transparent
 	);
 	margin: 1.25rem 0;
+}
+
+/* ── Modal & Splash Refinements ──────────────────────────────── */
+
+.splash-close-btn {
+	position: absolute;
+	top: 1.25rem;
+	right: 1.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
+	/* Frosted glass effect */
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	color: var(--text-gray);
+	transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+	z-index: 50;
+}
+
+.splash-close-btn:hover {
+	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.15);
+	color: var(--text-white);
+	transform: scale(1.05);
+}
+
+.splash-close-btn svg {
+	width: 1.1rem;
+	height: 1.1rem;
+}
+
+/* ── Stripe/Linear Style Buttons ─────────────────────────────── */
+
+.btn-premium-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.65rem 1.25rem;
+	/* Slightly tighter radius than a full pill looks more "tech" */
+	border-radius: 0.75rem; 
+	/* Very subtle gradient to give it physical volume */
+	background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+	color: var(--bg-ink); /* Dark text for sharp contrast */
+	font-weight: 600;
+	font-size: 0.95rem;
+	box-shadow:
+		inset 0 -2px 0 rgba(0, 0, 0, 0.05), /* Inner bottom shadow */
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		0 0 0 1px rgba(255, 255, 255, 0.5); /* Crisp outer definition */
+	transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-premium-primary:hover {
+	transform: translateY(-1px);
+	box-shadow:
+		inset 0 -2px 0 rgba(0, 0, 0, 0.05),
+		0 4px 8px rgba(0, 0, 0, 0.15),
+		0 0 0 1px rgba(255, 255, 255, 0.7);
+	filter: brightness(1.03);
 }

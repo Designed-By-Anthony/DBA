@@ -88,7 +88,7 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
   </td></tr>
   <tr><td style="padding:0 24px 24px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fffdf8;border-radius:14px;border:1px solid #e8dcc6;overflow:hidden;box-shadow:0 12px 40px -20px rgba(23,16,8,0.14);">
-      <tr><td style="height:3px;background:linear-gradient(90deg,#c9a86c,#8b6a38,#c9a86c);"></td></tr>
+      <tr><td style="height:3px;background:linear-gradient(90deg,#D4AF37,#8b6a38,#D4AF37);"></td></tr>
       <tr><td style="padding:22px 24px 8px;">
         <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#8b6a38;">Scores</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
@@ -99,10 +99,10 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
           ${row("SEO", params.seo)}
         </table>
       </td></tr>
-      ${safeNote ? `<tr><td style="padding:0 24px 20px;"><div style="background:#fff8df;border:1px solid #c9a86c;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.5;color:#6c4b16;"><strong>Partial report.</strong> ${safeNote}</div></td></tr>` : ""}
+      ${safeNote ? `<tr><td style="padding:0 24px 20px;"><div style="background:#fff8df;border:1px solid #D4AF37;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.5;color:#6c4b16;"><strong>Partial report.</strong> ${safeNote}</div></td></tr>` : ""}
       <tr><td style="padding:8px 24px 24px;">
-        <a href="${safeReport}" style="display:inline-block;background:linear-gradient(165deg,#c9a86c,#8b6a38);color:#171008;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;box-shadow:0 8px 24px -8px rgba(201,168,108,0.55);">View your report →</a>
-        ${printPath ? `<a href="${safePrint}" style="display:inline-block;margin-left:10px;color:#8b6a38;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #c9a86c;padding:11px 20px;border-radius:10px;background:#fdf8f0;">Print / PDF</a>` : ""}
+        <a href="${safeReport}" style="display:inline-block;background:linear-gradient(165deg,#D4AF37,#8b6a38);color:#171008;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;box-shadow:0 8px 24px -8px rgba(201,168,108,0.55);">View your report →</a>
+        ${printPath ? `<a href="${safePrint}" style="display:inline-block;margin-left:10px;color:#8b6a38;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #D4AF37;padding:11px 20px;border-radius:10px;background:#fdf8f0;">Print / PDF</a>` : ""}
       </td></tr>
     </table>
     <p style="margin:20px 0 0;font-size:12px;color:#9d8870;text-align:center;">Designed by Anthony · Central NY &amp; remote</p>
