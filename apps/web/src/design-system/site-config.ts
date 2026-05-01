@@ -17,8 +17,6 @@ export const SITE_BRAND = {
 	homeHref: "/",
 	tagline: "Mohawk Valley · 315 / 518 · Central NY",
 	footerDescription: "Custom websites for Central NY service businesses.",
-	/** Footer copyright suffix — after © year. */
-	footerCopyrightSuffix: "Built in the 315",
 	assets: BRAND_ASSETS,
 	/** Display wordmark without trailing period where punctuation is duplicated (e.g. © line). */
 	displayNameShort: "ANTHONY",
