@@ -32,6 +32,7 @@
 - Review fix: restored `.lh-editorial-h1` Lighthouse hero heading sizing, gradient text, and Fraunces variation settings.
 - Review fix: restored shared base button layout and hover transition styles on `.lh-submit-btn`.
 - Review fix: restored dynamic score color coding on the ScoreRing center value text.
+- Review fix: restored `lighthouse-prose` generated report HTML spacing and `lh-chip` impact/effort color variants.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
