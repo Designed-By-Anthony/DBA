@@ -71,7 +71,30 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 						))}
 					</nav>
 
-					{/* Legal + copyright */}
+					{/* Language switcher */}
+				<div className="flex items-center gap-[0.3rem] shrink-0">
+					<a
+						href="/"
+						hrefLang="en"
+						aria-label="View site in English"
+						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.85)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] hover:border-[rgba(212,175,55,0.4)] hover:text-[rgba(212,175,55,0.9)] transition-colors duration-[180ms] ease-in"
+					>
+						EN
+					</a>
+					<span className="text-[rgba(255,255,255,0.22)] text-[0.6rem]" aria-hidden>
+						|
+					</span>
+					<a
+						href="/es"
+						hrefLang="es"
+						aria-label="Ver el sitio en español"
+						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.48)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-transparent hover:border-[rgba(212,175,55,0.3)] hover:text-[rgba(212,175,55,0.8)] transition-colors duration-[180ms] ease-in"
+					>
+						ES
+					</a>
+				</div>
+
+				{/* Legal + copyright */}
 					<div className="flex items-center flex-wrap gap-x-[0.55rem] gap-y-[0.35rem] ml-auto text-[0.7rem] text-[rgba(247,244,238,0.38)] max-sm:ml-0">
 						<p className="m-0 whitespace-nowrap">
 							© {year} {SITE_BRAND.name}

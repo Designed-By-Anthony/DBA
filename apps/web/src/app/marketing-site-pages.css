@@ -1585,6 +1585,12 @@ a.marketing-service-card:hover {
 	border: 1px solid rgba(59, 130, 246, 0.22);
 }
 
+.region-card-tag--bronze {
+	color: #d4af37;
+	background: rgba(212, 175, 55, 0.08);
+	border: 1px solid rgba(212, 175, 55, 0.32);
+}
+
 .region-card-link {
 	text-decoration: none;
 	color: inherit;

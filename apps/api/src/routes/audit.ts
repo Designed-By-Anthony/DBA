@@ -33,7 +33,12 @@ import {
 	normalizeText,
 } from "@lh/lib/validation";
 import { Elysia } from "elysia";
+import { tryInsertLead } from "@/lib/d1Leads";
 import { postLeadIngest } from "@/lib/leadWebhook";
+import {
+	resolveEffectiveSecretKey,
+	verifyTurnstileToken,
+} from "@/lib/turnstile";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;
@@ -109,6 +114,46 @@ export const auditRoute = new Elysia({ aot: false }).post(
 			set.status = 400;
 			return { error: "Valid URL, name, company, and email are required." };
 		}
+
+		const turnstileSecret = resolveEffectiveSecretKey(
+			process.env.TURNSTILE_SECRET_KEY?.trim(),
+		);
+		if (turnstileSecret) {
+			const cfToken =
+				typeof body.cf_turnstile_response === "string"
+					? body.cf_turnstile_response.trim()
+					: "";
+			if (!cfToken) {
+				set.status = 403;
+				return {
+					error:
+						"Security check required. Please complete the challenge and try again.",
+				};
+			}
+			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
+			if (!verification.success) {
+				set.status = 403;
+				return {
+					error:
+						"Security check failed. Please refresh the page and try again.",
+				};
+			}
+		}
+
+		await tryInsertLead({
+			id: crypto.randomUUID(),
+			email,
+			company_name: company,
+			source: "Audit_Form",
+			status: "New",
+			turnstile_passed: turnstileSecret ? 1 : null,
+			metadata: JSON.stringify({
+				name,
+				url,
+				location,
+			}),
+			created_at: Date.now(),
+		});
 
 		try {
 			const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY?.trim() || undefined;

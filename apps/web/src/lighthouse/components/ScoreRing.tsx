@@ -1,29 +1,64 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ScoreRingProps {
     score: number | null;
     label: string;
     size?: "md" | "lg";
+    /** Delay in ms before the count-up and ring-fill begin (used for stagger). */
+    countDelay?: number;
 }
 
-export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
+const COUNT_UP_DURATION = 1200; // ms — 1.2 s per spec
+
+export function ScoreRing({ score, label, size = "md", countDelay = 0 }: ScoreRingProps) {
     const [filled, setFilled] = useState(false);
+    const [displayScore, setDisplayScore] = useState<number>(0);
     const [isHovered, setIsHovered] = useState(false);
     const prefersReducedMotion = useReducedMotion();
+    const rafRef = useRef<number | undefined>(undefined);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+    // Ring fill + count-up animation
     useEffect(() => {
+        const target = score ?? 0;
+
         if (prefersReducedMotion) {
             setFilled(true);
+            setDisplayScore(target);
             return;
         }
-        const raf = requestAnimationFrame(() =>
-            requestAnimationFrame(() => setFilled(true)),
-        );
-        return () => cancelAnimationFrame(raf);
-    }, [prefersReducedMotion]);
+
+        // Apply the stagger delay before starting both animations
+        timerRef.current = setTimeout(() => {
+            setFilled(true);
+
+            if (target === 0) {
+                setDisplayScore(0);
+                return;
+            }
+
+            const startTime = performance.now();
+            function tick(now: number) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / COUNT_UP_DURATION, 1);
+                // Cubic ease-out — matches the ring's cubic-bezier feel
+                const eased = 1 - Math.pow(1 - progress, 3);
+                setDisplayScore(Math.round(eased * target));
+                if (progress < 1) {
+                    rafRef.current = requestAnimationFrame(tick);
+                }
+            }
+            rafRef.current = requestAnimationFrame(tick);
+        }, countDelay);
+
+        return () => {
+            clearTimeout(timerRef.current);
+            if (rafRef.current !== undefined) cancelAnimationFrame(rafRef.current);
+        };
+    }, [score, prefersReducedMotion, countDelay]);
 
     const isLg = size === "lg";
     const radius = isLg ? 46 : 36;
@@ -124,7 +159,7 @@ export function ScoreRing({ score, label, size = "md" }: ScoreRingProps) {
                     }}
                     aria-hidden="true"
                 >
-                    {score == null ? "—" : score}
+                    {score == null ? "—" : displayScore}
                 </span>
             </div>
             <span className="text-center text-[9px] font-bold uppercase tracking-[0.25em] text-white/40">

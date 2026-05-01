@@ -1,3 +1,14 @@
+/** Line item shown on all pricing tiers: custom brand-config window before launch. */
+export const BESPOKE_CONFIG_LABEL = "Bespoke Brand Integration (24-48h config)";
+
+/** Stripe session / onboarding copy — describes the provisioning delay. */
+export const BESPOKE_CONFIG_DESCRIPTION =
+	"Access granted 24-48 hours post-onboarding call for custom brand mapping.";
+
+/** Spanish translation of the provisioning message — used on /es and in the checkout success page. */
+export const BESPOKE_CONFIG_DESCRIPTION_ES =
+	"Acceso concedido 24-48 horas después de la reunión de diseño para garantizar la alineación de la marca.";
+
 export const STANDARD_WEBSITE_STARTING_PRICE = "$999";
 /**
  * Typical total project band for a standard custom rebuild (5–10 pages, custom
