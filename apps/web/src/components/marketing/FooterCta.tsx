@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { btnPrimaryAudit, btnPrimaryBook } from "@/design-system/buttons";
+import { btnOutline, btnPrimary } from "@/design-system/buttons";
 
 export interface FooterCtaProps {
 	eyebrow: string;
@@ -47,13 +47,13 @@ export function FooterCta({
 
 					<div className={ACTIONS}>
 						{primaryHref.startsWith("/") ? (
-							<Link href={primaryHref} className={btnPrimaryAudit}>
+							<Link href={primaryHref} className={btnPrimary}>
 								{primaryLabel}
 							</Link>
 						) : (
 							<a
 								href={primaryHref}
-								className={btnPrimaryAudit}
+								className={btnPrimary}
 								{...(primaryIsCalendly ? { "data-calendar-link": true } : {})}
 							>
 								{primaryLabel}
@@ -62,13 +62,13 @@ export function FooterCta({
 						{secondaryHref &&
 							secondaryLabel &&
 							(secondaryHref.startsWith("/") ? (
-								<Link href={secondaryHref} className={btnPrimaryBook}>
+								<Link href={secondaryHref} className={btnOutline}>
 									{secondaryLabel}
 								</Link>
 							) : (
 								<a
 									href={secondaryHref}
-									className={btnPrimaryBook}
+									className={btnOutline}
 									target={
 										secondaryIsExternal && !secondaryIsCalendly
 											? "_blank"

@@ -68,6 +68,10 @@ export const metadata: Metadata = {
 		siteName: "Designed by Anthony",
 		type: "website",
 		locale: "en_US",
+		url: "https://designedbyanthony.com",
+		title: "Designed by Anthony — Custom websites & local SEO",
+		description:
+			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York. Lighthouse-grade performance, Bronze finish.",
 		images: [
 			{
 				url: "/images/og-site-premium.png",
@@ -80,6 +84,9 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
+		title: "Designed by Anthony — Custom websites & local SEO",
+		description:
+			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
 		images: ["/images/og-site-premium.png"],
 	},
 	icons: {

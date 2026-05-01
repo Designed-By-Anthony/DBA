@@ -11,8 +11,8 @@ import {
 } from "@/data/serviceAreaLocations";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
 import {
-	btnPrimaryAudit,
-	btnPrimaryBook,
+	btnOutline,
+	btnPrimary,
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
@@ -275,7 +275,7 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/lighthouse" className={btnPrimaryBook}>
+					<Link href="/lighthouse" className={btnPrimary}>
 						Audit My Site
 					</Link>
 					<Link href="/contact" className={btnSecondaryProof}>
@@ -423,10 +423,10 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<Link href="/lighthouse" className={btnPrimaryBook}>
+						<Link href="/lighthouse" className={btnPrimary}>
 							Audit My Site
 						</Link>
-						<Link href="/contact" className={btnPrimaryAudit}>
+						<Link href="/contact" className={btnOutline}>
 							Contact us
 						</Link>
 					</MotionReveal>
@@ -633,7 +633,7 @@ export function OurEdgePage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className={btnPrimaryAudit}>
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
 					<Link href="/services" className={btnSecondaryProof}>
@@ -701,10 +701,10 @@ export function FaqPage() {
 							marginTop: "clamp(2rem, 4vw, 3rem)",
 						}}
 					>
-						<Link href="/contact" className={btnPrimaryBook}>
+						<Link href="/contact" className={btnOutline}>
 							Still have a question? Contact us
 						</Link>
-						<Link href="/contact" className={btnPrimaryAudit}>
+						<Link href="/contact" className={btnOutline}>
 							Contact us for your free audit
 						</Link>
 					</MotionReveal>
@@ -830,10 +830,10 @@ export function ServiceAreasPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className={btnPrimaryBook}>
+					<Link href="/contact" className={btnOutline}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className={btnPrimaryAudit}>
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>
@@ -1039,10 +1039,10 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className={btnPrimaryBook}>
+					<Link href="/contact" className={btnOutline}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className={btnPrimaryAudit}>
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>

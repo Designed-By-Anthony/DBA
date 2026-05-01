@@ -4,7 +4,7 @@ import type { AuditData } from "@lh/auditReport";
 import { useReducedMotion } from "framer-motion";
 import { div as MotionDiv } from "framer-motion/client";
 import { useCallback, useState } from "react";
-import { btnPrimaryBook } from "@/design-system/buttons";
+import { btnOutline } from "@/design-system/buttons";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { ScoreRing } from "./ScoreRing";
 
@@ -711,7 +711,7 @@ export function AuditResults({
 						href="https://calendly.com/anthony-designedbyanthony/web-design-consult"
 						target="_blank"
 						rel="noopener"
-						className={`${btnPrimaryBook} !rounded-xl !px-8 !py-3.5 !text-[15px] !font-bold !tracking-tight`}
+						className={`${btnOutline} !rounded-xl !px-8 !py-3.5 !text-[15px] !font-bold !tracking-tight`}
 					>
 						Book a 15-minute call →
 					</a>

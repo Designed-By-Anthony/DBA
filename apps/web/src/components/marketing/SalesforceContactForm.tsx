@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { btnPrimaryAudit } from "@/design-system/buttons";
+import { btnPrimary } from "@/design-system/buttons";
 
 /* ── Phase 5: salesforce-* CSS classes migrated to inline Tailwind ── */
 const SF_FORM = "block";
@@ -97,7 +97,7 @@ export function SalesforceContactForm() {
 			</div>
 
 			<div className={SF_ACTIONS}>
-				<button type="submit" className={btnPrimaryAudit}>
+				<button type="submit" className={btnPrimary}>
 					Send Message
 				</button>
 			</div>

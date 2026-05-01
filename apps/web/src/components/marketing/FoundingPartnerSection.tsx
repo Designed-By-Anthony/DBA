@@ -15,7 +15,7 @@ const HEADER =
 const PILLARS =
 	"grid grid-cols-1 md:grid-cols-2 gap-[clamp(1.25rem,3vw,2rem)] max-w-[920px] mx-auto relative z-[1]";
 const PILLAR_BASE =
-	"reveal-up relative p-[clamp(1.85rem,3.5vw,2.35rem)] rounded-[var(--radius-card)] bg-[linear-gradient(165deg,rgba(11,17,30,0.92)_0%,rgba(15,23,42,0.88)_100%)] border border-white/[0.07] shadow-[0_28px_64px_-40px_rgba(2,6,18,0.9)] transition-[border-color,box-shadow,transform] duration-[450ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:border-[rgba(212,175,55,0.25)] hover:shadow-[0_32px_72px_-36px_rgba(2,6,18,0.95)] hover:-translate-y-0.5";
+	"reveal-up relative p-[clamp(1.85rem,3.5vw,2.35rem)] rounded-[var(--radius-card)] bg-[linear-gradient(165deg,rgba(10,12,16,0.95)_0%,rgba(24,20,14,0.92)_100%)] border border-[rgba(212,175,55,0.10)] shadow-[0_28px_64px_-40px_rgba(2,4,8,0.9)] transition-[border-color,box-shadow,transform] duration-[450ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:border-[rgba(212,175,55,0.32)] hover:shadow-[0_32px_72px_-36px_rgba(2,4,8,0.95)] hover:-translate-y-0.5";
 const PILLAR_ACCENT_BASE =
 	"absolute top-0 left-[1.85rem] right-[1.85rem] h-[2px] rounded-[2px] overflow-hidden opacity-85 pointer-events-none after:content-[''] after:absolute after:inset-0 after:w-[200%] after:h-full after:will-change-transform";
 const PILLAR_ACCENT_BRONZE = `${PILLAR_ACCENT_BASE} after:bg-[linear-gradient(90deg,transparent,rgba(212,175,55,0.55),transparent)] after:animate-[founding-shimmer_5s_ease-in-out_infinite] motion-reduce:after:animate-none`;

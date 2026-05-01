@@ -2,7 +2,7 @@
  * Tailwind v4 button class constants (Phase 5 Strangler).
  *
  * Replaces the `.btn-*` selectors that previously lived in
- * `apps/web/src/styles/theme.css`. Architecture is locked: these are
+ * `apps/web/src/styles/theme.css` (deleted Phase 5.5). Architecture is locked: these are
  * inline utility class strings — Bronze-locked (#D4AF37 / #B58A14),
  * Midnight surface — referenced by `className={...}` in TSX. No CSS
  * rules; no `@apply`.

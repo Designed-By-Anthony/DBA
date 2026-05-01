@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
-import { btnPrimaryAudit, btnSm } from "@/design-system/buttons";
+import { btnPrimary, btnSm } from "@/design-system/buttons";
 import { businessProfile } from "@/lib/seo";
 
 const BODY_LOCK_CLASS = "site-contact-drawer-open";
@@ -133,7 +133,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 			</div>
 
 			<div className={SF_DRAWER_ACTIONS}>
-				<button type="submit" className={`${btnPrimaryAudit} ${btnSm}`}>
+				<button type="submit" className={`${btnPrimary} ${btnSm}`}>
 					Send Message
 				</button>
 			</div>
@@ -223,6 +223,8 @@ export function SiteContactDrawer() {
 			<aside
 				id={panelId}
 				className={RAIL_DRAWER}
+				role="dialog"
+				aria-modal={open}
 				aria-label="Contact form"
 				aria-hidden={!open}
 				data-nav-rail

@@ -4,8 +4,8 @@ import Script from "next/script";
 import { homeFaqEntries, processSteps, whyStackCards } from "@/data/home";
 import { showcaseFeaturedItems } from "@/data/showcase";
 import {
-	btnPrimaryAudit,
-	btnPrimaryBook,
+	btnOutline,
+	btnPrimary,
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
@@ -107,7 +107,7 @@ export function HomePage() {
 						<div className="hero-actions">
 							<Link
 								href="/lighthouse"
-								className={`${btnPrimaryBook} hero-cta-glow`}
+								className={`${btnPrimary} hero-cta-glow`}
 								id="hero-audit-btn"
 							>
 								<span className="hero-cta-glow-halo" aria-hidden="true" />
@@ -115,7 +115,7 @@ export function HomePage() {
 							</Link>
 							<Link
 								href="/contact"
-								className={btnPrimaryAudit}
+								className={btnOutline}
 								id="hero-contact-btn"
 							>
 								Contact us
@@ -236,10 +236,10 @@ export function HomePage() {
 							</p>
 						</div>
 						<div className="home-email-cta__actions">
-							<Link href="/contact" className={btnPrimaryBook}>
+							<Link href="/contact" className={btnOutline}>
 								Open contact form
 							</Link>
-							<Link href="/lighthouse" className={btnSecondaryProof}>
+							<Link href="/lighthouse" className={btnPrimary}>
 								Or run a free site audit
 							</Link>
 						</div>
@@ -356,7 +356,7 @@ export function HomePage() {
 					</div>
 
 					<div className="process-action">
-						<Link href="/contact" className={btnPrimaryAudit}>
+						<Link href="/contact" className={btnOutline}>
 							Contact us for your free audit
 						</Link>
 					</div>
