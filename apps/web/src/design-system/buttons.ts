@@ -8,7 +8,7 @@
  * rules; no `@apply`.
  */
 
-/* Base button — bronze gradient, 999px pill, Outfit display font.
+/* Base button — bronze gradient, 999px pill, display font.
  * The `btn` marker class is preserved so JS-set states (e.g.
  * audit-submit-success in audit-forms.ts) can target it. */
 export const btnBase =

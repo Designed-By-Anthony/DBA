@@ -1,22 +1,9 @@
 import "@/design-system/dba-global.css";
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces } from "next/font/google";
 import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
-
-/**
- * Load Outfit Variable via Next.js Font API so the --font-outfit CSS variable
- * is available globally. theme.css sets --font-display to "Outfit Variable",
- * but without the Next.js font loader the Google Font only loads on the
- * Lighthouse segment (which has its own Outfit import). Loading it here
- * ensures headings use Outfit everywhere on the marketing site.
- */
-const outfit = Outfit({
-	variable: "--font-outfit",
-	subsets: ["latin"],
-	display: "swap",
-});
 
 /**
  * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
@@ -112,7 +99,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
-			className={`${outfit.variable} ${fraunces.variable}`}
+			className={fraunces.variable}
 		>
 			<head>
 				<JsonLd />

@@ -48,7 +48,7 @@ const RAIL_LINK =
 	"flex items-start gap-2 p-[0.55rem_0.6rem] rounded-[0.75rem] no-underline text-[rgba(247,244,238,0.86)] border border-white/[0.05] bg-white/[0.02] transition-[border-color,background,color,transform,box-shadow] duration-[220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] min-h-11 hover:border-[rgba(212,175,55,0.25)] hover:bg-white/[0.05] hover:text-[var(--text-cream)] hover:-translate-y-px hover:shadow-[0_12px_32px_-22px_rgba(0,0,0,0.45)] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[rgba(212,175,55,0.55)] focus-visible:outline-offset-2";
 const RAIL_TEXT = "flex flex-col gap-[0.08rem] leading-[1.2] min-w-0";
 const RAIL_TEXT_TITLE =
-	"text-[0.68rem] font-[650] tracking-[0.16em] uppercase font-[family-name:var(--font-display,'Outfit_Variable')] text-[rgba(247,244,238,0.88)]";
+	"text-[0.68rem] font-[650] tracking-[0.16em] uppercase font-[family-name:var(--font-display)] text-[rgba(247,244,238,0.88)]";
 const RAIL_TEXT_SUB =
 	"text-[0.66rem] font-[450] text-white/[0.48] tracking-[0.03em] leading-[1.35]";
 

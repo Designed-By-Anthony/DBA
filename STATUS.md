@@ -12,6 +12,8 @@
 - Verification after merge: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 - Review fix: restored Tailwind v4 entry imports in `dba-global.css` and `lighthouse-globals.css`; confirmed `/tools` has no remaining CSS module references; restored `/lighthouse` audit-stage `80rem` max-width.
 - Verification after review fixes: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+- Review cleanup: removed the unused `Outfit` Next font loader and stale `--font-outfit` references now that `--font-display` uses Fraunces.
+- Verification after font cleanup: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
