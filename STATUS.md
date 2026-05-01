@@ -20,6 +20,7 @@
 - Review fix: restored Lighthouse report viewer loading/error/invalid-link state styles in `theme.css`.
 - Review fix: restored the `body.site-contact-drawer-open` scroll-lock rule for the mobile contact drawer.
 - Review fix: synced `--font-main` to the loaded `"Inter Variable"` font-family in both `theme.css` and `tokens.css`.
+- Review fix: restored default-hidden mobile navigation overlay behavior and cookie-consent semantic class styles.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 

@@ -107,7 +107,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 			</div>
 
 			<div
-				className="mobile-nav-overlay fixed inset-0 z-[10060] flex flex-col bg-black/95"
+				className="mobile-nav-overlay fixed inset-0 z-[10060] flex flex-col bg-black/95 opacity-0 invisible pointer-events-none transition-[opacity,visibility] duration-[350ms] ease-out [&.open]:opacity-100 [&.open]:visible [&.open]:pointer-events-auto print:hidden"
 				id="mobile-nav"
 				role="dialog"
 				aria-modal="true"
