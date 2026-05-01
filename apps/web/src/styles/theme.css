@@ -20,6 +20,21 @@
 	font-display: swap;
 }
 
+@keyframes dba-bronze-glow-pulse {
+	0%,
+	100% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.65),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+	50% {
+		box-shadow:
+			0 22px 40px -22px rgba(145, 112, 56, 0.88),
+			0 0 32px 6px rgba(212, 175, 55, 0.22),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+}
+
 :root {
 	--bg-ink: #06080d;
 	--bg-deeper: #0a0c10;
@@ -800,12 +815,17 @@ li {
 .blog-index-grid,
 .marketing-link-grid,
 .lh-process-grid,
-.lh-score-grid,
 .lh-two-grid,
 .lh-metric-grid,
 .lh-field-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+	gap: var(--space-element);
+}
+
+.lh-score-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: var(--space-element);
 }
 
@@ -1610,6 +1630,7 @@ body:not(.has-progress-bar) #reading-progress-bar {
 	.page-hero-inner,
 	.hero-grid,
 	.lh-stage-grid,
+	.lh-score-grid,
 	.home-email-cta__card,
 	.portfolio-detail-grid,
 	.portfolio-results-grid,

@@ -25,6 +25,7 @@
 - Review fix: restored the four-column Lighthouse mini score grid in the hero diagnostic preview.
 - Review fix: restored semantic sticky header chrome styles for `site-chrome-sticky`.
 - Review fix: removed `.dba-footer` from the card/glass selector group so full-width footer chrome no longer inherits card radius, shadow, border, or backdrop blur.
+- Review fix: restored `dba-bronze-glow-pulse` keyframes and split `.lh-score-grid` into a fixed 3-column desktop grid with mobile collapse.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
