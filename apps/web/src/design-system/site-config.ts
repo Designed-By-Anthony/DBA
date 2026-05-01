@@ -13,9 +13,11 @@ export const SITE_BRAND = {
 	name: BRAND_NAME,
 	url: BRAND_SITE_URL,
 	homeHref: "/",
-	tagline: "Mohawk Valley · Central NY",
+	tagline: "Mohawk Valley · 315 / 518 · Central NY",
 	footerDescription: "Custom websites for Central NY service businesses.",
 	assets: BRAND_ASSETS,
+	/** Display wordmark without trailing period where punctuation is duplicated (e.g. © line). */
+	displayNameShort: "ANTHONY",
 } as const;
 
 export const SITE_BANNER = {

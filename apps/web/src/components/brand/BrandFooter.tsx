@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { stackBadge } from "@/design-system/buttons";
+import { FOOTER_LOCATION_TAGLINE } from "@/design-system/location";
 import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
@@ -44,7 +45,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					>
 						<Image
 							src={SITE_BRAND.assets.mark}
-							alt="Designed by Anthony logo"
+							alt="ANTHONY. logo"
 							width={22}
 							height={16}
 							className="shrink-0"
@@ -72,32 +73,41 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					</nav>
 
 					{/* Language switcher */}
-				<div className="flex items-center gap-[0.3rem] shrink-0">
-					<a
-						href="/"
-						hrefLang="en"
-						aria-label="View site in English"
-						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.85)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] hover:border-[rgba(212,175,55,0.4)] hover:text-[rgba(212,175,55,0.9)] transition-colors duration-[180ms] ease-in"
-					>
-						EN
-					</a>
-					<span className="text-[rgba(255,255,255,0.22)] text-[0.6rem]" aria-hidden>
-						|
-					</span>
-					<a
-						href="/es"
-						hrefLang="es"
-						aria-label="Ver el sitio en español"
-						className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.48)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-transparent hover:border-[rgba(212,175,55,0.3)] hover:text-[rgba(212,175,55,0.8)] transition-colors duration-[180ms] ease-in"
-					>
-						ES
-					</a>
-				</div>
+					<div className="flex items-center gap-[0.3rem] shrink-0">
+						<a
+							href="/"
+							hrefLang="en"
+							aria-label="View site in English"
+							className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.85)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] hover:border-[rgba(212,175,55,0.4)] hover:text-[rgba(212,175,55,0.9)] transition-colors duration-[180ms] ease-in"
+						>
+							EN
+						</a>
+						<span
+							className="text-[rgba(255,255,255,0.22)] text-[0.6rem]"
+							aria-hidden
+						>
+							|
+						</span>
+						<a
+							href="/es"
+							hrefLang="es"
+							aria-label="Ver el sitio en español"
+							className="text-[0.68rem] font-semibold tracking-[0.1em] uppercase text-[rgba(247,244,238,0.48)] no-underline px-[0.45rem] py-[0.18rem] rounded-full border border-transparent hover:border-[rgba(212,175,55,0.3)] hover:text-[rgba(212,175,55,0.8)] transition-colors duration-[180ms] ease-in"
+						>
+							ES
+						</a>
+					</div>
 
-				{/* Legal + copyright */}
+					{/* Legal + copyright */}
 					<div className="flex items-center flex-wrap gap-x-[0.55rem] gap-y-[0.35rem] ml-auto text-[0.7rem] text-[rgba(247,244,238,0.38)] max-sm:ml-0">
-						<p className="m-0 whitespace-nowrap">
-							© {year} {SITE_BRAND.name}
+						<p className="m-0 max-sm:max-w-none max-w-[min(52rem,92vw)] text-[rgba(247,244,238,0.42)] leading-snug">
+							© {year}{" "}
+							<span className="text-[rgba(247,244,238,0.55)]">
+								{SITE_BRAND.displayNameShort}
+								<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
+								{" | "}
+								{FOOTER_LOCATION_TAGLINE}
+							</span>
 						</p>
 						{SITE_LEGAL_LINKS.map((link) => (
 							<span

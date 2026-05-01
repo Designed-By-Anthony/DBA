@@ -74,7 +74,7 @@ import {
 } from "./offers";
 
 export const SITE_URL = "https://designedbyanthony.com";
-export const SITE_NAME = "Designed by Anthony";
+export const SITE_NAME = "ANTHONY.";
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const PERSON_ID = `${SITE_URL}/about#person`;
@@ -85,7 +85,7 @@ export const GOOGLE_BUSINESS_PROFILE_URL =
 	"https://www.google.com/search?kgmid=/g/11z36l4fmd&q=Designed+By+Anthony";
 export const DEFAULT_SOCIAL_IMAGE = `${SITE_URL}/images/og-site-premium.png`;
 export const SITE_LICENSE_PAGE = `${SITE_URL}/image-license`;
-export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} Designed by Anthony. All rights reserved.`;
+export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} ${SITE_NAME} All rights reserved.`;
 export const FACEBOOK_PROFILE_URL =
 	"https://www.facebook.com/profile.php?id=61574388797744";
 export const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/dbastudio315/";
@@ -94,11 +94,11 @@ export const YELP_BUSINESS_URL =
 
 /** Richer org description for JSON-LD (Organization / ProfessionalService / LocalBusiness). */
 export const ORGANIZATION_SCHEMA_DESCRIPTION =
-	"Designed by Anthony specializes in building custom, high-performance websites, VertaFlow CRM (client portal and automations), and powerful local SEO for home service businesses and contractors. Most contractor websites use generic templates that fail to rank in their service area or convert visitors. We hand-craft mobile-first, high-speed websites with LocalBusiness Schema and optimized content so you dominate the Google Map Pack and stop losing leads to your competitors. Whether you need a website rescue, monthly SEO, CRM-led follow-up, or just a faster site—let us handle the code while you focus on the jobs.";
+	"ANTHONY. engineers bespoke digital estates and high-performance infrastructure for service businesses — The Vault CRM (client workspace and automations), managed hosting, and local SEO across the Mohawk Valley (315), Capital Region (518), and Central New York. Digital Infrastructure, Engineered in the Copper City (Rome, NY).";
 
 export const businessProfile = {
 	name: SITE_NAME,
-	alternateName: ["designedbyanthony.com"],
+	alternateName: ["designedbyanthony.com", "ANTHONY"],
 	legalName: SITE_NAME,
 	url: SITE_URL,
 	contactPage: `${SITE_URL}/contact`,
@@ -108,9 +108,9 @@ export const businessProfile = {
 	founderName: "Anthony Jones",
 	founderJobTitle: "Founder, Web Designer, and Developer",
 	founderDescription:
-		"Marine Corps veteran and founder of Designed by Anthony, building custom websites, VertaFlow CRM (client portal, automations), managed hosting, website rescues, and local SEO systems for service businesses.",
+		"Marine Corps veteran and founder of ANTHONY., building custom websites, The Vault CRM (client workspace, automations), managed hosting, website rescues, and local SEO systems for service businesses from Rome, NY.",
 	description:
-		"Designed by Anthony builds custom websites, VertaFlow CRM (client portal, automations), website rescues, managed hosting, and local SEO systems for service businesses.",
+		"ANTHONY. builds custom websites, The Vault CRM (client workspace, automations), website rescues, managed hosting, and local SEO systems for service businesses across the Mohawk Valley, Capital Region, and Central New York.",
 	logo: `${SITE_URL}${BRAND_ASSETS.logo}`,
 	/** Back-compat — existing `/images/designed-by-anthony-logo.png` is still mirrored and indexed. */
 	legacyLogo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
@@ -151,6 +151,9 @@ export const businessProfile = {
 		"CRM software",
 		"Client portal",
 		"Marketing automation",
+		"Mohawk Valley New York",
+		"Capital Region New York",
+		"Central New York",
 	],
 	sameAs: [
 		GOOGLE_BUSINESS_PROFILE_URL,
@@ -376,7 +379,10 @@ export function toAbsoluteUrl(path: string): string {
 }
 
 export function stripSiteSuffix(title: string): string {
-	return title.replace(/\s*\|\s*Designed by Anthony\s*$/i, "").trim();
+	return title
+		.replace(/\s*\|\s*ANTHONY\.\s*$/i, "")
+		.replace(/\s*\|\s*Designed by Anthony\s*$/i, "")
+		.trim();
 }
 
 function startCase(value: string): string {
@@ -719,10 +725,8 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 		foundingLocation: toPlace(businessProfile.homeBase),
 		areaServed: businessProfile.areaServed.map(toPlace),
 		/**
-		 * Dual-shape serviceArea: a 50-mile GeoCircle anchored at the Rome, NY home base
-		 * (covers Utica / Rome / Syracuse / greater Mohawk Valley) plus the named
-		 * place list for broader markets. Google's LocalBusiness guidance prefers
-		 * GeoCircle for service-area businesses without a public storefront.
+		 * Primary service footprint: GeoCircle covering Mohawk Valley (315),
+		 * Capital Region (518), and Central NY (~150 mi / ~241 km from Rome HQ).
 		 */
 		serviceArea: [
 			{
@@ -732,12 +736,13 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 					latitude: businessProfile.geo.latitude,
 					longitude: businessProfile.geo.longitude,
 				},
-				geoRadius: "80467",
+				geoRadius: "241401",
 				description:
-					"50-mile service radius from Rome, NY — covers Utica, Rome, Syracuse, and the greater Mohawk Valley / Central New York region.",
+					"~150-mile radius from engineering HQ (7749 Kilbourn Rd, Rome, NY 13440) covering Mohawk Valley (315), Capital Region (518), and Central New York.",
 			},
 			...businessProfile.areaServed.map(toPlace),
 		],
+		slogan: "Digital Infrastructure, Engineered in the Copper City.",
 		brand: {
 			"@type": "Brand",
 			name: SITE_NAME,
@@ -791,7 +796,7 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 		potentialAction: [
 			{
 				"@type": "ContactAction",
-				name: "Contact Designed by Anthony",
+				name: "Contact ANTHONY.",
 				target: {
 					"@type": "EntryPoint",
 					urlTemplate: contactUrl,
@@ -820,8 +825,8 @@ export function buildVertaflowCrmSoftwareApplicationSchema(): SchemaValue {
 		"@context": "https://schema.org",
 		"@type": ["SoftwareApplication", "WebApplication"],
 		"@id": VERTAFLOW_CRM_SOFTWARE_ID,
-		name: "VertaFlow CRM",
-		alternateName: "Designed by Anthony VertaFlow CRM",
+		name: "The Vault by ANTHONY.",
+		alternateName: ["ANTHONY. Vault — Client Workspace", "VertaFlow CRM"],
 		description:
 			"CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Admin at admin.vertaflow.io; client-facing tools via accounts.vertaflow.io.",
 		applicationCategory: "BusinessApplication",
@@ -872,7 +877,7 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 		"@context": "https://schema.org",
 		"@type": "OfferCatalog",
 		"@id": `${pricingUrl}#offercatalog`,
-		name: "Designed by Anthony — Pricing",
+		name: "ANTHONY. — Pricing",
 		url: pricingUrl,
 		description:
 			"Website projects, VertaFlow CRM tiers, Growth Plan bundle, and Google Business Profile program.",

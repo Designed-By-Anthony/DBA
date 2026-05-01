@@ -73,11 +73,11 @@ export function BrandHeader({
 					<Link
 						href={SITE_BRAND.homeHref}
 						className="inline-flex items-center gap-3 no-underline min-w-0 group"
-						aria-label={`${SITE_BRAND.name} — home`}
+						aria-label="ANTHONY. — home"
 					>
 						<Image
 							src={SITE_BRAND.assets.mark}
-							alt="Designed by Anthony logo"
+							alt="ANTHONY. mark"
 							width={36}
 							height={27}
 							className="h-[1.85rem] w-auto shrink-0 transition-transform duration-[280ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-[-3deg] md:h-[2rem]"
@@ -97,7 +97,7 @@ export function BrandHeader({
 					{/* Desktop nav */}
 					<nav
 						className="hidden min-[960px]:flex items-center gap-5"
-						aria-label="Designed by Anthony main navigation"
+						aria-label="Main navigation"
 					>
 						{SITE_HEADER_NAV_LINKS.map((link) => (
 							<Link

@@ -9,6 +9,10 @@ import {
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
+	ATELIER_ROME_LEGACY,
+	COPPER_CITY_HOOK,
+} from "@/design-system/location";
+import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
 	FOUNDING_PARTNER_SEO_MONTHLY,
@@ -67,7 +71,8 @@ export function HomePage() {
 							</span>
 						</p>
 						<p className="page-eyebrow page-eyebrow--rule" data-hero-eyebrow>
-							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY
+							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY —{" "}
+							{COPPER_CITY_HOOK}
 						</p>
 						<div className="hero-launch-pill" role="status">
 							<span className="hero-launch-dot" aria-hidden="true" />
@@ -89,7 +94,7 @@ export function HomePage() {
 							throughout Utica, Rome, Syracuse, and Central New York.
 							Performance-optimized architecture, conversion-focused design, and
 							SEO infrastructure that positions you at the top of local search
-							results.
+							results. {ATELIER_ROME_LEGACY}
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
@@ -199,7 +204,8 @@ export function HomePage() {
 							<p>
 								The site showcases real Lighthouse results and the same
 								engineering standards used in client builds: fast loading, clean
-								accessibility, and solid technical SEO structure.
+								accessibility, and solid technical SEO structure.{" "}
+								{ATELIER_ROME_LEGACY}
 							</p>
 						</article>
 						<article className="surface-card home-proof-card reveal-up">

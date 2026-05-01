@@ -49,16 +49,16 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
 	metadataBase: new URL("https://designedbyanthony.com"),
 	title: {
-		default: "Designed by Anthony",
-		template: "%s | Designed by Anthony",
+		default: "ANTHONY.",
+		template: "%s | ANTHONY.",
 	},
 	description:
-		"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
+		"Bespoke digital estates and high-performance infrastructure for the Mohawk Valley (315), Capital Region (518), and Central New York — engineered in Rome, NY.",
 	manifest: "/manifest.webmanifest",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
-		title: "Designed by Anthony",
+		title: "ANTHONY.",
 	},
 	formatDetection: {
 		telephone: false,
@@ -66,34 +66,34 @@ export const metadata: Metadata = {
 		address: false,
 	},
 	generator: "Next.js",
-	authors: [{ name: "Designed By Anthony" }],
+	authors: [{ name: "Anthony Jones — ANTHONY." }],
 	other: {
 		"business-type": "B2B",
 		industry: "Professional Services / Web Design & Local SEO",
 	},
 	openGraph: {
-		siteName: "Designed by Anthony",
+		siteName: "ANTHONY.",
 		type: "website",
 		locale: "en_US",
 		url: "https://designedbyanthony.com",
-		title: "Designed by Anthony — Custom websites & local SEO",
+		title: "ANTHONY. — Digital infrastructure architect",
 		description:
-			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York. Lighthouse-grade performance, Bronze finish.",
+			"Bespoke digital estates for the Mohawk Valley (315), Capital Region (518), and Central New York. Engineered in Rome, NY.",
 		images: [
 			{
 				url: "/images/og-site-premium.png",
 				width: 2400,
 				height: 1260,
-				alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+				alt: "ANTHONY. — Mohawk Valley digital infrastructure",
 				type: "image/png",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Designed by Anthony — Custom websites & local SEO",
+		title: "ANTHONY. — Digital infrastructure architect",
 		description:
-			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
+			"Bespoke digital estates for the Mohawk Valley and Central New York.",
 		images: ["/images/og-site-premium.png"],
 	},
 	icons: {

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { btnPrimary, btnSm } from "@/design-system/buttons";
+import { regionTagFromPhone } from "@/lib/leadRegion";
 import { businessProfile } from "@/lib/seo";
 
 const BODY_LOCK_CLASS = "site-contact-drawer-open";
@@ -67,6 +68,18 @@ const SF_DRAWER_ACTIONS =
 /* Inline Salesforce Web-to-Lead form for the contact drawer. */
 function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 	const formId = useId();
+	const phoneRef = useRef<HTMLInputElement>(null);
+	const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+	const injectRegionPrefix = () => {
+		const phone = phoneRef.current?.value ?? "";
+		const region = regionTagFromPhone(phone);
+		if (!region || !descriptionRef.current) return;
+		const tag = `Region: ${region}. `;
+		const cur = descriptionRef.current.value;
+		if (cur.includes("Region: Mohawk Valley")) return;
+		descriptionRef.current.value = tag + cur;
+	};
 
 	return (
 		<form
@@ -74,6 +87,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 			method="POST"
 			className={SF_DRAWER_FORM}
 			onSubmit={() => {
+				injectRegionPrefix();
 				setTimeout(() => onSuccess?.(), 100);
 			}}
 		>
@@ -113,6 +127,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 					<label htmlFor={`${formId}-phone`}>Phone</label>
 					<input
 						id={`${formId}-phone`}
+						ref={phoneRef}
 						maxLength={40}
 						name="phone"
 						type="tel"
@@ -124,6 +139,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 					<label htmlFor={`${formId}-description`}>Message</label>
 					<textarea
 						id={`${formId}-description`}
+						ref={descriptionRef}
 						name="description"
 						rows={3}
 						placeholder="How can we help?"
