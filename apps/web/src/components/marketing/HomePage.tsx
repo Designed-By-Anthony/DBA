@@ -98,7 +98,9 @@ export function HomePage() {
 				</div>
 			</section>
 
-			<PremiumPitchStrip variant="home" />
+			<section className="section-shell section-shell--premium-pitch">
+				<PremiumPitchStrip variant="home" />
+			</section>
 
 			<section
 				className="section-shell section-shell--proof command-shell"

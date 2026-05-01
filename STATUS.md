@@ -33,6 +33,7 @@
 - Review fix: restored shared base button layout and hover transition styles on `.lh-submit-btn`.
 - Review fix: restored dynamic score color coding on the ScoreRing center value text.
 - Review fix: restored `lighthouse-prose` generated report HTML spacing and `lh-chip` impact/effort color variants.
+- Review fix: restored the home PremiumPitch wrapper so mobile gutters remain intact.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
