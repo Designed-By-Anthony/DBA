@@ -13,9 +13,9 @@
 	],
 	"d1_databases": [
 		{
-			"binding": "DBA_LEADS_DB",
-			"database_name": "dba-leads",
-			"database_id": "PLACEHOLDER_REPLACE_IN_CLOUDFLARE_DASHBOARD"
+			"binding": "DB",
+			"database_name": "dba-ledger",
+			"database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
 		}
 	]
 }

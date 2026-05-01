@@ -33,8 +33,12 @@ import {
 	normalizeText,
 } from "@lh/lib/validation";
 import { Elysia } from "elysia";
+import { tryInsertLead } from "@/lib/d1Leads";
 import { postLeadIngest } from "@/lib/leadWebhook";
-import { resolveEffectiveSecretKey, verifyTurnstileToken } from "@/lib/turnstile";
+import {
+	resolveEffectiveSecretKey,
+	verifyTurnstileToken,
+} from "@/lib/turnstile";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;
@@ -121,14 +125,35 @@ export const auditRoute = new Elysia({ aot: false }).post(
 					: "";
 			if (!cfToken) {
 				set.status = 403;
-				return { error: "Security check required. Please complete the challenge and try again." };
+				return {
+					error:
+						"Security check required. Please complete the challenge and try again.",
+				};
 			}
 			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
 			if (!verification.success) {
 				set.status = 403;
-				return { error: "Security check failed. Please refresh the page and try again." };
+				return {
+					error:
+						"Security check failed. Please refresh the page and try again.",
+				};
 			}
 		}
+
+		await tryInsertLead({
+			id: crypto.randomUUID(),
+			email,
+			company_name: company,
+			source: "Audit_Form",
+			status: "New",
+			turnstile_passed: turnstileSecret ? 1 : null,
+			metadata: JSON.stringify({
+				name,
+				url,
+				location,
+			}),
+			created_at: Date.now(),
+		});
 
 		try {
 			const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY?.trim() || undefined;

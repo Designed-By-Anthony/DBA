@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
 	},
 	trailingSlash: false,
 	reactStrictMode: true,
+	output: "standalone",
 	// sharp is not available in Cloudflare Workers; use unoptimized images
 	images: {
 		unoptimized: true,

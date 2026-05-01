@@ -2,6 +2,10 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## D1 Ledger + admin UI (2026-05-01)
+
+- `packages/shared` Drizzle schema: `leads` + `transactions`; D1 binding name `DB` (`apps/api/wrangler.json`, `apps/web/wrangler.json` + `wrangler.worker.json`). API: `setLedgerDb` + `tryInsertLead` / `tryInsertTransaction` in `packages/shared/src/lib/d1Leads.ts`. `POST /api/audit` and `POST /api/lead-email` insert after validation; Stripe thin webhook writes transactions + sets lead status `Provisioning`. Scaffolded `apps/admin` (ledger tables). Web `next.config.ts`: `output: "standalone"` so OpenNext finds `pages-manifest.json`.
+
 ## Playwright ironclad + security audit specs (2026-05-01)
 
 - Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).

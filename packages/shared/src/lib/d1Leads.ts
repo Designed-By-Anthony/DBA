@@ -1,34 +1,64 @@
 /**
- * Module-level D1 lead-insertion helper for the API Worker.
- *
- * The D1 binding is not available at import time — it is injected once
- * at Worker startup via `setLeadsDb()` (called from `apps/api/src/index.ts`).
- * Route handlers call `tryInsertLead()` which silently no-ops when the
- * binding is absent (e.g. local dev without D1 configured).
+ * D1 ledger helpers — binding injected via `setLedgerDb(env.DB)` at Worker startup.
  */
-import { type D1Client, type NewLead, leads } from "@dba/shared/db/client";
-import { insertLead } from "@dba/shared/db/insertLead";
 
-export type { D1Client, NewLead };
+import {
+	createD1Client,
+	type D1Client,
+	leads,
+	type NewLead,
+	type NewTransaction,
+	transactions,
+} from "@dba/shared/db/client";
+import { sql } from "drizzle-orm";
+
+export type { D1Client, NewLead, NewTransaction };
 
 let _db: D1Client | null = null;
 
-/** Called once at Worker startup from `apps/api/src/index.ts`. */
-export function setLeadsDb(db: D1Client): void {
+export function setLedgerDb(db: D1Client): void {
 	_db = db;
 }
 
-/**
- * Attempt to persist a lead to D1.
- * - Returns `{ ok: true }` on success or when D1 is not configured.
- * - Returns `{ ok: false, error }` on D1 errors.
- * - Never throws — callers must not skip their email fallback.
- */
-export async function tryInsertLead(
-	lead: NewLead,
-): Promise<{ ok: boolean; error?: unknown }> {
-	if (!_db) return { ok: true };
-	return insertLead(_db, lead);
+/** @deprecated Use setLedgerDb */
+export function setLeadsDb(db: D1Client): void {
+	setLedgerDb(db);
 }
 
-export { leads };
+export async function tryInsertLead(lead: NewLead): Promise<boolean> {
+	if (!_db) return false;
+	try {
+		await _db
+			.insert(leads)
+			.values(lead)
+			.onConflictDoUpdate({
+				target: leads.email,
+				set: {
+					metadata: sql`excluded.metadata`,
+					created_at: sql`excluded.created_at`,
+					company_name: sql`excluded.company_name`,
+					source: sql`excluded.source`,
+					turnstile_passed: sql`excluded.turnstile_passed`,
+				},
+			});
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export async function tryInsertTransaction(
+	tx: NewTransaction,
+	dbOverride?: D1Client,
+): Promise<boolean> {
+	const db = dbOverride ?? _db;
+	if (!db) return false;
+	try {
+		await db.insert(transactions).values(tx);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export { createD1Client, leads, transactions };

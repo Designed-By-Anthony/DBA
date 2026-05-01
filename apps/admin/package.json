@@ -1,0 +1,30 @@
+{
+	"name": "@dba/admin",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "next dev --port 3010",
+		"build": "next build",
+		"start": "next start --port 3010",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@dba/shared": "file:../../packages/shared",
+		"@opennextjs/cloudflare": "^1.19.4",
+		"drizzle-orm": "^0.45.2",
+		"next": "16.2.4",
+		"react": "19.2.5",
+		"react-dom": "19.2.5"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4.2.4",
+		"@cloudflare/workers-types": "^4.20260429.1",
+		"@types/node": "^24",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"tailwindcss": "^4.2.4",
+		"typescript": "^6.0.3",
+		"wrangler": "^4.86.0"
+	}
+}

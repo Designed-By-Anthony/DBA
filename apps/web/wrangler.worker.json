@@ -7,5 +7,12 @@
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "dba-ledger",
+			"database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
+		}
+	]
 }

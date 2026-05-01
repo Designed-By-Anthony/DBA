@@ -8,8 +8,7 @@
 		"./lighthouse/*": "./src/lighthouse/*.ts",
 		"./lighthouse/lib/*": "./src/lighthouse/lib/*.ts",
 		"./db/schema": "./src/db/schema.ts",
-		"./db/client": "./src/db/client.ts",
-		"./db/insertLead": "./src/db/insertLead.ts"
+		"./db/client": "./src/db/client.ts"
 	},
 	"dependencies": {
 		"@google/genai": "^1.48.0",
