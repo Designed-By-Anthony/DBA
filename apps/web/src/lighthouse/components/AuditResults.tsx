@@ -12,34 +12,37 @@ function formatStars(rating: number | null): string {
 	return `${rating.toFixed(1)}★`;
 }
 
-function sanitizeHtml(html: string): string {
-	return html
-		.replace(/<script[\s\S]*?<\/script>/gi, "")
-		.replace(/<style[\s\S]*?<\/style>/gi, "")
-		.replace(/\son\w+="[^"]*"/gi, "")
-		.replace(/\son\w+='[^']*'/gi, "");
+const htmlEntityMap: Record<string, string> = {
+	"&amp;": "&",
+	"&gt;": ">",
+	"&lt;": "<",
+	"&nbsp;": " ",
+	"&quot;": '"',
+	"&#39;": "'",
+};
+
+function aiTextParagraphs(text: string): string[] {
+	return text
+		.replace(/<\s*br\s*\/?\s*>/gi, "\n")
+		.replace(/<\s*\/\s*(p|div|h[1-6]|li|ul|ol)\s*>/gi, "\n")
+		.replace(/<\s*li\b[^>]*>/gi, "• ")
+		.replace(/<[^>]*>/g, "")
+		.replace(
+			/&(amp|gt|lt|nbsp|quot|#39);/g,
+			(entity) => htmlEntityMap[entity] ?? entity,
+		)
+		.split(/\n\n+|\n/)
+		.map((para) => para.trim())
+		.filter(Boolean);
 }
 
 function ExecutiveSummaryBody({ text }: { text: string }) {
-	const isHtml = /<[a-z][\s\S]*>/i.test(text);
-	if (isHtml) {
-		return (
-			<div
-				className="lighthouse-result-body lighthouse-prose"
-				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional sanitized HTML from trusted AI summary pipeline
-				dangerouslySetInnerHTML={{ __html: sanitizeHtml(text) }}
-			/>
-		);
-	}
 	return (
-		<div className="lighthouse-result-body space-y-3">
-			{text
-				.split(/\n\n+/)
-				.filter(Boolean)
-				.map((para, i) => (
-					// biome-ignore lint/suspicious/noArrayIndexKey: paragraph index is stable
-					<p key={i}>{para}</p>
-				))}
+		<div className="lighthouse-result-body lighthouse-prose space-y-3">
+			{aiTextParagraphs(text).map((para, i) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: paragraph index is stable
+				<p key={i}>{para}</p>
+			))}
 		</div>
 	);
 }
