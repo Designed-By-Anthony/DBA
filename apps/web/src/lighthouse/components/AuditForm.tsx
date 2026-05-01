@@ -5,6 +5,7 @@ import { initCursorGlow } from "@lh/lib/cursorGlow";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
+import { btnPrimaryAudit } from "@/design-system/buttons";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
@@ -140,14 +141,12 @@ export function AuditForm() {
 		);
 	}
 
-	/* WCAG: placeholder contrast bumped from white/28 → white/45 so the
-	   hint text passes 4.5:1 on the dark input fill. Focus ring also
-	   strengthened for keyboard a11y. */
+	/* Bronze token inputs — aligned with SalesforceContactForm SF_FIELD pattern. */
 	const inputClass =
-		"lh-field w-full rounded-lg border border-white/[0.14] bg-[rgba(7,10,17,0.74)] px-4 py-3 text-[14.5px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] placeholder:text-white/45 transition-[border-color,box-shadow,background-color] focus:border-[rgba(96,165,250,0.55)] focus:bg-[rgba(10,13,21,0.92)] focus:outline-none focus:ring-2 focus:ring-[rgba(96,165,250,0.25)]";
+		"w-full rounded-[0.65rem] border border-[rgb(var(--accent-bronze-rgb)/0.32)] bg-[rgba(8,12,18,0.78)] px-[0.95rem] py-[0.7rem] text-[0.95rem] text-white [caret-color:rgb(var(--accent-bronze-rgb)/0.95)] font-[inherit] transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-white/[0.42] focus:outline-none focus:border-[rgb(var(--accent-bronze-rgb)/0.7)] focus:bg-[rgba(10,14,22,0.92)] focus:shadow-[0_0_0_3px_rgb(var(--accent-bronze-rgb)/0.18)]";
 
 	const labelClass =
-		"mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-[rgba(148,163,184,0.75)]";
+		"mb-1.5 block text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[var(--text-cream)]";
 
 	return (
 		<div className="relative isolate w-full" id="run-audit">
@@ -197,7 +196,7 @@ export function AuditForm() {
 						autoCorrect="off"
 						autoCapitalize="off"
 						spellCheck={false}
-						className="lh-field lh-url-input w-full rounded-lg border border-white/[0.18] bg-[rgba(10,14,22,0.9)] px-4 py-4 font-mono text-[15px] text-white shadow-[0_18px_40px_-20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:font-normal placeholder:text-white/35 transition-[border-color,box-shadow,background-color] focus:border-[rgba(96,165,250,0.6)] focus:bg-[rgba(12,16,25,0.97)] focus:outline-none focus:ring-2 focus:ring-[rgba(96,165,250,0.3)]"
+						className="w-full rounded-[0.65rem] border border-[rgb(var(--accent-bronze-rgb)/0.32)] bg-[rgba(8,12,18,0.78)] px-[0.95rem] py-[0.95rem] font-mono text-[15px] text-white [caret-color:rgb(var(--accent-bronze-rgb)/0.95)] shadow-[0_18px_40px_-20px_rgba(0,0,0,0.25)] placeholder:font-normal placeholder:text-white/[0.42] transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none focus:border-[rgb(var(--accent-bronze-rgb)/0.7)] focus:bg-[rgba(10,14,22,0.92)] focus:shadow-[0_0_0_3px_rgb(var(--accent-bronze-rgb)/0.18)]"
 					/>
 				</div>
 
@@ -286,7 +285,7 @@ export function AuditForm() {
 						type="submit"
 						disabled={status === "loading"}
 						aria-disabled={status === "loading"}
-						className="lh-submit-btn group relative w-full cursor-pointer overflow-hidden rounded-lg px-4 py-4 text-[15px] font-bold tracking-normal text-[#100d08] transition-[transform,box-shadow,opacity] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[260px]"
+						className={`${btnPrimaryAudit} w-full sm:w-auto sm:min-w-[260px]`}
 					>
 						<span className="relative inline-flex items-center justify-center gap-2">
 							{status === "loading" ? "Running audit…" : "Run free audit"}

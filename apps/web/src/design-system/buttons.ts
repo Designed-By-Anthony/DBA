@@ -37,3 +37,10 @@ export const btnWhite = `${btnBase} bg-white text-[#0a0c10] border-white shadow-
 
 /* Small modifier — reduces padding/font size. Compose with any variant. */
 export const btnSm = "!px-[1.2rem] !py-[0.65rem] !text-[0.82rem]";
+
+/* Stack badge — small informational chip used for tech-stack / "powered-by"
+ * link rows. Replaces the legacy `.dba-stack-badge` selector that lived in
+ * brand-chrome.css (deleted Phase 3). Consumed by BrandFooter and the
+ * "Our Edge" section of EnrichedPages. */
+export const stackBadge =
+	"inline-flex items-center px-[0.52rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[0.62rem] font-medium tracking-[0.01em] text-[rgba(247,244,238,0.48)] no-underline whitespace-nowrap transition-[color,border-color] duration-[180ms] ease-in hover:text-[rgba(247,244,238,0.82)] hover:border-[rgba(255,255,255,0.2)]";

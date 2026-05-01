@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"skipLibCheck": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"paths": {
+			"@/*": ["./apps/web/src/*"],
+			"@lh/lib/*": ["./packages/shared/src/lighthouse/lib/*"],
+			"@lh/*": ["./apps/web/src/lighthouse/*"]
+		}
+	},
+	"include": [
+		"playwright/**/*.ts",
+		"apps/web/src/**/*.ts",
+		"packages/shared/src/**/*.ts"
+	]
+}
