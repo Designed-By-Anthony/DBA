@@ -1,24 +1,40 @@
 .page-hero--home {
 	--hero-spot-x: 50%;
 	--hero-spot-y: 22%;
+	position: relative;
+	overflow: clip;
 }
 
-/* Editorial typography dial: ~10% down from the global hero clamp, with a touch more leading. */
-.page-hero--home h1 {
+/* Preload OG artwork as hero LCP candidate (decorative; boosts discoverable image fetch). */
+.page-hero--home .hero-lcp-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.page-hero--home .hero-lcp-layer__img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0.12;
+	filter: saturate(1.05);
+}
+
+.page-hero--home .page-hero-inner {
+	position: relative;
+	z-index: 1;
+}
+
+/* Editorial typography dial: mixed Fraunces + Inter headline (`.home-hero-title`). */
+.page-hero--home .home-hero-title {
 	font-size: clamp(2.55rem, 5.85vw, 4.85rem);
 	line-height: 1.08;
-	/* Override the font-swap CLS reservation in theme.css so it tracks the
-       scoped font-size + line-height. theme.css reserves
-       calc(4 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (mobile, 4 lines) and
-       calc(3 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (≥900px, 3 lines) —
-       both explicitly derived from the global values, so they leave a
-       visible gap below the smaller homepage H1. Re-derive against the
-       dialed values here (desktop override follows below). */
 	min-height: calc(4 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
 }
 
 @media (min-width: 900px) {
-	.page-hero--home h1 {
+	.page-hero--home .home-hero-title {
 		min-height: calc(3 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
 	}
 }
@@ -216,36 +232,50 @@
 	align-items: center;
 	gap: 0.55rem;
 	flex-wrap: wrap;
-	max-width: 36rem;
+	max-width: 42rem;
 	margin-bottom: 1.15rem;
 	padding: 0.55rem 1rem 0.55rem 0.65rem;
 	border-radius: 999px;
-	font-size: 0.84rem;
-	font-weight: 600;
+	font-size: 0.8rem;
+	font-weight: 400;
+	font-family: var(--font-main);
 	letter-spacing: 0.02em;
 	color: rgba(255, 252, 245, 0.88);
 	background: linear-gradient(
 		135deg,
-		rgba(91, 156, 248, 0.14),
-		rgb(var(--accent-bronze-rgb) / 0.1)
+		rgb(var(--accent-bronze-rgb) / 0.12),
+		rgb(var(--accent-bronze-rgb) / 0.06)
 	);
 	border: 1px solid rgba(255, 252, 245, 0.1);
-	box-shadow: 0 12px 40px -28px rgba(91, 156, 248, 0.5);
+	box-shadow: 0 12px 40px -28px rgb(var(--accent-bronze-rgb) / 0.35);
 	animation: hero-pill-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 	animation-delay: 0.12s;
 }
 
 .hero-launch-pill strong {
 	color: var(--text-cream);
-	font-weight: 800;
+	font-weight: 600;
+}
+
+.hero-launch-pill__sub {
+	color: rgba(232, 213, 168, 0.72);
+	font-weight: 400;
+}
+
+.hero-launch-pill__sep {
+	color: rgba(255, 252, 245, 0.28);
 }
 
 .hero-launch-dot {
 	width: 9px;
 	height: 9px;
 	border-radius: 50%;
-	background: radial-gradient(circle at 35% 30%, #fef9c3, #5b9cf8);
-	box-shadow: 0 0 0 3px rgba(91, 156, 248, 0.25);
+	background: radial-gradient(
+		circle at 35% 30%,
+		#fcf0d2,
+		rgb(var(--accent-bronze-rgb))
+	);
+	box-shadow: 0 0 0 3px rgb(var(--accent-bronze-rgb) / 0.28);
 	flex-shrink: 0;
 	animation: hero-dot-pulse 2.4s ease-in-out infinite;
 }
@@ -414,33 +444,45 @@
 	gap: 0.75rem;
 }
 
-.home-faq-item {
+.home-faq-item.text-bubble.is-bordered {
 	padding: 0;
 	overflow: hidden;
+	border-radius: var(--radius-card);
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.04) 0%,
+		rgba(255, 255, 255, 0.015) 100%
+	);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.home-faq-item > summary {
+.home-faq-item.text-bubble.is-bordered > summary {
 	list-style: none;
 	cursor: pointer;
-	padding: 1.1rem 1.3rem;
+	padding: 1rem 1.15rem;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
 	color: var(--text-cream);
-	font-weight: 700;
-	font-size: 1rem;
-	line-height: 1.4;
+	font-weight: 600;
+	font-size: 0.98rem;
+	line-height: 1.45;
 }
 
-.home-faq-item > summary::-webkit-details-marker {
+.home-faq-item.text-bubble.is-bordered > summary::-webkit-details-marker {
 	display: none;
 }
 
-.home-faq-item > summary:focus-visible {
-	outline: 2px solid rgba(96, 165, 250, 0.5);
+.home-faq-item.text-bubble.is-bordered > summary:focus-visible {
+	outline: 2px solid rgb(var(--accent-bronze-rgb) / 0.45);
 	outline-offset: -2px;
 	border-radius: inherit;
+}
+
+.home-faq-item.text-bubble.is-bordered .home-faq-answer p {
+	margin: 0;
 }
 
 .home-faq-question {
@@ -449,8 +491,8 @@
 
 .home-faq-toggle {
 	position: relative;
-	width: 16px;
-	height: 16px;
+	width: 15px;
+	height: 15px;
 	flex-shrink: 0;
 }
 
@@ -458,8 +500,8 @@
 .home-faq-toggle::after {
 	content: "";
 	position: absolute;
-	background-color: var(--accent-blue);
-	border-radius: 2px;
+	background-color: rgb(var(--accent-bronze-rgb) / 0.85);
+	border-radius: 1px;
 	transition:
 		transform 0.25s ease,
 		opacity 0.25s ease;
@@ -468,31 +510,20 @@
 .home-faq-toggle::before {
 	top: 7px;
 	left: 0;
-	width: 16px;
-	height: 2px;
+	width: 14px;
+	height: 1px;
 }
 
 .home-faq-toggle::after {
 	top: 0;
 	left: 7px;
-	width: 2px;
-	height: 16px;
+	width: 1px;
+	height: 14px;
 }
 
 .home-faq-item[open] > summary .home-faq-toggle::after {
 	opacity: 0;
 	transform: scaleY(0);
-}
-
-.home-faq-answer {
-	padding: 0 1.3rem 1.15rem;
-	color: var(--text-gray);
-	line-height: 1.7;
-	font-size: 0.95rem;
-}
-
-.home-faq-answer p {
-	margin: 0;
 }
 
 .home-faq-cta-note {

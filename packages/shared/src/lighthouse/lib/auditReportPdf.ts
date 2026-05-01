@@ -22,7 +22,8 @@ const C_SLATE_700 = [23, 16, 8] as const;
 const C_SLATE_500 = [107, 114, 128] as const;
 const C_SLATE_300 = [209, 213, 219] as const;
 const C_SLATE_200 = [229, 231, 235] as const;
-const C_BRONZE    = [212, 175, 55] as const;const C_BRONZE_DARK = [166, 138, 43] as const;
+const C_BRONZE = [212, 175, 55] as const;
+const C_BRONZE_DARK = [166, 138, 43] as const;
 const C_AMBER_700 = [180, 83, 9] as const;
 const C_GREEN_700 = [21, 128, 61] as const;
 const C_RED_700 = [185, 28, 28] as const;
@@ -136,9 +137,9 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 	const doc = new jsPDF({ unit: "mm", format: "a4" });
 	doc.setProperties({
 		title: `Executive audit report — ${data.url}`,
-		subject: "Designed by Anthony — Lighthouse Scanner",
-		author: "Designed by Anthony",
-		keywords: "SEO audit, PageSpeed, Core Web Vitals, Designed by Anthony",
+		subject: "ANTHONY. — Lighthouse Scanner",
+		author: "ANTHONY.",
+		keywords: "SEO audit, PageSpeed, Core Web Vitals, ANTHONY.",
 	});
 
 	// White paper, no global fill.
@@ -632,7 +633,7 @@ export function buildAuditPdf(data: AuditData, reportId: string | null): Blob {
 		doc.setTextColor(...C_SLATE_500);
 		doc.setFont("helvetica", "normal");
 		doc.text(
-			"Designed by Anthony · designedbyanthony.com · Lighthouse Scanner v2",
+			"ANTHONY. · designedbyanthony.com · Lighthouse Scanner v2",
 			MARGIN,
 			PAGE_H - 7,
 		);

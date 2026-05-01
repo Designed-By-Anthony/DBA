@@ -3,7 +3,7 @@
  * Run `bun run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
- * Always-on site needs: Lighthouse audit API, VertaFlow CRM lead ingest, Crisp chat.
+ * Always-on site needs: Lighthouse audit API, Vault CRM lead ingest, Crisp chat.
  */
 
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
@@ -11,8 +11,8 @@ const LIGHTHOUSE_AUDIT_API_ORIGIN =
 	"https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app";
 const DBA_API_ORIGIN = "https://api.designedbyanthony.com";
 
-/** VertaFlow CRM public lead ingest (`POST /api/lead`, `/api/v1/ingest`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
-const VERTAFLOW_CRM_ORIGIN = "https://admin.vertaflow.io";
+/** Vault / CRM public lead ingest (`POST /api/lead`, `/api/v1/ingest`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
+const CRM_CONSOLE_ORIGIN = "https://admin.vertaflow.io";
 
 /**
  * Legacy Lighthouse subdomain origin — kept in CSP so any historical inbound
@@ -71,7 +71,7 @@ const DIRECTIVES = {
 		DBA_API_ORIGIN,
 		LIGHTHOUSE_AUDIT_API_ORIGIN,
 		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
-		VERTAFLOW_CRM_ORIGIN,
+		CRM_CONSOLE_ORIGIN,
 		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
 		"https://*.crisp.chat",
 		"wss://*.relay.crisp.chat",
@@ -86,7 +86,7 @@ const DIRECTIVES = {
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
 	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${DBA_API_ORIGIN} ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${VERTAFLOW_CRM_ORIGIN}`,
+	"form-action": `'self' ${DBA_API_ORIGIN} ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${CRM_CONSOLE_ORIGIN}`,
 	/**
 	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
 	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that

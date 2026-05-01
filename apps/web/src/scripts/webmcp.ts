@@ -32,7 +32,7 @@ export function initWebMCP(): void {
 	window.modelContext.provideContext({
 		name: "contact_us",
 		description:
-			"Navigate to the contact form to request web design services, SEO optimization, or custom web application development from Designed by Anthony in the Mohawk Valley.",
+			"Navigate to the contact form to request web design services, SEO optimization, or custom web application development from ANTHONY. in the Mohawk Valley.",
 		inputSchema: {
 			type: "object",
 			properties: {
@@ -98,7 +98,7 @@ export function initWebMCP(): void {
 	window.modelContext.provideContext({
 		name: "view_services",
 		description:
-			"View the complete list of web design and digital marketing services offered by Designed by Anthony.",
+			"View the complete list of web design and digital marketing services offered by ANTHONY.",
 		inputSchema: {
 			type: "object",
 			properties: {},

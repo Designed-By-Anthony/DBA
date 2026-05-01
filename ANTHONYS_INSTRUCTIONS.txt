@@ -1,4 +1,4 @@
-Designed by Anthony — Turborepo monorepo (apps/web + apps/api) — operator notes
+ANTHONY. — Turborepo monorepo (apps/web + apps/api) — operator notes
 ================================================================================
 
 Location: /Users/anthonyjones/Web Design/Designed_By_Anthony

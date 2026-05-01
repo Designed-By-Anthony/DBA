@@ -1,14 +1,21 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+	HERO_AB_COOKIE,
+	type HeroAbVariant,
+	isSearchEngineBot,
+	pickHeroAbVariant,
+} from "@/lib/edge-seo";
 
 const APEX_DOMAIN = "designedbyanthony.com";
-const VERTAFLOW_DOMAIN = "vertaflow.io";
+/** Legacy redirect host for managed admin + accounts consoles (infrastructure host). */
+const EXTERNAL_CONSOLE_DOMAIN = "vertaflow.io";
 
 const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
 
-const VF_ADMIN_HOST = `admin.${VERTAFLOW_DOMAIN}`;
-const VF_ACCOUNTS_HOST = `accounts.${VERTAFLOW_DOMAIN}`;
+const EXTERNAL_ADMIN_HOST = `admin.${EXTERNAL_CONSOLE_DOMAIN}`;
+const EXTERNAL_ACCOUNTS_HOST = `accounts.${EXTERNAL_CONSOLE_DOMAIN}`;
 
 /**
  * RFC 8288 Link headers for agent discovery
@@ -29,7 +36,7 @@ const LINK_HEADERS = [
 	'<https://api.designedbyanthony.com/health>; rel="status"; title="API Health"',
 ].join(", ");
 
-function redirectToVertaflow(
+function redirectToExternalConsole(
 	request: NextRequest,
 	targetHost: string,
 ): NextResponse {
@@ -42,7 +49,7 @@ function redirectToVertaflow(
 
 /**
  * Edge middleware for the Cloudflare Pages deployment.
- * `admin.*` and `accounts.*` redirect to VertaFlow; everything else is the
+ * `admin.*` and `accounts.*` redirect to the managed console host; everything else is the
  * single Next.js marketing app (including `/lighthouse`).
  */
 export function middleware(request: NextRequest) {
@@ -50,11 +57,11 @@ export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	if (host === ADMIN_HOST) {
-		return redirectToVertaflow(request, VF_ADMIN_HOST);
+		return redirectToExternalConsole(request, EXTERNAL_ADMIN_HOST);
 	}
 
 	if (host === ACCOUNTS_HOST) {
-		return redirectToVertaflow(request, VF_ACCOUNTS_HOST);
+		return redirectToExternalConsole(request, EXTERNAL_ACCOUNTS_HOST);
 	}
 
 	/* `/404` cannot be a stable `(site)/[...path]` segment — Next treats `404` specially.
@@ -116,17 +123,45 @@ export function middleware(request: NextRequest) {
 		});
 	}
 
-	// Add Link headers to all responses for agent discovery (RFC 8288)
+	/* ── Edge SEO: canonical hint + hero A/B cookie (no alternate bot HTML —
+	   serving materially different markup to crawlers risks cloaking; use the
+	   optional `workers/edge-seo-proxy` Worker in front of Pages if you need
+	   HTML rewriting at the outer edge.) ───────────────────────────────── */
+
+	if (pathname === "/" || pathname === "") {
+		const variant = pickHeroAbVariant(request);
+		const response = NextResponse.next();
+		response.headers.set("Link", LINK_HEADERS);
+		setHeroAbCookie(response, variant);
+		response.headers.set("x-hero-ab", variant);
+		if (isSearchEngineBot(request)) {
+			response.headers.set("x-seo-bot", "1");
+		}
+		return response;
+	}
+
 	const response = NextResponse.next();
 	response.headers.set("Link", LINK_HEADERS);
 	return response;
+}
+
+function setHeroAbCookie(response: NextResponse, variant: HeroAbVariant): void {
+	if (response.cookies.get(HERO_AB_COOKIE)?.value) return;
+	response.cookies.set({
+		name: HERO_AB_COOKIE,
+		value: variant,
+		path: "/",
+		maxAge: 60 * 60 * 24 * 90,
+		sameSite: "lax",
+		secure: process.env.NODE_ENV === "production",
+	});
 }
 
 /**
  * Generate markdown version of homepage for agents
  */
 function generateHomepageMarkdown(): string {
-	return `# Designed by Anthony
+	return `# ANTHONY.
 
 **Mohawk Valley Web Design Studio** · Utica · Rome · Syracuse · CNY
 

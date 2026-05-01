@@ -9,12 +9,16 @@ export type SiteLink = {
 	label: string;
 };
 
+export const SITE_WORDMARK_ALT = "ANTHONY. | Digital Infrastructure Architect";
+
 export const SITE_BRAND = {
 	name: BRAND_NAME,
 	url: BRAND_SITE_URL,
 	homeHref: "/",
 	tagline: "Mohawk Valley · 315 / 518 · Central NY",
 	footerDescription: "Custom websites for Central NY service businesses.",
+	/** Footer copyright suffix — after © year. */
+	footerCopyrightSuffix: "Built in the 315",
 	assets: BRAND_ASSETS,
 	/** Display wordmark without trailing period where punctuation is duplicated (e.g. © line). */
 	displayNameShort: "ANTHONY",
@@ -22,7 +26,7 @@ export const SITE_BRAND = {
 
 export const SITE_BANNER = {
 	href: "/lighthouse",
-	label: "Launch pilot · 10 founding spots",
+	label: "The 315 Pilot: 10 Founding Infrastructure Placements Remaining",
 	cta: "start with a free SEO + performance audit",
 	currentCta: "You're already on the free audit ↓",
 } as const;
@@ -47,7 +51,7 @@ export const SITE_CONTACT_LINK = {
 export const SITE_AUDIT_CTA = {
 	href: "/lighthouse",
 	label: "Audit My Site",
-	shortLabel: "Audit",
+	shortLabel: "Audit My Site",
 } as const;
 
 export const SITE_FOOTER_LINKS = [

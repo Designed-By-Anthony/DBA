@@ -8,7 +8,7 @@ let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
 let outputURL = URL(fileURLWithPath: "/Users/anthonyjones/Downloads/sample-audit-report-local.pdf")
 let previewDir = URL(fileURLWithPath: "/tmp/sample_audit_preview", isDirectory: true)
 let sourceAuditURL = URL(fileURLWithPath: "/Users/anthonyjones/Downloads/report-redacted-draft.pdf")
-let logoURL = URL(fileURLWithPath: "/Users/anthonyjones/Web Design/Designed by Anthony/src/assets/FullLogo.png")
+let logoURL = URL(fileURLWithPath: "/workspace/apps/web/public/brand/logo.png")
 
 let bg = NSColor(calibratedRed: 0.04, green: 0.07, blue: 0.12, alpha: 1)
 let bgAlt = NSColor(calibratedRed: 0.06, green: 0.10, blue: 0.16, alpha: 1)
@@ -293,9 +293,9 @@ guard let context = CGContext(
   consumer: consumer,
   mediaBox: &mediaBox,
   [
-    kCGPDFContextTitle as String: "Designed by Anthony Sample Audit Report",
-    kCGPDFContextCreator as String: "Designed by Anthony",
-    kCGPDFContextAuthor as String: "Designed by Anthony",
+    kCGPDFContextTitle as String: "ANTHONY. Sample Audit Report",
+    kCGPDFContextCreator as String: "ANTHONY.",
+    kCGPDFContextAuthor as String: "ANTHONY.",
   ] as CFDictionary
 ) else {
   fatalError("Could not create PDF context")
@@ -313,7 +313,7 @@ if let logo {
 }
 drawText("Website Audit Sample Report", in: CGRect(x: 54, y: 500, width: 500, height: 72), font: NSFont.systemFont(ofSize: 34, weight: .heavy), color: text)
 drawText(
-  "A branded example of how Designed by Anthony can package performance, accessibility, SEO, and stack findings into a clear, usable report.",
+  "A branded example of how ANTHONY. can package performance, accessibility, SEO, and stack findings into a clear, usable report.",
   in: CGRect(x: 54, y: 426, width: 500, height: 74),
   font: NSFont.systemFont(ofSize: 14.5, weight: .regular),
   color: muted,
@@ -340,7 +340,7 @@ drawText(
   color: muted,
   lineHeight: 19
 )
-drawText("Designed by Anthony", in: CGRect(x: 54, y: 58, width: 250, height: 18), font: NSFont.systemFont(ofSize: 11.5, weight: .semibold), color: accentSoft)
+drawText("ANTHONY.", in: CGRect(x: 54, y: 58, width: 250, height: 18), font: NSFont.systemFont(ofSize: 11.5, weight: .semibold), color: accentSoft)
 drawText("Local draft only • not for public use yet", in: CGRect(x: 312, y: 58, width: 246, height: 18), font: NSFont.systemFont(ofSize: 11.5, weight: .regular), color: subtle, alignment: .right)
 finishPage(context)
 

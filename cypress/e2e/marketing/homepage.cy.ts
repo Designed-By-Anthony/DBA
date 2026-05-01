@@ -10,7 +10,7 @@ describe("Marketing — Homepage", () => {
 	});
 
 	it("loads and renders hero section", () => {
-		cy.title().should("match", /Designed by Anthony/);
+		cy.title().should("match", /ANTHONY/);
 		cy.get(".page-hero h1").should("be.visible");
 		cy.get("#hero-founder-btn").should("be.visible");
 	});

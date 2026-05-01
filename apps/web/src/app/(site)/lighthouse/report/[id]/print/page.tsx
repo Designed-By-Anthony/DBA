@@ -217,7 +217,7 @@ function PrintReport({
 							marginBottom: "0.3rem",
 						}}
 					>
-						Designed by Anthony
+						ANTHONY.
 					</p>
 					<h1
 						style={{
@@ -935,7 +935,7 @@ export default function LighthouseReportPrintPage() {
 			<div className="print:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 border-b border-[rgb(var(--accent-bronze-rgb)/0.18)] bg-[rgba(6,10,18,0.94)] backdrop-blur-xl px-5 py-3.5 md:px-8">
 				<div>
 					<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--accent-bronze-muted)">
-						Designed by Anthony
+						ANTHONY.
 					</p>
 					<p className="text-sm font-semibold text-white/80">
 						Executive audit report

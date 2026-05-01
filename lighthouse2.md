@@ -6,7 +6,7 @@ This document is the **single source of truth** for how we **describe** the scan
 
 ## One-line pitch (use everywhere)
 
-**Free website audit for service businesses** — Google PageSpeed Insights (Core Web Vitals + Lighthouse categories), on-page SEO signals from your HTML, crawlability (robots.txt, sitemap, redirects), optional local/maps context, optional backlink metrics when configured, and an **AI-written** prioritized summary. Built by **Designed by Anthony** for Mohawk Valley and Central NY (and remote clients).
+**Free website audit for service businesses** — Google PageSpeed Insights (Core Web Vitals + Lighthouse categories), on-page SEO signals from your HTML, crawlability (robots.txt, sitemap, redirects), optional local/maps context, optional backlink metrics when configured, and an **AI-written** prioritized summary. Built by **ANTHONY.** for Mohawk Valley and Central NY (and remote clients).
 
 ---
 

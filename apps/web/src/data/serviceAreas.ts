@@ -14,7 +14,7 @@ export const SERVICE_AREAS: ServiceArea[] = [
 		state: "NY",
 		tagline: "Home base — where every build starts.",
 		description:
-			"Rome is where Designed by Anthony is headquartered. We know the corridors, the contractors, and the seasonal rhythm of Oneida County better than anyone.",
+			"Rome is where ANTHONY. is headquartered. We know the corridors, the contractors, and the seasonal rhythm of Oneida County better than anyone.",
 		sections: [
 			{
 				heading: "Why Rome businesses need a site that works harder",

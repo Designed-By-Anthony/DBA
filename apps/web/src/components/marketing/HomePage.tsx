@@ -6,6 +6,7 @@ import { showcaseFeaturedItems } from "@/data/showcase";
 import {
 	btnOutline,
 	btnPrimary,
+	btnPrimaryAudit,
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
@@ -20,6 +21,7 @@ import {
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
 } from "@/lib/offers";
+import { FaqSection } from "./FaqSection";
 import { FirstVisitSplash } from "./FirstVisitSplash";
 import { FoundingPartnerSection } from "./FoundingPartnerSection";
 import { PremiumPitchStrip } from "./PremiumPitchStrip";
@@ -48,9 +50,24 @@ const heroVariants = {
 } as const;
 
 export function HomePage() {
+	const heroSub =
+		"Enterprise-grade websites for contractors, home-service professionals, medical aesthetics, salons, and scaling businesses throughout Utica, Rome, Syracuse, and Central New York. Performance-optimized architecture, conversion-focused design, and SEO infrastructure that positions you at the top of local search results. ";
+	const heroSubWithLegacy = `${heroSub}${ATELIER_ROME_LEGACY}`;
 	return (
 		<>
 			<section className="page-hero page-hero--home">
+				<div className="hero-lcp-layer" aria-hidden="true">
+					<Image
+						src="/images/og-site-premium.png"
+						alt=""
+						width={2400}
+						height={1260}
+						className="hero-lcp-layer__img"
+						priority
+						fetchPriority="high"
+						sizes="100vw"
+					/>
+				</div>
 				<div className="hero-drift" aria-hidden="true">
 					<span className="hero-drift__glow hero-drift__glow--a" />
 					<span className="hero-drift__glow hero-drift__glow--b" />
@@ -76,25 +93,45 @@ export function HomePage() {
 						</p>
 						<div className="hero-launch-pill" role="status">
 							<span className="hero-launch-dot" aria-hidden="true" />
-							<span>
+							<span className="hero-launch-pill__text">
+								The 315 Pilot:{" "}
 								<strong>
-									{FOUNDING_PARTNER_BUILD_SLOTS} launch pilot spots
-								</strong>{" "}
-								· complimentary build + {FOUNDING_PARTNER_SEO_MONTHLY}/mo growth
-								plan
+									{FOUNDING_PARTNER_BUILD_SLOTS} Founding Infrastructure
+									Placements Remaining
+								</strong>
+								<span className="hero-launch-pill__sep"> · </span>
+								<span className="hero-launch-pill__sub">
+									complimentary build + {FOUNDING_PARTNER_SEO_MONTHLY}/mo growth
+									plan
+								</span>
 							</span>
 						</div>
-						<h1 data-hero-h1>
-							Strategic web design for service businesses that demand measurable
-							growth and lasting market presence.
+						<h1
+							data-hero-h1
+							className="home-hero-title font-[family-name:var(--font-inter)] font-normal tracking-[-0.02em]"
+						>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold">
+								Software
+							</span>{" "}
+							<span className="font-[family-name:var(--font-inter)] font-normal">
+								is built by machines.{" "}
+							</span>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold">
+								Infrastructure
+							</span>{" "}
+							<span className="font-[family-name:var(--font-inter)] font-normal">
+								is designed by{" "}
+							</span>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold whitespace-nowrap">
+								ANTHONY
+								<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
+							</span>
 						</h1>
-						<p data-hero-sub>
-							Enterprise-grade websites for contractors, home-service
-							professionals, medical aesthetics, salons, and scaling businesses
-							throughout Utica, Rome, Syracuse, and Central New York.
-							Performance-optimized architecture, conversion-focused design, and
-							SEO infrastructure that positions you at the top of local search
-							results. {ATELIER_ROME_LEGACY}
+						<p
+							data-hero-sub
+							className="font-[family-name:var(--font-inter)] font-normal"
+						>
+							{heroSubWithLegacy}
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
@@ -112,7 +149,7 @@ export function HomePage() {
 						<div className="hero-actions">
 							<Link
 								href="/lighthouse"
-								className={`${btnPrimary} hero-cta-glow`}
+								className={`${btnPrimaryAudit} hero-cta-glow`}
 								id="hero-audit-btn"
 							>
 								<span className="hero-cta-glow-halo" aria-hidden="true" />
@@ -245,8 +282,8 @@ export function HomePage() {
 							<Link href="/contact" className={btnOutline}>
 								Open contact form
 							</Link>
-							<Link href="/lighthouse" className={btnPrimary}>
-								Or run a free site audit
+							<Link href="/contact" className={btnPrimary}>
+								Let&apos;s build something great.
 							</Link>
 						</div>
 					</div>
@@ -306,22 +343,11 @@ export function HomePage() {
 							language, before you spend a dollar.
 						</p>
 					</div>
-					<div className="home-faq-list" data-exclusive-details>
-						{homeFaqEntries.map((entry) => (
-							<details
-								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
-							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
-							</details>
-						))}
-					</div>
+					<FaqSection
+						className="home-faq-list"
+						itemClassName="reveal-up"
+						entries={homeFaqEntries}
+					/>
 					<p className="home-faq-cta-note">
 						More on process, hosting, and revisions on the{" "}
 						<Link href="/faq" className="inline-link">
@@ -462,10 +488,8 @@ export function HomePage() {
     if (variantKey && heroVariants && heroVariants[variantKey]) {
       var variant = heroVariants[variantKey];
       var eyebrow = document.querySelector('[data-hero-eyebrow]');
-      var h1 = document.querySelector('[data-hero-h1]');
       var sub = document.querySelector('[data-hero-sub]');
       if (eyebrow && variant.eyebrow) eyebrow.textContent = variant.eyebrow;
-      if (h1 && variant.h1) h1.textContent = variant.h1;
       if (sub && variant.sub) sub.textContent = variant.sub;
       document.documentElement.setAttribute('data-hero-variant', variantKey);
     }

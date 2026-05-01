@@ -33,7 +33,7 @@ export const serviceAreaLocations: readonly ServiceAreaLocation[] = [
 		metaDescription:
 			"Rome, NY web design for contractors, home services, and local brands — fast mobile sites, Google-friendly structure, and local SEO from a Rome-based studio.",
 		intro: [
-			"Rome is our home base: when you hire Designed by Anthony, you are working with a builder who lives and works in the same market you serve. That matters for local nuance — how people search for plumbers, HVAC, medspas, and professional services across Oneida County — and for timelines when you want to meet in person.",
+			"Rome is our home base: when you hire ANTHONY., you are working with a builder who lives and works in the same market you serve. That matters for local nuance — how people search for plumbers, HVAC, medspas, and professional services across Oneida County — and for timelines when you want to meet in person.",
 			"We ship lean, hand-coded marketing sites that load quickly on phones, read clearly to Google, and turn visitors into calls and form fills. Every project includes technical SEO structure, schema where it helps, and honest guidance on what is worth fixing first.",
 		],
 		sections: [
@@ -239,7 +239,8 @@ export const serviceAreaLocations: readonly ServiceAreaLocation[] = [
 		name: "Saratoga Springs, NY",
 		tag: "primary",
 		cardBadge: "LOCAL",
-		cardTeaser: "Performance-driven digital architecture for the luxury service market.",
+		cardTeaser:
+			"Performance-driven digital architecture for the luxury service market.",
 		heroSubtitle:
 			"Custom web design and local SEO for Saratoga Springs service businesses in the luxury and high-end market.",
 		metaDescription:

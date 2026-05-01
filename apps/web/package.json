@@ -27,9 +27,10 @@
 	"scripts": {
 		"generate:gbp-playbook-cover": "bun build/generate-gbp-playbook-cover.mjs",
 		"generate:gbp-playbook-hero": "bun build/generate-gbp-playbook-hero.mjs",
+		"generate:master-wordmark": "bun build/generate-master-wordmark-png.mjs",
 		"build:site-script": "mkdir -p public/scripts && esbuild src/scripts/site.ts --bundle --platform=browser --format=esm --target=es2020 --minify --outfile=public/scripts/site.js && bun build/trim-generated-whitespace.mjs public/scripts/site.js",
 		"sync:static-headers": "bun build/sync-static-headers.mjs",
-		"prepare:next": "bun run build:site-script && bun run sync:static-headers",
+		"prepare:next": "bun run generate:master-wordmark && bun run build:site-script && bun run sync:static-headers",
 		"dev": "bun run build:site-script && next dev",
 		"build": "bun build/ensure-workspace-install.mjs && bun run build:pages",
 		"build:next": "bun run prepare:next && next build --webpack",

@@ -16,8 +16,18 @@ const fraunces = Fraunces({
 	display: "swap",
 });
 
+const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
+const SITE_DESCRIPTION =
+	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
+
 export const metadata: Metadata = {
-	title: "Ledger",
+	title: { default: SITE_TITLE, template: "%s | ANTHONY." },
+	description: SITE_DESCRIPTION,
+	openGraph: {
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
+		type: "website",
+	},
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -26,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			lang="en"
 			className={`${inter.variable} ${fraunces.variable} bg-black text-white`}
 		>
-			<body className="min-h-screen antialiased">{children}</body>
+			<body className="min-h-screen bg-[#000000] antialiased">{children}</body>
 		</html>
 	);
 }

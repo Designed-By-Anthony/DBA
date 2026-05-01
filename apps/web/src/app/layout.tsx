@@ -1,6 +1,6 @@
 import "@/design-system/dba-global.css";
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
@@ -21,15 +21,18 @@ const outfit = Outfit({
 
 /**
  * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
- * <html>. BrandHeader and BrandFooter reference var(--font-fraunces) for the
- * brand wordmark. Without this, the variable is unset on marketing pages and
- * the browser falls back to the @font-face "Fraunces Variable" name — which
- * works but skips preloading optimisations.
+ * <html>. Decorative serif headings may reference var(--font-fraunces).
  */
 const fraunces = Fraunces({
 	variable: "--font-fraunces",
 	subsets: ["latin"],
 	axes: ["opsz", "SOFT", "WONK"],
+	display: "swap",
+});
+
+const inter = Inter({
+	variable: "--font-inter",
+	subsets: ["latin"],
 	display: "swap",
 });
 
@@ -46,19 +49,22 @@ export const viewport: Viewport = {
 	colorScheme: "dark",
 };
 
+const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
+const SITE_DESCRIPTION =
+	"Bespoke digital estates and high-performance infrastructure for the Mohawk Valley (315), Capital Region (518), and Central New York — engineered in Rome, NY.";
+
 export const metadata: Metadata = {
 	metadataBase: new URL("https://designedbyanthony.com"),
 	title: {
-		default: "ANTHONY.",
+		default: SITE_TITLE,
 		template: "%s | ANTHONY.",
 	},
-	description:
-		"Bespoke digital estates and high-performance infrastructure for the Mohawk Valley (315), Capital Region (518), and Central New York — engineered in Rome, NY.",
+	description: SITE_DESCRIPTION,
 	manifest: "/manifest.webmanifest",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
-		title: "ANTHONY.",
+		title: SITE_TITLE,
 	},
 	formatDetection: {
 		telephone: false,
@@ -76,9 +82,8 @@ export const metadata: Metadata = {
 		type: "website",
 		locale: "en_US",
 		url: "https://designedbyanthony.com",
-		title: "ANTHONY. — Digital infrastructure architect",
-		description:
-			"Bespoke digital estates for the Mohawk Valley (315), Capital Region (518), and Central New York. Engineered in Rome, NY.",
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
 		images: [
 			{
 				url: "/images/og-site-premium.png",
@@ -91,9 +96,8 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "ANTHONY. — Digital infrastructure architect",
-		description:
-			"Bespoke digital estates for the Mohawk Valley and Central New York.",
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
 		images: ["/images/og-site-premium.png"],
 	},
 	icons: {
@@ -119,7 +123,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
-			className={`${outfit.variable} ${fraunces.variable}`}
+			className={`${outfit.variable} ${fraunces.variable} ${inter.variable}`}
 		>
 			<head>
 				<JsonLd />

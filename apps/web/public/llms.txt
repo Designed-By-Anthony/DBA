@@ -1,9 +1,9 @@
-# Designed by Anthony
+# ANTHONY.
 
-Designed by Anthony is a founder-led web design, local SEO, and VertaFlow CRM (client portal + automations) studio for service businesses. The business builds custom websites, pairs VertaFlow for leads and client experience, handles website rescues, provides managed hosting, and improves local search visibility for businesses that want more calls and better trust online.
+ANTHONY. is a founder-led digital infrastructure studio: web design, local SEO, and Vault CRM (client workspace + automations) for service businesses. The practice builds custom websites, pairs secure lead workflows and client experience, handles website rescues, provides managed hosting, and improves local search visibility for businesses that want more calls and stronger trust online.
 
 Canonical business information:
-- Business name: Designed by Anthony
+- Business name: ANTHONY.
 - Canonical domain: https://designedbyanthony.com
 - Founder: Anthony Jones
 - Business type: Custom web design and local SEO studio for service businesses
@@ -17,12 +17,12 @@ Canonical business information:
 
 Primary offers:
 - Free website audit by request (contact the studio — on-site automated audit tooling is paused pending redeployment)
-- Limited founding partner program: 10 complimentary custom website builds for qualified businesses that enroll in the $149/month Growth Plan (hosting, security, local SEO, and VertaFlow CRM access)
+- Limited founding partner program: 10 complimentary custom website builds for qualified businesses that enroll in the $149/month Growth Plan (hosting, security, local SEO, and Vault CRM access)
 - Standard custom website builds starting at $999
 
 Core services:
 - Custom web design
-- VertaFlow CRM (client portal at accounts.designedbyanthony.com, automations roadmap)
+- Vault CRM (client workspace at accounts.designedbyanthony.com, automations roadmap)
 - Website rescue and mobile optimization
 - Managed hosting and support
 - Local SEO and search visibility

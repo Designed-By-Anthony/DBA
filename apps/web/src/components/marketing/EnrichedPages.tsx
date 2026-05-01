@@ -5,6 +5,7 @@ import {
 	getServiceAreaDetailLongformSections,
 	getServiceAreaLongformSections,
 } from "@/data/longformContent";
+import { pricingFaqEntries } from "@/data/pricing-faq";
 import {
 	getServiceAreaLocation,
 	serviceAreaLocations,
@@ -35,7 +36,9 @@ import {
 	buildFaqPageSchema,
 	buildMarketingWebPageSchema,
 	buildPricingOfferCatalogSchema,
+	buildVaultCrmSoftwareApplicationSchema,
 } from "@/lib/seo";
+import { FaqAccordionSummaryAndAnswer } from "./FaqSection";
 import { InnerPageMotionSystem } from "./InnerPageMotionSystem";
 import { MarketingChrome } from "./MarketingChrome";
 import {
@@ -156,7 +159,7 @@ export function AboutPage() {
 			/>
 			<PageHero
 				kind="about"
-				title="About Designed by Anthony"
+				title="About ANTHONY."
 				subtitle="Marine Corps veteran–led Mohawk Valley web design studio for service businesses across Central New York."
 			/>
 			<section className="section-shell">
@@ -277,11 +280,11 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/lighthouse" className={btnPrimary}>
-						Audit My Site
+					<Link href="/contact" className={btnPrimary}>
+						Let&apos;s build something great.
 					</Link>
-					<Link href="/contact" className={btnSecondaryProof}>
-						Contact
+					<Link href="/lighthouse" className={btnSecondaryProof}>
+						Audit My Site
 					</Link>
 				</MotionReveal>
 			</section>
@@ -292,6 +295,10 @@ export function AboutPage() {
 export function PricingPage() {
 	const copy = staticMarketingPageCopy.pricing;
 	const pricingCatalog = buildPricingOfferCatalogSchema();
+	const vaultSoftware = buildVaultCrmSoftwareApplicationSchema();
+	const pricingFaqSchema = buildFaqPageSchema([...pricingFaqEntries], {
+		path: "/pricing",
+	});
 	return (
 		<MarketingChrome footerCta={homeFooterCta}>
 			<MarketingPageJsonLd
@@ -304,6 +311,16 @@ export function PricingPage() {
 				type="application/ld+json"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingCatalog) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(vaultSoftware) }}
+			/>
+			<script
+				type="application/ld+json"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingFaqSchema) }}
 			/>
 			<PageHero
 				kind="pricing"
@@ -428,11 +445,11 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<Link href="/lighthouse" className={btnPrimary}>
-							Audit My Site
+						<Link href="/contact" className={btnPrimary}>
+							Let&apos;s build something great.
 						</Link>
-						<Link href="/contact" className={btnOutline}>
-							Contact us
+						<Link href="/lighthouse" className={btnOutline}>
+							Audit My Site
 						</Link>
 					</MotionReveal>
 				</div>
@@ -499,7 +516,7 @@ export function OurEdgePage() {
 							</ul>
 						</MotionStaggerChild>
 						<MotionStaggerChild className="surface-card comparison-column comparison-column--us reveal-right">
-							<span className="comparison-label">Designed by Anthony</span>
+							<span className="comparison-label">ANTHONY.</span>
 							<ul className="comparison-list">
 								<li>Zero plugin dependencies</li>
 								<li>Sub-second load on mobile networks</li>
@@ -685,15 +702,9 @@ export function FaqPage() {
 							<MotionStaggerChild
 								as="details"
 								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
+								className="text-bubble is-bordered home-faq-item reveal-up"
 							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
+								<FaqAccordionSummaryAndAnswer {...entry} />
 							</MotionStaggerChild>
 						))}
 					</MotionStagger>
@@ -794,8 +805,11 @@ export function ServiceAreasPage() {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
-										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
+									<span
+										className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}
+									>
+										{r.cardBadge ??
+											(r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
@@ -986,15 +1000,9 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 							<MotionStaggerChild
 								as="details"
 								key={entry.question}
-								className="surface-card home-faq-item reveal-up"
+								className="text-bubble is-bordered home-faq-item reveal-up"
 							>
-								<summary>
-									<span className="home-faq-question">{entry.question}</span>
-									<span className="home-faq-toggle" aria-hidden="true" />
-								</summary>
-								<div className="home-faq-answer">
-									<p>{entry.answer}</p>
-								</div>
+								<FaqAccordionSummaryAndAnswer {...entry} />
 							</MotionStaggerChild>
 						))}
 					</MotionStagger>
@@ -1023,8 +1031,11 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
-										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
+									<span
+										className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}
+									>
+										{r.cardBadge ??
+											(r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>

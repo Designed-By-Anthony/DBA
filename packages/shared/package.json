@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./lib/programmaticSeo": "./src/lib/programmaticSeo.ts",
 		"./lib/*": "./src/lib/*.ts",
 		"./lighthouse/*": "./src/lighthouse/*.ts",
 		"./lighthouse/lib/*": "./src/lighthouse/lib/*.ts",

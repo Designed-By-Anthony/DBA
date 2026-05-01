@@ -153,7 +153,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 
 			<div className={SF_DRAWER_ACTIONS}>
 				<button type="submit" className={`${btnPrimary} ${btnSm}`}>
-					Send Message
+					Let&apos;s build something great.
 				</button>
 			</div>
 		</form>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 140" role="img" aria-labelledby="anthony-wm-title">
+	<title id="anthony-wm-title">ANTHONY.</title>
+	<defs>
+		<!-- Metallic bronze period - replace with asset from image_12 isolation if needed -->
+		<linearGradient id="anthony-dot-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#5c4018"/>
+			<stop offset="35%" stop-color="#e8c76b"/>
+			<stop offset="55%" stop-color="#d4af37"/>
+			<stop offset="100%" stop-color="#4a3412"/>
+		</linearGradient>
+		<radialGradient id="anthony-dot-shine" cx="32%" cy="28%" r="65%">
+			<stop offset="0%" stop-color="#fffdf8" stop-opacity="0.75"/>
+			<stop offset="55%" stop-color="#d4af37" stop-opacity="0"/>
+		</radialGradient>
+	</defs>
+	<!-- Light wordmark for dark UI (header/footer). Georgia Bold approximates Fraunces weight for raster export. -->
+	<text
+		x="8"
+		y="102"
+		font-family="Georgia, 'Times New Roman', serif"
+		font-weight="700"
+		font-size="88"
+		letter-spacing="-0.03em"
+		fill="#f7f4ee"
+	>
+		ANTHONY
+	</text>
+	<circle cx="628" cy="82" r="22" fill="url(#anthony-dot-metal)"/>
+	<circle cx="628" cy="82" r="22" fill="url(#anthony-dot-shine)"/>
+</svg>
