@@ -5,10 +5,11 @@
  *
  * Environment-aware key switching
  * ─────────────────────────────────────────────────────────────────────────────
- * Production is detected by `CF_PAGES_BRANCH === 'main'`.
- * Every other environment (preview deployments, localhost) uses Cloudflare's
- * official always-pass dummy keys so that non-production deployments are never
- * blocked by missing credentials.
+ * Production: `main` on Cloudflare Pages (`CF_PAGES_BRANCH` /
+ * `NEXT_PUBLIC_CF_PAGES_BRANCH`), or any standalone runtime that is not a Pages
+ * preview and not `development` / `test` (e.g. the API Worker on `api.*`).
+ * Other environments use Cloudflare's official always-pass dummy keys so
+ * previews and local dev are never blocked by missing credentials.
  *
  * Dummy keys (from https://developers.cloudflare.com/turnstile/troubleshooting/testing/):
  *   Site key : 1x00000000000000000000AA
@@ -21,20 +22,27 @@ const TURNSTILE_VERIFY_URL =
 /** Cloudflare always-pass test site key — safe to expose publicly. */
 export const TURNSTILE_DEV_SITE_KEY = "1x00000000000000000000AA";
 /** Cloudflare always-pass test secret key — for server-side use only. */
-export const TURNSTILE_DEV_SECRET_KEY =
-	"1x0000000000000000000000000000000AA";
+export const TURNSTILE_DEV_SECRET_KEY = "1x0000000000000000000000000000000AA";
 
 /**
- * Returns `true` only when the deployment is the production `main` branch.
- * Checks both `CF_PAGES_BRANCH` (Cloudflare Workers / API) and
- * `NEXT_PUBLIC_CF_PAGES_BRANCH` (Next.js client bundles, baked in via
- * `next.config.ts` env section).
+ * Returns `true` when this process should use real Turnstile keys (not dummy).
+ * Pages previews are detected via a non-`main` `CF_PAGES_BRANCH` (or public
+ * mirror). Local dev uses `NODE_ENV` `development` / `test`. The API Worker
+ * does not receive `CF_PAGES_BRANCH`; there we treat non-preview, non-dev as
+ * production.
  */
 export function isProductionBranch(): boolean {
-	return (
-		process.env.CF_PAGES_BRANCH === "main" ||
-		process.env.NEXT_PUBLIC_CF_PAGES_BRANCH === "main"
-	);
+	const pagesBranch = process.env.CF_PAGES_BRANCH;
+	const publicBranch = process.env.NEXT_PUBLIC_CF_PAGES_BRANCH;
+	if (pagesBranch === "main" || publicBranch === "main") return true;
+	const onPagesPreview =
+		(Boolean(pagesBranch) && pagesBranch !== "main") ||
+		(Boolean(publicBranch) && publicBranch !== "main");
+	const nodeEnv = process.env.NODE_ENV;
+	if (onPagesPreview || nodeEnv === "development" || nodeEnv === "test") {
+		return false;
+	}
+	return true;
 }
 
 /**

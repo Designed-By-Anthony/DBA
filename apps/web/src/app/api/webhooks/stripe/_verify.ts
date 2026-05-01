@@ -10,6 +10,15 @@
 
 const TOLERANCE_SECONDS = 300; // reject events older than 5 minutes
 
+type SubtleCryptoWithTimingSafeEqual = SubtleCrypto & {
+	timingSafeEqual(
+		a: ArrayBufferView<ArrayBufferLike>,
+		b: ArrayBufferView<ArrayBufferLike>,
+	): Promise<void>;
+};
+
+const subtle = crypto.subtle as SubtleCryptoWithTimingSafeEqual;
+
 /**
  * Verifies a Stripe `stripe-signature` header against the raw request body.
  *
@@ -43,7 +52,7 @@ export async function verifyStripeSignature(
 	const signedPayload = `${timestamp}.${rawBody}`;
 	const enc = new TextEncoder();
 
-	const key = await crypto.subtle.importKey(
+	const key = await subtle.importKey(
 		"raw",
 		enc.encode(secret),
 		{ name: "HMAC", hash: "SHA-256" },
@@ -51,11 +60,28 @@ export async function verifyStripeSignature(
 		["sign"],
 	);
 
-	const mac = await crypto.subtle.sign("HMAC", key, enc.encode(signedPayload));
+	const mac = await subtle.sign("HMAC", key, enc.encode(signedPayload));
+	const computedBytes = new Uint8Array(mac);
 
-	const computed = Array.from(new Uint8Array(mac))
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
+	function hexToBytes(hex: string): Uint8Array | null {
+		if (hex.length !== 64 || !/^[0-9a-fA-F]+$/.test(hex)) return null;
+		const out = new Uint8Array(32);
+		for (let i = 0; i < 32; i++) {
+			out[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+		}
+		return out;
+	}
 
-	return signatures.some((sig) => sig === computed);
+	let anyMatch = false;
+	for (const sig of signatures) {
+		const sigBytes = hexToBytes(sig);
+		if (!sigBytes) continue;
+		try {
+			await subtle.timingSafeEqual(computedBytes, sigBytes);
+			anyMatch = true;
+		} catch {
+			// Not equal or length mismatch — try next signature.
+		}
+	}
+	return anyMatch;
 }
