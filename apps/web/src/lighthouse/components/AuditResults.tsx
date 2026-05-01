@@ -94,7 +94,7 @@ export function AuditResults({
                          </button>
                          <button 
                             onClick={handlePrintView}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white hover:bg-white/10 transition-all"
+                            className="w-full rounded-[0.75rem] border border-white/10 bg-white/5 py-[0.65rem] text-sm font-bold text-white hover:bg-white/10 transition-all"
                          >
                             Print Full Layout
                          </button>
