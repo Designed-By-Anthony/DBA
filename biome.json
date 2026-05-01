@@ -100,7 +100,7 @@
 			}
 		},
 		{
-			"includes": ["apps/web/src/app/lighthouse/lighthouse-globals.css"],
+			"includes": ["apps/web/src/app/(site)/lighthouse/lighthouse-globals.css"],
 			"linter": {
 				"rules": {
 					"complexity": {

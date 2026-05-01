@@ -1,5 +1,5 @@
-@import "../../design-system/tokens.css";
-@import "../../design-system/tailwind-v4-bridge.css";
+@import "../../../design-system/tokens.css";
+@import "../../../design-system/tailwind-v4-bridge.css";
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════

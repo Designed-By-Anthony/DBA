@@ -4,8 +4,8 @@ import type { AuditData } from "@lh/auditReport";
 import { initCursorGlow } from "@lh/lib/cursorGlow";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { buildPublicApiUrl } from "@/lib/publicApi";
 import { btnPrimaryAudit } from "@/design-system/buttons";
+import { buildPublicApiUrl } from "@/lib/publicApi";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 

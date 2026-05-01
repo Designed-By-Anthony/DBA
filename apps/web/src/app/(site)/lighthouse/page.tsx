@@ -1,16 +1,24 @@
-import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { AuditForm } from "@lh/components/AuditForm";
 import { LighthouseHero } from "@lh/components/LighthouseHero";
 import { LighthouseValueStrip } from "@lh/components/LighthouseValueStrip";
+import { MarketingChrome } from "@/components/marketing/MarketingChrome";
+
+const LIGHTHOUSE_POWERED_BY = [
+	{ label: "Gemini 2.0", href: "https://deepmind.google/technologies/gemini/" },
+	{ label: "ElysiaJS", href: "https://elysiajs.com" },
+	{ label: "Next.js", href: "https://nextjs.org" },
+] as const;
 
 export default function LighthouseHome() {
 	return (
-		<MarketingChrome>
-			<main
-				id="main-content"
-				className="min-h-screen"
-				style={{ backgroundColor: "#0A0C10" }}
-			>
+		<MarketingChrome
+			headerCurrentSection="audit"
+			footerBuildTag="Lighthouse Scanner v2"
+			footerPoweredBy={LIGHTHOUSE_POWERED_BY}
+			segmentClassName="lighthouse-segment"
+			hidePreFooterCta
+		>
+			<div className="min-h-screen" style={{ backgroundColor: "#0A0C10" }}>
 				<section className="mx-auto w-full max-w-7xl px-[var(--container-gutter)] py-[var(--section-space)]">
 					<div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,min(100%,480px))]">
 						<LighthouseHero />
@@ -26,7 +34,7 @@ export default function LighthouseHome() {
 						<LighthouseValueStrip />
 					</div>
 				</section>
-			</main>
+			</div>
 		</MarketingChrome>
 	);
 }
