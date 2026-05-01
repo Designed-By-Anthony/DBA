@@ -7,10 +7,6 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { ScoreRing } from "./ScoreRing";
-import { 
-    SURFACE_CARD_TECHNICAL, 
-    CARD_HAS_TEXT_PAD 
-} from "@/design-system/sections";
 
 export type { AuditAiInsight, AuditData };
 
@@ -86,7 +82,7 @@ export function AuditResults({
                     </p>
                 </div>
                 
-                <div className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD} bg-white/[0.02]`}>
+                <div className="text-bubble is-bordered">
                     <p className="text-[11px] font-bold uppercase text-white/30 mb-2">Deliverables</p>
                     <div className="space-y-3">
                          <button
@@ -121,13 +117,13 @@ export function AuditResults({
 
             <div className="grid gap-10 lg:grid-cols-12">
                 <div className="lg:col-span-8 space-y-10">
-                    <section className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD}`}>
+                    <section className="text-bubble is-bordered">
                         <p className={LABEL_STYLE}>Strategic Overview</p>
                         <h2 className={HEADING_STYLE}>Executive Summary</h2>
                         <ExecutiveSummaryBody text={data.aiInsight?.executiveSummary || "No summary available."} />
                     </section>
 
-                    <section className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD}`}>
+                    <section className="text-bubble is-bordered">
                         <p className={LABEL_STYLE}>Impact Roadmap</p>
                         <h2 className={HEADING_STYLE}>Priority Actions</h2>
                         <div className="grid gap-4">
@@ -151,7 +147,7 @@ export function AuditResults({
                 </div>
 
                 <aside className="lg:col-span-4 space-y-10">
-                    <div className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD}`}>
+                    <div className="text-bubble is-bordered">
                         <p className={LABEL_STYLE}>Technical Health</p>
                         <h3 className="text-xl font-bold text-white mb-6">Lab Vitals</h3>
                         <div className="space-y-5">
@@ -163,13 +159,13 @@ export function AuditResults({
                             ].map(m => (
                                 <div key={m.l} className="flex justify-between items-end border-b border-white/5 pb-2">
                                     <span className="text-xs font-medium text-white/40">{m.l}</span>
-                                    <span className="text-sm font-bold text-[rgb(var(--accent-bronze-rgb))]">{m.v || "—"}</span>
+                                    <span className="text-sm font-mono tabular-nums text-white/90">{m.v || "—"}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD} bg-[rgb(var(--accent-bronze-rgb)/0.03)]`}>
+                    <div className="text-bubble is-bordered">
                         <p className={LABEL_STYLE}>Market Signals</p>
                         <h3 className="text-xl font-bold text-white mb-4">Local Visibility</h3>
                         <p className="text-2xl font-bold text-white mb-1">

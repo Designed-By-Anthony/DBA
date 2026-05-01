@@ -72,7 +72,7 @@ function ProseBlock({ paragraphs }: { paragraphs: string[] }) {
                 duration={0.6}
             >
                 {paragraphs.map((p) => (
-                    <p key={p} className="reveal-up">
+                    <p key={p} className="text-bubble is-bordered reveal-up">
                         {p}
                     </p>
                 ))}
