@@ -26,7 +26,6 @@ function isObject(v: unknown): v is Record<string, unknown> {
 }
 
 function toAuditData(json: Record<string, unknown>): AuditData {
-	const scores = (json.scores as Record<string, unknown>) ?? {};
 	const metrics = (json.metrics as Record<string, unknown>) ?? {};
 	const lead = (json.lead as Record<string, unknown>) ?? {};
 
@@ -61,14 +60,14 @@ function toAuditData(json: Record<string, unknown>): AuditData {
 
 	return {
 		url: String(lead.url ?? ""),
-		trustScore: Number(scores.trustScore ?? 0),
-		performance: scores.performance == null ? null : Number(scores.performance),
+		trustScore: Number(json.trustScore ?? 0),
+		performance: json.performance == null ? null : Number(json.performance),
 		accessibility:
-			scores.accessibility == null ? null : Number(scores.accessibility),
+			json.accessibility == null ? null : Number(json.accessibility),
 		bestPractices:
-			scores.bestPractices == null ? null : Number(scores.bestPractices),
-		seo: scores.seo == null ? null : Number(scores.seo),
-		conversion: Number(scores.conversion ?? 0),
+			json.bestPractices == null ? null : Number(json.bestPractices),
+		seo: json.seo == null ? null : Number(json.seo),
+		conversion: Number(json.conversion ?? 0),
 		metrics: {
 			fcp: String(metrics.fcp ?? "—"),
 			lcp: String(metrics.lcp ?? "—"),
