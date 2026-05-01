@@ -33,10 +33,6 @@ export const reportRoute = new Elysia({ aot: false }).get(
 				return { error: "Report data unavailable" };
 			}
 
-			// --- THE FIX: RELIABLE METRICS ---
-			// We await the update to ensure it survives the Worker isolate
-			// OR use ctx.waitUntil if your Elysia setup provides it.
-			// For now, awaiting is the safest bet for 100% data integrity.
 			await ref
 				.update({
 					views: FieldValue.increment(1),
@@ -44,16 +40,12 @@ export const reportRoute = new Elysia({ aot: false }).get(
 				})
 				.catch((err) => console.error("Update failed:", err));
 
-			// --- THE BRIDGE: FRONTEND MAPPING ---
-			// This flattens the 'scores' object so AuditResults.tsx
-			// sees data.performance, data.seo, etc. directly.
 			return {
 				id: data.id,
 				url: data.lead?.url || "",
 				createdAt: data.createdAt?.toDate?.().toISOString() || null,
 				psiDegradedReason: data.psiDegradedReason || null,
 
-				// Spread the scores directly into the top level
 				performance: data.scores?.performance ?? 0,
 				accessibility: data.scores?.accessibility ?? 0,
 				bestPractices: data.scores?.bestPractices ?? 0,
