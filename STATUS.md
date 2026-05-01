@@ -36,6 +36,11 @@
 - Review fix: restored the home PremiumPitch wrapper so mobile gutters remain intact.
 - Merge update: resolved fresh `main` conflicts in the report API/viewer while preserving flattened score fields for persisted reports.
 - Review fix: preserved `null` PSI metric values in the flattened report API response so degraded reports render scores as unavailable instead of zero.
+- Merge update: resolved the D1/admin + Turnstile `main` refresh while keeping the global UI rebuild's no-motion Lighthouse surfaces and semantic CSS classes.
+
+## D1 Ledger + admin UI (2026-05-01)
+
+- `packages/shared` Drizzle schema: `leads` + `transactions`; D1 binding name `DB` (`apps/api/wrangler.json`, `apps/web/wrangler.json` + `wrangler.worker.json`). API: `setLedgerDb` + `tryInsertLead` / `tryInsertTransaction` in `packages/shared/src/lib/d1Leads.ts`. `POST /api/audit` and `POST /api/lead-email` insert after validation; Stripe thin webhook writes transactions + sets lead status `Provisioning`. Scaffolded `apps/admin` (ledger tables). Web `next.config.ts`: `output: "standalone"` so OpenNext finds `pages-manifest.json`.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 

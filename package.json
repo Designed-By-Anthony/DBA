@@ -29,13 +29,16 @@
 		"test:cypress:open": "cypress open",
 		"test:playwright": "playwright test",
 		"test:playwright:render": "playwright test playwright/pages-render.spec.ts",
-		"test:playwright:zap": "cross-env PLAYWRIGHT_ZAP=1 playwright test"
+		"test:playwright:zap": "cross-env PLAYWRIGHT_ZAP=1 playwright test",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.13",
 		"@playwright/test": "^1.52.0",
 		"cross-env": "^10.1.0",
 		"cypress": "^15.14.2",
+		"drizzle-kit": "^0.31.10",
 		"turbo": "^2.9.6"
 	}
 }

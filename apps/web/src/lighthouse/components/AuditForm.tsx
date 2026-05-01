@@ -2,9 +2,11 @@
 
 import type { AuditData } from "@lh/auditReport";
 import { initCursorGlow } from "@lh/lib/cursorGlow";
+import { Turnstile } from "@marsidev/react-turnstile";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
+import { resolveEffectiveSiteKey } from "@/lib/turnstile";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
@@ -29,6 +31,7 @@ export function AuditForm() {
 	const [errorMsg, setErrorMsg] = useState("");
 	const [results, setResults] = useState<AuditData | null>(null);
 	const [reportId, setReportId] = useState<string | null>(null);
+	const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
 	const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 	const [scanPhase, setScanPhase] = useState<ScanPhase>("pagespeed");
@@ -89,6 +92,7 @@ export function AuditForm() {
 					name,
 					company,
 					location,
+					cf_turnstile_response: turnstileToken ?? "",
 				}),
 			});
 
@@ -120,6 +124,7 @@ export function AuditForm() {
 				err instanceof Error ? err.message : "Failed to fetch audit.";
 			setErrorMsg(message);
 			setStatus("error");
+			setTurnstileToken(null);
 		}
 	};
 
@@ -138,6 +143,12 @@ export function AuditForm() {
 			/>
 		);
 	}
+
+	const turnstileSiteKey = resolveEffectiveSiteKey(
+		process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+	);
+	const isSubmitDisabled =
+		status === "loading" || (!!turnstileSiteKey && !turnstileToken);
 
 	return (
 		<div className="lh-audit-form-wrap" id="run-audit">
@@ -249,11 +260,26 @@ export function AuditForm() {
 					</div>
 				)}
 
+				{turnstileSiteKey && (
+					<div className="flex flex-col items-center gap-2 py-4">
+						<Turnstile
+							siteKey={turnstileSiteKey}
+							onSuccess={(token) => setTurnstileToken(token)}
+							onExpire={() => setTurnstileToken(null)}
+							onError={() => setTurnstileToken(null)}
+							options={{ theme: "dark", size: "flexible" }}
+						/>
+						<p className="text-[0.7rem] font-bold uppercase tracking-widest text-white/30">
+							Security check required to proceed
+						</p>
+					</div>
+				)}
+
 				<div className="lh-submit-row">
 					<button
 						type="submit"
-						disabled={status === "loading"}
-						aria-disabled={status === "loading"}
+						disabled={isSubmitDisabled}
+						aria-disabled={isSubmitDisabled}
 						className="lh-submit-btn"
 					>
 						<span>

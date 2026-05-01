@@ -8,6 +8,8 @@ export interface ServiceAreaLocation {
 	slug: string;
 	name: string;
 	tag: ServiceAreaTag;
+	/** Override label shown on the index card badge (e.g. "LOCAL", "CAPITAL REGION"). Falls back to tag-derived label when omitted. */
+	cardBadge?: string;
 	/** One line for index cards */
 	cardTeaser: string;
 	/** H1-adjacent hero line */
@@ -233,69 +235,72 @@ export const serviceAreaLocations: readonly ServiceAreaLocation[] = [
 		],
 	},
 	{
-		slug: "naples-fl",
-		name: "Naples, FL",
-		tag: "secondary",
-		cardTeaser: "Select remote clients in the Southwest Florida market.",
+		slug: "saratoga-springs",
+		name: "Saratoga Springs, NY",
+		tag: "primary",
+		cardBadge: "LOCAL",
+		cardTeaser:
+			"Performance-driven digital architecture for the luxury service market.",
 		heroSubtitle:
-			"Remote web design engagements for qualified Naples and Southwest Florida service businesses.",
+			"Custom web design and local SEO for Saratoga Springs service businesses in the luxury and high-end market.",
 		metaDescription:
-			"Remote web design for Naples, FL service businesses — performance-first builds and SEO-friendly structure from an Upstate NY studio with select Florida clients.",
+			"Web design for Saratoga Springs, NY — performance-first custom sites and local SEO from a 518-based studio built for the luxury service market.",
 		intro: [
-			"We take a small number of remote clients in Southwest Florida when the fit is right: typically service businesses that want a senior builder, tight scope control, and a site that is not chained to a generic page builder.",
-			"Delivery is remote-first with scheduled video working sessions; we align on brand, SEO targets, and integrations up front so distance is not a bottleneck.",
+			"Saratoga Springs is one of the most competitive local markets in Upstate NY: affluent clientele, high expectations, and a dense field of service businesses all competing for the same high-intent searches. A templated site does not cut it here.",
+			"We build performance-first, hand-coded marketing sites tuned for the luxury service segment — fast on mobile, clear on trust signals, and structured so Google understands exactly what you offer and where.",
 		],
 		sections: [
 			{
-				heading: "Why remote still works for premium sites",
+				heading: "Why the luxury market demands a better site",
 				paragraphs: [
-					"Modern tooling makes reviews, approvals, and launches straightforward without daily on-site presence. What matters is clear communication, a written scope, and a staging environment you can click through on your phone.",
+					"Saratoga Springs searchers are sophisticated. They compare three tabs before calling. Your site needs to load in under two seconds, communicate credibility above the fold, and make the next step — call, book, or quote — obvious on a phone screen.",
 				],
 			},
 			{
-				heading: "Florida-local SEO from honest geography",
+				heading: "Local SEO for a premium market",
 				paragraphs: [
-					"We only target cities you truly serve and align GBP categories with on-page content. Search engines and customers both punish fake locality — we build to the markets you can defend in real life.",
+					"We align Google Business Profile categories with on-page content, build location-specific service pages, and structure schema so your listing stands out in the map pack for the searches that convert.",
 				],
 			},
 			{
-				heading: "Availability",
+				heading: "Get started",
 				paragraphs: [
-					"Use the contact page to describe your business and goals. If we are at capacity for Florida remote work, we will say so directly and suggest alternatives.",
+					"Reach out via the contact page with your URL and the services you offer. We will audit your current presence and recommend a focused build or SEO plan.",
 				],
 			},
 		],
 	},
 	{
-		slug: "houston-tx",
-		name: "Houston, TX",
-		tag: "secondary",
-		cardTeaser: "Remote engagements for qualified service businesses.",
+		slug: "albany",
+		name: "Albany, NY",
+		tag: "primary",
+		cardBadge: "CAPITAL REGION",
+		cardTeaser: "High-performance infrastructure for the Tech Valley corridor.",
 		heroSubtitle:
-			"Remote custom websites and SEO-friendly builds for Houston-area service companies.",
+			"Custom web design and local SEO for Albany and the Capital Region's growing tech and service economy.",
 		metaDescription:
-			"Remote web design for Houston, TX service businesses — fast custom marketing sites and structured local SEO support from Designed by Anthony.",
+			"Web design for Albany, NY — high-performance custom marketing sites and structured local SEO for Capital Region service businesses and tech-corridor companies.",
 		intro: [
-			"Houston is a massive, competitive metro. We do not pretend to be a Houston storefront agency — we partner selectively with service businesses that want a senior engineer-led site, transparent pricing, and a stack that will not rot behind a pile of plugins.",
-			"Engagements are remote-first with clear milestones; we integrate the booking, CRM, and analytics tools you already use where possible.",
+			"Albany and the Tech Valley corridor are growing fast: state government, healthcare, higher education, and a rising tech sector create real demand for professional web presence across a wide range of service verticals.",
+			"We build clean, fast, custom sites that rank in Albany-area searches and convert visitors into leads — without the bloat of a generic agency stack.",
 		],
 		sections: [
 			{
-				heading: "Standing out in a crowded metro",
+				heading: "Serving the Capital Region's competitive verticals",
 				paragraphs: [
-					"Differentiation is rarely a bigger slider hero — it is proof, clarity, and speed. We help you present services, services areas, and conversion paths so paid and organic traffic land on pages built to close.",
+					"From contractors and medspas to professional services and SaaS companies, the Albany market rewards sites that are technically sound and locally specific. We build for both.",
 				],
 			},
 			{
-				heading: "SEO expectations we will actually underwrite",
+				heading: "Tech Valley SEO strategy",
 				paragraphs: [
-					"We will tell you what on-page and technical fixes can realistically change, how GBP fits in, and what requires ongoing content or ads. No vague guarantees — just an execution plan tied to your geography and vertical.",
+					"The corridor from Albany to Troy, Schenectady, and Saratoga has distinct search markets. We build geo-targeted service pages and consistent NAP signals so you rank in the neighborhoods and towns where your customers actually are.",
 				],
 			},
 			{
-				heading: "Start a conversation",
+				heading: "Contact us",
 				paragraphs: [
-					"Send your site and a short note through the contact page. If the scope fits how we work, we will propose next steps; if not, we will point you in a better direction.",
+					"Send your site URL and a short note about your goals through the contact page. We will respond with an honest assessment and a proposed next step.",
 				],
 			},
 		],

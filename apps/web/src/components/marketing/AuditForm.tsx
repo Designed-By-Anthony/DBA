@@ -1,9 +1,11 @@
 "use client";
 
-import { useId } from "react";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { useId, useState } from "react";
 import { btnPrimaryAudit } from "@/design-system/buttons";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { businessProfile } from "@/lib/seo";
+import { resolveEffectiveSiteKey } from "@/lib/turnstile";
 
 export interface AuditFormProps {
 	ctaSource?: string;
@@ -74,6 +76,12 @@ export function AuditForm({
 }: AuditFormProps) {
 	const formId = useId();
 	const action = formEndpoint?.trim() || buildPublicApiUrl("/api/lead-email");
+	const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+	const siteKey = resolveEffectiveSiteKey(
+		process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+	);
+	const turnstileRequired = !!siteKey;
+	const isDisabled = turnstileRequired && !turnstileToken;
 
 	return (
 		<form
@@ -94,6 +102,13 @@ export function AuditForm({
 			<input type="hidden" name="referrer_url" value="" />
 			<input type="hidden" name="page_title" value="" />
 			<input type="hidden" name="ga_client_id" value="" />
+			{turnstileRequired && (
+				<input
+					type="hidden"
+					name="cf_turnstile_response"
+					value={turnstileToken ?? ""}
+				/>
+			)}
 			<div data-form-shell>
 				<div className={FORM_GRID}>
 					<div className={FIELD}>
@@ -157,7 +172,27 @@ export function AuditForm({
 
 				<p className={META} data-form-error hidden />
 				<div className={ACTIONS}>
-					<button type="submit" className={SUBMIT_BTN} data-form-submit>
+					{turnstileRequired && (
+						<div className="flex flex-col items-center gap-2 py-4">
+							<Turnstile
+								siteKey={siteKey}
+								onSuccess={(token) => setTurnstileToken(token)}
+								onExpire={() => setTurnstileToken(null)}
+								onError={() => setTurnstileToken(null)}
+								options={{ theme: "dark", size: "flexible" }}
+							/>
+							<p className="text-[0.7rem] font-bold uppercase tracking-widest text-white/30">
+								Security check required to proceed
+							</p>
+						</div>
+					)}
+					<button
+						type="submit"
+						className={SUBMIT_BTN}
+						data-form-submit
+						disabled={isDisabled}
+						aria-disabled={isDisabled}
+					>
 						{submitLabel}
 					</button>
 				</div>
