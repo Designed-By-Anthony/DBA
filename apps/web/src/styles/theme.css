@@ -657,10 +657,6 @@ li {
 	background: var(--text-cream);
 }
 
-.dba-footer {
-	margin: var(--section-space) var(--container-gutter) var(--container-gutter);
-}
-
 .dba-footer-inner {
 	display: grid;
 	gap: var(--space-block);
@@ -693,7 +689,6 @@ li {
 
 .page-hero-inner,
 .hero-grid,
-.lh-stage-grid,
 .home-email-cta__card,
 .portfolio-detail-grid,
 .portfolio-results-grid,
@@ -704,6 +699,13 @@ li {
 	grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
 	gap: var(--space-block);
 	align-items: center;
+}
+
+.lh-stage-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+	gap: var(--space-block);
+	align-items: start;
 }
 
 .page-hero--home,
