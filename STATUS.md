@@ -35,6 +35,7 @@
 - Review fix: restored `lighthouse-prose` generated report HTML spacing and `lh-chip` impact/effort color variants.
 - Review fix: restored the home PremiumPitch wrapper so mobile gutters remain intact.
 - Merge update: resolved fresh `main` conflicts in the report API/viewer while preserving flattened score fields for persisted reports.
+- Review fix: preserved `null` PSI metric values in the flattened report API response so degraded reports render scores as unavailable instead of zero.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 

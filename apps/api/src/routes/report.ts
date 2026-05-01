@@ -46,10 +46,10 @@ export const reportRoute = new Elysia({ aot: false }).get(
 				createdAt: data.createdAt?.toDate?.().toISOString() || null,
 				psiDegradedReason: data.psiDegradedReason || null,
 
-				performance: data.scores?.performance ?? 0,
-				accessibility: data.scores?.accessibility ?? 0,
-				bestPractices: data.scores?.bestPractices ?? 0,
-				seo: data.scores?.seo ?? 0,
+				performance: data.scores?.performance ?? null,
+				accessibility: data.scores?.accessibility ?? null,
+				bestPractices: data.scores?.bestPractices ?? null,
+				seo: data.scores?.seo ?? null,
 				trustScore: data.scores?.trustScore ?? 0,
 				conversion: data.scores?.conversion ?? 0,
 
