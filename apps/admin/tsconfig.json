@@ -26,6 +26,9 @@
       "@/*": [
         "./src/*"
       ],
+      "@dba/api": [
+        "../api/src/index.ts"
+      ],
       "@dba/shared/db/*": [
         "../../packages/shared/src/db/*"
       ],

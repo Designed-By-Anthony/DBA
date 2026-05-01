@@ -1,0 +1,12 @@
+{
+  "name": "dba-admin",
+  "pages_build_output_dir": ".open-next/assets",
+  "compatibility_date": "2025-04-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dba-ledger",
+      "database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
-import { buildAuditSummaryEmail } from "@lh/lib/auditSummaryEmail";
-import { checkLocalRateLimit, getClientAddress } from "@lh/lib/http";
+import { buildAuditSummaryEmail } from "@dba/shared/lighthouse/lib/auditSummaryEmail";
+import { checkLocalRateLimit, getClientAddress } from "@dba/shared/lighthouse/lib/http";
 import {
 	isResendConfigured,
 	sendTransactionalEmail,
-} from "@lh/lib/transactionalResend";
-import { normalizeEmail, normalizeText } from "@lh/lib/validation";
+} from "@dba/shared/lighthouse/lib/transactionalResend";
+import { normalizeEmail, normalizeText } from "@dba/shared/lighthouse/lib/validation";
 import { Elysia } from "elysia";
 import { z } from "zod";
 

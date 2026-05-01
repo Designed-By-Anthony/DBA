@@ -1,11 +1,10 @@
-import { env } from "cloudflare:workers";
 import { createD1Client } from "@dba/shared/db/client";
 import { cors } from "@elysiajs/cors";
-import { setReportKV } from "@lh/lib/report-store";
+import { setReportKV } from "@dba/shared/lighthouse/lib/report-store";
 import { Elysia } from "elysia";
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker";
-import { setLedgerDb } from "@/lib/d1Leads";
-import { isTrustedMarketingBrowserOrigin } from "@/lib/marketingBrowserOrigins";
+import { setLedgerDb } from "@dba/shared/lib/d1Leads";
+import { isTrustedMarketingBrowserOrigin } from "@dba/shared/lib/marketingBrowserOrigins";
 import { auditRoute } from "./routes/audit";
 import { auditEmailSummaryRoute } from "./routes/auditEmailSummary";
 import { leadEmailRoute } from "./routes/leadEmail";
@@ -14,13 +13,18 @@ import { reportRoute } from "./routes/report";
 import { reportEmailRoute } from "./routes/reportEmail";
 import { reportPdfRoute } from "./routes/reportPdf";
 import { testEmailsRoute } from "./routes/testEmails";
+import { leadsRoute } from "./routes/leads";
 
-type WorkerBindings = {
-	AUDIT_REPORTS_KV?: Parameters<typeof setReportKV>[0];
-	DB?: Parameters<typeof createD1Client>[0];
+// Mock the Cloudflare Workers environment for non-Worker environments
+const env = typeof process !== "undefined" && process.env ? process.env : {
+	AUDIT_REPORTS_KV: undefined,
+	DB: undefined,
 };
 
-const workerBindings = env as unknown as WorkerBindings;
+const workerBindings = env as unknown as {
+	AUDIT_REPORTS_KV?: any;
+	DB?: any;
+};
 
 const kvBinding = workerBindings.AUDIT_REPORTS_KV;
 if (kvBinding) {
@@ -59,15 +63,20 @@ const app = new Elysia({ adapter: CloudflareAdapter })
 				headers: { "Cache-Control": "public, max-age=86400" },
 			}),
 	)
-	.use(auditRoute)
-	.use(auditEmailSummaryRoute)
-	.use(leadEmailRoute)
-	.use(reportRoute)
-	.use(reportEmailRoute)
-	.use(reportPdfRoute)
-	.use(testEmailsRoute)
+  .use(auditRoute)
+  .use(auditEmailSummaryRoute)
+  .use(leadEmailRoute)
+  .use(leadsRoute)
+  .use(programmaticSeoRoute)
+  .use(reportRoute)
+  .use(reportEmailRoute)
+  .use(reportPdfRoute)
+  .use(testEmailsRoute)
 	.use(programmaticSeoRoute)
 	// This is required to make Elysia work on Cloudflare Worker
 	.compile();
 
 export default app;
+
+// Export the App type for Eden Treaty client generation
+export type App = typeof app;

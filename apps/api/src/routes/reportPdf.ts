@@ -1,6 +1,6 @@
-import { buildAuditPdf } from "@lh/lib/auditReportPdf";
-import { db, REPORTS_COLLECTION } from "@lh/lib/report-store";
-import { isValidReportId } from "@lh/lib/reportId";
+import { buildAuditPdf } from "@dba/shared/lighthouse/lib/auditReportPdf";
+import { db, REPORTS_COLLECTION } from "@dba/shared/lighthouse/lib/report-store";
+import { isValidReportId } from "@dba/shared/lighthouse/lib/reportId";
 import { Elysia } from "elysia";
 import type { AuditData } from "../../../../packages/shared/src/lighthouse/auditReport";
 

@@ -1,16 +1,16 @@
-import { isGmailConfigured, sendViaGmail } from "@lh/lib/gmail";
+import { isGmailConfigured, sendViaGmail } from "@dba/shared/lighthouse/lib/gmail";
 import { Elysia } from "elysia";
 import { z } from "zod";
-import { tryInsertLead } from "@/lib/d1Leads";
+import { tryInsertLead } from "@dba/shared/lib/d1Leads";
 import {
 	type PublicLeadIngestBody,
 	parsePublicLeadIngestBody,
-} from "@/lib/lead-form-contract";
-import { postLeadIngest } from "@/lib/leadWebhook";
+} from "@dba/shared/lib/lead-form-contract";
+import { postLeadIngest } from "@dba/shared/lib/leadWebhook";
 import {
 	resolveEffectiveSecretKey,
 	verifyTurnstileToken,
-} from "@/lib/turnstile";
+} from "@dba/shared/lib/turnstile";
 
 /*
  * CORS for `/api/lead-email` is handled exclusively by the global

@@ -7,7 +7,7 @@ import {
 	pickHeroAbVariant,
 } from "@/lib/edge-seo";
 
-const APEX_DOMAIN = "designedbyanthony.com";
+const APEX_DOMAIN = process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, "") ?? "designedbyanthony.com";
 
 const ADMIN_HOST = `admin.${APEX_DOMAIN}`;
 const ACCOUNTS_HOST = `accounts.${APEX_DOMAIN}`;
