@@ -37,6 +37,19 @@ const signalRows = [
 	},
 ] as const;
 
+/* ── Phase 1B SEV-0 inline replacements (was .lh-row-status* in lighthouse-globals.css). */
+const ROW_STATUS_BASE = "w-[0.45rem] h-10 rounded-full shrink-0";
+const ROW_STATUS_TONE = {
+	red: "bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.45)]",
+	warm: "bg-[#d88958]",
+	bronze: "bg-[rgb(var(--accent-bronze-rgb))]",
+	green: "bg-[#4fc58f]",
+} as const;
+
+/* Bronze pill (was .lh-diagnostic-pill — was sky-blue, retargeted to canonical bronze). */
+const DIAGNOSTIC_PILL =
+	"inline-flex items-center px-2 py-0.5 rounded-full border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-[rgb(var(--accent-bronze-rgb)/0.08)] text-[0.55rem] font-extrabold tracking-[0.12em] uppercase text-[rgb(var(--accent-bronze-rgb)/0.95)] whitespace-nowrap";
+
 function MiniScoreRing({
 	score,
 	label,
@@ -79,14 +92,14 @@ function MiniScoreRing({
 					/>
 				</svg>
 				<span
-					className="absolute inset-0 flex items-center justify-center font-report text-[13px] font-bold"
+					className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-display)] text-[13px] font-bold"
 					style={{ color }}
 					aria-hidden="true"
 				>
 					{score}
 				</span>
 			</div>
-			<span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/38">
+			<span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/40">
 				{label}
 			</span>
 		</div>
@@ -96,17 +109,21 @@ function MiniScoreRing({
 function DiagnosticPreview({ animate }: { animate: boolean }) {
 	return (
 		<MotionDiv
-			className="lh-diagnostic-board"
+			className="relative mt-12 max-w-[42rem] rounded-2xl border border-white/[0.08] bg-linear-to-b from-white/[0.04] to-white/[0.01] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_24px_60px_-32px_rgba(0,0,0,0.5)]"
 			initial={animate ? { opacity: 0, y: 18 } : false}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.72, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
 		>
-			<div className="lh-diagnostic-topline">
+			<div className="flex items-start justify-between gap-3 mb-4">
 				<div>
-					<p className="lh-mini-label">Sample audit report</p>
-					<p className="lh-diagnostic-title">local-roofing.com</p>
+					<p className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">
+						Sample audit report
+					</p>
+					<p className="font-[family-name:var(--font-fraunces)] text-base font-semibold text-white">
+						local-roofing.com
+					</p>
 				</div>
-				<span className="lh-diagnostic-pill">Preview</span>
+				<span className={DIAGNOSTIC_PILL}>Preview</span>
 			</div>
 
 			<div
@@ -118,11 +135,11 @@ function DiagnosticPreview({ animate }: { animate: boolean }) {
 				))}
 			</div>
 
-			<div className="lh-diagnostic-rows">
+			<div className="flex flex-col gap-2.5">
 				{signalRows.map((row, index) => (
 					<MotionDiv
 						key={row.label}
-						className="lh-diagnostic-row"
+						className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.025] p-3"
 						initial={animate ? { opacity: 0, x: -10 } : false}
 						animate={{ opacity: 1, x: 0 }}
 						transition={{
@@ -132,18 +149,18 @@ function DiagnosticPreview({ animate }: { animate: boolean }) {
 						}}
 					>
 						<span
-							className={`lh-row-status lh-row-status--${row.tone}`}
+							className={`${ROW_STATUS_BASE} ${ROW_STATUS_TONE[row.tone]}`}
 							aria-hidden
 						/>
 						<span className="min-w-0">
-							<span className="block font-report text-[14px] font-semibold leading-tight text-white/92">
+							<span className="block font-[family-name:var(--font-display)] text-[14px] font-semibold leading-tight text-white/95">
 								{row.label}
 							</span>
-							<span className="mt-0.5 block text-[11.5px] leading-[1.5] text-white/48">
+							<span className="mt-0.5 block text-[11.5px] leading-[1.5] text-white/50">
 								{row.value}
 							</span>
 						</span>
-						<span className="lh-diagnostic-pill">{row.status}</span>
+						<span className={DIAGNOSTIC_PILL}>{row.status}</span>
 					</MotionDiv>
 				))}
 			</div>
@@ -167,10 +184,10 @@ export function LighthouseHero() {
 
 	return (
 		<section
-			className="lighthouse-hero relative"
+			className="relative max-w-3xl pt-[var(--space-element)] pb-[var(--space-block)]"
 			aria-labelledby="lighthouse-hero-heading"
 		>
-			{/* Ambient glow */}
+			{/* Ambient glow — bronze (left) + cool counter-glow (right). */}
 			<div
 				className="pointer-events-none absolute -left-20 top-0 h-96 w-96 rounded-full opacity-25 blur-3xl"
 				style={{
@@ -188,12 +205,15 @@ export function LighthouseHero() {
 				aria-hidden
 			/>
 			<MotionDiv
-				className="lh-place-marker"
+				className="inline-flex items-center gap-[0.55rem] text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-[rgb(var(--accent-bronze-rgb)/0.92)] mb-4"
 				initial={animate ? { opacity: 0, x: -6 } : false}
 				animate={{ opacity: 1, x: 0 }}
 				transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
 			>
-				<span className="lh-place-marker-rule" aria-hidden />
+				<span
+					className="inline-block w-7 h-px bg-[linear-gradient(90deg,transparent,rgb(var(--accent-bronze-rgb)/0.85)_60%,rgb(var(--accent-bronze-rgb)/0.15))]"
+					aria-hidden
+				/>
 				<span>The Diagnostic Bench</span>
 			</MotionDiv>
 
@@ -206,7 +226,10 @@ export function LighthouseHero() {
 					ease: [0.22, 1, 0.36, 1],
 				}}
 			>
-				<h1 id="lighthouse-hero-heading" className="lh-editorial-h1">
+				<h1
+					id="lighthouse-hero-heading"
+					className="font-[family-name:var(--font-fraunces)] text-[clamp(2.55rem,5.5vw,4.85rem)] font-bold tracking-[-0.02em] leading-[1.0] text-[var(--text-cream)] text-balance mb-0"
+				>
 					Know What's Costing You Customers.
 				</h1>
 			</MotionDiv>
@@ -216,7 +239,7 @@ export function LighthouseHero() {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6, delay: 0.18 }}
 			>
-				<p className="lh-hero-copy">
+				<p className="mt-6 max-w-[64ch] text-[clamp(1rem,1.5vw,1.12rem)] leading-[1.75] text-white/70">
 					Get a full scored breakdown of your site's speed, SEO gaps, and trust
 					signals — with a prioritized AI fix list. Free, private, and ready in
 					about 60 seconds.
@@ -224,17 +247,20 @@ export function LighthouseHero() {
 			</MotionDiv>
 
 			<MotionDiv
-				className="lh-hero-proof-row"
+				className="mt-12 grid grid-cols-3 gap-4 max-w-md"
 				initial={animate ? { opacity: 0, y: 10 } : false}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.55, delay: 0.32 }}
 			>
 				{proofPoints.map((point) => (
-					<div key={point.k} className="lh-hero-proof">
-						<span className="font-report text-[17px] font-semibold leading-none text-white">
+					<div
+						key={point.k}
+						className="flex flex-col items-start min-w-0 rounded-xl border border-white/[0.08] bg-white/[0.03] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+					>
+						<span className="font-[family-name:var(--font-display)] text-[17px] font-semibold leading-none text-white">
 							{point.v}
 						</span>
-						<span className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/42">
+						<span className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
 							{point.k}
 						</span>
 					</div>
