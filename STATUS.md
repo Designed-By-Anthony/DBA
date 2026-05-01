@@ -22,6 +22,7 @@
 - Review fix: synced `--font-main` to the loaded `"Inter Variable"` font-family in both `theme.css` and `tokens.css`.
 - Review fix: restored default-hidden mobile navigation overlay behavior and cookie-consent semantic class styles.
 - Review fix: restored top alignment for the Lighthouse audit form grid and removed the duplicate footer margin shorthand that conflicted with `brand-chrome.css`.
+- Review fix: restored the four-column Lighthouse mini score grid in the hero diagnostic preview.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 

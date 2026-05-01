@@ -1202,7 +1202,6 @@ li {
 	text-transform: uppercase;
 }
 
-.lh-mini-score-grid,
 .lh-process-list,
 .lh-diagnostic-list,
 .lh-action-list,
@@ -1211,6 +1210,12 @@ li {
 	display: grid;
 	gap: 0.75rem;
 	list-style: none;
+}
+
+.lh-mini-score-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.75rem;
 }
 
 .lh-mini-score {
