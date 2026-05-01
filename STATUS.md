@@ -18,6 +18,7 @@
 - Verification after carousel fix: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 - Merge update: merged latest `main` again, kept the global `theme.css` architecture, retained the new `stackBadge` helper, and resolved Tailwind bridge conflicts without reintroducing duplicate global CSS.
 - Review fix: restored Lighthouse report viewer loading/error/invalid-link state styles in `theme.css`.
+- Review fix: restored the `body.site-contact-drawer-open` scroll-lock rule for the mobile contact drawer.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 

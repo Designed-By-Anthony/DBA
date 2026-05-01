@@ -123,6 +123,10 @@ body {
 	text-rendering: optimizeLegibility;
 }
 
+body.site-contact-drawer-open {
+	overflow: hidden;
+}
+
 body::before {
 	content: "";
 	position: fixed;
