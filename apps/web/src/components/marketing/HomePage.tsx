@@ -4,6 +4,11 @@ import Script from "next/script";
 import { homeFaqEntries, processSteps, whyStackCards } from "@/data/home";
 import { showcaseFeaturedItems } from "@/data/showcase";
 import {
+	btnOutline,
+	btnPrimary,
+	btnSecondaryProof,
+} from "@/design-system/buttons";
+import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
 	FOUNDING_PARTNER_SEO_MONTHLY,
@@ -102,7 +107,7 @@ export function HomePage() {
 						<div className="hero-actions">
 							<Link
 								href="/lighthouse"
-								className="btn btn-primary-book hero-cta-glow"
+								className={`${btnPrimary} hero-cta-glow`}
 								id="hero-audit-btn"
 							>
 								<span className="hero-cta-glow-halo" aria-hidden="true" />
@@ -110,7 +115,7 @@ export function HomePage() {
 							</Link>
 							<Link
 								href="/contact"
-								className="btn btn-primary-audit"
+								className={btnOutline}
 								id="hero-contact-btn"
 							>
 								Contact us
@@ -231,10 +236,10 @@ export function HomePage() {
 							</p>
 						</div>
 						<div className="home-email-cta__actions">
-							<Link href="/contact" className="btn btn-primary-book">
+							<Link href="/contact" className={btnOutline}>
 								Open contact form
 							</Link>
-							<Link href="/lighthouse" className="btn btn-secondary-proof">
+							<Link href="/lighthouse" className={btnPrimary}>
 								Or run a free site audit
 							</Link>
 						</div>
@@ -351,7 +356,7 @@ export function HomePage() {
 					</div>
 
 					<div className="process-action">
-						<Link href="/contact" className="btn btn-primary-audit">
+						<Link href="/contact" className={btnOutline}>
 							Contact us for your free audit
 						</Link>
 					</div>
@@ -435,7 +440,7 @@ export function HomePage() {
 					</div>
 
 					<div className="portfolio-link-wrap">
-						<Link href="/portfolio" className="btn btn-secondary-proof">
+						<Link href="/portfolio" className={btnSecondaryProof}>
 							View Full Portfolio
 						</Link>
 					</div>

@@ -1,7 +1,4 @@
-import {
-	buildBaseOrganizationSchema,
-	buildBaseWebsiteSchema,
-} from "@/lib/seo";
+import { buildBaseOrganizationSchema, buildBaseWebsiteSchema } from "@/lib/seo";
 
 const ENTRIES = [buildBaseOrganizationSchema(), buildBaseWebsiteSchema()];
 
@@ -10,7 +7,9 @@ export function JsonLd() {
 		<>
 			{ENTRIES.map((entry) => {
 				const id =
-					typeof entry["@id"] === "string" ? entry["@id"] : JSON.stringify(entry);
+					typeof entry["@id"] === "string"
+						? entry["@id"]
+						: JSON.stringify(entry);
 				return (
 					<script
 						key={id}

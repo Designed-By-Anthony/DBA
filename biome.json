@@ -77,10 +77,7 @@
 			}
 		},
 		{
-			"includes": [
-				"apps/web/src/styles/theme.css",
-				"apps/web/src/styles/layout-shell.css"
-			],
+			"includes": ["apps/web/src/design-system/tailwind-v4-bridge.css"],
 			"linter": {
 				"rules": {
 					"complexity": {

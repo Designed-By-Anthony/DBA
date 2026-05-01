@@ -1,7 +1,26 @@
 /**
- * Designed by Anthony — global theme entry.
- * Canonical tokens: src/styles/theme.css
- * Shared brand chrome (header, footer, banner): ./brand-chrome.css
+ * Designed by Anthony — global theme entry (Phase 5.5).
+ *
+ * Loaded by app/layout.tsx for every marketing page. The Lighthouse segment
+ * has its own entry (lighthouse-globals.css) that extends this foundation
+ * with audit-specific tokens and component styles.
+ *
+ * Load order is critical for Tailwind v4 correctness:
+ *   1. tokens.css               — :root CSS custom properties (single source).
+ *   2. tailwind-v4-bridge.css   — @theme block registers DBA tokens as
+ *                                 Tailwind design-token names + @font-face
+ *                                 declarations + base/component rules.
+ *   3. @import "tailwindcss"    — preflight reset + utility classes.
+ *
+ * Phase 5.5 — src/styles/theme.css DELETED. All rules consolidated into
+ * tailwind-v4-bridge.css under the Tailwind v4 design layer.
  */
-@import url("../styles/theme.css");
-@import url("./brand-chrome.css");
+
+/* 1. :root CSS custom properties (Midnight & Bronze palette). */
+@import url("./tokens.css");
+
+/* 2. @theme tokens + @font-face + base/component rules. */
+@import url("./tailwind-v4-bridge.css");
+
+/* 3. Tailwind preflight + utility classes. */
+@import "tailwindcss";

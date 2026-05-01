@@ -11,6 +11,11 @@ import {
 } from "@/data/serviceAreaLocations";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
 import {
+	btnOutline,
+	btnPrimary,
+	btnSecondaryProof,
+} from "@/design-system/buttons";
+import {
 	ENTERPRISE_WEBSITE_STARTING_PRICE,
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
@@ -44,15 +49,18 @@ function MarketingBreadcrumbs({ items }: { items: BreadcrumbItem[] }) {
 
 	return (
 		<nav
-			className="breadcrumb-nav marketing-breadcrumb-nav"
+			className="bg-white/[0.02] border-b border-white/[0.05] py-3"
 			aria-label="Breadcrumb"
 		>
-			<div className="breadcrumb-container">
-				<ol className="breadcrumbs">
+			<div className="max-w-[var(--content-max)] mx-auto px-[var(--container-gutter)]">
+				<ol className="list-none flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.85rem] text-[var(--text-gray)] overflow-hidden m-0 p-0">
 					{items.map((item, i) => {
 						const isLast = i === items.length - 1;
 						return (
-							<li key={item.path} className="breadcrumb-item">
+							<li
+								key={item.path}
+								className="flex items-center whitespace-nowrap min-w-0 last:overflow-hidden last:[text-overflow:ellipsis] last:flex-shrink before:[content:'/'] before:opacity-30 before:mr-2 before:flex-shrink-0 first:before:hidden last:[&>span]:overflow-hidden last:[&>span]:[text-overflow:ellipsis] last:[&>span]:whitespace-nowrap last:[&>span]:block"
+							>
 								{isLast ? (
 									<span aria-current="page">{item.name}</span>
 								) : (
@@ -267,10 +275,10 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/lighthouse" className="btn btn-primary-book">
+					<Link href="/lighthouse" className={btnPrimary}>
 						Audit My Site
 					</Link>
-					<Link href="/contact" className="btn btn-secondary-proof">
+					<Link href="/contact" className={btnSecondaryProof}>
 						Contact
 					</Link>
 				</MotionReveal>
@@ -415,10 +423,10 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<Link href="/lighthouse" className="btn btn-primary-book">
+						<Link href="/lighthouse" className={btnPrimary}>
 							Audit My Site
 						</Link>
-						<Link href="/contact" className="btn btn-primary-audit">
+						<Link href="/contact" className={btnOutline}>
 							Contact us
 						</Link>
 					</MotionReveal>
@@ -625,10 +633,10 @@ export function OurEdgePage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
-					<Link href="/services" className="btn btn-secondary-proof">
+					<Link href="/services" className={btnSecondaryProof}>
 						View services
 					</Link>
 				</MotionReveal>
@@ -693,10 +701,10 @@ export function FaqPage() {
 							marginTop: "clamp(2rem, 4vw, 3rem)",
 						}}
 					>
-						<Link href="/contact" className="btn btn-primary-book">
+						<Link href="/contact" className={btnOutline}>
 							Still have a question? Contact us
 						</Link>
-						<Link href="/contact" className="btn btn-primary-audit">
+						<Link href="/contact" className={btnOutline}>
 							Contact us for your free audit
 						</Link>
 					</MotionReveal>
@@ -822,10 +830,10 @@ export function ServiceAreasPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-book">
+					<Link href="/contact" className={btnOutline}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>
@@ -1031,10 +1039,10 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/contact" className="btn btn-primary-book">
+					<Link href="/contact" className={btnOutline}>
 						Contact the studio
 					</Link>
-					<Link href="/contact" className="btn btn-primary-audit">
+					<Link href="/contact" className={btnOutline}>
 						Contact us for your free audit
 					</Link>
 				</MotionReveal>
