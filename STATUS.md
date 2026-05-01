@@ -30,6 +30,7 @@
 - Review fix: changed the Lighthouse home page content wrapper from nested `<main id="main-content">` to a div inside `MarketingChrome`'s existing main landmark.
 - Review fix: restored internal padding on the semantic cookie consent dialog shell.
 - Review fix: restored `.lh-editorial-h1` Lighthouse hero heading sizing, gradient text, and Fraunces variation settings.
+- Review fix: restored shared base button layout and hover transition styles on `.lh-submit-btn`.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 

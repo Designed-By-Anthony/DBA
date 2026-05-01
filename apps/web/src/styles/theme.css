@@ -517,7 +517,8 @@ li {
 .btn,
 .lighthouse-btn-primary,
 .lighthouse-btn-secondary,
-.lighthouse-btn-emerald {
+.lighthouse-btn-emerald,
+.lh-submit-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -573,7 +574,8 @@ li {
 .lighthouse-btn-primary:hover,
 .lighthouse-btn-secondary:hover,
 .lighthouse-btn-emerald:hover,
-.dba-nav-cta:hover {
+.dba-nav-cta:hover,
+.lh-submit-btn:hover {
 	transform: translateY(-1px);
 }
 
