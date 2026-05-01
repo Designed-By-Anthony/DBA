@@ -5,6 +5,7 @@ import Script from "next/script";
 import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
+import { FirstVisitSplash } from "@/components/marketing/FirstVisitSplash";
 
 /**
  * Load Outfit Variable via Next.js Font API so the --font-outfit CSS variable
@@ -136,6 +137,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					/>
 				</noscript>
 				{children}
+				{/* Global first-visit splash. Mounted in the root layout so
+				    it fires on the user's very first landing regardless of
+				    entry URL. Reads `window.location` directly — no
+				    `useSearchParams` / Suspense boundary required. */}
+				<FirstVisitSplash />
 				<CrispBootstrap />
 				{/* Stripe v3 — loaded eagerly so Wappalyzer/BuiltWith detect "Payment Processing" */}
 				<Script
