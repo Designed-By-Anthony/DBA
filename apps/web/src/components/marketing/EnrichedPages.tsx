@@ -790,8 +790,8 @@ export function ServiceAreasPage() {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag region-card-tag--${r.tag}`}>
-										{r.tag === "primary" ? "Core market" : "Remote"}
+									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
+										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
@@ -1019,8 +1019,8 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag region-card-tag--${r.tag}`}>
-										{r.tag === "primary" ? "Core market" : "Remote"}
+									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
+										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
