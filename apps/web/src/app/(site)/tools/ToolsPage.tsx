@@ -82,7 +82,7 @@ function PreorderForm({
 		<form className="flex flex-col gap-2" onSubmit={handleSubmit}>
 			<input
 				type="email"
-				className="w-full px-3 py-[0.55rem] rounded-[0.45rem] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.04)] text-[rgba(247,244,238,0.95)] text-[0.82rem] outline-none transition-[border-color] duration-[180ms] ease-in focus:border-[rgba(201,168,108,0.45)] placeholder:text-[rgba(247,244,238,0.58)]"
+				className="w-full px-3 py-[0.55rem] rounded-[0.45rem] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.04)] text-[rgba(247,244,238,0.95)] text-[0.82rem] outline-none transition-[border-color] duration-[180ms] ease-in focus:border-[rgba(212,175,55,0.45)] placeholder:text-[rgba(247,244,238,0.58)]"
 				placeholder="your@email.com"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
@@ -93,7 +93,7 @@ function PreorderForm({
 			<div className="flex gap-[0.4rem]">
 				<button
 					type="submit"
-					className="flex-1 px-3 py-[0.55rem] rounded-[0.45rem] border border-[rgba(201,168,108,0.35)] bg-[rgba(201,168,108,0.15)] text-[#fcf0d2] text-[0.8rem] font-bold cursor-pointer transition-[background,transform] duration-[180ms] ease-in hover:bg-[rgba(201,168,108,0.22)] hover:-translate-y-px disabled:opacity-55 disabled:cursor-not-allowed"
+					className="flex-1 px-3 py-[0.55rem] rounded-[0.45rem] border border-[rgba(212,175,55,0.35)] bg-[rgba(212,175,55,0.15)] text-[#fcf0d2] text-[0.8rem] font-bold cursor-pointer transition-[background,transform] duration-[180ms] ease-in hover:bg-[rgba(212,175,55,0.22)] hover:-translate-y-px disabled:opacity-55 disabled:cursor-not-allowed"
 					disabled={status === "submitting"}
 				>
 					{status === "submitting" ? "Reserving\u2026" : "Reserve Spot"}
@@ -179,7 +179,7 @@ function TierCard({
 				) : (
 					<button
 						type="button"
-						className="block w-full text-center px-5 py-[0.65rem] rounded-[0.55rem] border border-[rgba(201,168,108,0.35)] bg-[linear-gradient(170deg,rgba(201,168,108,0.14)_0%,rgba(201,168,108,0.08)_100%)] text-[#fcf0d2] text-[0.85rem] font-bold cursor-pointer transition-[transform,box-shadow] duration-[180ms] ease-in hover:-translate-y-px hover:shadow-[0_10px_24px_-8px_rgba(201,168,108,0.35)]"
+						className="block w-full text-center px-5 py-[0.65rem] rounded-[0.55rem] border border-[rgba(212,175,55,0.35)] bg-[linear-gradient(170deg,rgba(212,175,55,0.14)_0%,rgba(212,175,55,0.08)_100%)] text-[#fcf0d2] text-[0.85rem] font-bold cursor-pointer transition-[transform,box-shadow] duration-[180ms] ease-in hover:-translate-y-px hover:shadow-[0_10px_24px_-8px_rgba(212,175,55,0.35)]"
 						onClick={() => setShowPreorder(true)}
 					>
 						Pre-order
@@ -211,7 +211,7 @@ function ProductSection({ product }: { product: Product }) {
 			<div className="flex gap-4 items-start mb-7 max-sm:flex-col">
 				<ProductIcon icon={product.icon} />
 				<div>
-					<span className="inline-block text-[0.65rem] font-bold tracking-[0.15em] uppercase text-[#c9a86c] mb-[0.3rem]">
+					<span className="inline-block text-[0.65rem] font-bold tracking-[0.15em] uppercase text-[#D4AF37] mb-[0.3rem]">
 						{product.category}
 					</span>
 					<h3
@@ -237,7 +237,7 @@ function ProductSection({ product }: { product: Product }) {
 					type="button"
 					className={`px-4 py-[0.45rem] border-none rounded-[0.4rem] text-[0.8rem] font-semibold cursor-pointer transition-[background,color] duration-[150ms] ease-in ${
 						!annual
-							? "bg-[rgba(212,175,55,0.14)] text-[#c9a86c]"
+							? "bg-[rgba(212,175,55,0.14)] text-[#D4AF37]"
 							: "bg-transparent text-[rgba(247,244,238,0.58)]"
 					}`}
 					onClick={() => setAnnual(false)}
@@ -249,7 +249,7 @@ function ProductSection({ product }: { product: Product }) {
 					type="button"
 					className={`px-4 py-[0.45rem] border-none rounded-[0.4rem] text-[0.8rem] font-semibold cursor-pointer transition-[background,color] duration-[150ms] ease-in ${
 						annual
-							? "bg-[rgba(212,175,55,0.14)] text-[#c9a86c]"
+							? "bg-[rgba(212,175,55,0.14)] text-[#D4AF37]"
 							: "bg-transparent text-[rgba(247,244,238,0.58)]"
 					}`}
 					onClick={() => setAnnual(true)}
@@ -281,9 +281,9 @@ export function ToolsPage() {
 		<div className="min-h-[80vh] pt-[clamp(4rem,8vw,7rem)] pb-[clamp(4rem,8vw,6rem)] px-[var(--container-gutter)] max-w-[80rem] mx-auto">
 			{/* Hero */}
 			<section className="max-w-[52rem] mx-auto mb-12 text-center">
-				<p className="inline-flex items-center gap-[0.45rem] px-[0.85rem] py-[0.35rem] rounded-full border border-[rgba(201,168,108,0.28)] bg-[rgba(201,168,108,0.07)] text-[0.68rem] font-bold tracking-[0.18em] uppercase text-[rgba(232,213,168,0.82)] mb-6">
+				<p className="inline-flex items-center gap-[0.45rem] px-[0.85rem] py-[0.35rem] rounded-full border border-[rgba(212,175,55,0.28)] bg-[rgba(212,175,55,0.07)] text-[0.68rem] font-bold tracking-[0.18em] uppercase text-[rgba(232,213,168,0.82)] mb-6">
 					<span
-						className="inline-block w-[0.35rem] h-[0.35rem] rounded-full bg-[rgba(201,168,108,0.9)] shadow-[0_0_6px_1px_rgba(201,168,108,0.45)] shrink-0"
+						className="inline-block w-[0.35rem] h-[0.35rem] rounded-full bg-[rgba(212,175,55,0.9)] shadow-[0_0_6px_1px_rgba(212,175,55,0.45)] shrink-0"
 						aria-hidden
 					/>
 					Micro SaaS Store &middot; Pre-orders Open
@@ -301,8 +301,8 @@ export function ToolsPage() {
 
 			{/* Promo banners */}
 			<div className="flex flex-wrap gap-4 justify-center mb-10 max-sm:flex-col max-sm:items-stretch">
-				<div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-[rgba(201,168,108,0.2)] bg-[rgba(201,168,108,0.05)] max-w-[28rem] flex-[1_1_20rem] max-sm:max-w-full">
-					<span className="inline-block px-[0.55rem] py-[0.25rem] rounded-[0.35rem] bg-[rgba(201,168,108,0.18)] text-[0.65rem] font-extrabold tracking-[0.12em] uppercase text-[#c9a86c] whitespace-nowrap shrink-0">
+				<div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.05)] max-w-[28rem] flex-[1_1_20rem] max-sm:max-w-full">
+					<span className="inline-block px-[0.55rem] py-[0.25rem] rounded-[0.35rem] bg-[rgba(212,175,55,0.18)] text-[0.65rem] font-extrabold tracking-[0.12em] uppercase text-[#D4AF37] whitespace-nowrap shrink-0">
 						{PROMO_FOUNDING.code}
 					</span>
 					<span className="text-[0.82rem] text-[rgba(247,244,238,0.92)] leading-[1.45]">
@@ -310,8 +310,8 @@ export function ToolsPage() {
 						{PROMO_FOUNDING.discount}. {PROMO_FOUNDING.note}.
 					</span>
 				</div>
-				<div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-[rgba(201,168,108,0.2)] bg-[rgba(201,168,108,0.05)] max-w-[28rem] flex-[1_1_20rem] max-sm:max-w-full">
-					<span className="inline-block px-[0.55rem] py-[0.25rem] rounded-[0.35rem] bg-[rgba(201,168,108,0.18)] text-[0.65rem] font-extrabold tracking-[0.12em] uppercase text-[#c9a86c] whitespace-nowrap shrink-0">
+				<div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.05)] max-w-[28rem] flex-[1_1_20rem] max-sm:max-w-full">
+					<span className="inline-block px-[0.55rem] py-[0.25rem] rounded-[0.35rem] bg-[rgba(212,175,55,0.18)] text-[0.65rem] font-extrabold tracking-[0.12em] uppercase text-[#D4AF37] whitespace-nowrap shrink-0">
 						{PROMO_BOGO.code}
 					</span>
 					<span className="text-[0.82rem] text-[rgba(247,244,238,0.92)] leading-[1.45]">
@@ -330,7 +330,7 @@ export function ToolsPage() {
 					<a
 						key={p.slug}
 						href={`#${p.slug}`}
-						className="inline-flex items-center gap-[0.35rem] px-[0.85rem] py-[0.45rem] rounded-full border border-[rgba(255,252,245,0.07)] bg-[rgba(255,255,255,0.025)] text-[0.78rem] font-semibold text-[rgba(247,244,238,0.92)] no-underline transition-[border-color,background] duration-[180ms] ease-in hover:border-[rgba(201,168,108,0.35)] hover:bg-[rgba(201,168,108,0.06)]"
+						className="inline-flex items-center gap-[0.35rem] px-[0.85rem] py-[0.45rem] rounded-full border border-[rgba(255,252,245,0.07)] bg-[rgba(255,255,255,0.025)] text-[0.78rem] font-semibold text-[rgba(247,244,238,0.92)] no-underline transition-[border-color,background] duration-[180ms] ease-in hover:border-[rgba(212,175,55,0.35)] hover:bg-[rgba(212,175,55,0.06)]"
 					>
 						{ICON_MAP[p.icon] ?? "\u{1F527}"} {p.name}
 					</a>
@@ -343,7 +343,7 @@ export function ToolsPage() {
 			))}
 
 			{/* Bottom CTA */}
-			<section className="text-center max-w-[40rem] mx-auto mt-8 px-[var(--card-pad,1.5rem)] py-10 rounded-[var(--radius-card,1.25rem)] border border-[rgba(201,168,108,0.18)] bg-[rgba(201,168,108,0.04)]">
+			<section className="text-center max-w-[40rem] mx-auto mt-8 px-[var(--card-pad,1.5rem)] py-10 rounded-[var(--radius-card,1.25rem)] border border-[rgba(212,175,55,0.18)] bg-[rgba(212,175,55,0.04)]">
 				<h2 className="text-[clamp(1.25rem,3vw,1.6rem)] font-bold text-[rgba(247,244,238,0.97)] mb-3">
 					Stack your tools. Save more.
 				</h2>

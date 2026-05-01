@@ -13,21 +13,10 @@ import {
 	type SchemaValue,
 } from "@/lib/seo";
 
-// Title trimmed to 58 chars (under Google's ~60 char SERP cap) and
-// description to 140 chars (under the 160 char meta description cap)
-// to fix the audit findings reported in the user-supplied PDF.
-//
-// `title.absolute` opts out of the root layout's `title.template`
-// ("%s | Designed by Anthony") since this string already includes
-// the brand suffix — without `absolute` the rendered title would be
-// duplicated to "...| Designed by Anthony | Designed by Anthony".
 const HOME_TITLE = "Mohawk Valley Web Design & Local SEO | Designed by Anthony";
 const HOME_DESCRIPTION =
 	"Custom websites & local SEO for Mohawk Valley and Central NY service businesses. Built to rank on Google and turn searches into booked work.";
-// Default site OG card. Re-declared here (instead of inheriting from
-// the root layout) because Next.js fully replaces parent `openGraph`
-// and `twitter` blocks rather than merging them — leaving these out
-// would drop the og:image / twitter:image meta tags on the homepage.
+
 const HOME_OG_IMAGE = {
 	url: "/images/og-site-premium.png",
 	width: 2400,
@@ -58,7 +47,7 @@ export const metadata: Metadata = {
 const homeServiceSchema = buildItemListSchema({
 	name: "Core Services",
 	description:
-		"Designed by Anthony provides custom websites, local SEO, managed hosting, and website rescue for service businesses, including a limited 10-client launch pilot.",
+		"Designed by Anthony provides custom websites, local SEO, managed hosting, and website rescue for service businesses.",
 	path: "/",
 	items: [
 		{
@@ -132,14 +121,22 @@ function jsonLdScriptKey(entry: SchemaValue): string {
 export default function Home() {
 	return (
 		<>
-			{structuredData.map((entry) => (
-				<script
-					key={jsonLdScriptKey(entry)}
-					type="application/ld+json"
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: intentional JSON-LD injection
-					dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
-				/>
-			))}
+			{/* SEO Structured Data — native <script type="application/ld+json"> renders
+                in the initial HTML stream from this Server Component, where Google's
+                rich-results parser expects it. (next/script would inject post-hydrate
+                in <body>, which works but is non-canonical for JSON-LD.) */}
+			{structuredData.map((entry) => {
+				const json = JSON.stringify(entry);
+				return (
+					<script
+						key={jsonLdScriptKey(entry)}
+						type="application/ld+json"
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD is data, not executable
+						dangerouslySetInnerHTML={{ __html: json }}
+					/>
+				);
+			})}
+
 			<MarketingChrome footerCta={homeFooterCta}>
 				<HomePage />
 			</MarketingChrome>

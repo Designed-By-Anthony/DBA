@@ -33,39 +33,42 @@ export const reportRoute = new Elysia({ aot: false }).get(
 				return { error: "Report data unavailable" };
 			}
 
-			const publicLead = {
-				name: data.lead?.name || "",
-				company: data.lead?.company || "",
-				url: data.lead?.url || "",
-			};
+			// --- THE FIX: RELIABLE METRICS ---
+			// We await the update to ensure it survives the Worker isolate
+			// OR use ctx.waitUntil if your Elysia setup provides it.
+			// For now, awaiting is the safest bet for 100% data integrity.
+			await ref
+				.update({
+					views: FieldValue.increment(1),
+					lastViewedAt: Timestamp.now(),
+				})
+				.catch((err) => console.error("Update failed:", err));
 
-			// Fire-and-forget view increment
-			Promise.resolve().then(async () => {
-				try {
-					await ref.update({
-						views: FieldValue.increment(1),
-						lastViewedAt: Timestamp.now(),
-					});
-				} catch (err) {
-					console.error(
-						"View increment failed:",
-						err instanceof Error ? err.message : err,
-					);
-				}
-			});
-
+			// --- THE BRIDGE: FRONTEND MAPPING ---
+			// This flattens the 'scores' object so AuditResults.tsx
+			// sees data.performance, data.seo, etc. directly.
 			return {
 				id: data.id,
+				url: data.lead?.url || "",
 				createdAt: data.createdAt?.toDate?.().toISOString() || null,
-				psiDegradedReason:
-					typeof data.psiDegradedReason === "string"
-						? data.psiDegradedReason
-						: null,
-				lead: publicLead,
-				scores: data.scores,
-				metrics: data.metrics,
-				diagnostics: data.diagnostics,
-				aiInsight: data.aiInsight,
+				psiDegradedReason: data.psiDegradedReason || null,
+
+				// Spread the scores directly into the top level
+				performance: data.scores?.performance ?? 0,
+				accessibility: data.scores?.accessibility ?? 0,
+				bestPractices: data.scores?.bestPractices ?? 0,
+				seo: data.scores?.seo ?? 0,
+				trustScore: data.scores?.trustScore ?? 0,
+				conversion: data.scores?.conversion ?? 0,
+
+				lead: {
+					name: data.lead?.name || "",
+					company: data.lead?.company || "",
+					url: data.lead?.url || "",
+				},
+				metrics: data.metrics || {},
+				diagnostics: data.diagnostics || {},
+				aiInsight: data.aiInsight || {},
 				htmlSignals: data.htmlSignals || {},
 				sitewide: data.sitewide || {},
 				backlinks: data.backlinks || {},
@@ -74,10 +77,7 @@ export const reportRoute = new Elysia({ aot: false }).get(
 				competitors: data.competitors || [],
 			};
 		} catch (err) {
-			console.error(
-				"Report fetch failed:",
-				err instanceof Error ? err.message : err,
-			);
+			console.error("Report fetch failed:", err);
 			set.status = 500;
 			return { error: "Failed to fetch report" };
 		}

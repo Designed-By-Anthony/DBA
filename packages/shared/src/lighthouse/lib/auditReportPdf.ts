@@ -17,13 +17,13 @@ const COL2 = MARGIN + MAX_W / 2 + 4;
  * desktop and home printers. Score/Vital tiles are now outline-only
  * (FD borders, no F fill) so the report prints clean on a B&W
  * laser as well as colour. */
-const C_SLATE_900 = [17, 24, 39] as const;
-const C_SLATE_700 = [55, 65, 81] as const;
+const C_SLATE_900 = [12, 10, 8] as const;
+const C_SLATE_700 = [23, 16, 8] as const;
 const C_SLATE_500 = [107, 114, 128] as const;
 const C_SLATE_300 = [209, 213, 219] as const;
 const C_SLATE_200 = [229, 231, 235] as const;
-const C_BRONZE = [161, 124, 70] as const;
-const C_BRONZE_DARK = [120, 88, 36] as const;
+const C_BRONZE = [212, 175, 55] as const;
+const C_BRONZE_DARK = [166, 138, 43] as const;
 const C_AMBER_700 = [180, 83, 9] as const;
 const C_GREEN_700 = [21, 128, 61] as const;
 const C_RED_700 = [185, 28, 28] as const;
