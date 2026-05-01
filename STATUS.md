@@ -6,7 +6,7 @@
 
 - **Schema:** `businessProfile` + `Organization` in `apps/web/src/lib/seo.ts` — `SITE_NAME` **ANTHONY.**, HQ **7749 Kilbourn Rd, Rome, NY 13440**, `slogan` *Digital Infrastructure, Engineered in the Copper City.*, `serviceArea` **GeoCircle** ~150 mi (241401 m) from Rome for 315/518/CNY; `areaServed` + `knowsAbout` include regional labels.
 - **UI:** `apps/web/src/design-system/location.ts` (footer line, hooks, Atelier sentence); footer shows **© YEAR ANTHONY. | 7749 Kilbourn Rd, Rome, NY | High-Performance Infrastructure for the 315.** (`BrandFooter.tsx`).
-- **Leads:** `apps/web/src/lib/leadRegion.ts` — Web-to-Lead forms prepend `Region: Mohawk Valley.` to the message when phone parses to area code **315** (`SalesforceContactForm`, `SiteContactDrawer`).
+- **Leads:** `apps/web/src/lib/leadRegion.ts` — Web-to-Lead forms prepend **`Region: Mohawk Valley.`** for **315**, **`Region: Capital Region.`** for **518** / **838** (`SalesforceContactForm`, `SiteContactDrawer`).
 - **Copy:** Copper City hook on hero eyebrow; Atelier legacy line on hero sub, proof card, founding partner engineering bullet; root `layout.tsx` metadata aligned to ANTHONY.
 
 ## D1 Ledger + admin UI (2026-05-01)

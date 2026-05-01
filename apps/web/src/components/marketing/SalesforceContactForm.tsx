@@ -2,7 +2,10 @@
 
 import { useId, useRef } from "react";
 import { btnPrimary } from "@/design-system/buttons";
-import { regionTagFromPhone } from "@/lib/leadRegion";
+import {
+	descriptionAlreadyHasRegionPrefix,
+	regionTagFromPhone,
+} from "@/lib/leadRegion";
 
 /* ── Phase 5: salesforce-* CSS classes migrated to inline Tailwind ── */
 const SF_FORM = "block";
@@ -31,7 +34,7 @@ export function SalesforceContactForm() {
 		if (!region || !descriptionRef.current) return;
 		const tag = `Region: ${region}. `;
 		const cur = descriptionRef.current.value;
-		if (cur.includes("Region: Mohawk Valley")) return;
+		if (descriptionAlreadyHasRegionPrefix(cur)) return;
 		descriptionRef.current.value = tag + cur;
 	};
 

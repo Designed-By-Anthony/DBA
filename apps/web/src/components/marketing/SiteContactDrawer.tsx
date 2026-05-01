@@ -4,7 +4,10 @@ import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BRAND_MARK_IMAGE } from "@/design-system/brand";
 import { btnPrimary, btnSm } from "@/design-system/buttons";
-import { regionTagFromPhone } from "@/lib/leadRegion";
+import {
+	descriptionAlreadyHasRegionPrefix,
+	regionTagFromPhone,
+} from "@/lib/leadRegion";
 import { businessProfile } from "@/lib/seo";
 
 const BODY_LOCK_CLASS = "site-contact-drawer-open";
@@ -77,7 +80,7 @@ function ContactDrawerForm({ onSuccess }: { onSuccess?: () => void }) {
 		if (!region || !descriptionRef.current) return;
 		const tag = `Region: ${region}. `;
 		const cur = descriptionRef.current.value;
-		if (cur.includes("Region: Mohawk Valley")) return;
+		if (descriptionAlreadyHasRegionPrefix(cur)) return;
 		descriptionRef.current.value = tag + cur;
 	};
 
