@@ -24,6 +24,10 @@ const marketingSchema = z
 		INDEXNOW_ENDPOINT: optionalUrl,
 		INDEXNOW_FALLBACK_ENDPOINTS: z.string().trim().optional(),
 
+		/** Stripe webhook secrets — one per endpoint registered in the Stripe dashboard. */
+		STRIPE_THIN_WEBHOOK_SECRET: z.string().trim().optional(),
+		STRIPE_SNAPSHOT_WEBHOOK_SECRET: z.string().trim().optional(),
+
 		// Reserved for VertaFlow redirect targets if we ever need to override
 		// the hard-coded admin/accounts hostnames in `src/middleware.ts`.
 		ADMIN_UPSTREAM_URL: optionalUrl,
