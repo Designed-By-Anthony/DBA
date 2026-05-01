@@ -283,6 +283,14 @@ canvas {
 	min-width: 0;
 }
 
+/* Scroll-lock when SiteContactDrawer is open on mobile (<1200px the drawer
+ * becomes a bottom-sheet that should freeze background scroll). The class is
+ * toggled by SiteContactDrawer.tsx; rule was carried over from the deleted
+ * layout-shell.css. */
+body.site-contact-drawer-open {
+	overflow: hidden;
+}
+
 body::before {
 	content: "";
 	position: fixed;

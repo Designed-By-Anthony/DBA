@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { stackBadge } from "@/design-system/buttons";
 import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
@@ -20,10 +21,6 @@ export type BrandFooterProps = {
 	/** Optional contextual "Powered by" chips shown below the standard Built-with row. */
 	poweredBy?: ReadonlyArray<{ label: string; href: string }>;
 };
-
-/* Shared stack badge class */
-const stackBadge =
-	"inline-flex items-center px-[0.52rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[0.62rem] font-medium tracking-[0.01em] text-[rgba(247,244,238,0.48)] no-underline whitespace-nowrap transition-[color,border-color] duration-[180ms] ease-in hover:text-[rgba(247,244,238,0.82)] hover:border-[rgba(255,255,255,0.2)]";
 
 export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 	const year = new Date().getFullYear();
