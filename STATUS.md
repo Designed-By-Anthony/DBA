@@ -7,6 +7,7 @@
 - Removed legacy external console redirects from middleware; `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` now remain first-party hosts for callback-safe routing.
 - Removed old external CRM origin from CSP, lead-form endpoint trust, JSON-LD aliases, operator docs, and generated headers/site script.
 - Added Clerk auth origins to `connect-src` and `frame-src`; no active Clerk/Auth.js provider or env-key implementation exists in the repo layouts today.
+- Pages build now flattens `.vercel/output/static` after OpenNext so Cloudflare deploys physical assets instead of symlinked entries.
 
 ## Logo lock + hero ghosting (2026-05-01)
 
