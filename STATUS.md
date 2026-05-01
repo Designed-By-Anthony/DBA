@@ -19,6 +19,7 @@
 - Merge update: merged latest `main` again, kept the global `theme.css` architecture, retained the new `stackBadge` helper, and resolved Tailwind bridge conflicts without reintroducing duplicate global CSS.
 - Review fix: restored Lighthouse report viewer loading/error/invalid-link state styles in `theme.css`.
 - Review fix: restored the `body.site-contact-drawer-open` scroll-lock rule for the mobile contact drawer.
+- Review fix: synced `--font-main` to the loaded `"Inter Variable"` font-family in both `theme.css` and `tokens.css`.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
