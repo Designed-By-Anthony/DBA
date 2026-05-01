@@ -152,6 +152,10 @@ export function AuditForm() {
 	const labelClass =
 		"mb-1.5 block text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[var(--text-cream)]";
 
+	const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+	const isSubmitDisabled =
+		status === "loading" || (!!turnstileSiteKey && !turnstileToken);
+
 	return (
 		<div className="relative isolate w-full" id="run-audit">
 			{status === "loading" ? (
@@ -290,10 +294,10 @@ export function AuditForm() {
 					</div>
 				)}
 
-				{process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+				{turnstileSiteKey && (
 					<div className="flex flex-col items-center gap-2 py-4">
 						<Turnstile
-							siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+							siteKey={turnstileSiteKey}
 							onSuccess={(token) => setTurnstileToken(token)}
 							onExpire={() => setTurnstileToken(null)}
 							onError={() => setTurnstileToken(null)}
@@ -308,14 +312,8 @@ export function AuditForm() {
 				<div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
 					<button
 						type="submit"
-						disabled={
-							status === "loading" ||
-							(!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken)
-						}
-						aria-disabled={
-							status === "loading" ||
-							(!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken)
-						}
+						disabled={isSubmitDisabled}
+						aria-disabled={isSubmitDisabled}
 						className={`${btnPrimaryAudit} w-full sm:w-auto sm:min-w-[260px]`}
 					>
 						<span className="relative inline-flex items-center justify-center gap-2">

@@ -31,13 +31,15 @@ export async function verifyTurnstileToken(
 	try {
 		const res = await fetch(TURNSTILE_VERIFY_URL, {
 			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
 			body: params,
 		});
 		json = (await res.json()) as {
 			success: boolean;
 			"error-codes"?: string[];
 		};
-	} catch {
+	} catch (err) {
+		console.error("[turnstile] Verification request failed:", err);
 		return { success: false, errorCodes: ["network-error"] };
 	}
 

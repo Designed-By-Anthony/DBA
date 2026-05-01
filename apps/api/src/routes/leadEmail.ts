@@ -86,13 +86,10 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 
 		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
 		if (turnstileSecret) {
+			const body = rawBody as Record<string, unknown>;
 			const cfToken =
-				typeof (rawBody as Record<string, unknown>).cf_turnstile_response ===
-				"string"
-					? (
-							(rawBody as Record<string, unknown>)
-								.cf_turnstile_response as string
-						).trim()
+				typeof body.cf_turnstile_response === "string"
+					? body.cf_turnstile_response.trim()
 					: "";
 			if (!cfToken) {
 				set.status = 403;
