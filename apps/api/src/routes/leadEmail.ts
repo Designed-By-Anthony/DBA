@@ -106,6 +106,10 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			}
 			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
 			if (!verification.success) {
+				console.warn(
+					"[lead-email] Turnstile verification failed:",
+					verification.errorCodes,
+				);
 				set.status = 403;
 				return {
 					errors: [
