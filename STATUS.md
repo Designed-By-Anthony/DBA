@@ -2,6 +2,13 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Playwright ironclad + security audit specs (2026-05-01)
+
+- Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).
+- Fixed Playwright route list import via `playwright/lib/marketing-paths.ts`; root `tsconfig.json` maps `@/*` for Playwright TS resolution.
+- Corrected `playwright.config.ts` webServer to use `bun run --cwd apps/web` and `PORT=` for `next start`.
+- Header forensic still flags missing `Content-Security-Policy` on local `next start` (CSP lives in `static-headers.json` / edge, not `next.config.ts` response headers).
+
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 
 - Tightened the shared marketing chrome for responsive navigation across tablet/desktop/mobile by updating `apps/web/src/components/brand/BrandHeader.tsx` and `apps/web/src/components/marketing/MarketingChrome.tsx`.

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { getAllMarketingPathnames } from "../src/lib/marketing-routes";
 import { runZapSpiderAndReport } from "./helpers/zap-crawl";
+import { getAllMarketingPathnames } from "./lib/marketing-paths";
 
 const ZAP_SEED_ROUTES = getAllMarketingPathnames();
 
