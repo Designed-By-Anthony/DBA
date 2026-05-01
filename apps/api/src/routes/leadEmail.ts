@@ -6,6 +6,7 @@ import {
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
 import { postLeadIngest } from "@/lib/leadWebhook";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 /*
  * CORS for `/api/lead-email` is handled exclusively by the global
@@ -81,6 +82,41 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 		if (rawBody == null || typeof rawBody !== "object") {
 			set.status = 400;
 			return { errors: [{ message: "Invalid request body." }] };
+		}
+
+		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+		if (turnstileSecret) {
+			const cfToken =
+				typeof (rawBody as Record<string, unknown>).cf_turnstile_response ===
+				"string"
+					? (
+							(rawBody as Record<string, unknown>)
+								.cf_turnstile_response as string
+						).trim()
+					: "";
+			if (!cfToken) {
+				set.status = 403;
+				return {
+					errors: [
+						{
+							message:
+								"Security check required. Please complete the challenge and try again.",
+						},
+					],
+				};
+			}
+			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
+			if (!verification.success) {
+				set.status = 403;
+				return {
+					errors: [
+						{
+							message:
+								"Security check failed. Please refresh the page and try again.",
+						},
+					],
+				};
+			}
 		}
 
 		let lead: PublicLeadIngestBody;

@@ -34,6 +34,7 @@ import {
 } from "@lh/lib/validation";
 import { Elysia } from "elysia";
 import { postLeadIngest } from "@/lib/leadWebhook";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;
@@ -108,6 +109,23 @@ export const auditRoute = new Elysia({ aot: false }).post(
 		if (!url || !email || !name || !company) {
 			set.status = 400;
 			return { error: "Valid URL, name, company, and email are required." };
+		}
+
+		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+		if (turnstileSecret) {
+			const cfToken =
+				typeof body.cf_turnstile_response === "string"
+					? body.cf_turnstile_response.trim()
+					: "";
+			if (!cfToken) {
+				set.status = 403;
+				return { error: "Security check required. Please complete the challenge and try again." };
+			}
+			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
+			if (!verification.success) {
+				set.status = 403;
+				return { error: "Security check failed. Please refresh the page and try again." };
+			}
 		}
 
 		try {
