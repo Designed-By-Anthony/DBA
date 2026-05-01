@@ -7,7 +7,7 @@ export async function GET() {
 			new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
 	);
 	const xml = buildRssFeed({
-		title: "Designed by Anthony — Web Design for Service Businesses",
+		title: "ANTHONY. — Web Design for Service Businesses",
 		description:
 			"Practical articles on web design, local SEO, site speed, and what actually gets service businesses more phone calls.",
 		items: sorted.map((post) => ({

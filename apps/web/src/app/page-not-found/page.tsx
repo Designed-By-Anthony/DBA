@@ -10,16 +10,16 @@ export const metadata: Metadata = {
 	robots: { index: false, follow: true },
 	alternates: { canonical: "/page-not-found" },
 	openGraph: {
-		title: "Page not found | Designed by Anthony",
+		title: "Page not found | ANTHONY.",
 		description:
 			"The page you requested is not on designedbyanthony.com. Use the homepage or contact link to continue.",
 		url: "https://designedbyanthony.com/page-not-found",
-		siteName: "Designed by Anthony",
+		siteName: "ANTHONY.",
 		type: "website",
 	},
 	twitter: {
 		card: "summary",
-		title: "Page not found | Designed by Anthony",
+		title: "Page not found | ANTHONY.",
 		description:
 			"The page you requested is not on designedbyanthony.com. Use the homepage or contact link to continue.",
 	},

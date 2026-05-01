@@ -30,7 +30,7 @@ const STEPS = [
 	{
 		id: "brand",
 		label: "Brand Integration",
-		sub: "In Progress — 24-48h",
+		sub: "Post design sync — ANTHONY. standard",
 		state: "active",
 	},
 	{

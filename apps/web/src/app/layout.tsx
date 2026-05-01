@@ -1,6 +1,6 @@
 import "@/design-system/dba-global.css";
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
@@ -21,15 +21,18 @@ const outfit = Outfit({
 
 /**
  * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
- * <html>. BrandHeader and BrandFooter reference var(--font-fraunces) for the
- * brand wordmark. Without this, the variable is unset on marketing pages and
- * the browser falls back to the @font-face "Fraunces Variable" name — which
- * works but skips preloading optimisations.
+ * <html>. Decorative serif headings may reference var(--font-fraunces).
  */
 const fraunces = Fraunces({
 	variable: "--font-fraunces",
 	subsets: ["latin"],
 	axes: ["opsz", "SOFT", "WONK"],
+	display: "swap",
+});
+
+const inter = Inter({
+	variable: "--font-inter",
+	subsets: ["latin"],
 	display: "swap",
 });
 
@@ -46,19 +49,22 @@ export const viewport: Viewport = {
 	colorScheme: "dark",
 };
 
+const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
+const SITE_DESCRIPTION =
+	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
+
 export const metadata: Metadata = {
 	metadataBase: new URL("https://designedbyanthony.com"),
 	title: {
-		default: "Designed by Anthony",
-		template: "%s | Designed by Anthony",
+		default: SITE_TITLE,
+		template: "%s | ANTHONY.",
 	},
-	description:
-		"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
+	description: SITE_DESCRIPTION,
 	manifest: "/manifest.webmanifest",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
-		title: "Designed by Anthony",
+		title: SITE_TITLE,
 	},
 	formatDetection: {
 		telephone: false,
@@ -66,34 +72,32 @@ export const metadata: Metadata = {
 		address: false,
 	},
 	generator: "Next.js",
-	authors: [{ name: "Designed By Anthony" }],
+	authors: [{ name: "Anthony Jones — ANTHONY." }],
 	other: {
 		"business-type": "B2B",
 		industry: "Professional Services / Web Design & Local SEO",
 	},
 	openGraph: {
-		siteName: "Designed by Anthony",
+		siteName: "ANTHONY.",
 		type: "website",
 		locale: "en_US",
 		url: "https://designedbyanthony.com",
-		title: "Designed by Anthony — Custom websites & local SEO",
-		description:
-			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York. Lighthouse-grade performance, Bronze finish.",
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
 		images: [
 			{
 				url: "/images/og-site-premium.png",
 				width: 2400,
 				height: 1260,
-				alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+				alt: "ANTHONY. — Digital Infrastructure Architect",
 				type: "image/png",
 			},
 		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Designed by Anthony — Custom websites & local SEO",
-		description:
-			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
 		images: ["/images/og-site-premium.png"],
 	},
 	icons: {
@@ -119,7 +123,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
-			className={`${outfit.variable} ${fraunces.variable}`}
+			className={`${outfit.variable} ${fraunces.variable} ${inter.variable}`}
 		>
 			<head>
 				<JsonLd />

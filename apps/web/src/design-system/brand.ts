@@ -2,7 +2,7 @@ import type { StaticImageData } from "next/image";
 import brandMarkImage from "./brand-mark.webp";
 
 /**
- * Designed by Anthony — brand asset constants.
+ * ANTHONY. — brand asset constants.
  *
  * Single source of truth for logo paths served by each app.
  *
@@ -14,7 +14,8 @@ import brandMarkImage from "./brand-mark.webp";
  * NEVER hardcode logo paths in individual components — import one of
  * the constants below so a rename touches a single file.
  */
-export const BRAND_NAME = "Designed by Anthony";
+/** Public wordmark — displayed as Fraunces + bronze period in chrome. */
+export const BRAND_NAME = "ANTHONY.";
 
 /** Bundled mark for `next/image` (avoids 404 when `/public` statics mis-deploy). */
 export const BRAND_MARK_IMAGE: StaticImageData = brandMarkImage;
@@ -28,8 +29,8 @@ export const BRAND_ASSETS = {
 	logo: "/brand/logo.png",
 	/** Horizontal brand lockup, larger source (for retina/print). */
 	logoFull: "/brand/logo-full.png",
-	/** Square/icon mark — used in dense UI chrome (sidebars, PWA). */
-	mark: "/brand/mark.webp",
+	/** Master wordmark — isolated ANTHONY. + bronze period (PNG from SVG source). */
+	masterWordmark: "/logos/anthony_master_wordmark.png",
 } as const;
 
 export type BrandAssetKey = keyof typeof BRAND_ASSETS;

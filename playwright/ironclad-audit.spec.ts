@@ -109,7 +109,7 @@ test.describe("Ironclad Playwright audit (report-only)", () => {
 		).toBe(false);
 	});
 
-	test("[VISUAL] CTA hierarchy — FoundingPartnerSection: only “Audit My Site” is btnPrimary", async ({
+	test("[VISUAL] CTA hierarchy — FoundingPartnerSection: only “Let's build something great.” is btnPrimary", async ({
 		page,
 	}) => {
 		await page.setViewportSize({ width: hammerWidth, height: hammerHeight });
@@ -130,7 +130,9 @@ test.describe("Ironclad Playwright audit (report-only)", () => {
 			const text = ((await el.innerText()) ?? "").trim();
 			if (!text) continue;
 
-			const audit = /audit my site/i.test(text);
+			const primaryCta =
+				/let's build something great/i.test(text) ||
+				/lets build something great/i.test(text);
 			const style = await el.evaluate((node) => {
 				const s = window.getComputedStyle(node);
 				return `${s.backgroundImage} ${s.backgroundColor} ${s.boxShadow}`;
@@ -140,17 +142,17 @@ test.describe("Ironclad Playwright audit (report-only)", () => {
 			const isOutline = matchesAny(style, BTN_OUTLINE_MARKERS);
 			const isSecondary = matchesAny(style, BTN_SECONDARY_MARKERS);
 
-			if (audit && !isPrimary) {
+			if (primaryCta && !isPrimary) {
 				failures.push(
-					`[VISUAL] “Audit My Site” missing btnPrimary markers — apps/web/src/components/marketing/FoundingPartnerSection.tsx — ${style.slice(0, 220)}`,
+					`[VISUAL] Primary CTA missing btnPrimary markers — apps/web/src/components/marketing/FoundingPartnerSection.tsx — ${style.slice(0, 220)}`,
 				);
 			}
-			if (!audit && isPrimary) {
+			if (!primaryCta && isPrimary) {
 				failures.push(
-					`[VISUAL] Non-audit CTA has btnPrimary bronze stack: “${text.slice(0, 48)}” — apps/web/src/components/marketing/FoundingPartnerSection.tsx:104-110 — ${style.slice(0, 220)}`,
+					`[VISUAL] Non-primary CTA has btnPrimary bronze stack: “${text.slice(0, 48)}” — apps/web/src/components/marketing/FoundingPartnerSection.tsx:104-110 — ${style.slice(0, 220)}`,
 				);
 			}
-			if (!audit && !(isOutline || isSecondary)) {
+			if (!primaryCta && !(isOutline || isSecondary)) {
 				failures.push(
 					`[VISUAL] Non-audit CTA is not outline/secondary by heuristic: “${text.slice(0, 48)}” — apps/web/src/components/marketing/FoundingPartnerSection.tsx — ${style.slice(0, 220)}`,
 				);

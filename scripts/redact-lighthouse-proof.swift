@@ -5,7 +5,7 @@ import PDFKit
 
 let sourcePDFURL = URL(fileURLWithPath: "/Users/anthonyjones/Downloads/clean run.pdf")
 let outputPDFURL = URL(fileURLWithPath: "/Users/anthonyjones/Downloads/clean-run-redacted-local.pdf")
-let outputPNGURL = URL(fileURLWithPath: "/Users/anthonyjones/Web Design/Designed by Anthony/public/images/audit-before-report.png")
+let outputPNGURL = URL(fileURLWithPath: "/workspace/apps/web/public/images/audit-before-report.png")
 let previewPNGURL = URL(fileURLWithPath: "/tmp/redacted-audit-before-preview.png")
 
 let redactionFill = NSColor(calibratedRed: 0.04, green: 0.07, blue: 0.12, alpha: 0.98)

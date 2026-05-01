@@ -8,7 +8,7 @@ export const staticMarketingPageCopy: Record<
 	{ title: string; description: string; paragraphs: string[] }
 > = {
 	about: {
-		title: "About Designed by Anthony",
+		title: "About ANTHONY.",
 		description:
 			"Marine Corps veteran–led Mohawk Valley web design studio for service businesses across Central New York.",
 		paragraphs: [
@@ -18,7 +18,7 @@ export const staticMarketingPageCopy: Record<
 	},
 	contact: {
 		title: "Contact",
-		description: "Reach Designed by Anthony — secure form, no spam.",
+		description: "Reach ANTHONY. — secure form, no spam.",
 		paragraphs: [
 			"Tell us what you are trying to fix (slow site, Map Pack visibility, rescue rebuild, or net-new build). We reply within one business day with a clear next step.",
 		],
@@ -33,7 +33,7 @@ export const staticMarketingPageCopy: Record<
 	},
 	portfolio: {
 		title: "Portfolio",
-		description: "Selected builds and concept work from Designed by Anthony.",
+		description: "Selected builds and concept work from ANTHONY.",
 		paragraphs: [
 			"Below is a mix of live client work and published concept builds that show the layout, performance, and conversion patterns we ship.",
 		],
@@ -64,7 +64,7 @@ export const staticMarketingPageCopy: Record<
 	privacy: {
 		title: "Privacy Policy",
 		description:
-			"How Designed by Anthony handles information submitted through this site.",
+			"How ANTHONY. handles information submitted through this site.",
 		paragraphs: [
 			"This policy describes what we collect through contact and audit forms, how long we retain it, and how to request deletion. A full legal review copy can be expanded here; for now, treat submissions as operational email + CRM records used only to respond and deliver services.",
 		],
@@ -72,7 +72,7 @@ export const staticMarketingPageCopy: Record<
 	terms: {
 		title: "Terms of Service",
 		description:
-			"Terms governing use of this website and engagement with Designed by Anthony.",
+			"Terms governing use of this website and engagement with ANTHONY.",
 		paragraphs: [
 			"Use of this site does not create a client relationship until a written agreement is signed. Project scope, payment milestones, and deliverables are defined per engagement.",
 		],

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 /** Shared PWA manifest for `/manifest.webmanifest` and legacy `/site.webmanifest`. */
 export const webAppManifest: MetadataRoute.Manifest = {
-	name: "Designed by Anthony",
-	short_name: "Designed by Anthony",
+	name: "ANTHONY.",
+	short_name: "ANTHONY.",
 	description:
 		"Custom websites, managed hosting, and local SEO systems for service businesses.",
 	start_url: "/",

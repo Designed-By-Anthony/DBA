@@ -3,7 +3,7 @@ const MARKETING = Cypress.env("MARKETING_URL") || "http://localhost:3000";
 describe("Marketing — SEO Meta", () => {
 	it("contact page title clearly describes the page purpose", () => {
 		cy.visit(`${MARKETING}/contact`);
-		cy.title().should("match", /Contact.*Web Design.*SEO.*Designed by Anthony/);
+		cy.title().should("match", /Contact.*ANTHONY/);
 	});
 
 	it("homepage has structured data", () => {

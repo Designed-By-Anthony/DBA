@@ -235,11 +235,11 @@ function ServiceDetailPage({ slug }: { slug: string }) {
                     y={20}
                     duration={0.6}
                 >
-                    <Link href="/lighthouse" className={btnPrimary}>
-                        Audit My Site
+                    <Link href="/contact" className={btnPrimary}>
+                        Let&apos;s build something great.
                     </Link>
-                    <Link href="/contact" className={btnOutline}>
-                        Contact us
+                    <Link href="/lighthouse" className={btnOutline}>
+                        Audit My Site
                     </Link>
                 </MotionReveal>
             </section>
@@ -553,11 +553,11 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
                         y={20}
                         duration={0.6}
                     >
-                        <Link href="/lighthouse" className={btnPrimary}>
-                            Audit My Site
+                        <Link href="/contact" className={btnPrimary}>
+                            Let&apos;s build something great.
                         </Link>
-                        <Link href="/contact" className={btnOutline}>
-                            Contact instead
+                        <Link href="/lighthouse" className={btnOutline}>
+                            Audit My Site
                         </Link>
                     </MotionReveal>
                 </section>

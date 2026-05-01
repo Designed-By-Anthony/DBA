@@ -9,13 +9,14 @@ import {
 	SITE_BRAND,
 	SITE_CONTACT_LINK,
 	SITE_HEADER_NAV_LINKS,
+	SITE_WORDMARK_ALT,
 } from "@/design-system/site-config";
 import { businessProfile } from "@/lib/seo";
 import { FooterCta, type FooterCtaProps } from "./FooterCta";
 import { PageLifecycle } from "./PageLifecycle";
 import { SiteContactDrawer } from "./SiteContactDrawer";
 
-const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — Designed by Anthony")}`;
+const mailtoContactHref = `mailto:${businessProfile.email}?subject=${encodeURIComponent("Website inquiry — ANTHONY.")}`;
 
 /** Build-time id (see `next.config.ts` env); avoids filesystem reads on Cloudflare Workers. */
 const siteScriptVersion =
@@ -209,12 +210,12 @@ window.__dbaRevokeAnalyticsConsent = function () {
 				<div className="rounded-2xl bg-[linear-gradient(165deg,rgba(19,26,36,0.96)_0%,rgba(8,11,18,0.99)_100%)] border border-[rgba(255,252,245,0.1)] shadow-[0_32px_90px_-40px_rgba(0,0,0,0.88),0_0_0_1px_rgba(255,252,245,0.06)] backdrop-blur-[20px] text-[rgba(247,244,238,0.92)] px-[1.35rem] pt-[1.25rem] pb-[1.15rem]">
 					<div className="flex items-start justify-between gap-3 mb-[0.35rem]">
 						<Image
-							src={SITE_BRAND.assets.mark}
-							alt={SITE_BRAND.name}
-							width={40}
-							height={30}
-							className="block"
-							style={{ width: 40, height: "auto" }}
+							src={SITE_BRAND.assets.masterWordmark}
+							alt={SITE_WORDMARK_ALT}
+							width={720}
+							height={140}
+							className="block h-9 w-auto max-h-9 object-contain object-left"
+							style={{ width: "auto", maxWidth: "min(240px, 85vw)" }}
 						/>
 						<button
 							type="button"

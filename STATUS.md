@@ -6,9 +6,21 @@
 
 - `packages/shared` Drizzle schema: `leads` + `transactions`; D1 binding name `DB` (`apps/api/wrangler.json`, `apps/web/wrangler.json` + `wrangler.worker.json`). API: `setLedgerDb` + `tryInsertLead` / `tryInsertTransaction` in `packages/shared/src/lib/d1Leads.ts`. `POST /api/audit` and `POST /api/lead-email` insert after validation; Stripe thin webhook writes transactions + sets lead status `Provisioning`. Scaffolded `apps/admin` (ledger tables). Web `next.config.ts`: `output: "standalone"` so OpenNext finds `pages-manifest.json`.
 
+## ANTHONY. identity pivot (2026-05-01)
+
+- Marketing hero + primary CTAs (`btnPrimary` Inter uppercase), Spanish `/es` headline, checkout provisioning copy, JSON-LD “The Vault by ANTHONY.” (replaces prior CRM product naming in structured data). Admin ledger UI retitled **The Vault** with **315 Pipeline** / **Revenue Ledger** on absolute black. CSP variable rename only (`CRM_CONSOLE_ORIGIN`); lead-ingest host unchanged.
+
+## Master ANTHONY. wordmark (2026-05-01)
+
+- Vector source: `apps/web/public/logos/anthony_master_wordmark.svg` (light-on-dark for midnight chrome). Build rasterizes to **`anthony_master_wordmark.png`** in `apps/web/public/logos/` and `apps/admin/public/logos/` via `bun run --cwd apps/web generate:master-wordmark` (runs in `prepare:next`). **Replace** the SVG/PNG after isolating the definitive asset from `image_12.png` if pixel-perfect match is required.
+- **Repo-wide string sweep:** no remaining `Designed by Anthony` references; `bun run build:site-script` regenerates `public/scripts/site.js` from `src/scripts/site.ts` (removes spurious minified matches).
+- **Header/footer/reach-out modal use Next `<Image>` + `BRAND_ASSETS.masterWordmark`;** JSON-LD org `logo` uses the same URL.
+- **FAQ:** `FaqSection.tsx` + `.text-bubble.is-bordered` accordion rows; thin bronze +/- toggle; inner pages use same pattern via `FaqAccordionSummaryAndAnswer`.
+- **`tailwind.config.ts`:** documents `#D4AF37` / aligns IDE with `@theme` tokens from `tokens.css`.
+
 ## Playwright ironclad + security audit specs (2026-05-01)
 
-- Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).
+- Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, primary vs outline CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).
 - Fixed Playwright route list import via `playwright/lib/marketing-paths.ts`; root `tsconfig.json` maps `@/*` for Playwright TS resolution.
 - Corrected `playwright.config.ts` webServer to use `bun run --cwd apps/web` and `PORT=` for `next start`.
 - Header forensic still flags missing `Content-Security-Policy` on local `next start` (CSP lives in `static-headers.json` / edge, not `next.config.ts` response headers).

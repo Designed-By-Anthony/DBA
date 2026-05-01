@@ -73,7 +73,7 @@ function renderEmail(lead: PublicLeadIngestBody): {
 <p style="margin:0 0 16px;font-size:13px;color:#64748b;">${escapeHtml(lead.leadSource || lead.offerType || "Website form")}</p>
 <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.5;">${htmlRows}</table>
 <hr style="margin:20px 0;border:0;border-top:1px solid #e2e8f0;">
-<p style="margin:0;font-size:12px;color:#94a3b8;">Interim lead-email bridge · replaced by VertaFlow CRM ingest when tenant is live.</p>
+<p style="margin:0;font-size:12px;color:#94a3b8;">Interim lead-email bridge · replaced by The Vault lead ingest when tenant is live.</p>
 </div></body></html>`;
 
 	return { text: textLines.join("\n"), html };

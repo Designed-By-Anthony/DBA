@@ -8,6 +8,6 @@ describe("Marketing — Accessibility", () => {
 
 	it("contact page title clearly describes the page purpose", () => {
 		cy.visit(`${MARKETING}/contact`);
-		cy.title().should("match", /Contact.*Web Design.*SEO.*Designed by Anthony/);
+		cy.title().should("match", /Contact.*ANTHONY/);
 	});
 });

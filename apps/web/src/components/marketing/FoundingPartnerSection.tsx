@@ -102,11 +102,11 @@ export function FoundingPartnerSection() {
 				</div>
 
 				<div className={ACTIONS}>
-					<Link href="/lighthouse" className={btnPrimary}>
-						Audit My Site
+					<Link href="/contact" className={btnPrimary}>
+						Let&apos;s build something great.
 					</Link>
-					<Link href="/contact" className={btnOutline}>
-						Contact us
+					<Link href="/lighthouse" className={btnOutline}>
+						Audit My Site
 					</Link>
 				</div>
 

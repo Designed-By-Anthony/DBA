@@ -1,5 +1,6 @@
 export const runtime = "edge";
 
+import Image from "next/image";
 import {
 	createD1Client,
 	type Lead,
@@ -35,16 +36,23 @@ export default async function AdminLedgerPage() {
 
 	return (
 		<main className="mx-auto max-w-7xl px-6 py-12">
-			<h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold tracking-tight text-white">
-				The Ledger
-			</h1>
-			<p className="mt-2 font-[family-name:var(--font-inter)] text-sm text-white/60">
-				Leads pipeline and revenue ledger (D1).
-			</p>
+			<div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+				<Image
+					src="/logos/anthony_master_wordmark.png"
+					alt="ANTHONY. | Digital Infrastructure Architect"
+					width={720}
+					height={140}
+					className="h-10 md:h-11 w-auto max-w-[min(92vw,20rem)] object-contain object-left"
+					priority
+				/>
+				<p className="font-[family-name:var(--font-inter)] text-sm text-white/60 md:text-right md:max-w-xs">
+					The Vault · Midnight ledger
+				</p>
+			</div>
 
 			<section className="mt-10">
 				<h2 className="font-[family-name:var(--font-fraunces)] text-xl font-semibold text-white">
-					Leads Pipeline
+					315 Pipeline
 				</h2>
 				<div className="text-bubble is-bordered mt-4 overflow-x-auto">
 					<table className="w-full border-collapse text-left text-sm font-[family-name:var(--font-inter)] text-white/90">

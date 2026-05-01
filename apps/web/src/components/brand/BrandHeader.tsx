@@ -6,27 +6,23 @@ import {
 	SITE_BRAND,
 	SITE_CONTACT_LINK,
 	SITE_HEADER_NAV_LINKS,
+	SITE_WORDMARK_ALT,
 } from "@/design-system/site-config";
 
 export type BrandHeaderProps = {
-	/** When set to "audit", the header shows a current-page chip
-	 * instead of the "Audit My Site" CTA. */
 	currentSection?: "audit";
-	/**
-	 * Render a hamburger button that the existing mobile-nav-overlay JS
-	 * (in public/scripts/site.js) hooks into. The lighthouse page can pass
-	 * `false` to render a slim mobile slot instead.
-	 */
 	includeHamburger?: boolean;
 };
 
-/* Shared bronze CTA button classes */
-const navCtaBase =
-	"inline-flex items-center gap-[0.4rem] rounded-[0.6rem] border border-[rgba(212,175,55,0.45)] bg-[linear-gradient(170deg,rgba(212,175,55,0.22)_0%,rgba(181,138,20,0.32)_100%)] font-bold tracking-[0.01em] text-[rgba(252,240,210,0.96)] no-underline shadow-[0_8px_22px_-10px_rgba(212,175,55,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] transition-[transform,box-shadow,border-color] duration-[200ms] ease-in whitespace-nowrap hover:-translate-y-px hover:border-[rgba(212,175,55,0.65)] hover:shadow-[0_12px_28px_-10px_rgba(212,175,55,0.45),inset_0_1px_0_rgba(255,255,255,0.12)]";
+const navAuditCtaTypography =
+	"font-[family-name:var(--font-inter)] font-semibold uppercase tracking-widest text-[0.68rem]";
 
-/* Audit / current-page chip (Lighthouse segment — intentional sky blue) */
-const auditCurrentChip =
-	"inline-flex items-center gap-[0.45rem] px-3 py-[0.35rem] rounded-full border border-[rgba(56,189,248,0.32)] bg-[rgba(56,189,248,0.08)] text-[0.7rem] font-bold tracking-[0.16em] uppercase text-[rgba(186,230,253,0.95)] whitespace-nowrap";
+const navCtaBase = `inline-flex items-center gap-[0.4rem] rounded-[0.6rem] border border-[rgba(212,175,55,0.45)] bg-[linear-gradient(170deg,rgba(212,175,55,0.22)_0%,rgba(181,138,20,0.32)_100%)] ${navAuditCtaTypography} text-[rgba(252,240,210,0.96)] no-underline shadow-[0_8px_22px_-10px_rgba(212,175,55,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] transition-[transform,box-shadow,border-color] duration-[200ms] ease-in whitespace-nowrap hover:-translate-y-px hover:border-[rgba(212,175,55,0.65)] hover:shadow-[0_12px_28px_-10px_rgba(212,175,55,0.45),inset_0_1px_0_rgba(255,255,255,0.12)]`;
+
+const auditCurrentChip = `inline-flex items-center gap-[0.45rem] px-3 py-[0.35rem] rounded-full border border-[rgba(56,189,248,0.32)] bg-[rgba(56,189,248,0.08)] ${navAuditCtaTypography} text-[rgba(186,230,253,0.95)] whitespace-nowrap`;
+
+const bannerDotBronze =
+	"inline-block w-[0.4rem] h-[0.4rem] rounded-full shrink-0 bg-[rgb(var(--accent-bronze-rgb))] animate-[atelier-bronze-dot-pulse_2.4s_ease-in-out_infinite]";
 
 export function BrandHeader({
 	currentSection,
@@ -36,68 +32,53 @@ export function BrandHeader({
 
 	return (
 		<>
-			{/* ── Top launch banner ── */}
 			<aside
 				className="relative z-[4] bg-[linear-gradient(90deg,rgba(8,12,22,0.96)_0%,rgba(11,17,30,0.96)_50%,rgba(8,12,22,0.96)_100%)] border-b border-[rgba(212,175,55,0.14)]"
 				aria-label="Site notice"
 			>
 				<Link
 					href={isAudit ? SITE_BRAND.homeHref : SITE_BANNER.href}
-					className="site-banner-link flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-medium tracking-[0.04em] text-[rgba(232,213,168,0.92)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
+					className="site-banner-link flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-[family-name:var(--font-inter)] font-light tracking-[0.03em] text-[rgba(232,213,168,0.88)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
 				>
-					<span
-						className="inline-block w-[0.4rem] h-[0.4rem] rounded-full bg-[rgba(212,175,55,0.95)] shadow-[0_0_8px_1px_rgba(212,175,55,0.4)] shrink-0"
-						aria-hidden
-					/>
+					<span className={bannerDotBronze} aria-hidden />
 					<span>
-						<strong className="font-[family-name:var(--font-fraunces)] font-semibold tracking-[0.01em] text-[rgba(252,240,210,0.96)]">
+						<span className="text-[rgba(252,240,210,0.94)]">
 							{SITE_BANNER.label}
-						</strong>
+						</span>
 						<span
 							className="text-[rgba(232,213,168,0.4)] mx-[0.05em]"
 							aria-hidden
 						>
 							{" — "}
 						</span>
-						<span className="italic text-[rgba(232,213,168,0.7)] max-[36rem]:hidden">
+						<span className="italic text-[rgba(232,213,168,0.65)] max-[36rem]:hidden">
 							{isAudit ? SITE_BANNER.currentCta : `${SITE_BANNER.cta} →`}
 						</span>
 					</span>
 				</Link>
 			</aside>
 
-			{/* ── Sticky glass header ── */}
 			<header className="relative z-[3] bg-[#0a0c10]/80 backdrop-blur-md border-b border-white/10 pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
 				<div className="flex items-center justify-between gap-6 max-w-[80rem] mx-auto py-[0.95rem] md:py-[1.1rem]">
-					{/* Brand lockup */}
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="inline-flex items-center gap-3 no-underline min-w-0 group"
-						aria-label={`${SITE_BRAND.name} — home`}
+						className="inline-flex items-center min-w-0 shrink max-w-[min(72vw,14rem)] md:max-w-none group"
+						aria-label={SITE_WORDMARK_ALT}
 					>
 						<Image
-							src={SITE_BRAND.assets.mark}
-							alt="Designed by Anthony logo"
-							width={36}
-							height={27}
-							className="h-[1.85rem] w-auto shrink-0 transition-transform duration-[280ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-[-3deg] md:h-[2rem]"
-							style={{ width: "auto" }}
+							src={SITE_BRAND.assets.masterWordmark}
+							alt={SITE_WORDMARK_ALT}
+							width={720}
+							height={140}
+							className="h-8 w-auto max-h-8 object-contain object-left opacity-[0.96] transition-opacity duration-200 group-hover:opacity-100"
 							priority
+							sizes="(max-width: 960px) 55vw, 240px"
 						/>
-						<span className="flex flex-col min-w-0">
-							<span className="font-[family-name:var(--font-fraunces)] text-[1rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.95)] leading-[1.1] [font-variation-settings:'opsz'_40] md:text-[1.05rem]">
-								{SITE_BRAND.name}
-							</span>
-							<span className="mt-[0.18rem] text-[0.62rem] font-medium tracking-[0.18em] uppercase text-[rgba(212,175,55,0.68)] max-[28rem]:hidden">
-								{SITE_BRAND.tagline}
-							</span>
-						</span>
 					</Link>
 
-					{/* Desktop nav */}
 					<nav
 						className="hidden min-[960px]:flex items-center gap-5"
-						aria-label="Designed by Anthony main navigation"
+						aria-label="Main navigation"
 					>
 						{SITE_HEADER_NAV_LINKS.map((link) => (
 							<Link
@@ -125,15 +106,14 @@ export function BrandHeader({
 						) : (
 							<Link
 								href={SITE_AUDIT_CTA.href}
-								className={`${navCtaBase} px-[1.1rem] py-[0.55rem] text-[0.78rem]`}
+								className={`${navCtaBase} px-[1rem] py-[0.5rem]`}
 								id="nav-audit-btn"
 							>
-								{SITE_AUDIT_CTA.label}
+								{SITE_AUDIT_CTA.shortLabel}
 							</Link>
 						)}
 					</nav>
 
-					{/* Mobile slot — CTA chip or hamburger */}
 					<div className="flex min-[960px]:hidden items-center gap-[0.6rem]">
 						{isAudit ? (
 							<span className={auditCurrentChip} aria-current="page">
@@ -146,7 +126,7 @@ export function BrandHeader({
 						) : (
 							<Link
 								href={SITE_AUDIT_CTA.href}
-								className={`${navCtaBase} px-[0.85rem] py-[0.4rem] text-[0.72rem] tracking-[0.04em]`}
+								className={`${navCtaBase} px-[0.75rem] py-[0.38rem]`}
 							>
 								{SITE_AUDIT_CTA.shortLabel}
 							</Link>
@@ -168,7 +148,6 @@ export function BrandHeader({
 					</div>
 				</div>
 
-				{/* Brass accent rule under header */}
 				<div
 					className="h-px bg-[linear-gradient(90deg,rgba(212,175,55,0)_0%,rgba(212,175,55,0.25)_25%,rgba(212,175,55,0.55)_50%,rgba(212,175,55,0.25)_75%,rgba(212,175,55,0)_100%)]"
 					aria-hidden

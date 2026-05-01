@@ -60,32 +60,32 @@ interface ItemListSchemaInput {
 import { serviceAreaSlugLabels } from "@/data/serviceAreaLocations";
 import { BRAND_ASSETS } from "@/design-system/brand";
 import {
+	CRM_ADMIN_APP_URL,
+	CRM_CAPTURE_MONTHLY,
+	CRM_CAPTURE_TIER_LABEL,
+	CRM_SUITE_MONTHLY,
+	CRM_SUITE_TIER_LABEL,
 	FOUNDING_PARTNER_SEO_MONTHLY,
 	GBP_FULL_PROGRAM_MONTHLY_PRICE,
 	PUBLIC_LAUNCH_BUNDLE_MONTHS,
 	STANDARD_WEBSITE_INSTALLMENT_EACH,
 	STANDARD_WEBSITE_STARTING_PRICE,
 	STANDARD_WEBSITE_TYPICAL_RANGE,
-	VERTAFLOW_CAPTURE_LABEL,
-	VERTAFLOW_CAPTURE_MONTHLY,
-	VERTAFLOW_CRM_APP_URL,
-	VERTAFLOW_SUITE_LABEL,
-	VERTAFLOW_SUITE_MONTHLY,
 } from "./offers";
 
 export const SITE_URL = "https://designedbyanthony.com";
-export const SITE_NAME = "Designed by Anthony";
+export const SITE_NAME = "ANTHONY.";
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const PERSON_ID = `${SITE_URL}/about#person`;
-/** Stable JSON-LD @id for VertaFlow CRM — admin app origin. */
-export const VERTAFLOW_CRM_SOFTWARE_ID = `${VERTAFLOW_CRM_APP_URL}/#software`;
+/** Stable JSON-LD @id for The Vault (CRM console) — admin app origin. */
+export const VAULT_CRM_SOFTWARE_ID = `${CRM_ADMIN_APP_URL}/#software`;
 export const GA_MEASUREMENT_ID = "G-4RSTBMRHDW";
 export const GOOGLE_BUSINESS_PROFILE_URL =
 	"https://www.google.com/search?kgmid=/g/11z36l4fmd&q=Designed+By+Anthony";
 export const DEFAULT_SOCIAL_IMAGE = `${SITE_URL}/images/og-site-premium.png`;
 export const SITE_LICENSE_PAGE = `${SITE_URL}/image-license`;
-export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} Designed by Anthony. All rights reserved.`;
+export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} ANTHONY. All rights reserved.`;
 export const FACEBOOK_PROFILE_URL =
 	"https://www.facebook.com/profile.php?id=61574388797744";
 export const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/dbastudio315/";
@@ -94,7 +94,7 @@ export const YELP_BUSINESS_URL =
 
 /** Richer org description for JSON-LD (Organization / ProfessionalService / LocalBusiness). */
 export const ORGANIZATION_SCHEMA_DESCRIPTION =
-	"Designed by Anthony specializes in building custom, high-performance websites, VertaFlow CRM (client portal and automations), and powerful local SEO for home service businesses and contractors. Most contractor websites use generic templates that fail to rank in their service area or convert visitors. We hand-craft mobile-first, high-speed websites with LocalBusiness Schema and optimized content so you dominate the Google Map Pack and stop losing leads to your competitors. Whether you need a website rescue, monthly SEO, CRM-led follow-up, or just a faster site—let us handle the code while you focus on the jobs.";
+	"ANTHONY. specializes in bespoke digital estates, high-performance infrastructure, client workspace (portal and automations), and powerful local SEO for home service businesses and contractors. Most contractor websites use generic templates that fail to rank in their service area or convert visitors. We hand-craft mobile-first, high-speed websites with LocalBusiness Schema and optimized content so you dominate the Google Map Pack and stop losing leads to your competitors. Whether you need a website rescue, monthly SEO, pipeline-led follow-up, or just a faster site—let us handle the code while you focus on the jobs.";
 
 export const businessProfile = {
 	name: SITE_NAME,
@@ -108,10 +108,10 @@ export const businessProfile = {
 	founderName: "Anthony Jones",
 	founderJobTitle: "Founder, Web Designer, and Developer",
 	founderDescription:
-		"Marine Corps veteran and founder of Designed by Anthony, building custom websites, VertaFlow CRM (client portal, automations), managed hosting, website rescues, and local SEO systems for service businesses.",
+		"Marine Corps veteran and founder of ANTHONY., building custom websites, client workspace (portal, automations), managed hosting, website rescues, and local SEO systems for service businesses.",
 	description:
-		"Designed by Anthony builds custom websites, VertaFlow CRM (client portal, automations), website rescues, managed hosting, and local SEO systems for service businesses.",
-	logo: `${SITE_URL}${BRAND_ASSETS.logo}`,
+		"ANTHONY. builds custom websites, client workspace (portal, automations), website rescues, managed hosting, and local SEO systems for service businesses.",
+	logo: `${SITE_URL}${BRAND_ASSETS.masterWordmark}`,
 	/** Back-compat — existing `/images/designed-by-anthony-logo.png` is still mirrored and indexed. */
 	legacyLogo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
 	image: `${SITE_URL}/images/og-site-premium.png`,
@@ -376,7 +376,7 @@ export function toAbsoluteUrl(path: string): string {
 }
 
 export function stripSiteSuffix(title: string): string {
-	return title.replace(/\s*\|\s*Designed by Anthony\s*$/i, "").trim();
+	return title.replace(/\s*\|\s*ANTHONY\.\s*$/i, "").trim();
 }
 
 function startCase(value: string): string {
@@ -758,7 +758,7 @@ export function buildBaseOrganizationSchema(): SchemaValue {
 		knowsAbout: businessProfile.knowsAbout,
 		sameAs: businessProfile.sameAs,
 		owns: {
-			"@id": VERTAFLOW_CRM_SOFTWARE_ID,
+			"@id": VAULT_CRM_SOFTWARE_ID,
 		},
 		hasOfferCatalog: buildCoreServiceOfferCatalog(),
 	};
@@ -791,7 +791,7 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 		potentialAction: [
 			{
 				"@type": "ContactAction",
-				name: "Contact Designed by Anthony",
+				name: "Contact ANTHONY.",
 				target: {
 					"@type": "EntryPoint",
 					urlTemplate: contactUrl,
@@ -810,30 +810,30 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 }
 
 /**
- * VertaFlow CRM — client portal and automation roadmap (Growth Plan).
+ * The Vault — client workspace, pipeline, and automation roadmap (Growth Plan).
  * Distinct from the free Lighthouse audit tool; linked from global JSON-LD on every page.
  */
-export function buildVertaflowCrmSoftwareApplicationSchema(): SchemaValue {
+export function buildVaultCrmSoftwareApplicationSchema(): SchemaValue {
 	const monthlyNumeric = FOUNDING_PARTNER_SEO_MONTHLY.replace(/[^0-9.]/g, "");
 
 	return {
 		"@context": "https://schema.org",
 		"@type": ["SoftwareApplication", "WebApplication"],
-		"@id": VERTAFLOW_CRM_SOFTWARE_ID,
-		name: "VertaFlow CRM",
-		alternateName: "Designed by Anthony VertaFlow CRM",
+		"@id": VAULT_CRM_SOFTWARE_ID,
+		name: "The Vault by ANTHONY.",
+		alternateName: "ANTHONY. Vault — Client Workspace",
 		description:
-			"CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Admin at admin.vertaflow.io; client-facing tools via accounts.vertaflow.io.",
+			"CRM for service businesses: pipeline and leads, client portal (magic-link access), and automations — paired with hosting and local SEO on the Growth Plan. Console access via the managed admin host; client-facing tools via accounts.designedbyanthony.com.",
 		applicationCategory: "BusinessApplication",
 		applicationSubCategory: "CRM",
 		operatingSystem: "Web",
-		url: VERTAFLOW_CRM_APP_URL,
+		url: CRM_ADMIN_APP_URL,
 		image: buildOwnedImageObject(DEFAULT_SOCIAL_IMAGE),
 		offers: {
 			"@type": "Offer",
 			name: "Growth Plan (founding partners)",
 			description:
-				"Bundled with founding-partner website builds: hosting, security, SEO, and VertaFlow CRM access.",
+				"Bundled with founding-partner website builds: hosting, security, SEO, and The Vault client workspace access.",
 			price: monthlyNumeric,
 			priceCurrency: "USD",
 			priceValidUntil: `${new Date().getFullYear()}-12-31`,
@@ -863,8 +863,8 @@ export function buildVertaflowCrmSoftwareApplicationSchema(): SchemaValue {
 /** OfferCatalog for /pricing — monthly stacks + CRM tiers (list prices). */
 export function buildPricingOfferCatalogSchema(): SchemaValue {
 	const pricingUrl = toAbsoluteUrl("/pricing");
-	const captureNum = VERTAFLOW_CAPTURE_MONTHLY.replace(/[^0-9.]/g, "");
-	const suiteNum = VERTAFLOW_SUITE_MONTHLY.replace(/[^0-9.]/g, "");
+	const captureNum = CRM_CAPTURE_MONTHLY.replace(/[^0-9.]/g, "");
+	const suiteNum = CRM_SUITE_MONTHLY.replace(/[^0-9.]/g, "");
 	const growthNum = FOUNDING_PARTNER_SEO_MONTHLY.replace(/[^0-9.]/g, "");
 	const gbpNum = GBP_FULL_PROGRAM_MONTHLY_PRICE.replace(/[^0-9.]/g, "");
 
@@ -872,10 +872,10 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 		"@context": "https://schema.org",
 		"@type": "OfferCatalog",
 		"@id": `${pricingUrl}#offercatalog`,
-		name: "Designed by Anthony — Pricing",
+		name: "ANTHONY. — Pricing",
 		url: pricingUrl,
 		description:
-			"Website projects, VertaFlow CRM tiers, Growth Plan bundle, and Google Business Profile program.",
+			"Website projects, Vault CRM tiers, Growth Plan bundle, and Google Business Profile program.",
 		itemListElement: [
 			{
 				"@type": "Offer",
@@ -885,7 +885,7 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 			},
 			{
 				"@type": "Offer",
-				name: `VertaFlow ${VERTAFLOW_CAPTURE_LABEL}`,
+				name: `Vault ${CRM_CAPTURE_TIER_LABEL}`,
 				description:
 					"Website leads, scheduling, and pipeline basics — CRM software.",
 				price: captureNum,
@@ -895,9 +895,9 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 			},
 			{
 				"@type": "Offer",
-				name: `VertaFlow ${VERTAFLOW_SUITE_LABEL}`,
+				name: `Vault ${CRM_SUITE_TIER_LABEL}`,
 				description:
-					"Full VertaFlow Suite: client portal, automations roadmap, and full CRM scope.",
+					"Full Vault Suite: client portal, automations roadmap, and full CRM scope.",
 				price: suiteNum,
 				priceCurrency: "USD",
 				availability: "https://schema.org/InStock",
@@ -907,7 +907,7 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 				"@type": "Offer",
 				name: "Growth Plan",
 				description:
-					"Hosting, security, local SEO, and VertaFlow Suite — bundled for website clients.",
+					"Hosting, security, local SEO, and Vault Suite — bundled for website clients.",
 				price: growthNum,
 				priceCurrency: "USD",
 				availability: "https://schema.org/InStock",

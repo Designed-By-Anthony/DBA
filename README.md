@@ -1,4 +1,4 @@
-# Designed by Anthony — Turborepo web
+# ANTHONY. — Turborepo web
 
 ## Architecture (two Cloudflare surfaces — required setup)
 
@@ -13,7 +13,7 @@ Public frontend is deployed via **Cloudflare Pages** (advanced mode with `_worke
 
 ## Routing — `apps/web/src/middleware.ts`
 
-[`apps/web/src/middleware.ts`](./apps/web/src/middleware.ts) runs as Edge middleware for Cloudflare Pages. It reads `Host` and handles VertaFlow redirects only — the audit lives on the apex at `/lighthouse`.
+[`apps/web/src/middleware.ts`](./apps/web/src/middleware.ts) runs as Edge middleware for Cloudflare Pages. It reads `Host` and 308-redirects `admin.*` / `accounts.*` to the managed console hosts — the audit lives on the apex at `/lighthouse`.
 
 ```
 admin.designedbyanthony.com/*       →  308 → https://admin.vertaflow.io/*

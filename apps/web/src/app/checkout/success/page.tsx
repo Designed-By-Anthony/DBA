@@ -14,7 +14,7 @@ import { CheckoutTimeline } from "./CheckoutTimeline";
 export const metadata: Metadata = {
 	title: "Payment Received — Your Build Is Starting",
 	description:
-		"Your payment was received. Your environment is being provisioned — access is granted 24-48 hours after our initial design sync.",
+		"Your payment was received. Your environment is being provisioned — access is granted 24-48 hours after our design sync to ensure brand mapping meets the ANTHONY. standard.",
 	robots: { index: false, follow: false },
 };
 
@@ -63,11 +63,7 @@ export default function CheckoutSuccessPage() {
 						Your environment is being provisioned.
 					</h1>
 					<p className="text-[1rem] leading-[1.78] text-[rgba(247,244,238,0.68)] m-0">
-						Access is granted{" "}
-						<strong className="text-[rgba(247,244,238,0.92)] font-semibold">
-							24-48 hours after our initial design sync
-						</strong>{" "}
-						to ensure brand alignment. {BESPOKE_CONFIG_DESCRIPTION}
+						{BESPOKE_CONFIG_DESCRIPTION}
 					</p>
 				</div>
 
@@ -77,7 +73,7 @@ export default function CheckoutSuccessPage() {
 				{/* Actions */}
 				<div className="flex flex-wrap justify-center gap-3 mt-2">
 					<Link href="/contact" className={btnPrimary}>
-						Book Design Sync
+						Let&apos;s build something great.
 					</Link>
 					<Link href="/" className={btnOutline}>
 						Back to Home

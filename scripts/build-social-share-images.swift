@@ -12,8 +12,8 @@ struct CardSpec {
 }
 
 let canvasSize = NSSize(width: 1200, height: 630)
-let logoURL = URL(fileURLWithPath: "/Users/anthonyjones/Web Design/Designed by Anthony/src/assets/FullLogo.png")
-let outputDirectory = URL(fileURLWithPath: "/Users/anthonyjones/Web Design/Designed by Anthony/public/images")
+let logoURL = URL(fileURLWithPath: "/workspace/apps/web/public/brand/logo.png")
+let outputDirectory = URL(fileURLWithPath: "/workspace/apps/web/public/images")
 
 let cards = [
   CardSpec(
