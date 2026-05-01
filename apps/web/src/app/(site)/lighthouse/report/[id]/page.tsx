@@ -34,6 +34,7 @@ function LighthouseReportShell({ children }: { children: React.ReactNode }) {
 			headerCurrentSection="audit"
 			footerBuildTag="Lighthouse Scanner v2"
 			footerPoweredBy={LIGHTHOUSE_POWERED_BY}
+			segmentClassName="lighthouse-segment"
 			hidePreFooterCta
 		>
 			{children}
