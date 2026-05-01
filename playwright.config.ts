@@ -28,7 +28,7 @@ export default defineConfig({
 		? {}
 		: {
 				webServer: {
-					command: `bun --cwd apps/web run build && bun --cwd apps/web run start -p ${testPort}`,
+					command: `bun run --cwd apps/web build && PORT=${testPort} bun run --cwd apps/web start`,
 					url: `http://127.0.0.1:${testPort}`,
 					/* Avoid a stale `next start` on :3000 from an older build (redirects/tests drift). */
 					reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === "1",
