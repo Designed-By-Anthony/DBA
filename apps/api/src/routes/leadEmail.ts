@@ -6,7 +6,7 @@ import {
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
 import { postLeadIngest } from "@/lib/leadWebhook";
-import { verifyTurnstileToken } from "@/lib/turnstile";
+import { resolveEffectiveSecretKey, verifyTurnstileToken } from "@/lib/turnstile";
 
 /*
  * CORS for `/api/lead-email` is handled exclusively by the global
@@ -84,7 +84,9 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			return { errors: [{ message: "Invalid request body." }] };
 		}
 
-		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+		const turnstileSecret = resolveEffectiveSecretKey(
+			process.env.TURNSTILE_SECRET_KEY?.trim(),
+		);
 		if (turnstileSecret) {
 			const body = rawBody as Record<string, unknown>;
 			const cfToken =

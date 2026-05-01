@@ -5,6 +5,7 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import { btnPrimaryAudit } from "@/design-system/buttons";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { businessProfile } from "@/lib/seo";
+import { resolveEffectiveSiteKey } from "@/lib/turnstile";
 
 export interface AuditFormProps {
 	ctaSource?: string;
@@ -77,7 +78,7 @@ export function AuditForm({
 	const formId = useId();
 	const action = formEndpoint?.trim() || buildPublicApiUrl("/api/lead-email");
 	const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-	const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+	const siteKey = resolveEffectiveSiteKey(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 	const turnstileRequired = !!siteKey;
 	const isDisabled = turnstileRequired && !turnstileToken;
 

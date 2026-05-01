@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
 			process.env.CF_PAGES_COMMIT_SHA?.slice(0, 12) ??
 			process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) ??
 			"local",
+		/** Expose branch name so client-side Turnstile key resolution can detect non-production envs. */
+		NEXT_PUBLIC_CF_PAGES_BRANCH: process.env.CF_PAGES_BRANCH ?? "",
 	},
 	trailingSlash: false,
 	reactStrictMode: true,

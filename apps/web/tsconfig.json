@@ -16,6 +16,9 @@
 		"plugins": [{ "name": "next" }],
 		"paths": {
 			"@/*": ["./src/*"],
+			"@dba/shared/lib/*": ["../../packages/shared/src/lib/*"],
+			"@dba/shared/lighthouse/*": ["../../packages/shared/src/lighthouse/*.ts"],
+			"@dba/shared/lighthouse/lib/*": ["../../packages/shared/src/lighthouse/lib/*"],
 			"@lh/lib/*": ["../../packages/shared/src/lighthouse/lib/*"],
 			"@lh/*": ["./src/lighthouse/*"]
 		}

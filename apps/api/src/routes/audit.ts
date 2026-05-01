@@ -34,7 +34,7 @@ import {
 } from "@lh/lib/validation";
 import { Elysia } from "elysia";
 import { postLeadIngest } from "@/lib/leadWebhook";
-import { verifyTurnstileToken } from "@/lib/turnstile";
+import { resolveEffectiveSecretKey, verifyTurnstileToken } from "@/lib/turnstile";
 
 const AUDIT_RATE_LIMIT = 5;
 const AUDIT_RATE_WINDOW_MS = 10 * 60_000;
@@ -111,7 +111,9 @@ export const auditRoute = new Elysia({ aot: false }).post(
 			return { error: "Valid URL, name, company, and email are required." };
 		}
 
-		const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+		const turnstileSecret = resolveEffectiveSecretKey(
+			process.env.TURNSTILE_SECRET_KEY?.trim(),
+		);
 		if (turnstileSecret) {
 			const cfToken =
 				typeof body.cf_turnstile_response === "string"

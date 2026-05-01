@@ -7,6 +7,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { btnPrimaryAudit } from "@/design-system/buttons";
+import { resolveEffectiveSiteKey } from "@/lib/turnstile";
 import { AuditResults } from "./AuditResults";
 import { AuditScanProgress, type ScanPhase } from "./AuditScanProgress";
 
@@ -152,7 +153,9 @@ export function AuditForm() {
 	const labelClass =
 		"mb-1.5 block text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[var(--text-cream)]";
 
-	const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+	const turnstileSiteKey = resolveEffectiveSiteKey(
+		process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+	);
 	const isSubmitDisabled =
 		status === "loading" || (!!turnstileSiteKey && !turnstileToken);
 
