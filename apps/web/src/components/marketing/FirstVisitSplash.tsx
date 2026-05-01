@@ -14,6 +14,13 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "dba_first_visit_shown_v3";
 
 const MICRO_SAAS_PATH_PREFIXES = ["/tools"] as const;
+/**
+ * Routes that must NEVER show the splash regardless of entry conditions
+ * (e.g. PDF print views, embedded widgets). The print sub-route is rendered
+ * with no marketing chrome by design — the splash would otherwise overlay
+ * the printable output and end up in the PDF.
+ */
+const PRINT_PATH_PATTERN = /^\/lighthouse\/report\/[^/]+\/print\/?$/;
 const MICRO_SAAS_PARAM_KEYS = [
 	"ref",
 	"source",
@@ -83,6 +90,13 @@ export function FirstVisitSplash() {
 		const pathname =
 			typeof window !== "undefined" ? window.location.pathname : "";
 		const search = typeof window !== "undefined" ? window.location.search : "";
+
+		// Print/PDF sub-route is intentionally bare (no marketing chrome).
+		// Skip without persisting the flag so a normal subsequent visit
+		// to the marketing site still triggers the splash on first paint.
+		if (PRINT_PATH_PATTERN.test(pathname)) {
+			return;
+		}
 
 		// Micro-SaaS entry points (e.g. direct /tools landings, or any URL
 		// tagged with a micro-saas utm/ref param) must NEVER show the splash,
