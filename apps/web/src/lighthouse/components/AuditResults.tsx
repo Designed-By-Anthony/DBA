@@ -60,6 +60,7 @@ export function AuditResults({
             a.href = URL.createObjectURL(blob);
             a.download = `audit-${reportId}.pdf`;
             a.click();
+            URL.revokeObjectURL(a.href);
             setPdfStatus("idle");
         } catch { setPdfStatus("error"); }
     }, [reportId]);
