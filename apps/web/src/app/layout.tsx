@@ -21,10 +21,7 @@ const outfit = Outfit({
 
 /**
  * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
- * <html>. BrandHeader and BrandFooter reference var(--font-fraunces) for the
- * brand wordmark. Without this, the variable is unset on marketing pages and
- * the browser falls back to the @font-face "Fraunces Variable" name — which
- * works but skips preloading optimisations.
+ * <html>. Decorative serif headings may reference var(--font-fraunces).
  */
 const fraunces = Fraunces({
 	variable: "--font-fraunces",
@@ -54,7 +51,7 @@ export const viewport: Viewport = {
 
 const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
 const SITE_DESCRIPTION =
-	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond. Designed by Anthony.";
+	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://designedbyanthony.com"),
@@ -75,7 +72,7 @@ export const metadata: Metadata = {
 		address: false,
 	},
 	generator: "Next.js",
-	authors: [{ name: "Designed By Anthony" }],
+	authors: [{ name: "Anthony Jones — ANTHONY." }],
 	other: {
 		"business-type": "B2B",
 		industry: "Professional Services / Web Design & Local SEO",
@@ -92,7 +89,7 @@ export const metadata: Metadata = {
 				url: "/images/og-site-premium.png",
 				width: 2400,
 				height: 1260,
-				alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+				alt: "ANTHONY. — Digital Infrastructure Architect",
 				type: "image/png",
 			},
 		],

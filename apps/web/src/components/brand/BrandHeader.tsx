@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
 	SITE_AUDIT_CTA,
@@ -5,21 +6,14 @@ import {
 	SITE_BRAND,
 	SITE_CONTACT_LINK,
 	SITE_HEADER_NAV_LINKS,
+	SITE_WORDMARK_ALT,
 } from "@/design-system/site-config";
 
 export type BrandHeaderProps = {
-	/** When set to "audit", the header shows a current-page chip
-	 * instead of the "Audit My Site" CTA. */
 	currentSection?: "audit";
-	/**
-	 * Render a hamburger button that the existing mobile-nav-overlay JS
-	 * (in public/scripts/site.js) hooks into. The lighthouse page can pass
-	 * `false` to render a slim mobile slot instead.
-	 */
 	includeHamburger?: boolean;
 };
 
-/** Nav audit CTA — Inter Variable, tracked uppercase (distinct from Fraunces audit tool buttons). */
 const navAuditCtaTypography =
 	"font-[family-name:var(--font-inter)] font-semibold uppercase tracking-widest text-[0.68rem]";
 
@@ -68,13 +62,18 @@ export function BrandHeader({
 				<div className="flex items-center justify-between gap-6 max-w-[80rem] mx-auto py-[0.95rem] md:py-[1.1rem]">
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="inline-flex items-center gap-0 no-underline min-w-0 group"
-						aria-label="ANTHONY. — home"
+						className="inline-flex items-center min-w-0 shrink max-w-[min(72vw,14rem)] md:max-w-none group"
+						aria-label={SITE_WORDMARK_ALT}
 					>
-						<span className="font-[family-name:var(--font-fraunces)] text-[1.05rem] md:text-[1.12rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.96)] leading-none [font-variation-settings:'opsz'_40]">
-							ANTHONY
-							<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
-						</span>
+						<Image
+							src={SITE_BRAND.assets.masterWordmark}
+							alt={SITE_WORDMARK_ALT}
+							width={720}
+							height={140}
+							className="h-8 w-auto max-h-8 object-contain object-left opacity-[0.96] transition-opacity duration-200 group-hover:opacity-100"
+							priority
+							sizes="(max-width: 960px) 55vw, 240px"
+						/>
 					</Link>
 
 					<nav

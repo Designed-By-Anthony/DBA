@@ -74,7 +74,7 @@ import {
 } from "./offers";
 
 export const SITE_URL = "https://designedbyanthony.com";
-export const SITE_NAME = "Designed by Anthony";
+export const SITE_NAME = "ANTHONY.";
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 export const PERSON_ID = `${SITE_URL}/about#person`;
@@ -85,7 +85,7 @@ export const GOOGLE_BUSINESS_PROFILE_URL =
 	"https://www.google.com/search?kgmid=/g/11z36l4fmd&q=Designed+By+Anthony";
 export const DEFAULT_SOCIAL_IMAGE = `${SITE_URL}/images/og-site-premium.png`;
 export const SITE_LICENSE_PAGE = `${SITE_URL}/image-license`;
-export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} Designed by Anthony. All rights reserved.`;
+export const SITE_COPYRIGHT = `© ${new Date().getFullYear()} ANTHONY. All rights reserved.`;
 export const FACEBOOK_PROFILE_URL =
 	"https://www.facebook.com/profile.php?id=61574388797744";
 export const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/dbastudio315/";
@@ -111,7 +111,7 @@ export const businessProfile = {
 		"Marine Corps veteran and founder of ANTHONY., building custom websites, client workspace (portal, automations), managed hosting, website rescues, and local SEO systems for service businesses.",
 	description:
 		"ANTHONY. builds custom websites, client workspace (portal, automations), website rescues, managed hosting, and local SEO systems for service businesses.",
-	logo: `${SITE_URL}${BRAND_ASSETS.logo}`,
+	logo: `${SITE_URL}${BRAND_ASSETS.masterWordmark}`,
 	/** Back-compat — existing `/images/designed-by-anthony-logo.png` is still mirrored and indexed. */
 	legacyLogo: `${SITE_URL}/images/designed-by-anthony-logo.png`,
 	image: `${SITE_URL}/images/og-site-premium.png`,
@@ -376,7 +376,7 @@ export function toAbsoluteUrl(path: string): string {
 }
 
 export function stripSiteSuffix(title: string): string {
-	return title.replace(/\s*\|\s*Designed by Anthony\s*$/i, "").trim();
+	return title.replace(/\s*\|\s*ANTHONY\.\s*$/i, "").trim();
 }
 
 function startCase(value: string): string {
@@ -791,7 +791,7 @@ export function buildBaseWebsiteSchema(): SchemaValue {
 		potentialAction: [
 			{
 				"@type": "ContactAction",
-				name: "Contact Designed by Anthony",
+				name: "Contact ANTHONY.",
 				target: {
 					"@type": "EntryPoint",
 					urlTemplate: contactUrl,
@@ -872,7 +872,7 @@ export function buildPricingOfferCatalogSchema(): SchemaValue {
 		"@context": "https://schema.org",
 		"@type": "OfferCatalog",
 		"@id": `${pricingUrl}#offercatalog`,
-		name: "Designed by Anthony — Pricing",
+		name: "ANTHONY. — Pricing",
 		url: pricingUrl,
 		description:
 			"Website projects, Vault CRM tiers, Growth Plan bundle, and Google Business Profile program.",

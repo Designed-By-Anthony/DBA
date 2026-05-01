@@ -1,6 +1,6 @@
 # Changelog
 
-Notable changes to the **Designed by Anthony** public site (single Next.js app at repo root).
+Notable changes to the **ANTHONY.** public site (single Next.js app at repo root).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 

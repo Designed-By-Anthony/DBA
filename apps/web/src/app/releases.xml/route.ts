@@ -7,9 +7,9 @@ export async function GET() {
 			new Date(b.publishedTime).getTime() - new Date(a.publishedTime).getTime(),
 	);
 	const xml = buildRssFeed({
-		title: "Designed by Anthony — New Releases",
+		title: "ANTHONY. — New Releases",
 		description:
-			"New client launches, case studies, and public work from Designed by Anthony.",
+			"New client launches, case studies, and public work from ANTHONY.",
 		items: sorted.map((release) => ({
 			title: release.title,
 			path: release.url,

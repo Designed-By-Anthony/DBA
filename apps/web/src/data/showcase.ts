@@ -47,7 +47,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		image: handymanDemo.src,
 		displayImage: handymanDemo,
 		imageAlt:
-			"Custom handyman website design for The Long Beach Handyman — a client build by Designed by Anthony featuring local SEO, lead capture, and mobile-friendly responsive design",
+			"Custom handyman website design for The Long Beach Handyman — a client build by ANTHONY. featuring local SEO, lead capture, and mobile-friendly responsive design",
 		featured: true,
 		features: [
 			{
@@ -92,7 +92,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		href: "https://roofing-demo.web.app/",
 		image: rooferDemo.src,
 		displayImage: rooferDemo,
-		imageAlt: "Summit Roofing example website by Designed by Anthony",
+		imageAlt: "Summit Roofing example website by ANTHONY.",
 		featured: true,
 	},
 	{
@@ -109,8 +109,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		href: "https://designed-by-anthony-c18bd.web.app/",
 		image: landscapeDemo.src,
 		displayImage: landscapeDemo,
-		imageAlt:
-			"Apex Landscaping and Snow Removal example website by Designed by Anthony",
+		imageAlt: "Apex Landscaping and Snow Removal example website by ANTHONY.",
 	},
 	{
 		status: "example",
@@ -126,7 +125,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		href: "https://food-service-demo-c7ecd.web.app/",
 		image: bakeryDemo.src,
 		displayImage: bakeryDemo,
-		imageAlt: "Marble & Bloom Bakery example website by Designed by Anthony",
+		imageAlt: "Marble & Bloom Bakery example website by ANTHONY.",
 	},
 	{
 		status: "example",
@@ -142,7 +141,7 @@ export const showcaseItems: ShowcaseItem[] = [
 		href: "https://plumber-demo-404e2.web.app/",
 		image: plumberDemo.src,
 		displayImage: plumberDemo,
-		imageAlt: "Copperline Plumbing example website by Designed by Anthony",
+		imageAlt: "Copperline Plumbing example website by ANTHONY.",
 		featured: true,
 	},
 ];

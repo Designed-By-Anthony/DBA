@@ -29,8 +29,8 @@ export const BRAND_ASSETS = {
 	logo: "/brand/logo.png",
 	/** Horizontal brand lockup, larger source (for retina/print). */
 	logoFull: "/brand/logo-full.png",
-	/** Square/icon mark — used in dense UI chrome (sidebars, PWA). */
-	mark: "/brand/mark.webp",
+	/** Master wordmark — isolated ANTHONY. + bronze period (PNG from SVG source). */
+	masterWordmark: "/logos/anthony_master_wordmark.png",
 } as const;
 
 export type BrandAssetKey = keyof typeof BRAND_ASSETS;

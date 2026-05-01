@@ -127,7 +127,7 @@ export function middleware(request: NextRequest) {
  * Generate markdown version of homepage for agents
  */
 function generateHomepageMarkdown(): string {
-	return `# Designed by Anthony
+	return `# ANTHONY.
 
 **Mohawk Valley Web Design Studio** · Utica · Rome · Syracuse · CNY
 

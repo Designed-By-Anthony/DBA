@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 	description:
 		"Six purpose-built tools for freelancers and small web agencies: website health reports, AI review response, client portals, local SEO dashboards, testimonial collection, and AI social content. Founding member pricing available.",
 	openGraph: {
-		title: "Tools — Micro SaaS Store | Designed by Anthony",
+		title: "Tools — Micro SaaS Store | ANTHONY.",
 		description:
 			"Purpose-built tools for local service businesses. SEO monitoring, AI review response, client portals, and more. Founding member pricing available.",
 		url: "https://designedbyanthony.com/tools",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Tools — Micro SaaS Store | Designed by Anthony",
+		title: "Tools — Micro SaaS Store | ANTHONY.",
 		description:
 			"Purpose-built tools for local service businesses. SEO monitoring, AI review response, client portals, and more.",
 	},

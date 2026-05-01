@@ -1,6 +1,6 @@
 # Security policy
 
-This document describes the security posture of the **Designed by Anthony** site: a **Turborepo monorepo** deployed on **Cloudflare Pages** (Next.js frontend) and a **Cloudflare Worker** (ElysiaJS API), built from **GitHub**.
+This document describes the security posture of the **ANTHONY.** site: a **Turborepo monorepo** deployed on **Cloudflare Pages** (Next.js frontend) and a **Cloudflare Worker** (ElysiaJS API), built from **GitHub**.
 
 ## Reporting a vulnerability
 

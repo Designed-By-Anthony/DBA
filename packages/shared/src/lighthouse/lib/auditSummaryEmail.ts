@@ -63,7 +63,7 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
 		`View or print the full report: ${reportPath}`,
 		printPath ? `Print-optimized page: ${printPath}` : "",
 		"",
-		"— Designed by Anthony",
+		"— ANTHONY.",
 	].filter(Boolean);
 
 	const safeUrl = escapeHtml(params.url);
@@ -82,7 +82,7 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
 	const html = `
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:0 auto;background:#f7f3ea;">
   <tr><td style="padding:28px 24px 8px;">
-    <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#8b6a38;">Designed by Anthony</p>
+    <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#8b6a38;">ANTHONY.</p>
     <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:700;letter-spacing:-0.02em;color:#171008;line-height:1.25;">Lighthouse Scanner</h1>
     <p style="margin:10px 0 0;font-size:14px;line-height:1.55;color:#3d362d;">${escapeHtml(greeting)} Your scan for <strong style="color:#171008;">${safeUrl}</strong> is ready.</p>
   </td></tr>
@@ -105,7 +105,7 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
         ${printPath ? `<a href="${safePrint}" style="display:inline-block;margin-left:10px;color:#8b6a38;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #D4AF37;padding:11px 20px;border-radius:10px;background:#fdf8f0;">Print / PDF</a>` : ""}
       </td></tr>
     </table>
-    <p style="margin:20px 0 0;font-size:12px;color:#9d8870;text-align:center;">Designed by Anthony · Central NY &amp; remote</p>
+    <p style="margin:20px 0 0;font-size:12px;color:#9d8870;text-align:center;">ANTHONY. · Central NY &amp; remote</p>
   </td></tr>
 </table>`.trim();
 

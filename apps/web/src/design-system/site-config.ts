@@ -9,6 +9,8 @@ export type SiteLink = {
 	label: string;
 };
 
+export const SITE_WORDMARK_ALT = "ANTHONY. | Digital Infrastructure Architect";
+
 export const SITE_BRAND = {
 	name: BRAND_NAME,
 	url: BRAND_SITE_URL,

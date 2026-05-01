@@ -1,9 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import { stackBadge } from "@/design-system/buttons";
 import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
 	SITE_LEGAL_LINKS,
+	SITE_WORDMARK_ALT,
 } from "@/design-system/site-config";
 
 const BUILT_WITH = [
@@ -33,13 +35,17 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 				<div className="flex items-center flex-wrap gap-x-6 gap-y-3">
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="inline-flex items-center gap-0 no-underline shrink-0"
-						aria-label="ANTHONY. — home"
+						className="inline-flex items-center shrink-0 max-w-[min(85vw,12rem)]"
+						aria-label={SITE_WORDMARK_ALT}
 					>
-						<span className="font-[family-name:var(--font-fraunces)] text-[0.92rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.9)] leading-none">
-							ANTHONY
-							<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
-						</span>
+						<Image
+							src={SITE_BRAND.assets.masterWordmark}
+							alt={SITE_WORDMARK_ALT}
+							width={720}
+							height={140}
+							className="h-6 md:h-7 w-auto max-h-7 object-contain object-left opacity-90 hover:opacity-100 transition-opacity duration-200"
+							sizes="(max-width: 640px) 70vw, 180px"
+						/>
 					</Link>
 
 					<nav

@@ -1,4 +1,4 @@
-# Designed by Anthony — Turborepo web
+# ANTHONY. — Turborepo web
 
 ## Architecture (two Cloudflare surfaces — required setup)
 

@@ -142,7 +142,7 @@ export async function generateAiInsight(params: {
 	businessRating?: number | null;
 	businessReviewCount?: number;
 }): Promise<AiInsightResult | null> {
-	const systemPrompt = `You are Anthony, founder of Designed by Anthony — a web design agency for local service businesses. You are writing a premium Local Digital Presence Audit report for a small business owner.
+	const systemPrompt = `You are Anthony, founder of ANTHONY. — a digital infrastructure studio for local service businesses. You are writing a premium Local Digital Presence Audit report for a small business owner.
 
 Your output will fill multiple sections of a professional, multi-page PDF report. Write in Business-owner-friendly plain English — no jargon.
 

@@ -81,7 +81,7 @@ export const MONTHLY_LOCAL_SEO_PRICE = FOUNDING_PARTNER_SEO_MONTHLY;
 export const GBP_FULL_PROGRAM_MONTHLY_PRICE = "$299";
 
 /** Opening line: dev studio launch, $0 upfront vs standard pricing (matches cold email “The offer”). */
-export const FOUNDING_PARTNER_OFFER_SENTENCE = `Designed by Anthony is launching as a dev studio: the first ${FOUNDING_PARTNER_BUILD_SLOTS} approved partners get a professional custom website at $0 upfront (standard builds typically start at ${STANDARD_WEBSITE_STARTING_PRICE}+).`;
+export const FOUNDING_PARTNER_OFFER_SENTENCE = `ANTHONY. is launching as a dev studio: the first ${FOUNDING_PARTNER_BUILD_SLOTS} approved partners get a professional custom website at $0 upfront (standard builds typically start at ${STANDARD_WEBSITE_STARTING_PRICE}+).`;
 
 /** Case studies, review ask, Growth Plan scope (matches cold email “The why”). */
 export const FOUNDING_PARTNER_WHY_SENTENCE = `We are publishing Founding Case Studies on the site—how a real website grows a local brand—and we ask for a Google review plus the ${FOUNDING_PARTNER_SEO_MONTHLY}/month ${FOUNDING_PARTNER_SEO_LABEL}, which covers your Google Cloud hosting, security, and SEO.`;

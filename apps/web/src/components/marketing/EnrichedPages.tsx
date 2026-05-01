@@ -157,7 +157,7 @@ export function AboutPage() {
 			/>
 			<PageHero
 				kind="about"
-				title="About Designed by Anthony"
+				title="About ANTHONY."
 				subtitle="Marine Corps veteran–led Mohawk Valley web design studio for service businesses across Central New York."
 			/>
 			<section className="section-shell">
@@ -500,7 +500,7 @@ export function OurEdgePage() {
 							</ul>
 						</MotionStaggerChild>
 						<MotionStaggerChild className="surface-card comparison-column comparison-column--us reveal-right">
-							<span className="comparison-label">Designed by Anthony</span>
+							<span className="comparison-label">ANTHONY.</span>
 							<ul className="comparison-list">
 								<li>Zero plugin dependencies</li>
 								<li>Sub-second load on mobile networks</li>

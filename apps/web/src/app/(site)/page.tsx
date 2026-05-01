@@ -15,7 +15,7 @@ import {
 
 const HOME_TITLE = "ANTHONY. | Digital Infrastructure Architect";
 const HOME_DESCRIPTION =
-    "Bespoke digital estates and high-performance infrastructure for the 315 and beyond. Designed by Anthony.";
+    "Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
 
 const HOME_OG_IMAGE = {
     url: "/images/og-site-premium.png",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 const homeServiceSchema = buildItemListSchema({
     name: "Core Services",
     description:
-        "Designed by Anthony provides custom websites, local SEO, managed hosting, and website rescue for service businesses.",
+        "ANTHONY. provides custom websites, local SEO, managed hosting, and website rescue for service businesses.",
     path: "/",
     items: [
         {

@@ -10,9 +10,11 @@
 
 - Marketing hero + primary CTAs (`btnPrimary` Inter uppercase), Spanish `/es` headline, checkout provisioning copy, JSON-LD “The Vault by ANTHONY.” (replaces prior CRM product naming in structured data). Admin ledger UI retitled **The Vault** with **315 Pipeline** / **Revenue Ledger** on absolute black. CSP variable rename only (`CRM_CONSOLE_ORIGIN`); lead-ingest host unchanged.
 
-## Deep rebrand — chrome + FAQ (2026-05-01)
+## Master ANTHONY. wordmark (2026-05-01)
 
-- **BrandHeader / BrandFooter:** Fraunces **ANTHONY.** wordmark (bronze period), text-only header (no mark image); site banner **315 Pilot** copy + bronze pulse dot; nav audit CTA **Inter** uppercase `tracking-widest` (“Audit My Site”). Footer line **ANTHONY. | Built in the 315**.
+- Vector source: `apps/web/public/logos/anthony_master_wordmark.svg` (light-on-dark for midnight chrome). Build rasterizes to **`anthony_master_wordmark.png`** in `apps/web/public/logos/` and `apps/admin/public/logos/` via `bun run --cwd apps/web generate:master-wordmark` (runs in `prepare:next`). **Replace** the SVG/PNG after isolating the definitive asset from `image_12.png` if pixel-perfect match is required.
+- **Repo-wide string sweep:** no remaining `Designed by Anthony` references; `bun run build:site-script` regenerates `public/scripts/site.js` from `src/scripts/site.ts` (removes spurious minified matches).
+- **Header/footer/reach-out modal use Next `<Image>` + `BRAND_ASSETS.masterWordmark`;** JSON-LD org `logo` uses the same URL.
 - **FAQ:** `FaqSection.tsx` + `.text-bubble.is-bordered` accordion rows; thin bronze +/- toggle; inner pages use same pattern via `FaqAccordionSummaryAndAnswer`.
 - **`tailwind.config.ts`:** documents `#D4AF37` / aligns IDE with `@theme` tokens from `tokens.css`.
 

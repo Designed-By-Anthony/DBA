@@ -1,4 +1,4 @@
-# AGENTS.md — Designed by Anthony
+# AGENTS.md — ANTHONY.
 
 ## Architectural Guardrails
 - **Root-Only Execution:** All builds and installs run from the repo root (`./`) via Turbo.

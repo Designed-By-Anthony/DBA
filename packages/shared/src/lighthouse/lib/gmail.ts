@@ -250,7 +250,7 @@ export function buildReceiptEmail(params: {
 
     <p>If anything looks off or you want to walk through it together, just reply to this email &mdash; or grab 15 minutes on my calendar: <a href="${calendarUrl}" style="color: #111;">${calendarUrl.split("?")[0]}</a>.</p>
 
-    <p style="margin-top: 28px;">Best,<br><strong>Anthony</strong><br><span style="color: #666; font-size: 14px;">Designed by Anthony</span></p>
+    <p style="margin-top: 28px;">Best,<br><strong>Anthony</strong><br><span style="color: #666; font-size: 14px;">ANTHONY.</span></p>
 
     <p style="color: #9ca3af; font-size: 12px; margin-top: 36px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
       Report ID: ${safeReportId} &middot; This is a one-time transactional receipt for the audit you requested.

@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 
 const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
 const SITE_DESCRIPTION =
-	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond. Designed by Anthony.";
+	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
 
 export const metadata: Metadata = {
 	title: { default: SITE_TITLE, template: "%s | ANTHONY." },
