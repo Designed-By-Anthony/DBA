@@ -43,19 +43,19 @@ export const reportRoute = new Elysia({ aot: false }).get(
             }).catch(err => console.error("Update failed:", err));
 
             // --- THE BRIDGE: FRONTEND MAPPING ---
-            // This flattens the 'scores' object so AuditResults.tsx 
-            // sees data.performance, data.seo, etc. directly.
+            // Nested `scores` is required by report viewers; top-level mirrors
+            // preserve null for unavailable PSI lab scores (not coerced to 0).
             return {
                 id: data.id,
                 url: data.lead?.url || "",
                 createdAt: data.createdAt?.toDate?.().toISOString() || null,
                 psiDegradedReason: data.psiDegradedReason || null,
-                
-                // Spread the scores directly into the top level
-                performance: data.scores?.performance ?? 0,
-                accessibility: data.scores?.accessibility ?? 0,
-                bestPractices: data.scores?.bestPractices ?? 0,
-                seo: data.scores?.seo ?? 0,
+                scores: data.scores ?? {},
+
+                performance: data.scores?.performance ?? null,
+                accessibility: data.scores?.accessibility ?? null,
+                bestPractices: data.scores?.bestPractices ?? null,
+                seo: data.scores?.seo ?? null,
                 trustScore: data.scores?.trustScore ?? 0,
                 conversion: data.scores?.conversion ?? 0,
 
