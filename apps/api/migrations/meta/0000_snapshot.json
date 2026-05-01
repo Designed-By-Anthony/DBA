@@ -1,0 +1,169 @@
+{
+	"version": "6",
+	"dialect": "sqlite",
+	"id": "d7241e31-9dbd-4d2c-af38-19be7351c8a4",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"tables": {
+		"leads": {
+			"name": "leads",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"email": {
+					"name": "email",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"company_name": {
+					"name": "company_name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"source": {
+					"name": "source",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'New'"
+				},
+				"turnstile_passed": {
+					"name": "turnstile_passed",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"leads_email_unique": {
+					"name": "leads_email_unique",
+					"columns": ["email"],
+					"isUnique": true
+				},
+				"leads_status_idx": {
+					"name": "leads_status_idx",
+					"columns": ["status"],
+					"isUnique": false
+				},
+				"leads_source_idx": {
+					"name": "leads_source_idx",
+					"columns": ["source"],
+					"isUnique": false
+				},
+				"leads_created_at_idx": {
+					"name": "leads_created_at_idx",
+					"columns": ["created_at"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"transactions": {
+			"name": "transactions",
+			"columns": {
+				"stripe_session_id": {
+					"name": "stripe_session_id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"customer_email": {
+					"name": "customer_email",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"amount_total": {
+					"name": "amount_total",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"plan_name": {
+					"name": "plan_name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"transactions_email_idx": {
+					"name": "transactions_email_idx",
+					"columns": ["customer_email"],
+					"isUnique": false
+				},
+				"transactions_created_at_idx": {
+					"name": "transactions_created_at_idx",
+					"columns": ["created_at"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		}
+	},
+	"views": {},
+	"enums": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"indexes": {}
+	}
+}

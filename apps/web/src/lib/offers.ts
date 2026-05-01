@@ -56,8 +56,8 @@ export const PUBLIC_LAUNCH_BUNDLE_COPY = `For the first ${PUBLIC_LAUNCH_BUNDLE_M
 /** Legacy single-line copy for anywhere that still expects one sentence (FAQ, process). */
 export const PUBLIC_PAYMENT_STRUCTURE_COPY = `${PUBLIC_STANDARD_PAYMENT_PLAN} ${PUBLIC_LAUNCH_BUNDLE_COPY}`;
 
-/** Admin CRM console origin (lead ingest, pipeline). Same infrastructure host; branded as The Vault in-app. */
-export const CRM_ADMIN_APP_URL = "https://admin.vertaflow.io";
+/** Admin CRM console origin (lead ingest, pipeline). */
+export const CRM_ADMIN_APP_URL = "https://admin.designedbyanthony.com";
 /** Client portal (magic-link access); Growth Plan positioning. */
 export const ACCOUNTS_PORTAL_URL = "https://accounts.designedbyanthony.com";
 

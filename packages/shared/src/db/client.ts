@@ -1,7 +1,7 @@
 /**
  * Drizzle D1 client factory — pass `env.DB` from Workers / Pages.
  */
-import { drizzle } from "drizzle-orm/d1";
+import { type AnyD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
 
 export type {
@@ -19,8 +19,7 @@ export {
 	transactions,
 } from "./schema";
 
-// biome-ignore lint/suspicious/noExplicitAny: D1Database from workers-types
-export function createD1Client(d1: any) {
+export function createD1Client(d1: AnyD1Database) {
 	return drizzle(d1, { schema });
 }
 

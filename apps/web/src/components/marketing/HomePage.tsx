@@ -28,6 +28,27 @@ import { PremiumPitchStrip } from "./PremiumPitchStrip";
 import "@/app/home-page.css";
 
 const homeFeaturedWorkItems = showcaseFeaturedItems.slice(0, 3);
+const heroGhostLines = [
+	"TAKE IT TO THE EDGE",
+	"LETS BUILD SOMETHING GREAT.",
+	"ENGINEERED IN THE 315.",
+	"INFRASTRUCTURE OVER SOFTWARE.",
+] as const;
+
+function HeroGhostLayer() {
+	return (
+		<div className="hero-ghost-layer" aria-hidden="true">
+			{heroGhostLines.map((line, index) => (
+				<span
+					key={line}
+					className={`hero-ghost-line hero-ghost-line--${index + 1}`}
+				>
+					{line}
+				</span>
+			))}
+		</div>
+	);
+}
 
 /**
  * Hero A/B variants. Default copy always renders in SSR for SEO; the
@@ -76,6 +97,7 @@ export function HomePage() {
 					<span className="hero-rain__layer hero-rain__layer--back" />
 					<span className="hero-rain__layer hero-rain__layer--front" />
 				</div>
+				<HeroGhostLayer />
 				<div className="page-hero-inner">
 					<div className="hero-copy">
 						<p className="hero-place-marker">

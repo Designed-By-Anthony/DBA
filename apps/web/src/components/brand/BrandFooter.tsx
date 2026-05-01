@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { stackBadge } from "@/design-system/buttons";
 import { FOOTER_LOCATION_TAGLINE } from "@/design-system/location";
@@ -39,13 +38,11 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 						className="inline-flex items-center shrink-0 max-w-[min(85vw,12rem)]"
 						aria-label={SITE_WORDMARK_ALT}
 					>
-						<Image
-							src={SITE_BRAND.assets.masterWordmark}
-							alt={SITE_WORDMARK_ALT}
-							width={720}
-							height={140}
-							className="h-6 md:h-7 w-auto max-h-7 object-contain object-left opacity-90 hover:opacity-100 transition-opacity duration-200"
-							sizes="(max-width: 640px) 70vw, 180px"
+						{/* biome-ignore lint/performance/noImgElement: Direct SVG wordmark keeps the bronze period locked to the master asset. */}
+						<img
+							src="/logos/anthony_master_wordmark.svg"
+							alt="ANTHONY."
+							className="block h-6 w-auto opacity-90 transition-opacity duration-200 hover:opacity-100 md:h-7"
 						/>
 					</Link>
 

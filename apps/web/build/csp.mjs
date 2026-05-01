@@ -3,7 +3,7 @@
  * Run `bun run sync:static-headers` after changing directives.
  *
  * Third-party *tags* (after cookie consent): direct GA4 via gtag.js only.
- * Always-on site needs: Lighthouse audit API, Vault CRM lead ingest, Crisp chat.
+ * Always-on site needs: Lighthouse audit API, first-party API, Clerk auth, Crisp chat.
  */
 
 /** Default `PUBLIC_API_URL` (Lighthouse audit/report APIs). Must stay aligned with client fallbacks. */
@@ -11,8 +11,10 @@ const LIGHTHOUSE_AUDIT_API_ORIGIN =
 	"https://lighthouse-audit--lighthouse-492701.us-east4.hosted.app";
 const DBA_API_ORIGIN = "https://api.designedbyanthony.com";
 
-/** Vault / CRM public lead ingest (`POST /api/lead`, `/api/v1/ingest`). Align with `PUBLIC_CRM_LEAD_URL` / marketing defaults. */
-const CRM_CONSOLE_ORIGIN = "https://admin.vertaflow.io";
+const CLERK_AUTH_ORIGINS = [
+	"https://clerk.designedbyanthony.com",
+	"https://clerk.com",
+];
 
 /**
  * Legacy Lighthouse subdomain origin — kept in CSP so any historical inbound
@@ -71,22 +73,30 @@ const DIRECTIVES = {
 		DBA_API_ORIGIN,
 		LIGHTHOUSE_AUDIT_API_ORIGIN,
 		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
-		CRM_CONSOLE_ORIGIN,
+		...CLERK_AUTH_ORIGINS,
 		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
 		"https://*.crisp.chat",
 		"wss://*.relay.crisp.chat",
 		"wss://*.relay.rescue.crisp.chat",
 	].join(" "),
-	"frame-src":
-		"'self' https://www.google.com https://calendly.com https://www.youtube-nocookie.com https://www.youtube.com https://game.crisp.chat https://plugins.crisp.chat",
+	"frame-src": [
+		"'self'",
+		"https://www.google.com",
+		"https://calendly.com",
+		"https://www.youtube-nocookie.com",
+		"https://www.youtube.com",
+		"https://game.crisp.chat",
+		"https://plugins.crisp.chat",
+		...CLERK_AUTH_ORIGINS,
+	].join(" "),
 	"media-src": "'self'",
 	/** Crisp loads short-lived workers from *.crisp.chat (see Crisp CSP docs). */
 	"worker-src": "'self' blob: https://*.crisp.chat",
 	"object-src": "'none'",
 	"base-uri": "'self'",
 	"frame-ancestors": "'self'",
-	/** Lead forms POST CRM `/api/lead`; Lighthouse tool uses `/api/audit` + report fetch. */
-	"form-action": `'self' ${DBA_API_ORIGIN} ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN} ${CRM_CONSOLE_ORIGIN}`,
+	/** Lead forms POST first-party API endpoints; Lighthouse tool uses `/api/audit` + report fetch. */
+	"form-action": `'self' ${DBA_API_ORIGIN} ${LIGHTHOUSE_AUDIT_API_ORIGIN} ${LIGHTHOUSE_SUBDOMAIN_ORIGIN}`,
 	/**
 	 * Intentionally no `require-trusted-types-for` here: Next.js + React hydration and
 	 * Turbopack chunks assign plain strings to DOM sinks (e.g. innerHTML) in ways that

@@ -2,6 +2,24 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## Auth infrastructure cleansing (2026-05-01)
+
+- Removed legacy external console redirects from middleware; `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` now remain first-party hosts for callback-safe routing.
+- Removed old external CRM origin from CSP, lead-form endpoint trust, JSON-LD aliases, operator docs, and generated headers/site script.
+- Added Clerk auth origins to `connect-src` and `frame-src`; no active Clerk/Auth.js provider or env-key implementation exists in the repo layouts today.
+- Pages build now flattens `.vercel/output/static` after OpenNext so Cloudflare deploys physical assets instead of symlinked entries.
+
+## Logo lock + hero ghosting (2026-05-01)
+
+- Header, footer, and reach-out modal now render the master SVG wordmark directly from `/logos/anthony_master_wordmark.svg`, locking the bronze period to the designed asset; header spacing now uses `pt-8 pb-4`.
+- Homepage 315 Pilot pill uses wider padding, `bg-white/5`, and `backdrop-blur`; hero gained oversized low-opacity mantra ghost lines behind the content.
+
+## Drizzle + D1 migration infrastructure (2026-05-01)
+
+- Root and API workspace manifests list `drizzle-kit` + `drizzle-orm` for migration workflows; root `drizzle.config.ts` reads `packages/shared/src/db/schema.ts` and writes migration files to `apps/api/migrations`.
+- Added the initial generated D1 migration under `apps/api/migrations`.
+- Confirmed API D1 binding remains `DB` and the intended Cloudflare D1 database name remains `dba-ledger`; operator notes now call out the binding/database-name distinction.
+
 ## ANTHONY. location protocol — Rome, NY (2026-05-01)
 
 - **Schema:** `businessProfile` + `Organization` in `apps/web/src/lib/seo.ts` — `SITE_NAME` **ANTHONY.**, HQ **7749 Kilbourn Rd, Rome, NY 13440**, `slogan` *Digital Infrastructure, Engineered in the Copper City.*, `serviceArea` **GeoCircle** ~150 mi (241401 m) from Rome for 315/518/CNY; `areaServed` + `knowsAbout` include regional labels.
@@ -20,7 +38,7 @@
 ## Master ANTHONY. wordmark (2026-05-01)
 
 - Vector source: `apps/web/public/logos/anthony_master_wordmark.svg` (light-on-dark for midnight chrome). Build rasterizes to **`anthony_master_wordmark.png`** in `apps/web/public/logos/` and `apps/admin/public/logos/` via `bun run --cwd apps/web generate:master-wordmark` (runs in `prepare:next`). **Replace** the SVG/PNG after isolating the definitive asset from `image_12.png` if pixel-perfect match is required.
-- **Repo-wide string sweep:** no remaining `Designed by Anthony` references; `bun run build:site-script` regenerates `public/scripts/site.js` from `src/scripts/site.ts` (removes spurious minified matches).
+- **Repo-wide string sweep:** no remaining legacy brand suffix references; `bun run build:site-script` regenerates `public/scripts/site.js` from `src/scripts/site.ts` (removes spurious minified matches).
 - **Header/footer/reach-out modal use Next `<Image>` + `BRAND_ASSETS.masterWordmark`;** JSON-LD org `logo` uses the same URL.
 - **FAQ:** `FaqSection.tsx` + `.text-bubble.is-bordered` accordion rows; thin bronze +/- toggle; inner pages use same pattern via `FaqAccordionSummaryAndAnswer`.
 - **`tailwind.config.ts`:** documents `#D4AF37` / aligns IDE with `@theme` tokens from `tokens.css`.

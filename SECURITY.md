@@ -25,10 +25,10 @@ Security fixes land on **`main`** and deploy through the normal Cloudflare Pages
 | Marketing routes | Public content under `apps/web/src/app/(site)/` |
 | Lighthouse segment | `apps/web/src/app/lighthouse/` |
 | API Worker | `apps/api/src/routes/` (audit, report, report-pdf, lead-email, audit-email-summary, report-email, test-emails) |
-| Request routing | `apps/web/src/middleware.ts` (host-based redirects) |
+| Request routing | `apps/web/src/middleware.ts` (host-based routing) |
 | Shared logic | `packages/shared/src/` (origins, rate limiting, report-store) |
 
-**The Vault** (admin console, client accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected in the Next.js middleware to the managed **vertaflow.io** infrastructure host. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `apps/`.
+**The Vault** (admin console, client accounts, CRM) is only represented here by first-party host routing and public marketing references. Do not assume this tree contains Clerk, Auth.js, Stripe webhooks, or portal session code unless those files exist under `apps/`.
 
 ## Trust boundaries (what this app enforces)
 
@@ -47,7 +47,7 @@ Security fixes land on **`main`** and deploy through the normal Cloudflare Pages
 
 | Concern | Location |
 |---------|----------|
-| Host-based redirects (admin / accounts) | `apps/web/src/middleware.ts` |
+| Host-based routing (admin / accounts) | `apps/web/src/middleware.ts` |
 | CORS (global, origin-validated) | `apps/api/src/index.ts` (Elysia `cors` plugin) |
 | Trusted origin allowlist | `packages/shared/src/lib/marketingBrowserOrigins.ts` |
 | Audit pipeline + rate limit | `apps/api/src/routes/audit.ts`, `packages/shared/src/lighthouse/lib/http.ts` |
