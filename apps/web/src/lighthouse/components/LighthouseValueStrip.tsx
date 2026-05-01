@@ -36,28 +36,30 @@ export function LighthouseValueStrip() {
 	const animate = !prefersReduced;
 
 	return (
-		<section
-			className="lh-process relative"
-			aria-labelledby="lh-process-heading"
-		>
-			<div className="lh-process-heading">
+		<section className="relative" aria-labelledby="lh-process-heading">
+			<div className="mb-12 grid gap-6 md:grid-cols-[1.5fr_1fr] md:items-end">
 				<div>
-					<p className="lighthouse-result-eyebrow">What the scan covers</p>
-					<h2 id="lh-process-heading" className="lh-process-title">
+					<p className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-[rgb(var(--accent-bronze-rgb)/0.85)] mb-2">
+						What the scan covers
+					</p>
+					<h2
+						id="lh-process-heading"
+						className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-bold tracking-tight text-white leading-[1.1]"
+					>
 						Five checks. One clear picture of where your site stands.
 					</h2>
 				</div>
-				<p className="lh-process-note">
+				<p className="text-[0.95rem] leading-[1.65] text-white/55 max-w-md">
 					Built for local service businesses that need the next move, not a pile
 					of disconnected scores.
 				</p>
 			</div>
 
-			<ol className="lh-process-grid">
+			<ol className="grid grid-cols-1 md:grid-cols-5 gap-4">
 				{phases.map((phase, index) => (
 					<MotionDiv
 						key={phase.num}
-						className="lh-process-step"
+						className="relative flex flex-col gap-3 min-h-[10.5rem] rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors hover:border-white/[0.12] hover:bg-white/[0.05]"
 						initial={animate ? { opacity: 0, y: 16 } : false}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: "-40px" }}
@@ -67,12 +69,14 @@ export function LighthouseValueStrip() {
 							ease: [0.22, 1, 0.36, 1],
 						}}
 					>
-						<span className="lh-process-num">{phase.num}</span>
+						<span className="inline-flex items-center justify-center min-w-[2.4rem] h-[1.65rem] px-2 w-fit rounded-md border border-[rgb(var(--accent-bronze-rgb)/0.25)] bg-[rgb(var(--accent-bronze-rgb)/0.08)] text-[0.7rem] font-bold tracking-[0.06em] text-[rgb(var(--accent-bronze-rgb)/0.95)] font-[family-name:var(--font-fraunces)]">
+							{phase.num}
+						</span>
 						<span className="min-w-0">
-							<span className="block font-report text-[15px] font-semibold leading-tight text-white/96">
+							<span className="block font-[family-name:var(--font-display)] text-[15px] font-semibold leading-tight text-white/95">
 								{phase.title}
 							</span>
-							<span className="mt-1.5 block text-[12px] leading-[1.55] text-white/56">
+							<span className="mt-1.5 block text-[12px] leading-[1.55] text-white/55">
 								{phase.body}
 							</span>
 						</span>

@@ -98,19 +98,6 @@
 					}
 				}
 			}
-		},
-		{
-			"includes": ["apps/web/src/app/(site)/lighthouse/lighthouse-globals.css"],
-			"linter": {
-				"rules": {
-					"complexity": {
-						"noImportantStyles": "off"
-					},
-					"style": {
-						"noDescendingSpecificity": "off"
-					}
-				}
-			}
 		}
 	]
 }

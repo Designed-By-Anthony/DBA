@@ -17,9 +17,9 @@
 	--text-soft: rgba(247, 244, 238, 0.92);
 	--text-gray: #9ca3ae;
 	--text-muted: rgba(247, 244, 238, 0.58);
-	--accent-bronze-rgb: 201 168 108;
-	--accent-bronze: #c9a86c;
-	--accent-bronze-dark: #b58a14;
+	--accent-bronze-rgb: 212 175 55;
+	--accent-bronze: #D4AF37;
+	--accent-bronze-dark: #A68A2B;
 	--accent-bronze-light: #fcf0d2;
 	--accent-bronze-muted: #e8d5a8;
 	--accent-bronze-soft: rgb(var(--accent-bronze-rgb) / 0.35);

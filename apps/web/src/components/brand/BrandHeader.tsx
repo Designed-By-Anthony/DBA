@@ -38,7 +38,7 @@ export function BrandHeader({
 		<>
 			{/* ── Top launch banner ── */}
 			<aside
-				className="relative z-[4] bg-[linear-gradient(90deg,rgba(8,12,22,0.96)_0%,rgba(11,17,30,0.96)_50%,rgba(8,12,22,0.96)_100%)] border-b border-[rgba(201,168,108,0.14)]"
+				className="relative z-[4] bg-[linear-gradient(90deg,rgba(8,12,22,0.96)_0%,rgba(11,17,30,0.96)_50%,rgba(8,12,22,0.96)_100%)] border-b border-[rgba(212,175,55,0.14)]"
 				aria-label="Site notice"
 			>
 				<Link
@@ -46,7 +46,7 @@ export function BrandHeader({
 					className="site-banner-link flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-medium tracking-[0.04em] text-[rgba(232,213,168,0.92)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
 				>
 					<span
-						className="inline-block w-[0.4rem] h-[0.4rem] rounded-full bg-[rgba(201,168,108,0.95)] shadow-[0_0_8px_1px_rgba(201,168,108,0.4)] shrink-0"
+						className="inline-block w-[0.4rem] h-[0.4rem] rounded-full bg-[rgba(212,175,55,0.95)] shadow-[0_0_8px_1px_rgba(212,175,55,0.4)] shrink-0"
 						aria-hidden
 					/>
 					<span>
@@ -88,7 +88,7 @@ export function BrandHeader({
 							<span className="font-[family-name:var(--font-fraunces)] text-[1rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.95)] leading-[1.1] [font-variation-settings:'opsz'_40] md:text-[1.05rem]">
 								{SITE_BRAND.name}
 							</span>
-							<span className="mt-[0.18rem] text-[0.62rem] font-medium tracking-[0.18em] uppercase text-[rgba(201,168,108,0.68)] max-[28rem]:hidden">
+							<span className="mt-[0.18rem] text-[0.62rem] font-medium tracking-[0.18em] uppercase text-[rgba(212,175,55,0.68)] max-[28rem]:hidden">
 								{SITE_BRAND.tagline}
 							</span>
 						</span>
@@ -170,7 +170,7 @@ export function BrandHeader({
 
 				{/* Brass accent rule under header */}
 				<div
-					className="h-px bg-[linear-gradient(90deg,rgba(201,168,108,0)_0%,rgba(201,168,108,0.25)_25%,rgba(201,168,108,0.55)_50%,rgba(201,168,108,0.25)_75%,rgba(201,168,108,0)_100%)]"
+					className="h-px bg-[linear-gradient(90deg,rgba(212,175,55,0)_0%,rgba(212,175,55,0.25)_25%,rgba(212,175,55,0.55)_50%,rgba(212,175,55,0.25)_75%,rgba(212,175,55,0)_100%)]"
 					aria-hidden
 				/>
 			</header>

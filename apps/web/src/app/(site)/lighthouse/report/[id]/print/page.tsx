@@ -20,7 +20,7 @@ const PRINT_PANEL = "#fffdf8";
 const PRINT_INK = "#171008";
 const PRINT_MUTED = "#6f6658";
 const PRINT_BORDER = "#e8dcc6";
-const PRINT_BRONZE = "#c9a86c";
+const PRINT_BRONZE = "#D4AF37";
 const PRINT_BRONZE_DARK = "#8b6a38";
 
 function ScoreBadge({ score, label }: { score: number | null; label: string }) {

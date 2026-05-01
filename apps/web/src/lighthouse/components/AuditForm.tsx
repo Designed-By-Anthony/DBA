@@ -159,21 +159,25 @@ export function AuditForm() {
 				</div>
 			) : null}
 
-			<form onSubmit={handleSubmit} className="lh-form-grid">
-				<div className="lh-form-header">
-					<p className="lighthouse-result-eyebrow">
+			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+				<div className="relative pb-6 mb-2 border-b border-white/[0.06]">
+					<span
+						className="pointer-events-none absolute left-0 -bottom-px h-px w-[4.5rem] bg-linear-to-r from-[rgb(var(--accent-bronze-rgb)/0.82)] to-transparent"
+						aria-hidden
+					/>
+					<p className="inline-block text-[0.65rem] font-bold tracking-[0.2em] uppercase text-[rgb(var(--accent-bronze-rgb)/0.85)] mb-2">
 						Free · Private · No Account Needed
 					</p>
-					<h2 className="font-report text-[1.6rem] font-semibold tracking-tight text-white/98 sm:text-[1.85rem]">
+					<h2 className="font-[family-name:var(--font-display)] text-[1.6rem] font-bold tracking-tight text-white sm:text-[1.85rem]">
 						Get Your Free Report
 					</h2>
-					<p className="mt-3 max-w-xl text-[14px] leading-[1.7] text-white/58">
+					<p className="mt-3 max-w-xl text-[14px] leading-[1.7] text-white/60">
 						Enter your site below. We score it on speed, SEO, and trust signals
 						in about 60 seconds and send a private report link to your email.
 					</p>
 				</div>
 
-				<div className="lh-url-block">
+				<div className="relative">
 					<label htmlFor="url" className={labelClass}>
 						Website to scan
 					</label>
@@ -200,8 +204,10 @@ export function AuditForm() {
 					/>
 				</div>
 
-				<fieldset className="lh-fieldset">
-					<legend className="lh-legend">Where to send the report</legend>
+				<fieldset className="border-0 m-0 p-0">
+					<legend className="block w-full text-[0.65rem] font-bold tracking-[0.2em] uppercase text-[rgba(247,244,238,0.58)] mb-2.5 pb-2 border-b border-dashed border-white/[0.06]">
+						Where to send the report
+					</legend>
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 						<div>
 							<label htmlFor="name" className={labelClass}>
@@ -280,7 +286,7 @@ export function AuditForm() {
 					</div>
 				)}
 
-				<div className="lh-submit-row">
+				<div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
 					<button
 						type="submit"
 						disabled={status === "loading"}
@@ -300,7 +306,7 @@ export function AuditForm() {
 						</span>
 					</button>
 
-					<div className="lh-submit-meta">
+					<div className="text-center sm:text-right">
 						<p className="font-mono text-[11px] tracking-tight text-white/45">
 							~60-90s · Private report · Shareable URL
 						</p>
