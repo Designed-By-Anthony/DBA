@@ -15,7 +15,7 @@ import {
 export type { AuditAiInsight, AuditData };
 
 const LABEL_STYLE = "text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent-bronze-rgb)/0.85)] mb-2";
-const HEADING_STYLE = "font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-white mb-4";
+const HEADING_STYLE = "font-[family-name:var(--font-display)] text-2xl font-medium tracking-[-0.035em] text-white mb-4";
 
 function formatStars(rating: number | null | undefined): string {
     if (rating == null) return ""; 
@@ -78,21 +78,21 @@ export function AuditResults({
             <div className="mb-12 grid gap-8 lg:grid-cols-[1fr_360px] items-start">
                 <div>
                     <p className={LABEL_STYLE}>Analysis Complete</p>
-                    <h1 className="font-[family-name:var(--font-display)] text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6">
+                    <h1 className="font-[family-name:var(--font-display)] text-4xl md:text-6xl font-medium tracking-[-0.035em] leading-[1.05] text-white mb-6">
                         System Report
                     </h1>
-                    <p className="text-xl text-white/50 leading-relaxed max-w-2xl">
-                        Deep-scan results for <span className="text-white">{data.url}</span>. 
+                    <p className="text-xl text-white/70 leading-relaxed max-w-2xl">
+                        Deep-scan results for <span className="text-white">{data.url}</span>.
                     </p>
                 </div>
                 
                 <div className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD} bg-white/[0.02]`}>
                     <p className="text-[11px] font-bold uppercase text-white/30 mb-2">Deliverables</p>
                     <div className="space-y-3">
-                         <button 
-                            onClick={handleDownloadPdf} 
+                         <button
+                            onClick={handleDownloadPdf}
                             disabled={pdfStatus === "generating"}
-                            className="w-full rounded-xl bg-[rgb(var(--accent-bronze-rgb))] py-3 text-sm font-bold text-black hover:brightness-110 transition-all disabled:opacity-50"
+                            className="btn-premium-primary w-full disabled:opacity-50"
                          >
                             {pdfStatus === "generating" ? "Generating..." : "Download PDF Report"}
                          </button>

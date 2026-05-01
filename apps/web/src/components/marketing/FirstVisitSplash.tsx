@@ -48,11 +48,10 @@ export function FirstVisitSplash() {
                 aria-label="Close splash"
             />
 
-            {/* Modal - Shrunk max-w-2xl to max-w-lg, tightened padding to p-8 md:p-10 */}
-            <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-linear-to-br from-[rgb(18_20_26/0.98)] to-[rgb(10_12_18/0.98)] p-8 md:p-10 shadow-2xl">
-                {/* Accent line */}
-                <div className="absolute left-0 right-0 top-0 h-[2px] bg-linear-to-r from-transparent via-[rgb(var(--accent-bronze-rgb)/0.8)] to-transparent" />
-
+            {/* Modal — canonical glass surface (Phase 4 SEV-1 Linear/Stripe pivot).
+                4% → 1% white gradient, micro-border at white/8, frosted blur,
+                inset top-highlight is the new accent (replaces the heavy bronze line). */}
+            <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-linear-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-2xl p-8 md:p-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_32px_80px_-32px_rgba(0,0,0,0.6)]">
                 {/* Sleek Close Button */}
                 <button
                     type="button"
@@ -69,7 +68,7 @@ export function FirstVisitSplash() {
                     <p className="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent-bronze-rgb)/0.9)]">
                         New: Micro SaaS Division
                     </p>
-                    <h2 className="font-display text-2xl md:text-3xl font-bold leading-tight text-white">
+                    <h2 className="font-[family-name:var(--font-display)] text-2xl md:text-3xl font-medium tracking-[-0.035em] leading-[1.1] text-white">
                         Bespoke web apps & automations.
                     </h2>
                 </div>
