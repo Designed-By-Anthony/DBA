@@ -13,6 +13,11 @@ import { isServiceAreaSlug } from "@/data/serviceAreaLocations";
 import { SERVICE_PAGE_EXTRA_SECTIONS } from "@/data/servicePageSections";
 import { showcaseItems } from "@/data/showcase";
 import { staticMarketingPageCopy } from "@/data/staticMarketingPages";
+import {
+	btnOutline,
+	btnPrimary,
+	btnSecondaryProof,
+} from "@/design-system/buttons";
 import { MARKETING_SERVICES } from "@/lib/seo";
 import { ArticleBody } from "./ArticleBody";
 import { BlogArticleEnhancements } from "./BlogArticleEnhancements";
@@ -206,10 +211,10 @@ function ServiceDetailPage({ slug }: { slug: string }) {
 					y={20}
 					duration={0.6}
 				>
-					<Link href="/lighthouse" className="btn btn-primary-book">
+					<Link href="/lighthouse" className={btnPrimary}>
 						Audit My Site
 					</Link>
-					<Link href="/contact" className="btn btn-secondary-proof">
+					<Link href="/contact" className={btnOutline}>
 						Contact us
 					</Link>
 				</MotionReveal>
@@ -472,7 +477,7 @@ function PortfolioCaseStudy({ slug }: { slug: string }) {
 					) : null}
 					{item.href ? (
 						<p>
-							<a className="btn btn-primary-book" href={item.href}>
+							<a className={btnOutline} href={item.href}>
 								Visit live site
 							</a>
 						</p>
@@ -504,10 +509,10 @@ export function StaticMarketingPage({ slug }: { slug: string }) {
 						y={20}
 						duration={0.6}
 					>
-						<Link href="/lighthouse" className="btn btn-primary-book">
+						<Link href="/lighthouse" className={btnPrimary}>
 							Audit My Site
 						</Link>
-						<Link href="/contact" className="btn btn-secondary-proof">
+						<Link href="/contact" className={btnOutline}>
 							Contact instead
 						</Link>
 					</MotionReveal>
@@ -553,7 +558,7 @@ function ThankYouPage() {
 						</p>
 					))}
 					<p className="reveal-up">
-						<Link href="/" className="btn btn-secondary-proof">
+						<Link href="/" className={btnSecondaryProof}>
 							Back to home
 						</Link>
 					</p>

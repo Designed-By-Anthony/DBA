@@ -1,6 +1,5 @@
 @import "../../design-system/tokens.css";
 @import "../../design-system/tailwind-v4-bridge.css";
-@import "../../styles/theme.css";
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -138,7 +137,12 @@
 /* ─── 3. Page scaffold ───
  * Matches body styles from theme.css so Lighthouse feels like the
  * rest of designedbyanthony.com — same atmospheric glows, grid
- * texture, and grain overlay. */
+ * texture, and grain overlay.
+ *
+ * NOTE: body::before (grid texture) and body::after (grain overlay)
+ * from theme.css already render globally via the root layout. Do NOT
+ * add duplicate fixed pseudo-elements here — they would stack on top
+ * and double the visual intensity of the texture on the Lighthouse page. */
 
 .lighthouse-segment {
 	min-height: 100dvh;
@@ -171,31 +175,6 @@
 		);
 
 	padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
-}
-
-/* Grid texture — same 72×72 grid as body::before in theme.css */
-.lighthouse-segment::before {
-	content: "";
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	z-index: 0;
-	background-image:
-		linear-gradient(rgba(255, 252, 245, 0.022) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(255, 252, 245, 0.022) 1px, transparent 1px);
-	background-size: 72px 72px;
-}
-
-/* Grain overlay — same as body::after in theme.css */
-.lighthouse-segment::after {
-	content: "";
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	z-index: 0;
-	opacity: 0.04;
-	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-	mix-blend-mode: overlay;
 }
 
 /* ─── 4. Layout system ───

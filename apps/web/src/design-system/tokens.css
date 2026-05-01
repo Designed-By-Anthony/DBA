@@ -1,6 +1,7 @@
 /**
- * :root tokens only — shared with Next apps (Tailwind bridge).
- * Source of truth: src/styles/theme.css (:root block)
+ * :root tokens — single source of truth (Phase 5.5).
+ * Consumed by dba-global.css → every Next.js marketing page + Lighthouse.
+ * theme.css was DELETED in Phase 5.5; rules live in tailwind-v4-bridge.css.
  */
 :root {
 	--bg-dark: #0f1218;
@@ -16,20 +17,22 @@
 	--text-soft: rgba(247, 244, 238, 0.92);
 	--text-gray: #9ca3ae;
 	--text-muted: rgba(247, 244, 238, 0.58);
-	--accent-blue: #5b9cf8;
-	--accent-blue-hover: #3b82f6;
-	--accent-blue-soft: rgba(91, 156, 248, 0.12);
 	--accent-bronze-rgb: 201 168 108;
 	--accent-bronze: #c9a86c;
+	--accent-bronze-dark: #b58a14;
 	--accent-bronze-light: #fcf0d2;
 	--accent-bronze-muted: #e8d5a8;
 	--accent-bronze-soft: rgb(var(--accent-bronze-rgb) / 0.35);
 	--accent-bronze-hairline: rgb(var(--accent-bronze-rgb) / 0.22);
 	--accent-bronze-glow: rgb(var(--accent-bronze-rgb) / 0.45);
+	/* Legacy blue tokens retargeted to Bronze — Midnight & Bronze aesthetic. */
+	--accent-blue: var(--accent-bronze);
+	--accent-blue-hover: var(--accent-bronze-dark);
+	--accent-blue-soft: rgb(var(--accent-bronze-rgb) / 0.12);
 	--accent-brass: var(--accent-bronze);
 	--accent-brass-soft: var(--accent-bronze-soft);
 	--border-soft: rgba(255, 252, 245, 0.07);
-	--border-strong: rgba(147, 197, 253, 0.22);
+	--border-strong: rgb(var(--accent-bronze-rgb) / 0.22);
 	--success-green: #22c55e;
 	--font-main:
 		"Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -40,11 +43,12 @@
 	--font-report-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
 	--container-gutter: max(0.85rem, min(2rem, clamp(1.15rem, 2.7vw, 2rem)));
 	--content-max: 1160px;
-	--section-space: clamp(5.25rem, 9vw, 7.25rem);
+	/* Apple breathing room: py-24 (6rem) on mobile → md:py-32 (8rem). */
+	--section-space: clamp(6rem, 9vw, 8rem);
 	--section-space-tight: clamp(3.5rem, 5.5vw, 5rem);
 	--radius-card: 1.25rem;
 	--radius-card-lg: 1.4rem;
-	/* Mirrored from styles/theme.css — keep these two files in sync. */
+	/* Spacing scale — single source of truth for vertical / horizontal rhythm. */
 	--space-section: clamp(4rem, 8vw, 6rem);
 	--space-block: clamp(2rem, 4vw, 3rem);
 	--space-element: clamp(1rem, 2vw, 1.5rem);

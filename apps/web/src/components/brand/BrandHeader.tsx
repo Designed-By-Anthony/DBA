@@ -20,6 +20,14 @@ export type BrandHeaderProps = {
 	includeHamburger?: boolean;
 };
 
+/* Shared bronze CTA button classes */
+const navCtaBase =
+	"inline-flex items-center gap-[0.4rem] rounded-[0.6rem] border border-[rgba(212,175,55,0.45)] bg-[linear-gradient(170deg,rgba(212,175,55,0.22)_0%,rgba(181,138,20,0.32)_100%)] font-bold tracking-[0.01em] text-[rgba(252,240,210,0.96)] no-underline shadow-[0_8px_22px_-10px_rgba(212,175,55,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] transition-[transform,box-shadow,border-color] duration-[200ms] ease-in whitespace-nowrap hover:-translate-y-px hover:border-[rgba(212,175,55,0.65)] hover:shadow-[0_12px_28px_-10px_rgba(212,175,55,0.45),inset_0_1px_0_rgba(255,255,255,0.12)]";
+
+/* Audit / current-page chip (Lighthouse segment — intentional sky blue) */
+const auditCurrentChip =
+	"inline-flex items-center gap-[0.45rem] px-3 py-[0.35rem] rounded-full border border-[rgba(56,189,248,0.32)] bg-[rgba(56,189,248,0.08)] text-[0.7rem] font-bold tracking-[0.16em] uppercase text-[rgba(186,230,253,0.95)] whitespace-nowrap";
+
 export function BrandHeader({
 	currentSection,
 	includeHamburger = true,
@@ -28,31 +36,43 @@ export function BrandHeader({
 
 	return (
 		<>
-			{/* ── Top banner ── */}
-			<aside className="dba-banner" aria-label="Site notice">
+			{/* ── Top launch banner ── */}
+			<aside
+				className="relative z-[4] bg-[linear-gradient(90deg,rgba(8,12,22,0.96)_0%,rgba(11,17,30,0.96)_50%,rgba(8,12,22,0.96)_100%)] border-b border-[rgba(201,168,108,0.14)]"
+				aria-label="Site notice"
+			>
 				<Link
 					href={isAudit ? SITE_BRAND.homeHref : SITE_BANNER.href}
-					className="dba-banner-link"
+					className="site-banner-link flex items-center justify-center gap-[0.6rem] px-4 py-[0.55rem] text-[0.7rem] font-medium tracking-[0.04em] text-[rgba(232,213,168,0.92)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(252,240,210,1)] max-[36rem]:text-[0.65rem] max-[36rem]:px-3 max-[36rem]:py-[0.5rem]"
 				>
-					<span className="dba-banner-dot" aria-hidden />
-					<span className="dba-banner-text">
-						<strong>{SITE_BANNER.label}</strong>
-						<span className="dba-banner-sep" aria-hidden>
+					<span
+						className="inline-block w-[0.4rem] h-[0.4rem] rounded-full bg-[rgba(201,168,108,0.95)] shadow-[0_0_8px_1px_rgba(201,168,108,0.4)] shrink-0"
+						aria-hidden
+					/>
+					<span>
+						<strong className="font-[family-name:var(--font-fraunces)] font-semibold tracking-[0.01em] text-[rgba(252,240,210,0.96)]">
+							{SITE_BANNER.label}
+						</strong>
+						<span
+							className="text-[rgba(232,213,168,0.4)] mx-[0.05em]"
+							aria-hidden
+						>
 							{" — "}
 						</span>
-						<span className="dba-banner-cta">
+						<span className="italic text-[rgba(232,213,168,0.7)] max-[36rem]:hidden">
 							{isAudit ? SITE_BANNER.currentCta : `${SITE_BANNER.cta} →`}
 						</span>
 					</span>
 				</Link>
 			</aside>
 
-			{/* ── Header ── */}
-			<header className="dba-header">
-				<div className="dba-header-inner">
+			{/* ── Sticky glass header ── */}
+			<header className="relative z-[3] bg-[#0a0c10]/80 backdrop-blur-md border-b border-white/10 pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))]">
+				<div className="flex items-center justify-between gap-6 max-w-[80rem] mx-auto py-[0.95rem] md:py-[1.1rem]">
+					{/* Brand lockup */}
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="dba-brand-lockup"
+						className="inline-flex items-center gap-3 no-underline min-w-0 group"
 						aria-label={`${SITE_BRAND.name} — home`}
 					>
 						<Image
@@ -60,41 +80,52 @@ export function BrandHeader({
 							alt="Designed by Anthony logo"
 							width={36}
 							height={27}
-							className="dba-brand-mark"
+							className="h-[1.85rem] w-auto shrink-0 transition-transform duration-[280ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-[-3deg] md:h-[2rem]"
 							style={{ width: "auto" }}
 							priority
 						/>
-						<span className="dba-brand-wordmark">
-							<span className="dba-brand-wordmark-display">
+						<span className="flex flex-col min-w-0">
+							<span className="font-[family-name:var(--font-fraunces)] text-[1rem] font-semibold tracking-[-0.02em] text-[rgba(247,244,238,0.95)] leading-[1.1] [font-variation-settings:'opsz'_40] md:text-[1.05rem]">
 								{SITE_BRAND.name}
 							</span>
-							<span className="dba-brand-wordmark-sub">
+							<span className="mt-[0.18rem] text-[0.62rem] font-medium tracking-[0.18em] uppercase text-[rgba(201,168,108,0.68)] max-[28rem]:hidden">
 								{SITE_BRAND.tagline}
 							</span>
 						</span>
 					</Link>
 
+					{/* Desktop nav */}
 					<nav
-						className="dba-nav dba-nav--desktop"
+						className="hidden min-[960px]:flex items-center gap-5"
 						aria-label="Designed by Anthony main navigation"
 					>
 						{SITE_HEADER_NAV_LINKS.map((link) => (
-							<Link key={link.href} href={link.href} className="dba-nav-link">
+							<Link
+								key={link.href}
+								href={link.href}
+								className="text-[0.82rem] font-medium text-[rgba(247,244,238,0.7)] no-underline transition-colors duration-[180ms] ease-in tracking-[-0.005em] whitespace-nowrap hover:text-[rgba(247,244,238,0.98)]"
+							>
 								{link.label}
 							</Link>
 						))}
-						<Link href={SITE_CONTACT_LINK.href} className="dba-nav-link">
+						<Link
+							href={SITE_CONTACT_LINK.href}
+							className="nav-contact-link text-[0.82rem] font-medium text-[rgba(247,244,238,0.7)] no-underline transition-colors duration-[180ms] ease-in tracking-[-0.005em] whitespace-nowrap hover:text-[rgba(247,244,238,0.98)]"
+						>
 							{SITE_CONTACT_LINK.label}
 						</Link>
 						{isAudit ? (
-							<span className="dba-nav-current" aria-current="page">
-								<span className="dba-nav-current-dot" aria-hidden />
+							<span className={auditCurrentChip} aria-current="page">
+								<span
+									className="inline-block w-[0.35rem] h-[0.35rem] rounded-full bg-[rgb(74,222,128)] shadow-[0_0_6px_1px_rgba(74,222,128,0.55)] animate-[dba-pulse-dot_2s_ease-in-out_infinite]"
+									aria-hidden
+								/>
 								{SITE_AUDIT_CTA.shortLabel}
 							</span>
 						) : (
 							<Link
 								href={SITE_AUDIT_CTA.href}
-								className="dba-nav-cta"
+								className={`${navCtaBase} px-[1.1rem] py-[0.55rem] text-[0.78rem]`}
 								id="nav-audit-btn"
 							>
 								{SITE_AUDIT_CTA.label}
@@ -102,39 +133,46 @@ export function BrandHeader({
 						)}
 					</nav>
 
-					{/* Mobile slot — either hamburger (marketing site) or current chip (lighthouse) */}
-					<div className="dba-nav dba-nav--mobile">
+					{/* Mobile slot — CTA chip or hamburger */}
+					<div className="flex min-[960px]:hidden items-center gap-[0.6rem]">
 						{isAudit ? (
-							<span className="dba-nav-current" aria-current="page">
-								<span className="dba-nav-current-dot" aria-hidden />
+							<span className={auditCurrentChip} aria-current="page">
+								<span
+									className="inline-block w-[0.35rem] h-[0.35rem] rounded-full bg-[rgb(74,222,128)] shadow-[0_0_6px_1px_rgba(74,222,128,0.55)] animate-[dba-pulse-dot_2s_ease-in-out_infinite]"
+									aria-hidden
+								/>
 								{SITE_AUDIT_CTA.shortLabel}
 							</span>
 						) : (
 							<Link
 								href={SITE_AUDIT_CTA.href}
-								className="dba-nav-cta dba-nav-cta--compact"
+								className={`${navCtaBase} px-[0.85rem] py-[0.4rem] text-[0.72rem] tracking-[0.04em]`}
 							>
 								{SITE_AUDIT_CTA.shortLabel}
 							</Link>
 						)}
 						{includeHamburger ? (
 							<button
-								className="hamburger dba-hamburger"
+								className="hamburger inline-flex flex-col justify-center gap-[0.28rem] w-[2.4rem] h-[2.4rem] px-[0.55rem] bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] rounded-[0.5rem] cursor-pointer transition-[background,border-color] duration-[180ms] ease-in hover:bg-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] aria-expanded:bg-[rgba(255,255,255,0.08)] aria-expanded:border-[rgba(255,255,255,0.18)] [&.active>span:nth-child(1)]:[transform:translate(0,0.4rem)_rotate(45deg)] [&.active>span:nth-child(2)]:opacity-0 [&.active>span:nth-child(3)]:[transform:translate(0,-0.4rem)_rotate(-45deg)]"
 								id="hamburger-btn"
 								type="button"
 								aria-label="Open navigation menu"
 								aria-controls="mobile-nav"
 								aria-expanded="false"
 							>
-								<span className="hamburger-line" />
-								<span className="hamburger-line" />
-								<span className="hamburger-line" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-[opacity,transform] duration-[200ms] ease-in" />
+								<span className="block h-[1.5px] w-full bg-[rgba(247,244,238,0.78)] rounded-[1px] transition-transform duration-[200ms] ease-in" />
 							</button>
 						) : null}
 					</div>
 				</div>
+
 				{/* Brass accent rule under header */}
-				<div className="dba-header-rule" aria-hidden />
+				<div
+					className="h-px bg-[linear-gradient(90deg,rgba(201,168,108,0)_0%,rgba(201,168,108,0.25)_25%,rgba(201,168,108,0.55)_50%,rgba(201,168,108,0.25)_75%,rgba(201,168,108,0)_100%)]"
+					aria-hidden
+				/>
 			</header>
 		</>
 	);

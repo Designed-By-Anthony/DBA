@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 /**
- * Bumped from `_v1` to `_v2` when splash ownership moved from `HomePage`
- * to the root layout (2026-04). Old v1 flags get ignored so existing
- * visitors still see the splash once under the new global rules.
+ * Bumped from `_v1` -> `_v2` (splash moved out of HomePage into root layout)
+ * -> `_v3` (splash now reads `window.location` directly on mount instead of
+ * Next's `useSearchParams` hook, so there is no Suspense/hydration race —
+ * the effect fires on the user's very first paint regardless of entry URL).
+ * Old v1/v2 flags are ignored so every existing visitor is re-evaluated
+ * once under the new global rules.
  */
-const STORAGE_KEY = "dba_first_visit_shown_v2";
+const STORAGE_KEY = "dba_first_visit_shown_v3";
 
 const MICRO_SAAS_PATH_PREFIXES = ["/tools"] as const;
 const MICRO_SAAS_PARAM_KEYS = [
@@ -22,22 +24,25 @@ const MICRO_SAAS_PARAM_KEYS = [
 ] as const;
 const MICRO_SAAS_PARAM_PATTERN = /micro[-_ ]?saas|microsaas/i;
 
-function isMicroSaasEntry(
-	pathname: string | null,
-	searchParams: URLSearchParams | null,
-): boolean {
-	if (pathname) {
-		for (const prefix of MICRO_SAAS_PATH_PREFIXES) {
-			if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
-				return true;
-			}
+function isMicroSaasEntry(pathname: string, search: string): boolean {
+	for (const prefix of MICRO_SAAS_PATH_PREFIXES) {
+		if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+			return true;
 		}
 	}
-	if (searchParams) {
-		for (const key of MICRO_SAAS_PARAM_KEYS) {
-			const value = searchParams.get(key);
-			if (value && MICRO_SAAS_PARAM_PATTERN.test(value)) {
-				return true;
+	if (search) {
+		let params: URLSearchParams | null = null;
+		try {
+			params = new URLSearchParams(search);
+		} catch {
+			params = null;
+		}
+		if (params) {
+			for (const key of MICRO_SAAS_PARAM_KEYS) {
+				const value = params.get(key);
+				if (value && MICRO_SAAS_PARAM_PATTERN.test(value)) {
+					return true;
+				}
 			}
 		}
 	}
@@ -61,11 +66,8 @@ function safeSetStorage(key: string, value: string): void {
 }
 
 export function FirstVisitSplash() {
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
 	const [isOpen, setIsOpen] = useState(false);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional — evaluates only the initial landing URL on mount; re-running on client nav would re-fire the splash.
 	useEffect(() => {
 		// Only evaluate once per session (on initial mount). After the first
 		// run we persist a flag so subsequent navigations never re-trigger.
@@ -73,10 +75,19 @@ export function FirstVisitSplash() {
 			return;
 		}
 
+		// Read the initial landing URL directly from window.location so the
+		// check does not depend on Next's `useSearchParams` (which forces a
+		// Suspense boundary and can defer mount to a later hydration step).
+		// This guarantees the splash is evaluated on the user's very first
+		// paint, regardless of which route they land on.
+		const pathname =
+			typeof window !== "undefined" ? window.location.pathname : "";
+		const search = typeof window !== "undefined" ? window.location.search : "";
+
 		// Micro-SaaS entry points (e.g. direct /tools landings, or any URL
 		// tagged with a micro-saas utm/ref param) must NEVER show the splash,
 		// since those visitors are already arriving for that exact offer.
-		if (isMicroSaasEntry(pathname, searchParams)) {
+		if (isMicroSaasEntry(pathname, search)) {
 			safeSetStorage(STORAGE_KEY, "skipped-microsaas");
 			return;
 		}
@@ -109,7 +120,7 @@ export function FirstVisitSplash() {
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+		<div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
 			{/* Backdrop */}
 			<button
 				type="button"
@@ -119,7 +130,7 @@ export function FirstVisitSplash() {
 			/>
 
 			{/* Modal */}
-			<div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-linear-to-br from-[rgba(18,20,26,0.98)] to-[rgba(10,12,18,0.98)] p-12 md:p-14 shadow-2xl">
+			<div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgb(var(--accent-bronze-rgb)/0.3)] bg-linear-to-br from-[rgb(18_20_26/0.98)] to-[rgb(10_12_18/0.98)] p-12 md:p-14 shadow-2xl">
 				{/* Accent line */}
 				<div className="absolute left-0 right-0 top-0 h-[2px] bg-linear-to-r from-transparent via-[rgb(var(--accent-bronze-rgb)/0.8)] to-transparent" />
 
@@ -165,7 +176,7 @@ export function FirstVisitSplash() {
 					<Link
 						href="/contact"
 						onClick={handleContactClick}
-						className="inline-flex items-center justify-center rounded-xl border border-[rgb(var(--accent-bronze-rgb)/0.6)] bg-linear-to-b from-[rgb(var(--accent-bronze-light))] to-[rgb(var(--accent-bronze-rgb))] px-8 py-3.5 text-base font-semibold text-[#171008] shadow-lg transition hover:-translate-y-px hover:shadow-xl"
+						className="inline-flex items-center justify-center rounded-xl border border-[rgb(var(--accent-bronze-rgb)/0.6)] bg-linear-to-b from-[var(--accent-bronze-light)] to-[rgb(var(--accent-bronze-rgb))] px-8 py-3.5 text-base font-semibold text-[#171008] shadow-lg transition hover:-translate-y-px hover:shadow-xl"
 					>
 						Contact us →
 					</Link>

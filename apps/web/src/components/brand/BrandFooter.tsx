@@ -21,17 +21,28 @@ export type BrandFooterProps = {
 	poweredBy?: ReadonlyArray<{ label: string; href: string }>;
 };
 
+/* Shared stack badge class */
+const stackBadge =
+	"inline-flex items-center px-[0.52rem] py-[0.18rem] rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[0.62rem] font-medium tracking-[0.01em] text-[rgba(247,244,238,0.48)] no-underline whitespace-nowrap transition-[color,border-color] duration-[180ms] ease-in hover:text-[rgba(247,244,238,0.82)] hover:border-[rgba(255,255,255,0.2)]";
+
 export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 	const year = new Date().getFullYear();
 
 	return (
-		<footer className="dba-footer">
-			<div className="dba-footer-rule" aria-hidden />
-			<div className="dba-footer-inner">
-				<div className="dba-footer-row">
+		<footer className="relative z-[1] mt-[clamp(2.5rem,5vw,4rem)] pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] bg-[linear-gradient(180deg,transparent_0%,rgba(6,8,14,0.65)_40%,rgba(6,8,14,0.92)_100%)]">
+			{/* Bronze accent rule */}
+			<div
+				className="h-px bg-[linear-gradient(90deg,rgba(201,168,108,0)_0%,rgba(201,168,108,0.4)_50%,rgba(201,168,108,0)_100%)]"
+				aria-hidden
+			/>
+
+			<div className="max-w-[80rem] mx-auto py-5 pb-[1.1rem]">
+				{/* Single compact row */}
+				<div className="flex items-center flex-wrap gap-x-6 gap-y-3">
+					{/* Brand lockup */}
 					<Link
 						href={SITE_BRAND.homeHref}
-						className="dba-footer-brand"
+						className="inline-flex items-center gap-2 no-underline shrink-0"
 						aria-label={`${SITE_BRAND.name} — home`}
 					>
 						<Image
@@ -39,50 +50,74 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 							alt="Designed by Anthony logo"
 							width={22}
 							height={16}
-							className="dba-footer-mark"
+							className="shrink-0"
 							style={{ width: "auto" }}
 						/>
-						<span className="dba-footer-brand-name">{SITE_BRAND.name}</span>
+						<span className="font-[family-name:var(--font-fraunces)] text-[0.88rem] font-semibold tracking-[-0.015em] text-[rgba(247,244,238,0.88)] leading-none">
+							{SITE_BRAND.name}
+						</span>
 					</Link>
 
-					<nav className="dba-footer-nav" aria-label="Footer navigation">
+					{/* Footer nav */}
+					<nav
+						className="flex flex-row flex-wrap gap-x-4 gap-y-1"
+						aria-label="Footer navigation"
+					>
 						{SITE_FOOTER_LINKS.map((link) => (
-							<Link key={link.href} href={link.href}>
+							<Link
+								key={link.href}
+								href={link.href}
+								className="text-[0.78rem] text-[rgba(247,244,238,0.55)] no-underline transition-colors duration-[180ms] ease-in whitespace-nowrap hover:text-[rgba(247,244,238,0.92)]"
+							>
 								{link.label}
 							</Link>
 						))}
 					</nav>
 
-					<div className="dba-footer-legal">
-						<p className="dba-footer-copy">
+					{/* Legal + copyright */}
+					<div className="flex items-center flex-wrap gap-x-[0.55rem] gap-y-[0.35rem] ml-auto text-[0.7rem] text-[rgba(247,244,238,0.38)] max-sm:ml-0">
+						<p className="m-0 whitespace-nowrap">
 							© {year} {SITE_BRAND.name}
 						</p>
 						{SITE_LEGAL_LINKS.map((link) => (
-							<span key={link.href} className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
+							<span
+								key={link.href}
+								className="inline-flex items-center gap-[0.55rem]"
+							>
+								<span className="text-[rgba(247,244,238,0.22)]" aria-hidden>
 									·
 								</span>
-								<Link href={link.href}>{link.label}</Link>
+								<Link
+									href={link.href}
+									className="text-[rgba(247,244,238,0.48)] no-underline transition-colors duration-[180ms] ease-in hover:text-[rgba(247,244,238,0.82)]"
+								>
+									{link.label}
+								</Link>
 							</span>
 						))}
 						{buildTag ? (
-							<span className="dba-footer-legal-item">
-								<span className="dba-footer-sep" aria-hidden>
+							<span className="inline-flex items-center gap-[0.55rem]">
+								<span className="text-[rgba(247,244,238,0.22)]" aria-hidden>
 									·
 								</span>
-								<span className="dba-footer-meta font-mono">{buildTag}</span>
+								<span className="font-mono text-[rgba(201,168,108,0.55)] text-[0.66rem] tracking-[0.06em]">
+									{buildTag}
+								</span>
 							</span>
 						) : null}
 					</div>
 				</div>
 
-				<div className="dba-footer-stack">
-					<span className="dba-footer-stack-label">Built with</span>
+				{/* Built-with chips */}
+				<div className="flex flex-wrap items-center gap-x-2 gap-y-[0.35rem] pt-[0.7rem] border-t border-[rgba(255,255,255,0.06)] mt-[0.65rem]">
+					<span className="text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[rgba(247,244,238,0.28)] mr-[0.15rem] shrink-0">
+						Built with
+					</span>
 					{BUILT_WITH.map(({ label, href }) => (
 						<a
 							key={label}
 							href={href}
-							className="dba-stack-badge"
+							className={stackBadge}
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -91,14 +126,17 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 					))}
 				</div>
 
+				{/* Optional powered-by chips */}
 				{poweredBy?.length ? (
-					<div className="dba-footer-stack">
-						<span className="dba-footer-stack-label">Powered by</span>
+					<div className="flex flex-wrap items-center gap-x-2 gap-y-[0.35rem] pt-[0.7rem] border-t border-[rgba(255,255,255,0.06)] mt-[0.65rem]">
+						<span className="text-[0.6rem] font-semibold tracking-[0.12em] uppercase text-[rgba(247,244,238,0.28)] mr-[0.15rem] shrink-0">
+							Powered by
+						</span>
 						{poweredBy.map(({ label, href }) => (
 							<a
 								key={label}
 								href={href}
-								className="dba-stack-badge"
+								className={stackBadge}
 								target="_blank"
 								rel="noopener noreferrer"
 							>

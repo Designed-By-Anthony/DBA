@@ -1,10 +1,37 @@
 import "@/design-system/dba-global.css";
+import type { Metadata, Viewport } from "next";
+import { Fraunces, Outfit } from "next/font/google";
+import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
 import { FirstVisitSplash } from "@/components/marketing/FirstVisitSplash";
-import "@/styles/layout-shell.css";
-import type { Metadata, Viewport } from "next";
-import { type ReactNode, Suspense } from "react";
+
+/**
+ * Load Outfit Variable via Next.js Font API so the --font-outfit CSS variable
+ * is available globally. theme.css sets --font-display to "Outfit Variable",
+ * but without the Next.js font loader the Google Font only loads on the
+ * Lighthouse segment (which has its own Outfit import). Loading it here
+ * ensures headings use Outfit everywhere on the marketing site.
+ */
+const outfit = Outfit({
+	variable: "--font-outfit",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+/**
+ * Load Fraunces Variable via Next.js Font API so --font-fraunces is set on
+ * <html>. BrandHeader and BrandFooter reference var(--font-fraunces) for the
+ * brand wordmark. Without this, the variable is unset on marketing pages and
+ * the browser falls back to the @font-face "Fraunces Variable" name — which
+ * works but skips preloading optimisations.
+ */
+const fraunces = Fraunces({
+	variable: "--font-fraunces",
+	subsets: ["latin"],
+	axes: ["opsz", "SOFT", "WONK"],
+	display: "swap",
+});
 
 /** Mobile-first: correct scaling on phones/tablets; safe areas for notched devices. */
 export const viewport: Viewport = {
@@ -42,6 +69,10 @@ export const metadata: Metadata = {
 		siteName: "Designed by Anthony",
 		type: "website",
 		locale: "en_US",
+		url: "https://designedbyanthony.com",
+		title: "Designed by Anthony — Custom websites & local SEO",
+		description:
+			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York. Lighthouse-grade performance, Bronze finish.",
 		images: [
 			{
 				url: "/images/og-site-premium.png",
@@ -54,6 +85,9 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
+		title: "Designed by Anthony — Custom websites & local SEO",
+		description:
+			"Custom web design and local SEO for service businesses in the Mohawk Valley and Central New York.",
 		images: ["/images/og-site-premium.png"],
 	},
 	icons: {
@@ -79,6 +113,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 			prefix="og: https://ogp.me/ns#"
 			data-scroll-behavior="smooth"
 			data-lead-webhook={leadWebhookDefault || undefined}
+			className={`${outfit.variable} ${fraunces.variable}`}
 		>
 			<head>
 				<JsonLd />
@@ -97,13 +132,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				{children}
 				{/* Global first-visit splash. Mounted in the root layout so
 				    it fires on the user's very first landing regardless of
-				    entry URL. The `useSearchParams` hook inside the splash
-				    forces the subtree onto the client, so it is wrapped in
-				    a Suspense boundary to keep the surrounding server tree
-				    statically renderable. */}
-				<Suspense fallback={null}>
-					<FirstVisitSplash />
-				</Suspense>
+				    entry URL. Reads `window.location` directly — no
+				    `useSearchParams` / Suspense boundary required. */}
+				<FirstVisitSplash />
 				<CrispBootstrap />
 			</body>
 		</html>
