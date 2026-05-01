@@ -187,7 +187,9 @@ export function LighthouseHero() {
 			className="relative max-w-3xl pt-[var(--space-element)] pb-[var(--space-block)]"
 			aria-labelledby="lighthouse-hero-heading"
 		>
-			{/* Ambient glow — bronze (left) + cool counter-glow (right). */}
+			{/* Ambient glow — twin bronze halos (left + right) for warm symmetry.
+			    The right-side stale blue (rgba(91,156,248,*)) was retired in
+			    Phase 4 SEV-2 along with the broader bronze sweep. */}
 			<div
 				className="pointer-events-none absolute -left-20 top-0 h-96 w-96 rounded-full opacity-25 blur-3xl"
 				style={{
@@ -200,7 +202,7 @@ export function LighthouseHero() {
 				className="pointer-events-none absolute -right-10 top-20 h-72 w-72 rounded-full opacity-15 blur-3xl"
 				style={{
 					background:
-						"radial-gradient(circle, rgba(91,156,248,0.14), transparent 70%)",
+						"radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%)",
 				}}
 				aria-hidden
 			/>

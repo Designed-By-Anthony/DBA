@@ -1,4 +1,3 @@
-import Script from "next/script";
 import type { Metadata } from "next";
 import { HomePage } from "@/components/marketing/HomePage";
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
@@ -116,9 +115,13 @@ function jsonLdScriptKey(entry: SchemaValue): string {
 export default function Home() {
     return (
         <>
-            {/* SEO Structured Data Injected into <head> via next/script */}
+            {/* SEO Structured Data — native <script type="application/ld+json"> renders
+                in the initial HTML stream from this Server Component, where Google's
+                rich-results parser expects it. (next/script would inject post-hydrate
+                in <body>, which works but is non-canonical for JSON-LD.) */}
             {structuredData.map((entry) => (
-                <Script
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD is data, not executable
+                <script
                     key={jsonLdScriptKey(entry)}
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}

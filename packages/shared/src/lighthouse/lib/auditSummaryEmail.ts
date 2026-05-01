@@ -101,7 +101,7 @@ export function buildAuditSummaryEmail(params: AuditSummaryEmailParams): {
       </td></tr>
       ${safeNote ? `<tr><td style="padding:0 24px 20px;"><div style="background:#fff8df;border:1px solid #D4AF37;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.5;color:#6c4b16;"><strong>Partial report.</strong> ${safeNote}</div></td></tr>` : ""}
       <tr><td style="padding:8px 24px 24px;">
-        <a href="${safeReport}" style="display:inline-block;background:linear-gradient(165deg,#D4AF37,#8b6a38);color:#171008;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;box-shadow:0 8px 24px -8px rgba(201,168,108,0.55);">View your report →</a>
+        <a href="${safeReport}" style="display:inline-block;background:linear-gradient(165deg,#D4AF37,#8b6a38);color:#171008;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;box-shadow:0 8px 24px -8px rgba(212,175,55,0.55);">View your report →</a>
         ${printPath ? `<a href="${safePrint}" style="display:inline-block;margin-left:10px;color:#8b6a38;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #D4AF37;padding:11px 20px;border-radius:10px;background:#fdf8f0;">Print / PDF</a>` : ""}
       </td></tr>
     </table>

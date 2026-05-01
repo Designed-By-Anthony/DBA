@@ -29,7 +29,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 		<footer className="relative z-[1] mt-[clamp(2.5rem,5vw,4rem)] pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] bg-[linear-gradient(180deg,transparent_0%,rgba(6,8,14,0.65)_40%,rgba(6,8,14,0.92)_100%)]">
 			{/* Bronze accent rule */}
 			<div
-				className="h-px bg-[linear-gradient(90deg,rgba(201,168,108,0)_0%,rgba(201,168,108,0.4)_50%,rgba(201,168,108,0)_100%)]"
+				className="h-px bg-[linear-gradient(90deg,rgba(212,175,55,0)_0%,rgba(212,175,55,0.4)_50%,rgba(212,175,55,0)_100%)]"
 				aria-hidden
 			/>
 
@@ -97,7 +97,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 								<span className="text-[rgba(247,244,238,0.22)]" aria-hidden>
 									·
 								</span>
-								<span className="font-mono text-[rgba(201,168,108,0.55)] text-[0.66rem] tracking-[0.06em]">
+								<span className="font-mono text-[rgba(212,175,55,0.55)] text-[0.66rem] tracking-[0.06em]">
 									{buildTag}
 								</span>
 							</span>

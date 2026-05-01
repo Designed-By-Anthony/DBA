@@ -26,7 +26,7 @@ const siteScriptVersion =
 /* Cookie consent buttons — bronze primary, ink outline */
 const cookieBtnBase =
 	"inline-flex items-center justify-center gap-[0.45rem] rounded-full font-[family-name:var(--font-display,'Outfit_Variable')] font-bold text-[0.78rem] tracking-[0.01em] leading-none cursor-pointer transition-[transform,box-shadow,border-color,background,color] duration-[350ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[rgba(212,175,55,0.5)] focus-visible:outline-offset-[3px] active:scale-[0.97] py-[0.55rem] px-[1.1rem]";
-const cookieBtnPrimary = `${cookieBtnBase} text-[#171008] border border-[rgba(212,175,55,0.78)] bg-[linear-gradient(180deg,#fcf0d2_0%,#c9a86c_100%)] shadow-[0_18px_34px_-22px_rgba(181,138,20,0.85),inset_0_1px_0_rgba(255,255,255,0.4)] hover:-translate-y-px hover:border-[rgba(212,175,55,0.95)] hover:bg-[linear-gradient(180deg,#fff5dc_0%,#d4af37_100%)]`;
+const cookieBtnPrimary = `${cookieBtnBase} text-[#171008] border border-[rgba(212,175,55,0.78)] bg-[linear-gradient(180deg,#fcf0d2_0%,#D4AF37_100%)] shadow-[0_18px_34px_-22px_rgba(181,138,20,0.85),inset_0_1px_0_rgba(255,255,255,0.4)] hover:-translate-y-px hover:border-[rgba(212,175,55,0.95)] hover:bg-[linear-gradient(180deg,#fff5dc_0%,#d4af37_100%)]`;
 const cookieBtnOutline = `${cookieBtnBase} text-[rgba(247,244,238,0.92)] bg-[rgba(9,15,28,0.45)] border border-[rgba(226,232,240,0.5)] hover:-translate-y-px hover:border-[rgba(212,175,55,0.55)] hover:bg-[rgba(9,15,28,0.65)] hover:text-[rgba(252,240,210,0.96)]`;
 
 export function MarketingChrome({
@@ -327,7 +327,7 @@ window.__dbaRevokeAnalyticsConsent = function () {
 					</p>
 					<p
 						id="cookie-consent-desc"
-						className="m-0 mb-4 text-[0.875rem] leading-[1.6] text-[#9ca3ae] [&_a]:text-[#c9a86c] [&_a]:no-underline [&_a]:border-b [&_a]:border-[rgba(201,168,108,0.4)] [&_a]:transition-[border-color] [&_a]:duration-200 [&_a:hover]:border-[#c9a86c]"
+						className="m-0 mb-4 text-[0.875rem] leading-[1.6] text-[#9ca3ae] [&_a]:text-[#D4AF37] [&_a]:no-underline [&_a]:border-b [&_a]:border-[rgba(212,175,55,0.4)] [&_a]:transition-[border-color] [&_a]:duration-200 [&_a:hover]:border-[#D4AF37]"
 					>
 						We use essential tools to keep forms secure and the site running. If
 						you are OK with it, we also load Google Analytics 4 to see how
