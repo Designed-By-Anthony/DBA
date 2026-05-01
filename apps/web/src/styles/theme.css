@@ -407,6 +407,7 @@ li {
 .cookie-consent__inner {
 	width: min(44rem, 100%);
 	margin-inline: auto;
+	padding: var(--card-pad-lg);
 	border: 1px solid var(--border-soft);
 	border-radius: var(--radius-card);
 	background:

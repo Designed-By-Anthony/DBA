@@ -28,6 +28,7 @@
 - Review fix: restored `dba-bronze-glow-pulse` keyframes and split `.lh-score-grid` into a fixed 3-column desktop grid with mobile collapse.
 - Review fix: restored Lighthouse value strip `.lh-process`, `.lh-process-title`, and `.lh-process-note` styles.
 - Review fix: changed the Lighthouse home page content wrapper from nested `<main id="main-content">` to a div inside `MarketingChrome`'s existing main landmark.
+- Review fix: restored internal padding on the semantic cookie consent dialog shell.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
