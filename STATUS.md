@@ -10,6 +10,8 @@
 - Verification: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 - Merge update: resolved latest `main` conflicts while keeping the canonical `theme.css` architecture, deleting empty page CSS shims/imports, and preserving global brand chrome.
 - Verification after merge: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+- Review fix: restored Tailwind v4 entry imports in `dba-global.css` and `lighthouse-globals.css`; confirmed `/tools` has no remaining CSS module references; restored `/lighthouse` audit-stage `80rem` max-width.
+- Verification after review fixes: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 

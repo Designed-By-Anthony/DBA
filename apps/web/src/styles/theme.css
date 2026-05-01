@@ -199,9 +199,14 @@ main,
 
 .section-container,
 .page-hero-inner,
-.lh-audit-stage,
 .lh-report-panel {
 	width: min(var(--content-max), 100%);
+	max-width: 100%;
+	margin-inline: auto;
+}
+
+.lh-audit-stage {
+	width: min(80rem, 100%);
 	max-width: 100%;
 	margin-inline: auto;
 }

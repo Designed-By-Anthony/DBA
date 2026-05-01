@@ -4,4 +4,7 @@
  * Shared brand chrome (header, footer, banner): ./brand-chrome.css
  */
 @import url("../styles/theme.css");
+@import url("./tokens.css");
+@import url("./tailwind-v4-bridge.css");
 @import url("./brand-chrome.css");
+@import "tailwindcss";
