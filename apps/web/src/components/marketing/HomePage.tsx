@@ -10,6 +10,10 @@ import {
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
+	ATELIER_ROME_LEGACY,
+	COPPER_CITY_HOOK,
+} from "@/design-system/location";
+import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
 	FOUNDING_PARTNER_SEO_MONTHLY,
@@ -47,7 +51,8 @@ const heroVariants = {
 
 export function HomePage() {
 	const heroSub =
-		"High-performance digital architecture for businesses that have outgrown their 'web guy.' Engineered in the 315.";
+		"Enterprise-grade websites for contractors, home-service professionals, medical aesthetics, salons, and scaling businesses throughout Utica, Rome, Syracuse, and Central New York. Performance-optimized architecture, conversion-focused design, and SEO infrastructure that positions you at the top of local search results. ";
+	const heroSubWithLegacy = `${heroSub}${ATELIER_ROME_LEGACY}`;
 	return (
 		<>
 			<section className="page-hero page-hero--home">
@@ -83,7 +88,8 @@ export function HomePage() {
 							</span>
 						</p>
 						<p className="page-eyebrow page-eyebrow--rule" data-hero-eyebrow>
-							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY
+							Mohawk Valley Digital Agency · Utica · Rome · Syracuse · CNY —{" "}
+							{COPPER_CITY_HOOK}
 						</p>
 						<div className="hero-launch-pill" role="status">
 							<span className="hero-launch-dot" aria-hidden="true" />
@@ -125,7 +131,7 @@ export function HomePage() {
 							data-hero-sub
 							className="font-[family-name:var(--font-inter)] font-normal"
 						>
-							{heroSub}
+							{heroSubWithLegacy}
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
@@ -235,7 +241,8 @@ export function HomePage() {
 							<p>
 								The site showcases real Lighthouse results and the same
 								engineering standards used in client builds: fast loading, clean
-								accessibility, and solid technical SEO structure.
+								accessibility, and solid technical SEO structure.{" "}
+								{ATELIER_ROME_LEGACY}
 							</p>
 						</article>
 						<article className="surface-card home-proof-card reveal-up">

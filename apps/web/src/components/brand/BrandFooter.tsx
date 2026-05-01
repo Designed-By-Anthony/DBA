@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { stackBadge } from "@/design-system/buttons";
+import { FOOTER_LOCATION_TAGLINE } from "@/design-system/location";
 import {
 	SITE_BRAND,
 	SITE_FOOTER_LINKS,
@@ -63,6 +64,7 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 						))}
 					</nav>
 
+					{/* Language switcher */}
 					<div className="flex items-center gap-[0.3rem] shrink-0">
 						<a
 							href="/"
@@ -88,14 +90,15 @@ export function BrandFooter({ buildTag, poweredBy }: BrandFooterProps) {
 						</a>
 					</div>
 
+					{/* Legal + copyright */}
 					<div className="flex items-center flex-wrap gap-x-[0.55rem] gap-y-[0.35rem] ml-auto text-[0.7rem] text-[rgba(247,244,238,0.38)] max-sm:ml-0">
-						<p className="m-0 whitespace-nowrap">
+						<p className="m-0 max-sm:max-w-none max-w-[min(52rem,92vw)] text-[rgba(247,244,238,0.42)] leading-snug">
 							© {year}{" "}
 							<span className="text-[rgba(247,244,238,0.55)]">
-								ANTHONY
+								{SITE_BRAND.displayNameShort}
 								<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
 								{" | "}
-								{SITE_BRAND.footerCopyrightSuffix}
+								{FOOTER_LOCATION_TAGLINE}
 							</span>
 						</p>
 						{SITE_LEGAL_LINKS.map((link) => (

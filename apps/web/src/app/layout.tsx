@@ -51,7 +51,7 @@ export const viewport: Viewport = {
 
 const SITE_TITLE = "ANTHONY. | Digital Infrastructure Architect";
 const SITE_DESCRIPTION =
-	"Bespoke digital estates and high-performance infrastructure for the 315 and beyond.";
+	"Bespoke digital estates and high-performance infrastructure for the Mohawk Valley (315), Capital Region (518), and Central New York — engineered in Rome, NY.";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://designedbyanthony.com"),
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
 				url: "/images/og-site-premium.png",
 				width: 2400,
 				height: 1260,
-				alt: "ANTHONY. — Digital Infrastructure Architect",
+				alt: "ANTHONY. — Mohawk Valley digital infrastructure",
 				type: "image/png",
 			},
 		],

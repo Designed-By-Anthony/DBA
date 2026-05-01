@@ -1,7 +1,11 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useRef } from "react";
 import { btnPrimary } from "@/design-system/buttons";
+import {
+	descriptionAlreadyHasRegionPrefix,
+	regionTagFromPhone,
+} from "@/lib/leadRegion";
 
 /* ── Phase 5: salesforce-* CSS classes migrated to inline Tailwind ── */
 const SF_FORM = "block";
@@ -21,12 +25,25 @@ const SF_PRIVACY = "mt-3 text-[0.75rem] text-[var(--text-muted)]";
  */
 export function SalesforceContactForm() {
 	const formId = useId();
+	const phoneRef = useRef<HTMLInputElement>(null);
+	const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+	const injectRegionPrefix = () => {
+		const phone = phoneRef.current?.value ?? "";
+		const region = regionTagFromPhone(phone);
+		if (!region || !descriptionRef.current) return;
+		const tag = `Region: ${region}. `;
+		const cur = descriptionRef.current.value;
+		if (descriptionAlreadyHasRegionPrefix(cur)) return;
+		descriptionRef.current.value = tag + cur;
+	};
 
 	return (
 		<form
 			action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dao00001YO4nx"
 			method="POST"
 			className={SF_FORM}
+			onSubmit={injectRegionPrefix}
 		>
 			<input type="hidden" name="oid" value="00Dao00001YO4nx" />
 			<input
@@ -64,6 +81,7 @@ export function SalesforceContactForm() {
 					<label htmlFor={`${formId}-phone`}>Phone</label>
 					<input
 						id={`${formId}-phone`}
+						ref={phoneRef}
 						maxLength={40}
 						name="phone"
 						type="tel"
@@ -88,6 +106,7 @@ export function SalesforceContactForm() {
 					<label htmlFor={`${formId}-description`}>Message</label>
 					<textarea
 						id={`${formId}-description`}
+						ref={descriptionRef}
 						name="description"
 						rows={4}
 						placeholder="Tell us what you're looking for..."

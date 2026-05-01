@@ -2,6 +2,13 @@
 
 > **Note:** This file tracks migration and release notes for the **Turborepo Cloudflare** app (`apps/web` Next.js Pages + `apps/api` Elysia Worker, `bun`, `bun.lock`). Older single-app / Astro-era detail is archived below for context — see [README.md](README.md) and [AGENTS.md](AGENTS.md).
 
+## ANTHONY. location protocol — Rome, NY (2026-05-01)
+
+- **Schema:** `businessProfile` + `Organization` in `apps/web/src/lib/seo.ts` — `SITE_NAME` **ANTHONY.**, HQ **7749 Kilbourn Rd, Rome, NY 13440**, `slogan` *Digital Infrastructure, Engineered in the Copper City.*, `serviceArea` **GeoCircle** ~150 mi (241401 m) from Rome for 315/518/CNY; `areaServed` + `knowsAbout` include regional labels.
+- **UI:** `apps/web/src/design-system/location.ts` (footer line, hooks, Atelier sentence); footer shows **© YEAR ANTHONY. | 7749 Kilbourn Rd, Rome, NY | High-Performance Infrastructure for the 315.** (`BrandFooter.tsx`).
+- **Leads:** `apps/web/src/lib/leadRegion.ts` — Web-to-Lead forms prepend **`Region: Mohawk Valley.`** for **315**, **`Region: Capital Region.`** for **518** / **838** (`SalesforceContactForm`, `SiteContactDrawer`).
+- **Copy:** Copper City hook on hero eyebrow; Atelier legacy line on hero sub, proof card, founding partner engineering bullet; root `layout.tsx` metadata aligned to ANTHONY.
+
 ## D1 Ledger + admin UI (2026-05-01)
 
 - `packages/shared` Drizzle schema: `leads` + `transactions`; D1 binding name `DB` (`apps/api/wrangler.json`, `apps/web/wrangler.json` + `wrangler.worker.json`). API: `setLedgerDb` + `tryInsertLead` / `tryInsertTransaction` in `packages/shared/src/lib/d1Leads.ts`. `POST /api/audit` and `POST /api/lead-email` insert after validation; Stripe thin webhook writes transactions + sets lead status `Provisioning`. Scaffolded `apps/admin` (ledger tables). Web `next.config.ts`: `output: "standalone"` so OpenNext finds `pages-manifest.json`.

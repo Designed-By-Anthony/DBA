@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { btnOutline, btnPrimary } from "@/design-system/buttons";
+import { ATELIER_ROME_LEGACY } from "@/design-system/location";
 import {
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
@@ -72,7 +73,10 @@ export function FoundingPartnerSection() {
 							<li>
 								Built for trust, calls, and local search—not vanity slides
 							</li>
-							<li>Mobile-first engineering with strong Lighthouse scores</li>
+							<li>
+								Mobile-first engineering with strong Lighthouse scores —{" "}
+								{ATELIER_ROME_LEGACY}
+							</li>
 							<li>You approve everything before anything goes live</li>
 						</ul>
 					</article>
