@@ -17,6 +17,7 @@ import {
 	stackBadge,
 } from "@/design-system/buttons";
 import {
+	BESPOKE_CONFIG_LABEL,
 	ENTERPRISE_WEBSITE_STARTING_PRICE,
 	FOUNDING_PARTNER_BUILD_SLOTS,
 	FOUNDING_PARTNER_SEO_LABEL,
@@ -346,6 +347,7 @@ export function PricingPage() {
 								<li>Contact form with server-side validation</li>
 								<li>Lighthouse performance tuning</li>
 								<li>Full source code handed to you at launch</li>
+								<li>{BESPOKE_CONFIG_LABEL}</li>
 							</ul>
 						</MotionStaggerChild>
 						<MotionStaggerChild
@@ -375,6 +377,7 @@ export function PricingPage() {
 								<li>Google Business Profile alignment</li>
 								<li>CRM integration ready</li>
 								<li>Source code is yours — no lock-in</li>
+								<li>{BESPOKE_CONFIG_LABEL}</li>
 							</ul>
 						</MotionStaggerChild>
 						<MotionStaggerChild
@@ -396,6 +399,7 @@ export function PricingPage() {
 								<li>CRM and booking integrations</li>
 								<li>Advanced analytics setup</li>
 								<li>Priority support channel</li>
+								<li>{BESPOKE_CONFIG_LABEL}</li>
 							</ul>
 						</MotionStaggerChild>
 					</MotionStagger>
@@ -790,8 +794,8 @@ export function ServiceAreasPage() {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag region-card-tag--${r.tag}`}>
-										{r.tag === "primary" ? "Core market" : "Remote"}
+									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
+										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>
@@ -1019,8 +1023,8 @@ export function ServiceAreaLocationPage({ slug }: { slug: string }) {
 									href={`/service-areas/${r.slug}`}
 									className="surface-card region-card region-card-link reveal-up"
 								>
-									<span className={`region-card-tag region-card-tag--${r.tag}`}>
-										{r.tag === "primary" ? "Core market" : "Remote"}
+									<span className={`region-card-tag ${r.cardBadge ? "region-card-tag--bronze" : `region-card-tag--${r.tag}`}`}>
+										{r.cardBadge ?? (r.tag === "primary" ? "Core market" : "Remote")}
 									</span>
 									<h3>{r.name}</h3>
 									<p>{r.cardTeaser}</p>

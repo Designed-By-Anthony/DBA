@@ -1,11 +1,16 @@
 import { isGmailConfigured, sendViaGmail } from "@lh/lib/gmail";
 import { Elysia } from "elysia";
 import { z } from "zod";
+import { tryInsertLead } from "@/lib/d1Leads";
 import {
 	type PublicLeadIngestBody,
 	parsePublicLeadIngestBody,
 } from "@/lib/lead-form-contract";
 import { postLeadIngest } from "@/lib/leadWebhook";
+import {
+	resolveEffectiveSecretKey,
+	verifyTurnstileToken,
+} from "@/lib/turnstile";
 
 /*
  * CORS for `/api/lead-email` is handled exclusively by the global
@@ -83,6 +88,44 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			return { errors: [{ message: "Invalid request body." }] };
 		}
 
+		const turnstileSecret = resolveEffectiveSecretKey(
+			process.env.TURNSTILE_SECRET_KEY?.trim(),
+		);
+		if (turnstileSecret) {
+			const body = rawBody as Record<string, unknown>;
+			const cfToken =
+				typeof body.cf_turnstile_response === "string"
+					? body.cf_turnstile_response.trim()
+					: "";
+			if (!cfToken) {
+				set.status = 403;
+				return {
+					errors: [
+						{
+							message:
+								"Security check required. Please complete the challenge and try again.",
+						},
+					],
+				};
+			}
+			const verification = await verifyTurnstileToken(cfToken, turnstileSecret);
+			if (!verification.success) {
+				console.warn(
+					"[lead-email] Turnstile verification failed:",
+					verification.errorCodes,
+				);
+				set.status = 403;
+				return {
+					errors: [
+						{
+							message:
+								"Security check failed. Please refresh the page and try again.",
+						},
+					],
+				};
+			}
+		}
+
 		let lead: PublicLeadIngestBody;
 		try {
 			lead = parsePublicLeadIngestBody(rawBody);
@@ -99,6 +142,25 @@ export const leadEmailRoute = new Elysia({ aot: false }).post(
 			set.status = 400;
 			return { errors: [{ message: "Invalid request body." }] };
 		}
+
+		await tryInsertLead({
+			id: crypto.randomUUID(),
+			email: lead.email,
+			company_name: lead.company ?? null,
+			source: "Contact_Form",
+			status: "New",
+			turnstile_passed: turnstileSecret ? 1 : null,
+			metadata: JSON.stringify({
+				name: lead.name,
+				phone: lead.phone,
+				website: lead.website,
+				message: lead.message,
+				leadSource: lead.leadSource,
+				offerType: lead.offerType,
+				pageUrl: lead.pageUrl,
+			}),
+			created_at: Date.now(),
+		});
 
 		const leadWebhookUrl = process.env.LEAD_WEBHOOK_URL?.trim();
 		const resendApiKey = process.env.RESEND_API_KEY;

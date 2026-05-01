@@ -136,8 +136,8 @@ export const businessProfile = {
 		"New Hartford, New York",
 		"Clinton, New York",
 		"Syracuse, New York",
-		"Naples, Florida",
-		"Houston, Texas",
+		"Saratoga Springs, New York",
+		"Albany, New York",
 		"United States",
 	],
 	knowsAbout: [

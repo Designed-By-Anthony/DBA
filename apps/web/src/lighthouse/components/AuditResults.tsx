@@ -2,9 +2,10 @@
 
 import type { AuditData, AuditAiInsight } from "@lh/auditReport";
 import { useReducedMotion } from "framer-motion";
-import { div as MotionDiv } from "framer-motion/client";
+import { div as MotionDiv, ul as MotionUl, li as MotionLi } from "framer-motion/client";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { buildPublicApiUrl } from "@/lib/publicApi";
 import { ScoreRing } from "./ScoreRing";
 import { 
@@ -17,6 +18,16 @@ export type { AuditAiInsight, AuditData };
 const LABEL_STYLE = "text-[10px] font-bold uppercase tracking-[0.2em] text-[rgb(var(--accent-bronze-rgb)/0.85)] mb-2";
 const HEADING_STYLE = "font-[family-name:var(--font-display)] text-2xl font-medium tracking-[-0.035em] text-white mb-4";
 
+// Stagger variants for the score ring row
+const ringRowVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+};
+const ringItemVariants = {
+    hidden: { opacity: 0, y: 16, scale: 0.92 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
 function formatStars(rating: number | null | undefined): string {
     if (rating == null) return ""; 
     return `${rating.toFixed(1)}★`;
@@ -24,7 +35,7 @@ function formatStars(rating: number | null | undefined): string {
 
 function ExecutiveSummaryBody({ text }: { text: string }) {
     return (
-        <div className="text-[15px] leading-relaxed text-white/80 space-y-4">
+        <div className="font-[family-name:var(--font-main)] text-[15px] leading-relaxed text-white/80 space-y-4">
             {text.split(/\n\n+/).filter(Boolean).map((para, i) => (
                 <p key={i}>{para}</p>
             ))}
@@ -70,6 +81,21 @@ export function AuditResults({
         window.open(`/lighthouse/report/${encodeURIComponent(reportId)}/print`, "_blank");
     }, [reportId]);
 
+    // The 4 Lighthouse score rings (Performance, A11y, Best Practices, SEO)
+    // receive a staggered countDelay so their count-up animations cascade.
+    const lighthouseRings = [
+        { val: data.performance,    lab: "Performance",    delay: 0 },
+        { val: data.accessibility,  lab: "A11y",           delay: 120 },
+        { val: data.bestPractices,  lab: "Best Practices", delay: 240 },
+        { val: data.seo,            lab: "SEO",            delay: 360 },
+    ];
+
+    const allRings = [
+        { val: data.trustScore,  lab: "Trust",      delay: 0 },
+        ...lighthouseRings,
+        { val: data.conversion,  lab: "Conversion", delay: 480 },
+    ];
+
     return (
         <MotionDiv
             initial={prefersReduced ? false : { opacity: 0, y: 20 }}
@@ -90,39 +116,57 @@ export function AuditResults({
                 <div className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD} bg-white/[0.02]`}>
                     <p className="text-[11px] font-bold uppercase text-white/30 mb-2">Deliverables</p>
                     <div className="space-y-3">
-                         <button
+                        {/* Primary CTA — book a strategy session */}
+                        <Link
+                            href="/contact"
+                            className="btn-premium-primary w-full block text-center"
+                        >
+                            Book a Strategy Session
+                        </Link>
+                        {/* Secondary CTA — Download PDF (frosted glass outline) */}
+                        <button
                             onClick={handleDownloadPdf}
                             disabled={pdfStatus === "generating"}
-                            className="btn-premium-primary w-full disabled:opacity-50"
-                         >
-                            {pdfStatus === "generating" ? "Generating..." : "Download PDF Report"}
-                         </button>
-                         <button 
+                            className="w-full rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-sm py-3 text-sm font-bold text-white hover:bg-white/10 transition-all disabled:opacity-50"
+                        >
+                            {pdfStatus === "generating" ? "Generating…" : "Download PDF Report"}
+                        </button>
+                        <button 
                             onClick={handlePrintView}
-                            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white hover:bg-white/10 transition-all"
-                         >
+                            className="w-full rounded-xl border border-white/[0.06] bg-transparent py-2.5 text-xs font-bold text-white/50 hover:text-white/80 hover:border-white/10 transition-all"
+                        >
                             Print Full Layout
-                         </button>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div className="mb-20 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-                {[
-                    { val: data.trustScore, lab: "Trust" },
-                    { val: data.performance, lab: "Performance" },
-                    { val: data.accessibility, lab: "A11y" },
-                    { val: data.bestPractices, lab: "Best Practices" },
-                    { val: data.seo, lab: "SEO" },
-                    { val: data.conversion, lab: "Conversion" },
-                ].map((s) => (
-                    <ScoreRing key={s.lab} score={s.val} label={s.lab} />
+            {/* Score ring row — staggered Framer Motion entrance */}
+            <MotionUl
+                className="mb-20 grid list-none grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6 p-0"
+                variants={prefersReduced ? undefined : ringRowVariants}
+                initial={prefersReduced ? false : "hidden"}
+                animate="visible"
+            >
+                {allRings.map((s) => (
+                    <MotionLi
+                        key={s.lab}
+                        variants={prefersReduced ? undefined : ringItemVariants}
+                        className="flex justify-center"
+                    >
+                        <ScoreRing
+                            score={s.val}
+                            label={s.lab}
+                            countDelay={prefersReduced ? 0 : s.delay}
+                        />
+                    </MotionLi>
                 ))}
-            </div>
+            </MotionUl>
 
             <div className="grid gap-10 lg:grid-cols-12">
                 <div className="lg:col-span-8 space-y-10">
-                    <section className={`${SURFACE_CARD_TECHNICAL} ${CARD_HAS_TEXT_PAD}`}>
+                    {/* Executive Summary — text-bubble.is-bordered surface */}
+                    <section className="text-bubble is-bordered">
                         <p className={LABEL_STYLE}>Strategic Overview</p>
                         <h2 className={HEADING_STYLE}>Executive Summary</h2>
                         <ExecutiveSummaryBody text={data.aiInsight?.executiveSummary || "No summary available."} />

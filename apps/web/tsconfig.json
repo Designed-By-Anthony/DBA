@@ -16,8 +16,12 @@
 		"plugins": [{ "name": "next" }],
 		"paths": {
 			"@/*": ["./src/*"],
+			"@dba/shared/lib/*": ["../../packages/shared/src/lib/*"],
+			"@dba/shared/lighthouse/*": ["../../packages/shared/src/lighthouse/*"],
+			"@dba/shared/lighthouse/lib/*": ["../../packages/shared/src/lighthouse/lib/*"],
 			"@lh/lib/*": ["../../packages/shared/src/lighthouse/lib/*"],
-			"@lh/*": ["./src/lighthouse/*"]
+			"@lh/*": ["./src/lighthouse/*"],
+			"@dba/shared/db/*": ["../../packages/shared/src/db/*"]
 		}
 	},
 	"include": [

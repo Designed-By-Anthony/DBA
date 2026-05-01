@@ -1,6 +1,7 @@
 import "@/design-system/dba-global.css";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Outfit } from "next/font/google";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { CrispBootstrap } from "@/components/CrispBootstrap";
 import { JsonLd } from "@/components/JsonLd";
@@ -63,6 +64,12 @@ export const metadata: Metadata = {
 		telephone: false,
 		email: false,
 		address: false,
+	},
+	generator: "Next.js",
+	authors: [{ name: "Designed By Anthony" }],
+	other: {
+		"business-type": "B2B",
+		industry: "Professional Services / Web Design & Local SEO",
 	},
 	openGraph: {
 		siteName: "Designed by Anthony",
@@ -130,6 +137,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				</noscript>
 				{children}
 				<CrispBootstrap />
+				{/* Stripe v3 — loaded eagerly so Wappalyzer/BuiltWith detect "Payment Processing" */}
+				<Script
+					src="https://js.stripe.com/v3/"
+					strategy="afterInteractive"
+					id="stripe-js"
+				/>
 			</body>
 		</html>
 	);
