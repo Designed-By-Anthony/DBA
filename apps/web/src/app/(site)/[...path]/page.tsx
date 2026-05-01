@@ -1,5 +1,3 @@
-import "@/app/home-page.css";
-import "@/app/marketing-site-pages.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MarketingJsonLd } from "@/components/marketing/MarketingJsonLd";

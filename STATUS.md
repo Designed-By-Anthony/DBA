@@ -8,6 +8,8 @@
 - Removed the old Framer Motion/GSAP UI layer and deleted unused motion/reveal helper components and scripts.
 - Consolidated page-specific CSS into the global theme surface, preserving brand assets at `/brand/logo.png` and `/brand/mark.webp`.
 - Verification: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
+- Merge update: resolved latest `main` conflicts while keeping the canonical `theme.css` architecture, deleting empty page CSS shims/imports, and preserving global brand chrome.
+- Verification after merge: `bun run lint`, `bun run typecheck`, and `bun run build` pass from the repo root.
 
 ## Codebase cleanup, perf optimization & tech integrations (2026-04-30)
 

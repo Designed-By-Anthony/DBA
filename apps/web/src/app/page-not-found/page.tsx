@@ -1,5 +1,3 @@
-import "@/app/home-page.css";
-import "@/app/marketing-site-pages.css";
 import type { Metadata } from "next";
 import { StaticMarketingPage } from "@/components/marketing/MarketingSitePages";
 
