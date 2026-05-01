@@ -29,6 +29,7 @@
 - Review fix: restored Lighthouse value strip `.lh-process`, `.lh-process-title`, and `.lh-process-note` styles.
 - Review fix: changed the Lighthouse home page content wrapper from nested `<main id="main-content">` to a div inside `MarketingChrome`'s existing main landmark.
 - Review fix: restored internal padding on the semantic cookie consent dialog shell.
+- Review fix: restored `.lh-editorial-h1` Lighthouse hero heading sizing, gradient text, and Fraunces variation settings.
 
 ## Playwright ironclad + security audit specs (2026-05-01)
 
