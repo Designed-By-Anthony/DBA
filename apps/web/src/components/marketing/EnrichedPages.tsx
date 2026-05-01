@@ -277,11 +277,11 @@ export function AboutPage() {
 					duration={0.6}
 					style={{ justifyContent: "center" }}
 				>
-					<Link href="/lighthouse" className={btnPrimary}>
-						Audit My Site
+					<Link href="/contact" className={btnPrimary}>
+						Let&apos;s build something great.
 					</Link>
-					<Link href="/contact" className={btnSecondaryProof}>
-						Contact
+					<Link href="/lighthouse" className={btnSecondaryProof}>
+						Audit My Site
 					</Link>
 				</MotionReveal>
 			</section>
@@ -428,11 +428,11 @@ export function PricingPage() {
 						duration={0.6}
 						style={{ justifyContent: "center" }}
 					>
-						<Link href="/lighthouse" className={btnPrimary}>
-							Audit My Site
+						<Link href="/contact" className={btnPrimary}>
+							Let&apos;s build something great.
 						</Link>
-						<Link href="/contact" className={btnOutline}>
-							Contact us
+						<Link href="/lighthouse" className={btnOutline}>
+							Audit My Site
 						</Link>
 					</MotionReveal>
 				</div>

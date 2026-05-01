@@ -28,7 +28,7 @@ Security fixes land on **`main`** and deploy through the normal Cloudflare Pages
 | Request routing | `apps/web/src/middleware.ts` (host-based redirects) |
 | Shared logic | `packages/shared/src/` (origins, rate limiting, report-store) |
 
-**VertaFlow** (admin, accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected to **vertaflow.io** in the Next.js middleware. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `apps/`.
+**The Vault** (admin console, client accounts, CRM) is **not** implemented in this repo: `admin.designedbyanthony.com` and `accounts.designedbyanthony.com` are redirected in the Next.js middleware to the managed **vertaflow.io** infrastructure host. Do not assume this tree contains Clerk, Stripe webhooks, or portal session code unless those files exist under `apps/`.
 
 ## Trust boundaries (what this app enforces)
 

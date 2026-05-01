@@ -3,22 +3,15 @@
 	--hero-spot-y: 22%;
 }
 
-/* Editorial typography dial: ~10% down from the global hero clamp, with a touch more leading. */
-.page-hero--home h1 {
+/* Editorial typography dial: mixed Fraunces + Inter headline (`.home-hero-title`). */
+.page-hero--home .home-hero-title {
 	font-size: clamp(2.55rem, 5.85vw, 4.85rem);
 	line-height: 1.08;
-	/* Override the font-swap CLS reservation in theme.css so it tracks the
-       scoped font-size + line-height. theme.css reserves
-       calc(4 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (mobile, 4 lines) and
-       calc(3 * 1.05 * clamp(2.8rem, 6.5vw, 5.4rem)) (≥900px, 3 lines) —
-       both explicitly derived from the global values, so they leave a
-       visible gap below the smaller homepage H1. Re-derive against the
-       dialed values here (desktop override follows below). */
 	min-height: calc(4 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
 }
 
 @media (min-width: 900px) {
-	.page-hero--home h1 {
+	.page-hero--home .home-hero-title {
 		min-height: calc(3 * 1.08 * clamp(2.55rem, 5.85vw, 4.85rem));
 	}
 }

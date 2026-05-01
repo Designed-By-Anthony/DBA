@@ -3,11 +3,11 @@ export const BESPOKE_CONFIG_LABEL = "Bespoke Brand Integration (24-48h config)";
 
 /** Stripe session / onboarding copy — describes the provisioning delay. */
 export const BESPOKE_CONFIG_DESCRIPTION =
-	"Access granted 24-48 hours post-onboarding call for custom brand mapping.";
+	"Access is granted 24-48 hours after our design sync to ensure brand mapping meets the ANTHONY. standard.";
 
 /** Spanish translation of the provisioning message — used on /es and in the checkout success page. */
 export const BESPOKE_CONFIG_DESCRIPTION_ES =
-	"Acceso concedido 24-48 horas después de la reunión de diseño para garantizar la alineación de la marca.";
+	"El acceso se concede entre 24 y 48 horas después de nuestra sincronización de diseño para garantizar que el mapeo de marca cumpla el estándar ANTHONY.";
 
 export const STANDARD_WEBSITE_STARTING_PRICE = "$999";
 /**
@@ -40,7 +40,7 @@ export const PUBLIC_LAUNCH_BUNDLE_MONTHS = 3;
 /** Launch program: first N local partners — complimentary build with Growth Plan enrollment. */
 export const FOUNDING_PARTNER_BUILD_SLOTS = 10;
 /**
- * Founding Growth Plan — hosting, security, SEO, and VertaFlow CRM (client portal + roadmap automations).
+ * Founding Growth Plan — hosting, security, SEO, and client workspace (portal + roadmap automations).
  * Set at $149/mo: below typical SMB CRM seat bundles ($15–75+/user/mo × tools) while reflecting bundled
  * web + local SEO + product value vs. standalone $100–300/mo hosting retainers.
  */
@@ -56,20 +56,20 @@ export const PUBLIC_LAUNCH_BUNDLE_COPY = `For the first ${PUBLIC_LAUNCH_BUNDLE_M
 /** Legacy single-line copy for anywhere that still expects one sentence (FAQ, process). */
 export const PUBLIC_PAYMENT_STRUCTURE_COPY = `${PUBLIC_STANDARD_PAYMENT_PLAN} ${PUBLIC_LAUNCH_BUNDLE_COPY}`;
 
-/** VertaFlow admin (CRM). Used in schema and positioning copy—not a crawl-first landing page. */
-export const VERTAFLOW_CRM_APP_URL = "https://admin.vertaflow.io";
-/** Client portal (magic-link access); paired with VertaFlow in Growth Plan positioning. */
+/** Admin CRM console origin (lead ingest, pipeline). Same infrastructure host; branded as The Vault in-app. */
+export const CRM_ADMIN_APP_URL = "https://admin.vertaflow.io";
+/** Client portal (magic-link access); Growth Plan positioning. */
 export const ACCOUNTS_PORTAL_URL = "https://accounts.designedbyanthony.com";
 
 /**
- * VertaFlow CRM — software-only list prices (per organization / month).
+ * CRM tier list prices (per organization / month).
  * Capture: leads + scheduling + light pipeline. Suite: full product (portal, automations roadmap, deeper CRM).
  * Growth Plan ($149) bundles Suite-level access with hosting + local SEO — better value than Suite alone for site clients.
  */
-export const VERTAFLOW_CAPTURE_LABEL = "Capture";
-export const VERTAFLOW_SUITE_LABEL = "Suite";
-export const VERTAFLOW_CAPTURE_MONTHLY = "$69";
-export const VERTAFLOW_SUITE_MONTHLY = "$179";
+export const CRM_CAPTURE_TIER_LABEL = "Capture";
+export const CRM_SUITE_TIER_LABEL = "Suite";
+export const CRM_CAPTURE_MONTHLY = "$69";
+export const CRM_SUITE_MONTHLY = "$179";
 
 /** Ongoing local SEO + hosting (lighter scope than the full GBP program). Same value as founding partner monthly. */
 export const MONTHLY_LOCAL_SEO_PRICE = FOUNDING_PARTNER_SEO_MONTHLY;

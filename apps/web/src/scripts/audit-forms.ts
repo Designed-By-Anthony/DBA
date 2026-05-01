@@ -4,7 +4,7 @@ import { pushAnalyticsEvent, requestGaClientId } from "./analytics";
 /**
  * Lead endpoint resolution (marketing audit/contact-style forms):
  *   1. Form `action` URL when it is a trusted target (same-origin `/api/*`,
- *      VertaFlow `/api/*`, or Convex `*.convex.site/webhook/*`).
+ *      managed CRM `/api/*`, or Convex `*.convex.site/webhook/*`).
  *   2. `NEXT_PUBLIC_LEAD_WEBHOOK_URL` when `action` is missing (build-time).
  *   3. Fallback: `https://admin.vertaflow.io/api/v1/ingest`.
  */

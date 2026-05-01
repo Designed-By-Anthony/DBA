@@ -9,19 +9,19 @@ import {
     buildFounderPersonSchema,
     buildItemListSchema,
     buildSiteNavigationSchema,
-    buildVertaflowCrmSoftwareApplicationSchema,
+    buildVaultCrmSoftwareApplicationSchema,
     type SchemaValue,
 } from "@/lib/seo";
 
-const HOME_TITLE = "Mohawk Valley Web Design & Local SEO | Designed by Anthony";
+const HOME_TITLE = "ANTHONY. | Digital Infrastructure Architect";
 const HOME_DESCRIPTION =
-    "Custom websites & local SEO for Mohawk Valley and Central NY service businesses. Built to rank on Google and turn searches into booked work.";
+    "Bespoke digital estates and high-performance infrastructure for the 315 and beyond. Designed by Anthony.";
 
 const HOME_OG_IMAGE = {
     url: "/images/og-site-premium.png",
     width: 2400,
     height: 1260,
-    alt: "Designed by Anthony — Mohawk Valley web design & local SEO",
+    alt: "ANTHONY. — Digital infrastructure architect",
     type: "image/png",
 } as const;
 
@@ -93,7 +93,7 @@ const structuredData: SchemaValue[] = [
     buildFounderPersonSchema(),
     buildBaseWebsiteSchema(),
     buildSiteNavigationSchema(),
-    buildVertaflowCrmSoftwareApplicationSchema(),
+    buildVaultCrmSoftwareApplicationSchema(),
     homeServiceSchema,
     homeFaqSchema,
 ];

@@ -6,12 +6,12 @@
 - Shared helpers belong in `packages/shared/` (`@dba/shared`) — business logic reused by both web and API.
 
 ## 2. The "Augusta" Security Protocol
-- DATABASE: Neon Postgres (`DATABASE_URL`) where VertaFlow CRM / tenant apps apply.
+- DATABASE: Neon Postgres (`DATABASE_URL`) where The Vault / tenant apps apply.
 - TENANT LOCK: Every query in tenant-scoped apps must filter by tenant (`tenant_id` / `clerk_org_id`).
 - Cross-tenant data leakage is a critical failure.
 
 ## 3. Subdomain routing (apps/web)
-- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to VertaFlow (see `apps/web/src/middleware.ts`).
+- `admin.designedbyanthony.com` / `accounts.designedbyanthony.com` → **308** to the managed console host (see `apps/web/src/middleware.ts`).
 - `designedbyanthony.com` / `www` / `lighthouse.*` → this Next.js app.
 
 ## 4. The Purge
@@ -19,7 +19,7 @@
 - CLEANUP: Delete unused legacy artifacts.
 
 ## 5. VERBATIM SYSTEM MAPPING
-- **Sales Term:** "Agency" or "VertaFlow CRM"
+- **Sales Term:** "ANTHONY." or "The Vault"
 - **Database Table:** `tenants`
 - **Security Key (SQL):** `tenant_id` (UUID) or `clerk_org_id` (Text)
 - **UI Logic:** Use `tenant.vertical` to drive the "Chameleon" skinning.

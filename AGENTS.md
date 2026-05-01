@@ -80,8 +80,8 @@ bun run test:e2e      # Cypress (see cypress.config.ts)
 
 `apps/web/src/middleware.ts` branches on `Host`.
 
-- `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*`
-- `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*`
+- `admin.designedbyanthony.com/*` → **308** → `https://admin.vertaflow.io/*` (The Vault / managed console)
+- `accounts.designedbyanthony.com/*` → **308** → `https://accounts.vertaflow.io/*` (client portal)
 - everything else (including `/lighthouse`) → normal Next.js handling
 
 ### Theme + brand (single source of truth)

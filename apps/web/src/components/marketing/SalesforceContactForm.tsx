@@ -98,7 +98,7 @@ export function SalesforceContactForm() {
 
 			<div className={SF_ACTIONS}>
 				<button type="submit" className={btnPrimary}>
-					Send Message
+					Let&apos;s build something great.
 				</button>
 			</div>
 

@@ -28,7 +28,7 @@ const marketingSchema = z
 		STRIPE_THIN_WEBHOOK_SECRET: z.string().trim().optional(),
 		STRIPE_SNAPSHOT_WEBHOOK_SECRET: z.string().trim().optional(),
 
-		// Reserved for VertaFlow redirect targets if we ever need to override
+		// Reserved for managed console redirect targets if we ever need to override
 		// the hard-coded admin/accounts hostnames in `src/middleware.ts`.
 		ADMIN_UPSTREAM_URL: optionalUrl,
 		ACCOUNTS_UPSTREAM_URL: optionalUrl,

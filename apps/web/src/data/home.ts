@@ -85,7 +85,7 @@ export const homeFooterCta = {
 	description:
 		"Drop your URL and you'll get a straight report — Core Web Vitals, on-page SEO, crawl checks, and an AI-prioritized fix list. No signup, no pitch deck.",
 	primaryHref: "/lighthouse",
-	primaryLabel: "Audit My Site",
+	primaryLabel: "Let's build something great.",
 	secondaryHref: "/contact",
 	secondaryLabel: "Or open the contact form",
 	note: "A reply from Anthony usually comes within one business day.",

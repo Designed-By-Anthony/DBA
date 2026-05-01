@@ -36,15 +36,19 @@ export default async function AdminLedgerPage() {
 	return (
 		<main className="mx-auto max-w-7xl px-6 py-12">
 			<h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold tracking-tight text-white">
-				The Ledger
+				The Vault by{" "}
+				<span className="whitespace-nowrap">
+					ANTHONY
+					<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
+				</span>
 			</h1>
 			<p className="mt-2 font-[family-name:var(--font-inter)] text-sm text-white/60">
-				Leads pipeline and revenue ledger (D1).
+				Midnight ledger · 315 Pipeline (leads) and Revenue Ledger (D1).
 			</p>
 
 			<section className="mt-10">
 				<h2 className="font-[family-name:var(--font-fraunces)] text-xl font-semibold text-white">
-					Leads Pipeline
+					315 Pipeline
 				</h2>
 				<div className="text-bubble is-bordered mt-4 overflow-x-auto">
 					<table className="w-full border-collapse text-left text-sm font-[family-name:var(--font-inter)] text-white/90">

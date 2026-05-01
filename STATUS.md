@@ -6,9 +6,13 @@
 
 - `packages/shared` Drizzle schema: `leads` + `transactions`; D1 binding name `DB` (`apps/api/wrangler.json`, `apps/web/wrangler.json` + `wrangler.worker.json`). API: `setLedgerDb` + `tryInsertLead` / `tryInsertTransaction` in `packages/shared/src/lib/d1Leads.ts`. `POST /api/audit` and `POST /api/lead-email` insert after validation; Stripe thin webhook writes transactions + sets lead status `Provisioning`. Scaffolded `apps/admin` (ledger tables). Web `next.config.ts`: `output: "standalone"` so OpenNext finds `pages-manifest.json`.
 
+## ANTHONY. identity pivot (2026-05-01)
+
+- Marketing hero + primary CTAs (`btnPrimary` Inter uppercase), Spanish `/es` headline, checkout provisioning copy, JSON-LD “The Vault by ANTHONY.” (replaces prior CRM product naming in structured data). Admin ledger UI retitled **The Vault** with **315 Pipeline** / **Revenue Ledger** on absolute black. CSP variable rename only (`CRM_CONSOLE_ORIGIN`); lead-ingest host unchanged.
+
 ## Playwright ironclad + security audit specs (2026-05-01)
 
-- Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).
+- Added `playwright/ironclad-audit.spec.ts` (375px crawl, Founding Partner section, primary vs outline CTA hierarchy, mobile nav ARIA) and `playwright/security-zap-audit.spec.ts` (form fuzz, response headers, cookie consent).
 - Fixed Playwright route list import via `playwright/lib/marketing-paths.ts`; root `tsconfig.json` maps `@/*` for Playwright TS resolution.
 - Corrected `playwright.config.ts` webServer to use `bun run --cwd apps/web` and `PORT=` for `next start`.
 - Header forensic still flags missing `Content-Security-Policy` on local `next start` (CSP lives in `static-headers.json` / edge, not `next.config.ts` response headers).

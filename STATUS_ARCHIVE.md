@@ -208,7 +208,7 @@ Before adding a store, ensure:
 - **Contact embed:** Contact page shell no longer uses `reveal-up` (avoids invisible form until IO). `.surface-card--contact-embed` + section/footer use `overflow: visible` so Freshworks iframe is not clipped; `AuditForm` mounts Freshworks `form.js` into `#freshworks-contact-form` via DOM (not Next `Script`) so the vendor script targets the correct node; loading + timeout fallback with mailto + Calendly.
 - **Quick rail drawer:** Desktop left rail is a fixed slide-out panel (default closed) with an edge tab and close control; open state persisted in `localStorage` (`dba_quick_rail_open`). Replaces the always-visible sticky column.
 
-## Marketing lead-email bridge — interim Resend handler until VertaFlow CRM tenant is live (2026-04-22)
+## Marketing lead-email bridge — interim Resend handler until The Vault tenant is live (2026-04-22)
 ## Pre-Netlify migration archive (superseded)
 
 Detailed STATUS entries before **2026-04-26** described an older **multi-app + Turborepo** layout (`apps/marketing`, `apps/lighthouse`, `apps/web-viewer`, `packages/*`), **Astro** marketing, and **Vercel** multi-project routing. That tree is **not** present in this repository anymore.
@@ -302,7 +302,7 @@ Detailed STATUS entries before **2026-04-26** described an older **multi-app + T
 
 - Applied SSRF hardening:
   - Added outbound URL safety checks in `src/lighthouse/lib/http.ts` (protocol + private-host blocking, with `ALLOW_PRIVATE_EGRESS=true` escape hatch for trusted internal workflows).
-  - Restricted browser-side lead endpoint resolution in `src/scripts/audit-forms.ts` to trusted `/api/` targets (same-origin or `admin.vertaflow.io`), with safe fallback.
+  - Restricted browser-side lead endpoint resolution in `src/scripts/audit-forms.ts` to trusted `/api/` targets (same-origin or the managed admin host at `admin.vertaflow.io`), with safe fallback.
   - Added ZAP helper safeguards in `playwright/helpers/zap-crawl.ts` to block untrusted proxy hosts and unapproved spider targets by default.
 - Reduced SAST null-assertion findings by removing unsafe non-null assertions in report/contact/email/index utility paths.
 - Added explicit semgrep suppressions for known-safe dynamic file path/regex usage in local maintenance scripts:

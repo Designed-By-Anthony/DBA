@@ -6,6 +6,7 @@ import { showcaseFeaturedItems } from "@/data/showcase";
 import {
 	btnOutline,
 	btnPrimary,
+	btnPrimaryAudit,
 	btnSecondaryProof,
 } from "@/design-system/buttons";
 import {
@@ -79,17 +80,33 @@ export function HomePage() {
 								plan
 							</span>
 						</div>
-						<h1 data-hero-h1>
-							Strategic web design for service businesses that demand measurable
-							growth and lasting market presence.
+						<h1
+							data-hero-h1
+							className="home-hero-title font-[family-name:var(--font-inter)] font-normal tracking-[-0.02em]"
+						>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold">
+								Software
+							</span>{" "}
+							<span className="font-[family-name:var(--font-inter)] font-normal">
+								is built by machines.{" "}
+							</span>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold">
+								Infrastructure
+							</span>{" "}
+							<span className="font-[family-name:var(--font-inter)] font-normal">
+								is designed by{" "}
+							</span>
+							<span className="font-[family-name:var(--font-fraunces)] font-bold whitespace-nowrap">
+								ANTHONY
+								<span className="text-[rgb(var(--accent-bronze-rgb))]">.</span>
+							</span>
 						</h1>
-						<p data-hero-sub>
-							Enterprise-grade websites for contractors, home-service
-							professionals, medical aesthetics, salons, and scaling businesses
-							throughout Utica, Rome, Syracuse, and Central New York.
-							Performance-optimized architecture, conversion-focused design, and
-							SEO infrastructure that positions you at the top of local search
-							results.
+						<p
+							data-hero-sub
+							className="font-[family-name:var(--font-inter)] font-normal"
+						>
+							High-performance digital architecture for businesses that have
+							outgrown their &apos;web guy.&apos; Engineered in the 315.
 						</p>
 						<p className="hero-pricing-anchor">
 							Standard engagements:{" "}
@@ -107,7 +124,7 @@ export function HomePage() {
 						<div className="hero-actions">
 							<Link
 								href="/lighthouse"
-								className={`${btnPrimary} hero-cta-glow`}
+								className={`${btnPrimaryAudit} hero-cta-glow`}
 								id="hero-audit-btn"
 							>
 								<span className="hero-cta-glow-halo" aria-hidden="true" />
@@ -239,8 +256,8 @@ export function HomePage() {
 							<Link href="/contact" className={btnOutline}>
 								Open contact form
 							</Link>
-							<Link href="/lighthouse" className={btnPrimary}>
-								Or run a free site audit
+							<Link href="/contact" className={btnPrimary}>
+								Let&apos;s build something great.
 							</Link>
 						</div>
 					</div>
@@ -456,10 +473,8 @@ export function HomePage() {
     if (variantKey && heroVariants && heroVariants[variantKey]) {
       var variant = heroVariants[variantKey];
       var eyebrow = document.querySelector('[data-hero-eyebrow]');
-      var h1 = document.querySelector('[data-hero-h1]');
       var sub = document.querySelector('[data-hero-sub]');
       if (eyebrow && variant.eyebrow) eyebrow.textContent = variant.eyebrow;
-      if (h1 && variant.h1) h1.textContent = variant.h1;
       if (sub && variant.sub) sub.textContent = variant.sub;
       document.documentElement.setAttribute('data-hero-variant', variantKey);
     }
