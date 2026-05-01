@@ -536,6 +536,13 @@ li {
 	text-underline-offset: 0.25em;
 }
 
+.site-chrome-sticky {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	box-shadow: 0 12px 32px rgba(3, 7, 18, 0.34);
+}
+
 .dba-header {
 	position: sticky;
 	top: 0;
