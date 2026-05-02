@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import type { ReactNode } from "react";
-import { ClerkProvider } from "@clerk/nextjs";
+
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,15 +32,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <html
-        lang="en"
-        className={`${inter.variable} ${fraunces.variable} bg-black text-white`}
-      >
-        <body className="min-h-screen bg-[#000000] antialiased">{children}</body>
-      </html>
-    </ClerkProvider>
-  );
+  return ;
 }
 
