@@ -40,7 +40,7 @@ jobs:
         run: bun run build --filter=@dba/web
       - name: Deploy to Cloudflare Workers
         working-directory: apps/web
-        run: bunx wrangler deploy -c wrangler.worker.json
+        run: bunx wrangler deploy
 
   deploy-admin:
     name: Deploy @dba/admin
@@ -63,4 +63,4 @@ jobs:
         run: bun run build --filter=@dba/admin
       - name: Deploy to Cloudflare Workers
         working-directory: apps/admin
-        run: bunx wrangler deploy -c wrangler.worker.json
+        run: bunx wrangler deploy
