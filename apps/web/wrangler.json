@@ -9,13 +9,20 @@
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "dba-ledger",
-			"database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
-		}
-	],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dba-ledger",
+      "database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_CACHE",
+      "id": "72f85b0a2e284e7c890815e77bc0982a",
+      "preview_id": "YOUR_PREVIEW_KV_NAMESPACE_ID_HERE"
+    }
+  ],
 	"routes": [
 		{ "pattern": "designedbyanthony.com", "custom_domain": true },
 		{ "pattern": "www.designedbyanthony.com", "custom_domain": true }

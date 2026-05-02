@@ -16,6 +16,12 @@
       "database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_CACHE",
+      "id": "72f85b0a2e284e7c890815e77bc0982a",
+    }
+  ],
   "routes": [
     { "pattern": "admin.designedbyanthony.com", "custom_domain": true }
   ]
