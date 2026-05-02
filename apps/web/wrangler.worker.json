@@ -15,5 +15,9 @@
 			"database_name": "dba-ledger",
 			"database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
 		}
+	],
+	"routes": [
+		{ "pattern": "designedbyanthony.com", "custom_domain": true },
+		{ "pattern": "www.designedbyanthony.com", "custom_domain": true }
 	]
 }
