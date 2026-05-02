@@ -1,4 +1,4 @@
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 import { api } from "../../../lib/api";
 import { type Lead, type Transaction } from "@dba/shared/db/schema";

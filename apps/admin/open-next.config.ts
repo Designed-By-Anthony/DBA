@@ -5,5 +5,5 @@ import {
 
 export default {
   ...defineCloudflareConfig(),
-  buildCommand: "next build",
+  buildCommand: "next build --webpack",
 } satisfies OpenNextConfig;

@@ -1,15 +1,13 @@
 {
-	"name": "designedbyanthony",
-	"pages_build_output_dir": "apps/web/.open-next",
-	"compatibility_date": "2025-04-01",
-	"compatibility_flags": [
-	  "nodejs_compat"
-	],
-	"d1_databases": [
-	  {
-		"binding": "DB",
-		"database_name": "dba-ledger",
-		"database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
-	  }
-	]
-  }
+  "name": "designedbyanthony",
+  "pages_build_output_dir": "apps/web/.vercel/output/static",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dba-ledger",
+      "database_id": "961ce211-2843-4ed7-a609-9ab224f7eb8a"
+    }
+  ]
+}

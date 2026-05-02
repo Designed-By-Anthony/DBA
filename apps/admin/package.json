@@ -9,8 +9,9 @@
   },
   "scripts": {
     "dev": "next dev --port 3010",
-    "build": "opennextjs-cloudflare build",
-    "build:pages": "opennextjs-cloudflare build && cp -RL .open-next/assets .open-next/assets_flat && rm -rf .open-next/assets && mv .open-next/assets_flat .open-next/assets",
+    "build": "bun run build:pages",
+    "build:worker": "opennextjs-cloudflare build",
+    "build:pages": "bun run build:worker && bun build/prepare-pages-bundle.mjs && rm -rf .vercel/output/static_flat && mkdir -p .vercel/output/static_flat && cp -RL .vercel/output/static/. .vercel/output/static_flat && rm -rf .vercel/output/static && mv .vercel/output/static_flat .vercel/output/static",
     "start": "next start --port 3010",
     "typecheck": "tsc --noEmit"
   },

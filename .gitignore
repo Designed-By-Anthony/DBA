@@ -28,6 +28,10 @@ apps/web/.open-next/
 apps/web/.pages-output/
 apps/web/.vercel/
 apps/web/.dev.vars
+apps/admin/.open-next/
+apps/admin/.vercel/
+apps/admin/.next/
+apps/admin/.dev.vars
 .dev.vars
 
 # Removed app; delete locally if present (some installs had root-owned node_modules):
