@@ -32,6 +32,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return ;
+  return (
+    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+      <body className="bg-[#0a0a0a] text-white antialiased">{children}</body>
+    </html>
+  );
 }
 
