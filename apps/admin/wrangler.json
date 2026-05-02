@@ -1,7 +1,11 @@
 {
   "name": "dba-admin",
-  "pages_build_output_dir": ".open-next/assets",
+  "pages_build_output_dir": "apps/admin/.open-next/assets",
   "compatibility_date": "2025-04-01",
+  "build": {
+    "command": "bun install && bun run build --filter=@dba/admin",
+    "watch_dir": "apps/admin"
+  },
   "d1_databases": [
     {
       "binding": "DB",
