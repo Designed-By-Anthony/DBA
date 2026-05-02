@@ -1,6 +1,0 @@
-{
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "designed-by-anthony",
-	"compatibility_date": "2025-04-01",
-	"compatibility_flags": ["nodejs_compat"]
-}
