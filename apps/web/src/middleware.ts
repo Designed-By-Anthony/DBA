@@ -182,5 +182,5 @@ Custom websites for contractors, home-service pros, medspas, salons, boutiques, 
 }
 
 export const config = {
-	matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+	matcher: ["/((?!_next/static|_next/image|favicon.ico|locations).*)"],
 };

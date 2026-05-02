@@ -2,6 +2,12 @@
   "name": "dba-admin",
   "pages_build_output_dir": ".open-next/assets",
   "compatibility_date": "2025-04-01",
+  "routes": [
+    {
+      "pattern": "admin.designedbyanthony.com",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
