@@ -1,6 +1,6 @@
 {
 	"name": "designedbyanthony",
-  "pages_build_output_dir": "apps/web/.next",
+  "pages_build_output_dir": "apps/web/.open-next/assets",
   "compatibility_date": "2025-04-01",
 	"build": {
 	  "command": "bun install && bun run build --filter=@dba/web",
