@@ -40,6 +40,8 @@
 		"turbo": "^2.9.6"
 	},
 	"dependencies": {
-		"@marsidev/react-turnstile": "^1.5.1"
+		"@marsidev/react-turnstile": "^1.5.1",
+		"framer-motion": "^12.38.0",
+		"gsap": "^3.15.0"
 	}
 }

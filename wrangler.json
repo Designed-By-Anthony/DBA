@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "designed-by-anthony",
-	"pages_build_output_dir": "apps/web/.vercel/output/static",
+	"pages_build_output_dir": "apps/web/.next",
 	"compatibility_date": "2025-04-01",
 	"compatibility_flags": ["nodejs_compat"]
 }
