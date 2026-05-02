@@ -18,8 +18,8 @@
   ],
   "kv_namespaces": [
     {
-      "binding": "NEXT_CACHE",
-      "id": "72f85b0a2e284e7c890815e77bc0982a",
+      "binding": "NEXT_CACHE_WORKERS_KV",
+      "id": "860a4c60147a484a995ed207af8094de"
     }
   ],
   "routes": [

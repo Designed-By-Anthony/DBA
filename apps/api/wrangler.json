@@ -11,12 +11,12 @@
 			"custom_domain": true
 		}
 	],
-	"kv_namespaces": [
-		{
-			"binding": "AUDIT_REPORTS_KV",
-			"id": "PLACEHOLDER_REPLACE_IN_CLOUDFLARE_DASHBOARD"
-		}
-	],
+  "kv_namespaces": [
+    {
+      "binding": "AUDIT_REPORTS_KV",
+      "id": "48827a794a8b4ccc8b0dc3dbca8c80ec"
+    }
+  ],
 	"d1_databases": [
 		{
 			"binding": "DB",
