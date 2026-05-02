@@ -7,17 +7,39 @@ import { btnOutline, btnPrimary } from "@/design-system/buttons";
 
 export const revalidate = 86400;
 
+interface SeoMetadata {
+  title: string;
+  description: string;
+  keywords?: string;
+}
+
+async function fetchLocationMetadata(slug: string): Promise<SeoMetadata | null> {
+  try {
+    const response = await fetch(
+      `https://api.designedbyanthony.com/api/seo/metadata?page_url=/locations/${encodeURIComponent(slug)}`,
+      { next: { revalidate: 86400 } },
+    );
+    if (!response.ok) return null;
+    const data = await response.json() as Record<string, unknown>;
+    if (typeof data.title !== "string" || !data.title) return null;
+    return {
+      title: data.title,
+      description: typeof data.description === "string" ? data.description : "",
+      keywords: typeof data.keywords === "string" ? data.keywords : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  
-  // Fetch SEO metadata from D1 based on the slug
-  const response = await fetch(`https://api.designedbyanthony.com/api/seo/metadata?page_url=/locations/${slug}`);
-  const metadata = await response.json();
-  
+  const metadata = await fetchLocationMetadata(slug);
+
   if (!metadata) {
     return { title: "Not found" };
   }
-  
+
   return {
     title: metadata.title,
     description: metadata.description,
@@ -33,15 +55,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function LocationPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
-  // Fetch SEO metadata from D1 based on the slug
-  const response = await fetch(`https://api.designedbyanthony.com/api/seo/metadata?page_url=/locations/${slug}`);
-  const metadata = await response.json();
-  
+  const metadata = await fetchLocationMetadata(slug);
+
   if (!metadata) {
     notFound();
   }
-  
+
   return (
     <MarketingChrome footerCta={homeFooterCta}>
       <section className="section-shell section-shell--wash marketing-page-hero">

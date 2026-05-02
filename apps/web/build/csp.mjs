@@ -25,30 +25,34 @@ const LIGHTHOUSE_SUBDOMAIN_ORIGIN = "https://lighthouse.designedbyanthony.com";
 
 /** GA4 + Google web fonts loader; no data:/unsafe-eval (report-only probe). */
 const REPORT_ONLY_SCRIPT_SRC = [
-	"'self'",
-	"'unsafe-inline'",
-	"https://www.googletagmanager.com",
-	"https://*.google-analytics.com",
-	"https://*.googletagmanager.com",
-	"https://www.google.com",
-	"https://www.gstatic.com",
+"'self'",
+"'unsafe-inline'",
+"https://www.googletagmanager.com",
+"https://*.google-analytics.com",
+"https://*.googletagmanager.com",
+"https://www.google.com",
+"https://www.gstatic.com",
+"https://client.crisp.chat",
+"https://settings.crisp.chat",
+"https://js.stripe.com",
 ].join(" ");
 
 /**
  * Enforcing script-src: same tag surface + data:/unsafe-eval for Next client bundles.
  */
 const SCRIPT_SRC_ENFORCING = [
-	"'self'",
-	"data:",
-	"'unsafe-inline'",
-	"'unsafe-eval'",
-	"https://www.googletagmanager.com",
-	"https://*.google-analytics.com",
-	"https://*.googletagmanager.com",
-	"https://www.google.com",
-	"https://www.gstatic.com",
-	"https://client.crisp.chat",
-	"https://settings.crisp.chat",
+"'self'",
+"data:",
+"'unsafe-inline'",
+"'unsafe-eval'",
+"https://www.googletagmanager.com",
+"https://*.google-analytics.com",
+"https://*.googletagmanager.com",
+"https://www.google.com",
+"https://www.gstatic.com",
+"https://client.crisp.chat",
+"https://settings.crisp.chat",
+"https://js.stripe.com",
 ].join(" ");
 
 const DIRECTIVES = {
@@ -60,25 +64,26 @@ const DIRECTIVES = {
 		"'self' data: https://fonts.gstatic.com https://client.crisp.chat",
 	"img-src":
 		"'self' data: https: blob: https://s3.amazonaws.com https://image.crisp.chat https://client.crisp.chat https://storage.crisp.chat",
-	"connect-src": [
-		"'self'",
-		"https://*.google-analytics.com",
-		"https://*.analytics.google.com",
-		"https://*.googletagmanager.com",
-		"https://*.google.com",
-		"https://designedbyanthony.com",
-		"https://www.google.com",
-		"https://www.gstatic.com",
-		"https://*.googleapis.com",
-		DBA_API_ORIGIN,
-		LIGHTHOUSE_AUDIT_API_ORIGIN,
-		LIGHTHOUSE_SUBDOMAIN_ORIGIN,
-		...CLERK_AUTH_ORIGINS,
-		/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
-		"https://*.crisp.chat",
-		"wss://*.relay.crisp.chat",
-		"wss://*.relay.rescue.crisp.chat",
-	].join(" "),
+"connect-src": [
+"'self'",
+"https://*.google-analytics.com",
+"https://*.analytics.google.com",
+"https://*.googletagmanager.com",
+"https://*.google.com",
+"https://designedbyanthony.com",
+"https://www.google.com",
+"https://www.gstatic.com",
+"https://*.googleapis.com",
+"https://*.doubleclick.net",
+DBA_API_ORIGIN,
+LIGHTHOUSE_AUDIT_API_ORIGIN,
+LIGHTHOUSE_SUBDOMAIN_ORIGIN,
+...CLERK_AUTH_ORIGINS,
+/** Crisp Chat — wildcards match current + fallback relay hosts (Crisp CSP guide, Dec 2024). */
+"https://*.crisp.chat",
+"wss://*.relay.crisp.chat",
+"wss://*.relay.rescue.crisp.chat",
+].join(" "),
 	"frame-src": [
 		"'self'",
 		"https://www.google.com",

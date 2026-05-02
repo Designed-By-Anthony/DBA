@@ -1,9 +1,0 @@
-{
-	"$schema": "../../apps/web/node_modules/wrangler/config-schema.json",
-	"name": "dba-edge-seo-proxy",
-	"main": "src/index.ts",
-	"compatibility_date": "2025-06-01",
-	"vars": {
-		"ORIGIN_URL": "https://designedbyanthony.com"
-	}
-}

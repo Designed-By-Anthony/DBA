@@ -14,28 +14,31 @@ import { reportEmailRoute } from "./routes/reportEmail";
 import { reportPdfRoute } from "./routes/reportPdf";
 import { testEmailsRoute } from "./routes/testEmails";
 import { leadsRoute } from "./routes/leads";
+import { webhooks } from "./routes/webhooks";
 
 // Mock the Cloudflare Workers environment for non-Worker environments
 const env = typeof process !== "undefined" && process.env ? process.env : {
-	AUDIT_REPORTS_KV: undefined,
-	DB: undefined,
+AUDIT_REPORTS_KV: undefined,
+DB: undefined,
 };
 
 const workerBindings = env as unknown as {
-	AUDIT_REPORTS_KV?: any;
-	DB?: any;
+AUDIT_REPORTS_KV?: unknown;
+DB?: unknown;
 };
 
 const kvBinding = workerBindings.AUDIT_REPORTS_KV;
 if (kvBinding) {
-	setReportKV(kvBinding);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+setReportKV(kvBinding as any);
 }
 
 // Wire the D1 binding so route handlers can insert leads without carrying
 // the binding through every function signature.
 const d1Binding = workerBindings.DB;
 if (d1Binding) {
-	setLedgerDb(createD1Client(d1Binding));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+setLedgerDb(createD1Client(d1Binding as any));
 }
 
 const app = new Elysia({ adapter: CloudflareAdapter })
@@ -72,7 +75,7 @@ const app = new Elysia({ adapter: CloudflareAdapter })
   .use(reportEmailRoute)
   .use(reportPdfRoute)
   .use(testEmailsRoute)
-	.use(programmaticSeoRoute)
+  .use(webhooks)
 	// This is required to make Elysia work on Cloudflare Worker
 	.compile();
 

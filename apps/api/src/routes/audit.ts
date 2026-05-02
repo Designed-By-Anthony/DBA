@@ -670,8 +670,7 @@ export const auditRoute = new Elysia({ aot: false }).post(
 								sendViaGmail(email, subject, emailHtml)
 									.then(() => {
 										if (process.env.NODE_ENV === "development") {
-											console.info(`Email receipt dispatched for ${reportId}`);
-										}
+																					}
 									})
 									.catch((err) =>
 										console.error(
